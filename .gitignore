@@ -1,5 +1,7 @@
 .vs
-Visui/bin
-Visui/obj
-Main/bin
-Main/obj
+bin
+obj
+lib
+project/Mycena/bin
+project/Mycena/obj
+project/Irseny.userprefs
