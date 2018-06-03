@@ -43,11 +43,17 @@ namespace Mycena {
 		public bool AllowRegister { get; protected set; }
 		public bool AllowChildren { get; protected set; }
 		public bool IsContainer { get; protected set; }
+		public abstract string ClassName { get; }
 		protected ISet<string> CreationProperties { get; private set; }
 		protected ISet<string> PackProperties { get; private set; }
 		protected IDictionary<string, PropertyApplicationHandler<T>> ModProperties { get; private set; }
-		public abstract string ClassName { get; }
 
+		/// <summary>
+		/// Sets the visibility of the given <see cref="Gtk.Widget"/> 
+		/// </summary>
+		/// <returns><c>true</c>, if operation was successful, <c>false</c> otherwise.</returns>
+		/// <param name="widget">Widget to modify.</param>
+		/// <param name="text">Property value.</param>
 		private static bool SetVisibility(Gtk.Widget widget, string text) {
 			try {
 				bool visible = TextParseTools.ParseBool(text);
@@ -57,6 +63,12 @@ namespace Mycena {
 				return false;
 			}
 		}
+		/// <summary>
+		/// Sets whether the given <see cref="Gtk.Widget/> can be focused.
+		/// </summary>
+		/// <returns><c>true</c>, if the operation was successful, <c>false</c> otherwise.</returns>
+		/// <param name="widget">Widget to modify.</param>
+		/// <param name="text">Property value.</param>
 		private static bool SetFocusable(Gtk.Widget widget, string text) {
 			try {
 				bool focusable = TextParseTools.ParseBool(text);
@@ -131,6 +143,11 @@ namespace Mycena {
 			}
 			return widget;
 		}
+		/// <summary>
+		/// Checks whether the given class name corresponds to the class identifer of this instance.
+		/// </summary>
+		/// <returns><c>true</c>, if the names correspond or the class identifer is null, <c>false</c> otherwise.</returns>
+		/// <param name="name">Class name to compare.</param>
 		private bool CheckClassName(string name) {
 			if (ClassName != null) {
 				return ClassName.Equals(name);
@@ -138,6 +155,11 @@ namespace Mycena {
 				return true;
 			}
 		}
+		/// <summary>
+		/// Creates a widget with the given properties.
+		/// </summary>
+		/// <returns>The widget created.</returns>
+		/// <param name="properties">Properties for instantiation.</param>
 		protected abstract T CreateWidget(IDictionary<string, string> properties);
 
 	}

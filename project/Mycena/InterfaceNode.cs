@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 
 namespace Mycena {
-	public class InterfaceRoot : IInterfaceRoot, IWidgetRegister {
+	public class InterfaceNode : IInterfaceNode, IWidgetRegister {
 
 		Dictionary<string, Gtk.Widget> widgets = new Dictionary<string, Gtk.Widget>();
 
-
-		public InterfaceRoot() {
-			RootWidget = null;
-
+		/// <summary>
+		/// Initializes an empty instance of the <see cref="Mycena.InterfaceNode"/> class.
+		/// </summary>
+		public InterfaceNode() {
 		}
-		public Gtk.Widget RootWidget { get; private set; }
 
 		public Gtk.Widget this[string name] {
 			get { return GetWidget(name); }

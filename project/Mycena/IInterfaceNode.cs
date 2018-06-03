@@ -1,7 +1,9 @@
 ﻿using System;
 
 namespace Mycena {
-	public interface IInterfaceRoot : IDisposable {
+	
+
+	public interface IInterfaceNode : IDisposable {
 		/// <summary>
 		/// Gets the <see cref="Gtk.Widget"/> with the specified name.
 		/// </summary>
@@ -53,5 +55,7 @@ namespace Mycena {
 		/// <typeparam name="T">Widget type.</typeparam>
 		bool TryGetWidget<T>(string name, out T result) where T : Gtk.Widget;
 	}
+
+
 }
 

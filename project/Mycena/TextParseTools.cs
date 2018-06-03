@@ -2,9 +2,13 @@
 
 namespace Mycena {
 	internal static class TextParseTools {
+		/// <summary>
+		/// Reads a boolean value from the given string.
+		/// </summary>
+		/// <returns><c>true</c>, if given value evaluates to "True", <c>false</c> otherwise.</returns>
+		/// <param name="text">String to read from.</param>
 		public static bool ParseBool(string text) {
 			text = text.Trim();
-
 			if (text.Length > 0) {
 				int intValue;
 				if (int.TryParse(text, out intValue)) {
@@ -28,6 +32,11 @@ namespace Mycena {
 				return false;
 			}
 		}
+		/// <summary>
+		/// Reads an integer from the given string.
+		/// </summary>
+		/// <returns>The integer read.</returns>
+		/// <param name="text">String to read from.</param>
 		public static int ParseInt(string text) {
 			text = text.Trim();
 			if (text.Length > 0) {

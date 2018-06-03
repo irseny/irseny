@@ -3,15 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycena", "Mycena\Mycena.csproj", "{D238C375-B51C-45B7-8236-695FE5128F01}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny", "Irseny\Irseny.csproj", "{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Linux Debug|Any CPU = Linux Debug|Any CPU
-		Invalid|Any CPU = Invalid|Any CPU
+		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D238C375-B51C-45B7-8236-695FE5128F01}.Invalid|Any CPU.ActiveCfg = Invalid|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.Invalid|Any CPU.Build.0 = Invalid|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.Linux Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.Linux Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D238C375-B51C-45B7-8236-695FE5128F01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D238C375-B51C-45B7-8236-695FE5128F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal
