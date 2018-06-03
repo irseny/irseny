@@ -22,7 +22,7 @@ namespace Mycena {
 		/// Gets a value indicating whether to create child widgets.
 		/// </summary>
 		/// <value><c>true</c> if child creation is enabled; otherwise, <c>false</c>.</value>
-		bool AllowChildren { get; }
+		bool PackChildren { get; }
 		/// <summary>
 		/// Creates the widget defined by the given <see cref="System.Xml.XmlNode"/>  alongside its children.
 		/// </summary>

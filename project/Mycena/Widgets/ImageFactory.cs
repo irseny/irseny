@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
@@ -12,18 +13,18 @@ namespace Mycena {
 		public override string ClassName {
 			get { return "GtkImage"; }
 		}
-		protected override Gtk.Image CreateWidget(IDictionary<string, string> properties) {
-			string stock;
+		protected override Gtk.Image CreateWidget(IDictionary<string, XmlNode> properties) {
+			XmlNode stock;
 			if (properties.TryGetValue(StockPropertyName, out stock)) {
-				if (stock.Equals(MissingImageText)) {
-					return new Gtk.Image(stock, Gtk.IconSize.Invalid);
+				if (stock.InnerText.Equals(MissingImageText)) {
+					return new Gtk.Image(stock.InnerText, Gtk.IconSize.Invalid);
 				} else {
-					return new Gtk.Image(stock, Gtk.IconSize.Button);
+					return new Gtk.Image(stock.InnerText, Gtk.IconSize.Button);
 				}
 			}
 			return new Gtk.Image();
 		}
-		protected override void PackWidget(Gtk.Image container, Gtk.Widget child, IDictionary<string, string> properties) {
+		protected override void PackWidget(Gtk.Image container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
 			throw new NotSupportedException(ClassName + " can not pack widgets");
 		}
 	}

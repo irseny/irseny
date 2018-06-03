@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
@@ -9,10 +10,10 @@ namespace Mycena {
 		public override string ClassName {
 			get { return "GtkWindow"; }
 		}
-		protected override Gtk.Window CreateWidget(IDictionary<string, string> properties) {
+		protected override Gtk.Window CreateWidget(IDictionary<string, XmlNode> properties) {
 			return new Gtk.Window(Gtk.WindowType.Toplevel);
 		}
-		protected override void PackWidget(Gtk.Window container, Gtk.Widget child, IDictionary<string, string> properties) {
+		protected override void PackWidget(Gtk.Window container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
 			container.Add(child);
 		}
 	}
