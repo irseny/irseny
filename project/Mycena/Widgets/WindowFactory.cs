@@ -12,6 +12,9 @@ namespace Mycena {
 		protected override Gtk.Window CreateWidget(IDictionary<string, string> properties) {
 			return new Gtk.Window(Gtk.WindowType.Toplevel);
 		}
+		protected override void PackWidget(Gtk.Window container, Gtk.Widget child, IDictionary<string, string> properties) {
+			container.Add(child);
+		}
 	}
 }
 

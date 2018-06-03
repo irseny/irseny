@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using System.Collections.Generic;
 
@@ -39,8 +40,14 @@ namespace Mycena {
 		/// <param name="filePath">Path to glade file.</param>
 		public static InterfaceFactory CreateFromFile(string filePath) {
 			if (filePath == null) throw new ArgumentNullException("filePath");
+			var settings = new XmlReaderSettings();
+			settings.IgnoreComments = true;
 			var doc = new XmlDocument();
-			doc.Load(filePath);
+			using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
+				using (var reader = XmlReader.Create(stream, settings)) {
+					doc.Load(reader);
+				}
+			}
 			return new InterfaceFactory(doc);
 		}
 	}

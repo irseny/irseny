@@ -37,17 +37,18 @@ namespace Mycena {
 		/// Creates the widget defined by the given node alongside its children.
 		/// </summary>
 		/// <param name="rootNode">Node to create the root widget from.</param>
-		/// <param name="result">Widget container.</param>
-		private static void CreateWidget(XmlNode rootNode, IWidgetRegister result) {
+		/// <param name="target">Widget container.</param>
+		/// <returns>The created widget.</returns>
+		public static Gtk.Widget CreateWidget(XmlNode rootNode, IWidgetRegister target) {
 			if (rootNode == null) throw new ArgumentNullException("rootNode");
-			if (result == null) throw new ArgumentNullException("result");
+			if (target == null) throw new ArgumentNullException("result");
 			var classAttr = rootNode.Attributes[ObjectClassAttribute];
 			if (classAttr == null) {
 				throw new ArgumentException("rootNode: missing class name attribute (" + rootNode + ")");
 			}
 			IWidgetFactory factory;
 			if (widgets.TryGetValue(classAttr.Value, out factory)) {
-				factory.CreateWidget(rootNode, result);
+				return factory.CreateWidget(rootNode, target);
 			} else {
 				throw new NotSupportedException(string.Format("unknown class name {0} ({1})", classAttr.Value, rootNode));
 			}

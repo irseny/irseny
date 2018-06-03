@@ -23,6 +23,9 @@ namespace Mycena {
 			}
 			return new Gtk.Image();
 		}
+		protected override void PackWidget(Gtk.Image container, Gtk.Widget child, IDictionary<string, string> properties) {
+			throw new NotSupportedException(ClassName + " can not pack widgets");
+		}
 	}
 }
 
