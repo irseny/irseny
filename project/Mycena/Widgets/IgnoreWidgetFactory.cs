@@ -14,9 +14,6 @@ namespace Mycena {
 		protected override Gtk.Widget CreateWidget(IDictionary<string, XmlNode> properties) {
 			return null;
 		}
-		protected override void PackWidget(Gtk.Widget container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
-			throw new NotSupportedException(ClassName + " can not pack widgets.");
-		}
 	}
 }
 

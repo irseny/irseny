@@ -136,14 +136,15 @@ namespace Mycena {
 								}
 							}
 						}
-						if (child == null) {
-							throw new KeyNotFoundException("Missing object in child node: " + childNode);
+						if (child != null) { // child node may be empty (actuallly contains placeholder)
+							if (missingPackProperties.Count > 0) {
+								throw new KeyNotFoundException(
+									string.Format("Missing packing properties ({0}) for child node: {1}", CreatePropertyList(missingPackProperties), childNode));
+							}
+							if (!PackWidget(widget, child, packProperties)) {
+								throw new InvalidOperationException("Unable to pack widget: " + childNode);
+							}
 						}
-						if (missingPackProperties.Count > 0) {
-							throw new KeyNotFoundException(
-								string.Format("Missing packing properties ({0}) for child node: {1}", CreatePropertyList(missingPackProperties), childNode));
-						}
-						PackWidget(widget, child, packProperties);
 
 					}
 				}
@@ -159,10 +160,13 @@ namespace Mycena {
 		/// <summary>
 		/// Packs the given child in the container widget.
 		/// </summary>
+		/// <returns><c>true</c>, if packing was successful, <c>false</c> otherwise.</returns>
 		/// <param name="container">Container to place the child in.</param>
 		/// <param name="child">Child widget to place in the container.</param>
 		/// <param name="properties">Packing properties.</param>
-		protected abstract void PackWidget(T container, Gtk.Widget child, IDictionary<string, XmlNode> properties);
+		protected virtual bool PackWidget(T container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
+			throw new InvalidOperationException(ClassName + " can not pack widgets");
+		}
 		/// <summary>
 		/// Indicates whether the available properties contain all required properties.
 		/// </summary>

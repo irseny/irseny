@@ -14,6 +14,10 @@ namespace Mycena {
 			widgets.Add("GtkEntryBuffer", new IgnoreWidgetFactory());
 			widgets.Add("GtkImage", new ImageFactory());
 			widgets.Add("GtkWindow", new WindowFactory());
+			widgets.Add("GtkHBox", new HorizontalBoxFactory());
+			widgets.Add("GtkVBox", new VerticalBoxFactory());
+			widgets.Add("GtkHPaned", new HorizontalPanedFactory());
+			widgets.Add("GtkVPaned", new VerticalPanedFactory());
 		}
 		/// <summary>
 		/// Creates the widget defined by the given node alongside its children.
@@ -39,7 +43,7 @@ namespace Mycena {
 		/// <param name="rootNode">Node to create the root widget from.</param>
 		/// <param name="target">Widget container.</param>
 		/// <returns>The created widget.</returns>
-		public static Gtk.Widget CreateWidget(XmlNode rootNode, IWidgetRegister target) {
+		public static Gtk.Widget CreateWidget(XmlNode rootNode, IInterfaceNode target) {
 			if (rootNode == null) throw new ArgumentNullException("rootNode");
 			if (target == null) throw new ArgumentNullException("result");
 			var classAttr = rootNode.Attributes[ObjectClassAttribute];
@@ -50,7 +54,7 @@ namespace Mycena {
 			if (widgets.TryGetValue(classAttr.Value, out factory)) {
 				return factory.CreateWidget(rootNode, target);
 			} else {
-				throw new NotSupportedException(string.Format("unknown class name {0} ({1})", classAttr.Value, rootNode));
+				throw new NotSupportedException(string.Format("Unknown class name: {0} ({1})", classAttr.Value, rootNode));
 			}
 		}
 

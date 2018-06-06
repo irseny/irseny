@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
-	public class InterfaceNode : IInterfaceNode, IWidgetRegister {
+	public class InterfaceNode : IInterfaceNode {
 
 		Dictionary<string, Gtk.Widget> widgets = new Dictionary<string, Gtk.Widget>();
+		//IDictionary<string, Dictionary<string, XmlNode>> packInfo = new Dictionary<string, Dictionary<string, XmlNode>>();
 
 		/// <summary>
 		/// Initializes an empty instance of the <see cref="Mycena.InterfaceNode"/> class.
@@ -66,12 +68,27 @@ namespace Mycena {
 				throw new ArgumentException("name: widget with this name does already exist");
 			}
 		}
+		/*public IDictionary<string, XmlNode> GetPackInfo(string name) {
+			if (name == null) throw new ArgumentNullException("name");
+			Dictionary<string, XmlNode> info;
+			if (packInfo.TryGetValue(name, out info)) {
+				return new Dictionary<string, XmlNode>(info);
+			} else {
+				return new Dictionary<string, XmlNode>();
+			}
+		}
+		public void StorePackInfo(string name, IDictionary<string, XmlNode> properties) {
+			if (name == null) throw new ArgumentNullException("name");
+			if (properties == null) throw new ArgumentNullException("properties");
+			packInfo[name] = new Dictionary<string, XmlNode>(properties);
+		}*/
 
 		public void Dispose() {
 			foreach (var widget in widgets.Values) {
 				widget.Dispose();
 			}
 			widgets.Clear();
+			//packInfo.Clear();
 		}
 
 

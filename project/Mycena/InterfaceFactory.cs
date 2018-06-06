@@ -28,7 +28,7 @@ namespace Mycena {
 		public IInterfaceNode CreateWidget(string id) {
 			if (id == null) throw new ArgumentNullException("id");
 			var rootNode = WidgetFactory.FindWidgetNode(Source.DocumentElement, id);
-			if (rootNode == null) throw new KeyNotFoundException("id");
+			if (rootNode == null) throw new KeyNotFoundException("id: " + id);
 			var result = WidgetFactory.CreateWidget(rootNode);
 			return result;
 		}

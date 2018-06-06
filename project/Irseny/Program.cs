@@ -21,15 +21,14 @@ namespace Irseny {
 			if (resourceFolder == null) {
 				throw new FileNotFoundException("resource folder not available");
 			}
-			string exampleFile = Path.Combine(resourceFolder, "gtk/example2.glade");
+			string exampleFile = Path.Combine(resourceFolder, "gtk/Main.glade");
 			var factory = Mycena.InterfaceFactory.CreateFromFile(exampleFile);
 			Gtk.Application.Init();
-			var container = factory.CreateWidget("window1");
-			var window = container.GetWidget<Gtk.Window>("window1");
+			var container = factory.CreateWidget("wn_Main");
+			var window = container.GetWidget<Gtk.Window>("wn_Main");
+			var imageLogSplitter = container.GetWidget<Gtk.Paned>("sp_ImageLog");
+			//imageLogSplitter.Add(new Gtk.Label("text"));
 			window.Resize(800, 600);
-
-			var l = new Gtk.Label("text");
-			window.Add(l);
 			window.ShowAll();
 			window.DeleteEvent += delegate {
 				Gtk.Application.Quit();

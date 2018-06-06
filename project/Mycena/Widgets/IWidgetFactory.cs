@@ -29,7 +29,7 @@ namespace Mycena {
 		/// <returns>The widget created.</returns>
 		/// <param name="rootNode">Node to create the widget from.</param>
 		/// <param name="target">Widget register.</param>
-		Gtk.Widget CreateWidget(System.Xml.XmlNode rootNode, IWidgetRegister target);
+		Gtk.Widget CreateWidget(System.Xml.XmlNode rootNode, IInterfaceNode target);
 	}
 }
 

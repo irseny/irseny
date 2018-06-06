@@ -13,8 +13,13 @@ namespace Mycena {
 		protected override Gtk.Window CreateWidget(IDictionary<string, XmlNode> properties) {
 			return new Gtk.Window(Gtk.WindowType.Toplevel);
 		}
-		protected override void PackWidget(Gtk.Window container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
-			container.Add(child);
+		protected override bool PackWidget(Gtk.Window container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
+			if (container.Child != null) {
+				return false;
+			} else {
+				container.Add(child);
+				return true;
+			}
 		}
 	}
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Xml;
+using System.Collections.Generic;
 
 namespace Mycena {
 	
@@ -54,6 +56,24 @@ namespace Mycena {
 		/// <param name="result">Whether the operation was succesful.</param>
 		/// <typeparam name="T">Widget type.</typeparam>
 		bool TryGetWidget<T>(string name, out T result) where T : Gtk.Widget;
+		/// <summary>
+		/// Gets the stored packing information for a widget.
+		/// </summary>
+		/// <returns>The packing information.</returns>
+		/// <param name="name">Unique widget name.</param>
+		//IDictionary<string, XmlNode> GetPackInfo(string name);
+		/// <summary>
+		/// Stores the given widget.
+		/// </summary>
+		/// <param name="name">Unique widget name.</param>
+		/// <param name="widget">Widget to store.</param>
+		void RegisterWidget(string name, Gtk.Widget widget);
+		/// <summary>
+		/// Stores packing info for a widget.
+		/// </summary>
+		/// <param name="name">Unique widget name.</param>
+		/// <param name="properties">Packing information to store.</param>
+		//void StorePackInfo(string name, IDictionary<string, XmlNode> properties);
 	}
 
 
