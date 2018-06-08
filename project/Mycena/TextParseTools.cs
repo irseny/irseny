@@ -27,7 +27,7 @@ namespace Mycena {
 				if (lower.Equals("no")) {
 					return false;
 				}
-				throw new FormatException(text + "not convertable to bool");
+				throw new FormatException(text + " not convertable to bool");
 			} else {
 				return false;
 			}
@@ -44,10 +44,27 @@ namespace Mycena {
 				if (int.TryParse(text, out result)) {
 					return result;
 				} else {
-					throw new FormatException(text + "not convertable to int");
+					throw new FormatException(text + " not convertable to int");
 				}
 			} else {
 				return 0;
+			}
+		}
+		/// <summary>
+		/// Reads a policy type value from the given string.
+		/// </summary>
+		/// <returns>The policy type value.</returns>
+		/// <param name="text">String to read from.</param>
+		public static Gtk.PolicyType ParsePolicyType(string text) {
+			text = text.Trim();
+			if (text.Equals("automatic")) {
+				return Gtk.PolicyType.Automatic;
+			} else if (text.Equals("always")) {
+				return Gtk.PolicyType.Always;
+			} else if (text.Equals("never")) {
+				return Gtk.PolicyType.Never;
+			} else {
+				throw new FormatException(text + " not convertible to policy type");
 			}
 		}
 	}

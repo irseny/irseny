@@ -33,8 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Widgets\WidgetFactory.cs" />
-    <Compile Include="Widgets\IWidgetFactory.cs" />
     <Compile Include="Widgets\IgnoreWidgetFactory.cs" />
     <Compile Include="TextParseTools.cs" />
     <Compile Include="InterfaceFactory.cs" />
@@ -45,9 +43,19 @@
     <Compile Include="InterfaceNode.cs" />
     <Compile Include="Widgets\PanedFactory.cs" />
     <Compile Include="Widgets\BoxFactory.cs" />
+    <Compile Include="Widgets\ScrolledWindowFactory.cs" />
+    <Compile Include="Widgets\TextViewFactory.cs" />
+    <Compile Include="ConfigProperties.cs" />
+    <Compile Include="Widgets\IWidgetFactory.cs" />
+    <Compile Include="Widgets\WidgetFactory.cs" />
+    <Compile Include="Widgets\CommonWidgetModification.cs" />
+    <Compile Include="Gadgets\IGadgetFactory.cs" />
+    <Compile Include="Gadgets\GadgetFactory.cs" />
+    <Compile Include="Gadgets\StaticGadgetFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Widgets\" />
+    <Folder Include="Gadgets\" />
   </ItemGroup>
 </Project>

@@ -5,18 +5,17 @@ using System.Collections.Generic;
 namespace Mycena {
 	internal abstract class PanedFactory<T> : WidgetFactory<T> where T : Gtk.Paned {
 		public PanedFactory() {
-			IsContainer = true;
-			PackChildren = true;
-			ModProperties.Add("position", SetPosition);
-			ModProperties.Add("position_set", ApplyPositionSet);
+			
+			CreationProperties.Add("position", SetPosition);
+			CreationProperties.Add("position_set", ApplyPositionSet);
 			PackProperties.Add("resize");
 			PackProperties.Add("shrink");
 
 		}
-		protected override bool PackWidget(T container, Gtk.Widget child, IDictionary<string, XmlNode> properties) {
+		protected override bool PackWidget(T container, Gtk.Widget child, ConfigProperties properties) {
 			try {
-				bool resize = TextParseTools.ParseBool(properties["resize"].InnerText);
-				bool shrink = TextParseTools.ParseBool(properties["shrink"].InnerText);
+				bool resize = TextParseTools.ParseBool(properties.GetProperty("resize", "false"));
+				bool shrink = TextParseTools.ParseBool(properties.GetProperty("shrink", "false"));
 				if (container.Child1 == null) {
 					container.Pack1(child, resize, shrink);
 					return true;
@@ -31,18 +30,18 @@ namespace Mycena {
 			}
 
 		}
-		private static bool SetPosition(Gtk.Paned widget, XmlNode property) {
+		private static bool SetPosition(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container) {
 			try {
-				int position = TextParseTools.ParseInt(property.InnerText);
+				int position = TextParseTools.ParseInt(properties.GetProperty("position"));
 				widget.Position = position;
 				return true;
 			} catch (FormatException) {
 				return false;
 			}
 		}
-		private static bool ApplyPositionSet(Gtk.Paned widget, XmlNode property) {
+		private static bool ApplyPositionSet(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container) {
 			try {
-				bool enabled = TextParseTools.ParseBool(property.InnerText);
+				bool enabled = TextParseTools.ParseBool(properties.GetProperty("position_set"));
 				widget.PositionSet = enabled;
 				return true;
 			} catch (FormatException) {
@@ -53,11 +52,11 @@ namespace Mycena {
 
 	internal class HorizontalPanedFactory : PanedFactory<Gtk.HPaned> {
 		
-		public override string ClassName {
-			get { return "GtkHPaned"; }
-		}
-		protected override Gtk.HPaned CreateWidget(System.Collections.Generic.IDictionary<string, XmlNode> properties) {
-			return new Gtk.HPaned();
+
+		protected override Gtk.HPaned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			var result = new Gtk.HPaned();
+			ApplyProperties(result, properties, container);
+			return result;
 		}
 
 
@@ -65,11 +64,10 @@ namespace Mycena {
 	}
 
 	internal class VerticalPanedFactory : PanedFactory<Gtk.VPaned> {
-		public override string ClassName {
-			get { return "GtkVPaned"; }
-		}
-		protected override Gtk.VPaned CreateWidget(IDictionary<string, XmlNode> properties) {
-			return new Gtk.VPaned();
+		protected override Gtk.VPaned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			var result = new Gtk.VPaned();
+			ApplyProperties(result, properties, container);
+			return result;
 		}
 	}
 }

@@ -27,9 +27,19 @@ namespace Mycena {
 		/// <param name="id">Root widget identifer.</param>
 		public IInterfaceNode CreateWidget(string id) {
 			if (id == null) throw new ArgumentNullException("id");
-			var rootNode = WidgetFactory.FindWidgetNode(Source.DocumentElement, id);
+			var rootNode = WidgetFactory.FindWidgetNode(null, Source.DocumentElement, id);
 			if (rootNode == null) throw new KeyNotFoundException("id: " + id);
-			var result = WidgetFactory.CreateWidget(rootNode);
+			var result = new InterfaceNode();
+			bool exceptional = true;
+			try {
+				GadgetFactory.CreateGadgets(rootNode, result);
+				WidgetFactory.CreateWidget(rootNode, result);
+				exceptional = false;
+			} finally {
+				if (exceptional) {
+					result.Dispose();
+				}
+			}
 			return result;
 		}
 

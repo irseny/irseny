@@ -8,21 +8,20 @@ namespace Mycena {
 		const string MissingImageText = "gtk-missing-image";
 
 		public ImageFactory() : base() {
-			CreationProperties.Add("stock");
+			
 		}
-		public override string ClassName {
-			get { return "GtkImage"; }
-		}
-		protected override Gtk.Image CreateWidget(IDictionary<string, XmlNode> properties) {
-			XmlNode stock;
-			if (properties.TryGetValue(StockPropertyName, out stock)) {
-				if (stock.InnerText.Equals(MissingImageText)) {
-					return new Gtk.Image(stock.InnerText, Gtk.IconSize.Invalid);
-				} else {
-					return new Gtk.Image(stock.InnerText, Gtk.IconSize.Button);
-				}
+		protected override Gtk.Image CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			string stock = properties.GetProperty(StockPropertyName, null);
+			Gtk.Image result;
+			if (stock == null) {
+				result = new Gtk.Image();
+			} else if (stock.Equals(MissingImageText)) {
+				result = new Gtk.Image(stock, Gtk.IconSize.Invalid);
+			} else {
+				result = new Gtk.Image(stock, Gtk.IconSize.Button);
 			}
-			return new Gtk.Image();
+			ApplyProperties(result, properties, container);
+			return result;
 		}
 	}
 }
