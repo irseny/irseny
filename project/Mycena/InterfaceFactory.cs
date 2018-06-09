@@ -32,7 +32,7 @@ namespace Mycena {
 			var result = new InterfaceNode();
 			bool exceptional = true;
 			try {
-				GadgetFactory.CreateGadgets(rootNode, result);
+				GadgetFactory.CreateGadgets(Source.DocumentElement, result);
 				WidgetFactory.CreateWidget(rootNode, result);
 				exceptional = false;
 			} finally {
@@ -51,7 +51,7 @@ namespace Mycena {
 		public static InterfaceFactory CreateFromFile(string filePath) {
 			if (filePath == null) throw new ArgumentNullException("filePath");
 			var settings = new XmlReaderSettings();
-			settings.IgnoreComments = true;
+			//settings.IgnoreComments = true;
 			var doc = new XmlDocument();
 			using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
 				using (var reader = XmlReader.Create(stream, settings)) {

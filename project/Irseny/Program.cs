@@ -21,10 +21,11 @@ namespace Irseny {
 			if (resourceFolder == null) {
 				throw new FileNotFoundException("resource folder not available");
 			}
-			string mainFile = Path.Combine(resourceFolder, "gtk/Main.glade");
+			/*string mainFile = Path.Combine(resourceFolder, "gtk/Main.glade");
 			string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
-			var mainFactory = Mycena.InterfaceFactory.CreateFromFile(mainFile);
 			var logFactory = Mycena.InterfaceFactory.CreateFromFile(logFile);
+			var mainFactory = Mycena.InterfaceFactory.CreateFromFile(mainFile);
+
 			Gtk.Application.Init();
 			var mainContainer = mainFactory.CreateWidget("wn_Main");
 			var logContainer = logFactory.CreateWidget("pnl_Root");
@@ -32,7 +33,12 @@ namespace Irseny {
 			var logPanel = logContainer.GetWidget<Gtk.Widget>("pnl_Root");
 			imageLogSplitter.Pack2(logPanel, true, true);
 
-			var window = mainContainer.GetWidget<Gtk.Window>("wn_Main");
+			var window = mainContainer.GetWidget<Gtk.Window>("wn_Main");*/
+			string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
+			var logFactory = Mycena.InterfaceFactory.CreateFromFile(logFile);
+			Gtk.Application.Init();
+			var logContainer = logFactory.CreateWidget("win_Root");
+			var window = logContainer.GetWidget<Gtk.Window>("win_Root");
 			window.Resize(800, 600);
 			window.ShowAll();
 			window.DeleteEvent += delegate {

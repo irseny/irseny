@@ -9,7 +9,7 @@ namespace Mycena {
 		}
 
 		protected override Gtk.Widget CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			return null;
+			return new Gtk.Widget(IntPtr.Zero);
 		}
 	}
 }

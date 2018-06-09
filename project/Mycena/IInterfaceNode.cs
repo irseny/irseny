@@ -110,6 +110,11 @@ namespace Mycena {
 		/// <param name="name">Unique gadget name.</param>
 		/// <param name="gadget">Gadget to store.</param>
 		void RegisterGadget(string name, GLib.Object gadget);
+		/// <summary>
+		/// Stores the given gadget in order to dispose it later.
+		/// </summary>
+		/// <param name="gadget">Gadget to store.</param>
+		void AddGadget(GLib.Object gadget);
 		#endregion
 	}
 

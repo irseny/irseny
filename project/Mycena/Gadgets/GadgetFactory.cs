@@ -9,9 +9,12 @@ namespace Mycena {
 		const string PropertyNodeName = "property";
 
 		public GadgetFactory() {
-			GLib.Object txb = new Gtk.TextBuffer(null as Gtk.TextTagTable);
-			GLib.Object adj = new Gtk.Adjustment(0, 0, 1, 0.1, 1, 2);
+			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>();
 		}
+		protected delegate bool PropertyApplicationHandler<TW>(TW gadget, ConfigProperties properties, IInterfaceNode container);
+
+		protected IDictionary<string, PropertyApplicationHandler<T>> CreationProperties { get; private set; }
+
 
 		public void CreateGadget(XmlNode rootNode, IInterfaceNode container) {
 			if (rootNode == null) throw new ArgumentNullException("rootNode");
@@ -33,6 +36,8 @@ namespace Mycena {
 			GLib.Object gadget = CreateGadget(properties, container);
 			if (gadget != null) {
 				container.RegisterGadget(idAttr.Value, gadget);
+			} else {
+				throw new InvalidOperationException("Cannot instantiate gadget from : " + rootNode.OuterXml);
 			}
 		}
 		/// <summary>
@@ -42,6 +47,26 @@ namespace Mycena {
 		/// <param name="properties">Creation properties.</param>
 		/// <param name="container">Gadget container.</param>
 		protected abstract T CreateGadget(ConfigProperties properties, IInterfaceNode container);
+
+		/// <summary>
+		/// Applies all known properties to the given gadget.
+		/// </summary>
+		/// <param name="gadget">Gadget.</param>
+		/// <param name="properties">Available properties.</param>
+		/// <param name="container">Widget container.</param>
+		/// <param name="exclude">Properties to exclude.</param>
+		protected void ApplyProperties(T gadget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
+			foreach (string p in properties.PropertyNames) {
+				if (exclude == null || !exclude.Contains(p)) {
+					PropertyApplicationHandler<T> handler;
+					if (CreationProperties.TryGetValue(p, out handler)) {						
+						if (!handler(gadget, properties, container)) {
+							throw new InvalidOperationException("Failed to apply property to gadget: " + p);
+						}
+					} 
+				}
+			}
+		}
 	}
 }
 

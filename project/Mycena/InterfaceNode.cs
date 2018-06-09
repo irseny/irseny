@@ -7,6 +7,7 @@ namespace Mycena {
 
 		Dictionary<string, Gtk.Widget> widgets;
 		Dictionary<string, GLib.Object> gadgets;
+		List<GLib.Object> anonym;
 
 		/// <summary>
 		/// Initializes an empty instance of the <see cref="Mycena.InterfaceNode"/> class.
@@ -14,6 +15,7 @@ namespace Mycena {
 		public InterfaceNode() {
 			widgets = new Dictionary<string, Gtk.Widget>(32);
 			gadgets = new Dictionary<string, GLib.Object>(16);
+			anonym = new List<GLib.Object>(16);
 		}
 
 		#region Widget
@@ -119,14 +121,18 @@ namespace Mycena {
 			return false;
 
 		}
-		public void RegisterGadget(string name, GLib.Object Gadget) {
+		public void RegisterGadget(string name, GLib.Object gadget) {
 			if (name == null) throw new ArgumentNullException("name");
-			if (Gadget == null) throw new ArgumentNullException("Gadget");
+			if (gadget == null) throw new ArgumentNullException("gadget");
 			try {
-				gadgets.Add(name, Gadget);
+				gadgets.Add(name, gadget);
 			} catch (ArgumentException) {
 				throw new ArgumentException("name: Gadget with this name does already exist");
 			}
+		}
+		public void AddGadget(GLib.Object gadget) {
+			if (gadget == null) throw new ArgumentNullException("gadget");
+			anonym.Add(gadget);
 		}
 		#endregion
 
@@ -139,6 +145,10 @@ namespace Mycena {
 				gadget.Dispose();
 			}
 			gadgets.Clear();
+			foreach (var obj in anonym) {
+				obj.Dispose();
+			}
+			anonym.Clear();
 		}
 
 

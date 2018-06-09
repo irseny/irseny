@@ -4,7 +4,7 @@ using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
-	internal abstract class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
+	internal abstract partial class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
 		protected const string ObjectNodeName = "object";
 		protected const string ObjectIdAttribute = "id";
 		protected const string ObjectClassAttribute = "class";
@@ -15,10 +15,10 @@ namespace Mycena {
 
 		static WidgetFactory() {
 			CommonCreationProperties = new Dictionary<string, PropertyApplicationHandler<Gtk.Widget>>();
-			CommonCreationProperties.Add("visible", CommonWidgetModification.SetVisibility);
-			CommonCreationProperties.Add("can_focus", CommonWidgetModification.SetFocusable);
-			CommonCreationProperties.Add("receives_default", CommonWidgetModification.SetReceiveDefault);
-			CommonCreationProperties.Add("sensitive", CommonWidgetModification.SetSensitivity);
+			CommonCreationProperties.Add("visible", WidgetFactory.SetVisibility);
+			CommonCreationProperties.Add("can_focus", WidgetFactory.SetFocusable);
+			CommonCreationProperties.Add("receives_default", WidgetFactory.SetReceiveDefault);
+			CommonCreationProperties.Add("sensitive", WidgetFactory.SetSensitivity);
 		}
 		public WidgetFactory() {			
 			
@@ -54,7 +54,7 @@ namespace Mycena {
 			// creation (calls property application)
 			T widget = CreateWidget(creationProperties, container);
 			if (widget == null) {
-				return null;
+				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml);
 			}
 			container.RegisterWidget(idAttr.Value, widget);
 			// children pass
@@ -118,9 +118,13 @@ namespace Mycena {
 					PropertyApplicationHandler<T> handler;
 					PropertyApplicationHandler<Gtk.Widget> commonHandler;
 					if (CreationProperties.TryGetValue(p, out handler)) {
-						handler(widget, properties, container);
+						if (!handler(widget, properties, container)) {
+							throw new InvalidOperationException("Failed to apply property to widget: " + p);
+						}
 					} else if (CommonCreationProperties.TryGetValue(p, out commonHandler)) {
-						commonHandler(widget, properties, container);
+						if (!commonHandler(widget, properties, container)) {
+							throw new InvalidOperationException("Failed to apply property to widget: " + p);
+						}
 					}
 				}
 			}

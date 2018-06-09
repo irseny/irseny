@@ -36,7 +36,6 @@
     <Compile Include="Widgets\IgnoreWidgetFactory.cs" />
     <Compile Include="TextParseTools.cs" />
     <Compile Include="InterfaceFactory.cs" />
-    <Compile Include="Widgets\ImageFactory.cs" />
     <Compile Include="Widgets\WindowFactory.cs" />
     <Compile Include="Widgets\StaticWidgetFactory.cs" />
     <Compile Include="IInterfaceNode.cs" />
@@ -48,10 +47,18 @@
     <Compile Include="ConfigProperties.cs" />
     <Compile Include="Widgets\IWidgetFactory.cs" />
     <Compile Include="Widgets\WidgetFactory.cs" />
-    <Compile Include="Widgets\CommonWidgetModification.cs" />
     <Compile Include="Gadgets\IGadgetFactory.cs" />
     <Compile Include="Gadgets\GadgetFactory.cs" />
     <Compile Include="Gadgets\StaticGadgetFactory.cs" />
+    <Compile Include="Gadgets\AdjustmentFactory.cs" />
+    <Compile Include="Gadgets\TextTagTableFactory.cs" />
+    <Compile Include="Gadgets\TextBufferFactory.cs" />
+    <Compile Include="Widgets\ImageWidgetFactory.cs" />
+    <Compile Include="Gadgets\ImageGadgetFactory.cs" />
+    <Compile Include="Widgets\CheckButtonFactory.cs" />
+    <Compile Include="Widgets\CommonWidgetMods.cs" />
+    <Compile Include="Widgets\ToggleButtonFactory.cs" />
+    <Compile Include="Widgets\ButtonFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

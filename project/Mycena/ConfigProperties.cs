@@ -34,6 +34,20 @@ namespace Mycena {
 				throw new KeyNotFoundException("name");
 			}
 		}
+		public string GetProperty<T>(string name, T defaultValue) {
+			if (name == null) throw new ArgumentNullException("name");
+			string result;
+			if (properties.TryGetValue(name, out result)) {
+				return result;
+			} else {
+				if (defaultValue == null) {
+					return null;
+				} else {
+					return defaultValue.ToString();
+				}
+
+			}
+		}
 		public string GetProperty(string name, string defaultValue) {
 			if (name == null) throw new ArgumentNullException("name");
 			string result;

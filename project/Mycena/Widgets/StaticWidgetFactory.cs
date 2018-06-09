@@ -3,7 +3,7 @@ using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
-	internal static class WidgetFactory {
+	internal static partial class WidgetFactory {
 		const string ObjectClassAttribute = "class";
 		const string ObjectIdAttribute = "id";
 		const string ObjectNodeName = "object";
@@ -16,7 +16,7 @@ namespace Mycena {
 		static WidgetFactory() {
 			widgets = new Dictionary<string, IWidgetFactory>(32);
 			widgets.Add("GtkEntryBuffer", new IgnoreWidgetFactory());
-			widgets.Add("GtkImage", new ImageFactory());
+			widgets.Add("GtkImage", new ImageWidgetFactory());
 			widgets.Add("GtkWindow", new WindowFactory());
 			widgets.Add("GtkHBox", new HorizontalBoxFactory());
 			widgets.Add("GtkVBox", new VerticalBoxFactory());
@@ -24,6 +24,9 @@ namespace Mycena {
 			widgets.Add("GtkVPaned", new VerticalPanedFactory());
 			widgets.Add("GtkScrolledWindow", new ScrolledWindowFactory());
 			widgets.Add("GtkTextView", new TextViewFactory());
+
+			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
+			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 		}
 		/// <summary>
 		/// Creates the widget defined by the given node alongside its children.
