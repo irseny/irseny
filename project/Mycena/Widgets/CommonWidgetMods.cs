@@ -40,6 +40,27 @@ namespace Mycena {
 				return false;
 			}
 		}
+		public static bool SetScrollAdjustment<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Widget {
+			string hName = properties.GetProperty("hadjustment", String.Empty);
+			string vName = properties.GetProperty("vadjustment", String.Empty);
+			var hAdjustment = container.GetGadget<Gtk.Adjustment>(hName, null);
+			var vAdjustment = container.GetGadget<Gtk.Adjustment>(vName, null);
+			if (hAdjustment == null || vAdjustment == null) {
+				var defaultAdjustment = container.GetGadget<Gtk.Adjustment>("adj_Default", null);
+				if (defaultAdjustment == null) {
+					defaultAdjustment = new Gtk.Adjustment(0, 0, 100, 1, 10, 0);
+					container.RegisterGadget("adj_Default", defaultAdjustment);
+				}
+				if (hAdjustment == null) {
+					hAdjustment = defaultAdjustment;
+				}
+				if (vAdjustment == null) {
+					vAdjustment = defaultAdjustment;
+				}
+			}
+			widget.SetScrollAdjustments(hAdjustment, vAdjustment);
+			return true;
+		}
 	}
 }
 

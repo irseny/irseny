@@ -15,6 +15,8 @@ namespace Mycena {
 		static GadgetFactory() {
 			gadgets = new Dictionary<string, IGadgetFactory>(16);
 			gadgets.Add("GtkAdjustment", new AdjustmentFactory());
+			gadgets.Add("GtkImage", new ImageGadgetFactory());
+			gadgets.Add("GtkTextTagTable", new TextTagTableFactory());
 		}
 		/// <summary>
 		/// Creates the gadgets that are on the first level of the given <see cref="System.Xml.XmlNode"/>.

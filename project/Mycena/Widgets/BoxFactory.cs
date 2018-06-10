@@ -7,18 +7,28 @@ namespace Mycena {
 			
 		}
 		protected override bool PackWidget(T container, Gtk.Widget child, ConfigProperties properties) {
-			bool start = true;
+			Gtk.PackType packType;
+			bool expand;
+			bool fill;
+			uint padding;
 			try {
-				start = TextParseTools.ParseBool(properties.GetProperty("start", "true"));
+				packType = TextParseTools.ParsePackType(properties.GetProperty("pack_type", Gtk.PackType.Start));
+				expand = TextParseTools.ParseBool(properties.GetProperty("expand", false));
+				fill = TextParseTools.ParseBool(properties.GetProperty("fill", false));
+				padding = TextParseTools.ParseUInt(properties.GetProperty("padding", 0));
 			} catch (FormatException) {
 				return false;
 			}
-			if (start) {
-				container.PackStart(child);
-			} else {
-				container.PackEnd(child);
+			switch (packType) {
+			case Gtk.PackType.Start:
+				container.PackStart(child, expand, fill, padding);
+				return true;
+			case Gtk.PackType.End:
+				container.PackEnd(child, expand, fill, padding);
+				return true;
+			default:
+				return false;
 			}
-			return true;
 		}
 	}
 

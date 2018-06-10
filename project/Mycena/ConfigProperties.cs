@@ -19,10 +19,18 @@ namespace Mycena {
 			get { return properties.Keys; }
 		}
 		public void RegisterProperty(XmlNode property) {
-			if (property.Name == null || property.Name.Length == 0) throw new ArgumentException("propery: Missing name: " + property.OuterXml);
+			if (property == null) throw new ArgumentNullException("property");
+			if (property.Attributes == null) throw new ArgumentException("property: Has no attributes.");
+			var nameAttr = property.Attributes["name"];
+			if (nameAttr == null) {
+				throw new ArgumentException("property: Missing name attribute: " + property.OuterXml);
+			}
+			string name = nameAttr.Value;
 			if (property.InnerText == null || property.InnerText.Length == 0) throw new ArgumentException("property: Empty value: " + property.OuterXml);
-			if (properties.ContainsKey(property.Name)) {
-				properties[property.Name] = property.InnerText;
+			if (properties.ContainsKey(name)) {
+				properties[name] = property.InnerText;
+			} else {
+				properties.Add(name, property.InnerText);
 			}
 		}
 		public string GetProperty(string name) {

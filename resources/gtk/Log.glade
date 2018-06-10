@@ -10,6 +10,12 @@
     <property name="page_increment">10</property>
     <property name="page_size">80</property>
   </object>
+  <object class="GtkImage" id="img_Custom">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">emblem-favorite</property>
+    <property name="use_fallback">True</property>
+  </object>
   <object class="GtkImage" id="img_Error">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -41,7 +47,6 @@
           <object class="GtkScrolledWindow" id="scr_Log">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="hadjustment">adj_Log</property>
             <property name="vadjustment">adj_Log</property>
             <property name="hscrollbar_policy">automatic</property>
             <child>
@@ -109,6 +114,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
+                <property name="image">img_Error</property>
                 <property name="image_position">right</property>
                 <property name="active">True</property>
                 <property name="draw_indicator">True</property>
@@ -139,7 +145,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">img_Error</property>
+                <property name="image">img_Custom</property>
                 <property name="use_underline">True</property>
                 <property name="image_position">right</property>
               </object>

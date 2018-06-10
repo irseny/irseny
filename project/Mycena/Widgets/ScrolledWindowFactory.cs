@@ -7,6 +7,8 @@ namespace Mycena {
 		public ScrolledWindowFactory() : base() {
 			CreationProperties.Add("hscrollbar_policy", SetPolicy);
 			CreationProperties.Add("vscrollbar_policy", SetPolicy);
+			CreationProperties.Add("hadjustment", WidgetFactory.SetScrollAdjustment);
+			CreationProperties.Add("vadjustment", WidgetFactory.SetScrollAdjustment);
 		}
 
 		protected override Gtk.ScrolledWindow CreateWidget(ConfigProperties properties, IInterfaceNode container) {
@@ -14,7 +16,7 @@ namespace Mycena {
 			ApplyProperties(result, properties, container);
 			return result;
 		}
-		protected override bool PackWidget(Gtk.ScrolledWindow container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.ScrolledWindow container, Gtk.Widget child, ConfigProperties properties) {			
 			container.AddWithViewport(child);
 			return true;
 		}
@@ -36,6 +38,7 @@ namespace Mycena {
 			widget.SetPolicy(horizontalPolicy, verticalPolicy);
 			return true;
 		}
+
 
 
 	}

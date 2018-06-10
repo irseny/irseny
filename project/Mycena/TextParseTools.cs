@@ -39,7 +39,7 @@ namespace Mycena {
 				if (lower.Equals("no")) {
 					return false;
 				}
-				throw new FormatException(text + " not convertable to bool");
+				throw new FormatException(text + " not convertible to bool");
 			} else {
 				return false;
 			}
@@ -55,7 +55,20 @@ namespace Mycena {
 				if (int.TryParse(text, out result)) {
 					return result;
 				} else {
-					throw new FormatException(text + " not convertable to int");
+					throw new FormatException(text + " not convertible to int");
+				}
+			} else {
+				return 0;
+			}
+		}
+
+		public static uint ParseUInt(string text) {
+			if (text.Length > 0) {
+				uint result;
+				if (uint.TryParse(text, out result)) {
+					return result;
+				} else {
+					throw new FormatException(text + " not convertible to uint");
 				}
 			} else {
 				return 0;
@@ -129,6 +142,16 @@ namespace Mycena {
 				return Gtk.PositionType.Bottom;
 			} else {
 				throw new FormatException(text + " not convertible to position type");
+			}
+		}
+		public static Gtk.PackType ParsePackType(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("start")) {
+				return Gtk.PackType.Start;
+			} else if (text.Equals("end")) {
+				return Gtk.PackType.End;
+			} else {
+				throw new FormatException(text + " can not be converted to pack type");
 			}
 		}
 	}
