@@ -21,8 +21,7 @@ namespace Mycena {
 			return true;
 		}
 		public static bool SetImage<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
-			string gadgetName = properties.GetProperty("image");
-			Gtk.Image image = container.GetGadget<Gtk.Image>(gadgetName, null);
+			Gtk.Image image = container.GetGadget<Gtk.Image>(properties.GetProperty("image"), null);
 			if (image == null) {
 				return false;
 			} else {

@@ -68,6 +68,11 @@
     <Compile Include="Widgets\CommonWidgetMods.cs" />
     <Compile Include="Widgets\ToggleButtonFactory.cs" />
     <Compile Include="Widgets\ButtonFactory.cs" />
+    <Compile Include="Widgets\SeparatorFactory.cs" />
+    <Compile Include="Widgets\SpinButtonFactory.cs" />
+    <Compile Include="Widgets\EntryFactory.cs" />
+    <Compile Include="Widgets\TableFactory.cs" />
+    <Compile Include="Widgets\SpinnerFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

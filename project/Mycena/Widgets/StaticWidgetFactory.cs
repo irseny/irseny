@@ -4,12 +4,6 @@ using System.Collections.Generic;
 
 namespace Mycena {
 	internal static partial class WidgetFactory {
-		const string ObjectClassAttribute = "class";
-		const string ObjectIdAttribute = "id";
-		const string ObjectNodeName = "object";
-		const string PackNodeName = "packing";
-		const string PropertyNodeName = "property";
-		const string PlaceholderNodeName = "placeholder";
 
 		static IDictionary<string, IWidgetFactory> widgets;
 
@@ -17,16 +11,23 @@ namespace Mycena {
 			widgets = new Dictionary<string, IWidgetFactory>(32);
 			widgets.Add("GtkEntryBuffer", new IgnoreWidgetFactory());
 			widgets.Add("GtkImage", new ImageWidgetFactory());
+
+			widgets.Add("GtkScrolledWindow", new ScrolledWindowFactory());
 			widgets.Add("GtkWindow", new WindowFactory());
 			widgets.Add("GtkHBox", new HorizontalBoxFactory());
 			widgets.Add("GtkVBox", new VerticalBoxFactory());
 			widgets.Add("GtkHPaned", new HorizontalPanedFactory());
 			widgets.Add("GtkVPaned", new VerticalPanedFactory());
-			widgets.Add("GtkScrolledWindow", new ScrolledWindowFactory());
+			widgets.Add("GtkTable", new TableFactory());
+
+			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
+			widgets.Add("GtkHSeparator", new VerticalSeparatorFactory());
+
 			widgets.Add("GtkTextView", new TextViewFactory());
 
 			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
+			widgets.Add("GtkSpinButton", new SpinButtonFactory());
 		}
 		/// <summary>
 		/// Creates the widget defined by the given node alongside its children.
@@ -37,7 +38,7 @@ namespace Mycena {
 		public static Tuple<Gtk.Widget, ConfigProperties> CreateWidget(XmlNode rootNode, IInterfaceNode container) {
 			if (rootNode == null) throw new ArgumentNullException("rootNode");
 			if (container == null) throw new ArgumentNullException("result");
-			var classAttr = rootNode.Attributes[ObjectClassAttribute]; // may be null in case of child and not object node
+			var classAttr = rootNode.Attributes["class"]; // may be null in case of child and not object node
 			XmlNode packNode = null;
 			XmlNode objectNode = null;
 			bool hasPlaceholder = false;
@@ -45,13 +46,13 @@ namespace Mycena {
 				objectNode = rootNode;
 			} else {
 				foreach (XmlNode node in rootNode.ChildNodes) {
-					if (node.Name.Equals(ObjectNodeName)) {
+					if (node.Name.Equals("object")) {
 						if (objectNode != null) throw new InvalidOperationException("Child node with multiple children: " + rootNode.OuterXml);
 						objectNode = node;
-					} else if (node.Name.Equals(PackNodeName)) {
+					} else if (node.Name.Equals("packing")) {
 						if (packNode != null) throw new InvalidOperationException("Child node with multiple pack nodes: " + rootNode.OuterXml);
 						packNode = node;
-					} else if (node.Name.Equals(PlaceholderNodeName)) {
+					} else if (node.Name.Equals("placeholder")) {
 						hasPlaceholder = true;
 					}
 				}
@@ -63,7 +64,7 @@ namespace Mycena {
 					throw new ArgumentException("rootNode: Does not contain an object node: " + rootNode.OuterXml);
 				}
 			}
-			classAttr = objectNode.Attributes[ObjectClassAttribute];
+			classAttr = objectNode.Attributes["class"];
 			if (classAttr == null) throw new KeyNotFoundException("Object node without class attribute: " + objectNode.OuterXml);
 			IWidgetFactory factory;
 			if (widgets.TryGetValue(classAttr.Value, out factory)) {
@@ -90,7 +91,7 @@ namespace Mycena {
 		public static XmlNode FindWidgetNode(XmlNode rootNode, XmlNode widgetNode, string id) {
 			foreach (XmlNode node in widgetNode.ChildNodes) {
 				if (node.Attributes != null) { // null if comment node
-					var idAttr = node.Attributes[ObjectIdAttribute];
+					var idAttr = node.Attributes["id"];
 					if (idAttr != null && idAttr.Value.Equals(id)) {
 						if (rootNode != null) {
 							return rootNode;
@@ -120,10 +121,10 @@ namespace Mycena {
 		/// <param name="properties">Properties read from the packing node.</param>
 		private static void ReadPackProperties(XmlNode packNode, ConfigProperties properties) {
 			foreach (XmlNode propertyNode in packNode) {
-				if (propertyNode.Name.Equals(PropertyNodeName)) {
+				if (propertyNode.Name.Equals("property")) {
 					properties.RegisterProperty(propertyNode);
 				}
-			}	
+			}
 		}
 	}
 }

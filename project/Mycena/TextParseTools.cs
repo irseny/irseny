@@ -2,6 +2,13 @@
 
 namespace Mycena {
 	internal static class TextParseTools {
+		public static char ParseChar(string text) {
+			if (text.Length > 0) {
+				return text[0];
+			} else {
+				return '\0';
+			}
+		}
 		public static double ParseDouble(string text) {
 			if (text.Length > 0) {
 				double result;
@@ -152,6 +159,22 @@ namespace Mycena {
 				return Gtk.PackType.End;
 			} else {
 				throw new FormatException(text + " can not be converted to pack type");
+			}
+		}
+		public static Gtk.AttachOptions ParseAttachOptions(string text) {
+			if (text.Length > 0) {
+				text = text.Trim().ToLower();
+				if (text.Equals("gtk_fill")) {
+					return Gtk.AttachOptions.Fill;
+				} else if (text.Equals("gtk_expand")) {
+					return Gtk.AttachOptions.Expand;
+				} else if (text.Equals("gtk_shrink")) {
+					return Gtk.AttachOptions.Shrink;
+				} else {
+					throw new FormatException(text + " can not be converted to attach options");
+				}
+			} else {
+				return Gtk.AttachOptions.Expand;
 			}
 		}
 	}
