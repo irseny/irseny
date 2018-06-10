@@ -2,50 +2,45 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkAdjustment" id="adj_Bright">
-    <property name="upper">10</property>
-    <property name="value">5</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">2</property>
-  </object>
-  <object class="GtkAdjustment" id="adj_DeviceId">
+  <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">8</property>
     <property name="step_increment">1</property>
     <property name="page_increment">4</property>
   </object>
-  <object class="GtkAdjustment" id="adj_Height">
-    <property name="lower">240</property>
-    <property name="upper">1080</property>
-    <property name="value">240</property>
-    <property name="step_increment">10</property>
-    <property name="page_increment">100</property>
-  </object>
-  <object class="GtkAdjustment" id="adj_Rate">
-    <property name="lower">5</property>
-    <property name="upper">120</property>
-    <property name="value">30</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="adj_Width">
+  <object class="GtkAdjustment" id="adjustment2">
     <property name="lower">320</property>
     <property name="upper">1920</property>
     <property name="value">320</property>
     <property name="step_increment">10</property>
     <property name="page_increment">100</property>
   </object>
-  <object class="GtkImage" id="img_Start">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-execute</property>
+  <object class="GtkAdjustment" id="adjustment3">
+    <property name="lower">240</property>
+    <property name="upper">1080</property>
+    <property name="value">240</property>
+    <property name="step_increment">10</property>
+    <property name="page_increment">100</property>
   </object>
-  <object class="GtkWindow" id="window1">
+  <object class="GtkAdjustment" id="adjustment4">
+    <property name="upper">10</property>
+    <property name="value">5</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">2</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment5">
+    <property name="lower">5</property>
+    <property name="upper">120</property>
+    <property name="value">30</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkWindow" id="win_Main">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkVBox" id="vbox1">
+      <object class="GtkVBox" id="pnl_Main">
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkTable" id="table1">
+          <object class="GtkTable" id="tbl_Properties">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="n_rows">6</property>
@@ -57,7 +52,7 @@
                 <property name="xalign">1</property>
                 <property name="label" translatable="yes">Property</property>
                 <attributes>
-                  <attribute name="underline" value="True"/>
+                  <attribute name="language"/>
                 </attributes>
               </object>
               <packing>
@@ -71,7 +66,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Value</property>
                 <attributes>
-                  <attribute name="underline" value="True"/>
+                  <attribute name="language"/>
                 </attributes>
               </object>
               <packing>
@@ -87,7 +82,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Auto</property>
                 <attributes>
-                  <attribute name="underline" value="True"/>
+                  <attribute name="language"/>
                 </attributes>
               </object>
               <packing>
@@ -123,7 +118,7 @@
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
-                <property name="adjustment">adj_DeviceId</property>
+                <property name="adjustment">adjustment1</property>
                 <property name="numeric">True</property>
               </object>
               <packing>
@@ -161,7 +156,7 @@
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
-                <property name="adjustment">adj_Width</property>
+                <property name="adjustment">adjustment2</property>
                 <property name="numeric">True</property>
               </object>
               <packing>
@@ -268,7 +263,7 @@
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
-                <property name="adjustment">adj_Height</property>
+                <property name="adjustment">adjustment3</property>
                 <property name="numeric">True</property>
               </object>
               <packing>
@@ -314,7 +309,7 @@
               <object class="GtkHScale" id="scr_Bright">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="adjustment">adj_Bright</property>
+                <property name="adjustment">adjustment4</property>
                 <property name="round_digits">1</property>
                 <property name="draw_value">False</property>
               </object>
@@ -403,7 +398,7 @@
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
-                <property name="adjustment">adj_Rate</property>
+                <property name="adjustment">adjustment5</property>
                 <property name="numeric">True</property>
               </object>
               <packing>
@@ -439,7 +434,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkHBox" id="pnl_Start">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -467,7 +462,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">img_Start</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -484,12 +478,10 @@
             <property name="position">1</property>
           </packing>
         </child>
+        <child>
+          <placeholder/>
+        </child>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="img_Stop">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-stop</property>
   </object>
 </interface>
