@@ -73,6 +73,9 @@
     <Compile Include="Widgets\EntryFactory.cs" />
     <Compile Include="Widgets\TableFactory.cs" />
     <Compile Include="Widgets\SpinnerFactory.cs" />
+    <Compile Include="Widgets\LabelFactory.cs" />
+    <Compile Include="Widgets\MiscFactory.cs" />
+    <Compile Include="Widgets\ScaleFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

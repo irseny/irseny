@@ -35,6 +35,7 @@ namespace Mycena {
 			}
 			GLib.Object gadget = CreateGadget(properties, container);
 			if (gadget != null) {
+				ApplyProperties(gadget, properties, container);
 				container.RegisterGadget(idAttr.Value, gadget);
 			} else {
 				throw new InvalidOperationException("Cannot instantiate gadget from : " + rootNode.OuterXml);
@@ -55,15 +56,15 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		/// <param name="exclude">Properties to exclude.</param>
-		protected void ApplyProperties(T gadget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
+		private void ApplyProperties(T gadget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
 			foreach (string p in properties.PropertyNames) {
 				if (exclude == null || !exclude.Contains(p)) {
 					PropertyApplicationHandler<T> handler;
-					if (CreationProperties.TryGetValue(p, out handler)) {						
+					if (CreationProperties.TryGetValue(p, out handler)) {
 						if (!handler(gadget, properties, container)) {
 							throw new InvalidOperationException("Failed to apply property to gadget: " + p);
 						}
-					} 
+					}
 				}
 			}
 		}

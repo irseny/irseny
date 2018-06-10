@@ -9,6 +9,18 @@ namespace Mycena {
 				return '\0';
 			}
 		}
+		public static float ParseFloat(string text) {
+			if (text.Length > 0) {
+				float result;
+				if (float.TryParse(text, out result)) {
+					return result;
+				} else {
+					throw new FormatException(text + " not convertible to float");
+				}
+			} else {
+				return 0;
+			}
+		}
 		public static double ParseDouble(string text) {
 			if (text.Length > 0) {
 				double result;
@@ -174,7 +186,7 @@ namespace Mycena {
 					throw new FormatException(text + " can not be converted to attach options");
 				}
 			} else {
-				return Gtk.AttachOptions.Expand;
+				return 0;//Gtk.AttachOptions.Expand;
 			}
 		}
 	}

@@ -8,7 +8,7 @@ namespace Mycena {
 		}
 
 		protected override Gtk.TextView CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.TextView();
+			var result = new Gtk.TextView(,); // TODO: add text buffer
 			ApplyProperties(result, properties, container);
 			return result;
 		}

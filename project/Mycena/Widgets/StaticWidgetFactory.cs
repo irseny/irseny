@@ -21,9 +21,14 @@ namespace Mycena {
 			widgets.Add("GtkTable", new TableFactory());
 
 			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
-			widgets.Add("GtkHSeparator", new VerticalSeparatorFactory());
+			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
+
+			widgets.Add("GtkHScale", new HorizontalScaleFactory());
+			widgets.Add("GtkVScale", new VerticalScaleFactory());
 
 			widgets.Add("GtkTextView", new TextViewFactory());
+			widgets.Add("GtkLabel", new LabelFactory());
+			widgets.Add("GtkEntry", new EntryFactory());
 
 			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());

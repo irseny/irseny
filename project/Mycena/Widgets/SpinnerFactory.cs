@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Mycena {
-	internal class SpinnerFactory : WidgetFactory<Gtk.SpinButton> {
+	/*internal class SpinnerFactory : WidgetFactory<Gtk.spin> {
 		public SpinnerFactory() : base() {
 			CreationProperties.Add("climb_rate", SetClimb);
 			CreationProperties.Add("digits", SetDigits);
@@ -17,6 +17,7 @@ namespace Mycena {
 				widget.Adjustment = adjustment;
 				return true;
 			}
+			widget.
 		}
 		private static bool SetClimb(Gtk.SpinButton widget, ConfigProperties properties, IInterfaceNode container) {
 			double climb;
@@ -38,5 +39,5 @@ namespace Mycena {
 			widget.Digits = digits;
 			return true;
 		}
-	}
+	}*/
 }

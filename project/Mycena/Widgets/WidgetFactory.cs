@@ -19,9 +19,10 @@ namespace Mycena {
 			CommonCreationProperties.Add("can_focus", WidgetFactory.SetFocusable);
 			CommonCreationProperties.Add("receives_default", WidgetFactory.SetReceiveDefault);
 			CommonCreationProperties.Add("sensitive", WidgetFactory.SetSensitivity);
+			CommonCreationProperties.Add("hadjustment", WidgetFactory.SetScrollAdjustment);
+			CommonCreationProperties.Add("vadjustment", WidgetFactory.SetScrollAdjustment);
 		}
-		public WidgetFactory() {			
-			
+		public WidgetFactory() {
 			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>();
 			PackProperties = new HashSet<string>();
 		}
@@ -49,13 +50,14 @@ namespace Mycena {
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
 				if (propertyNode.Name.Equals(PropertyNodeName)) {
 					creationProperties.RegisterProperty(propertyNode);
-				} 
+				}
 			}
 			// creation (calls property application)
 			T widget = CreateWidget(creationProperties, container);
 			if (widget == null) {
 				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml);
 			}
+			ApplyProperties(widget, creationProperties, container);
 			container.RegisterWidget(idAttr.Value, widget);
 			// children pass
 			foreach (XmlNode childNode in rootNode.ChildNodes) {
@@ -66,7 +68,7 @@ namespace Mycena {
 					try {
 						EnsureRequiredProperties(packProperties, PackProperties);
 					} catch (KeyNotFoundException e) {
-						new KeyNotFoundException("Missing packing properties in child node: " + childNode.OuterXml, e);
+						throw new KeyNotFoundException("Missing packing properties in child node: " + childNode.OuterXml, e);
 					}
 					if (!PackWidget(widget, child, packProperties)) {
 						throw new InvalidOperationException("Unable to pack widget: " + childNode.OuterXml);
@@ -84,7 +86,7 @@ namespace Mycena {
 		protected static bool CheckRequiredProperties(ConfigProperties available, ICollection<string> required) {
 			if (available == null) throw new ArgumentNullException("available");
 			if (required == null) throw new ArgumentNullException("required");
-			foreach (string p in required) {				
+			foreach (string p in required) {
 				if (available.GetProperty(p, null) == null) {
 					return false;
 				}
@@ -112,7 +114,7 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		/// <param name="exclude">Properties to exclude.</param>
-		protected void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
+		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
 			foreach (string p in properties.PropertyNames) {
 				if (exclude == null || !exclude.Contains(p)) {
 					PropertyApplicationHandler<T> handler;

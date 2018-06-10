@@ -7,11 +7,20 @@ namespace Mycena {
 			CreationProperties.Add("max_length", EntryFactory.SetMaxLength);
 			CreationProperties.Add("invisible_char", EntryFactory.SetInvisibleChar);
 			CreationProperties.Add("width_chars", EntryFactory.SetWidthChars);
-			CreationProperties.Add("adjustment", SetAdjustment);
+			//CreationProperties.Add("adjustment", SetAdjustment);
 			CreationProperties.Add("numeric", SetNumeric);
 		}
 		protected override Gtk.SpinButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			return new Gtk.SpinButton(0, 10, 1);
+			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
+			double climb;
+			uint digits;
+			try {
+				climb = TextParseTools.ParseDouble(properties.GetProperty("climb_rate", 1));
+				digits = TextParseTools.ParseUInt(properties.GetProperty("digits", 0));
+			} catch (FormatException) {
+				return null;
+			}
+			return new Gtk.SpinButton(adjustment, climb, digits);
 		}
 		private static bool SetNumeric(Gtk.SpinButton widget, ConfigProperties properties, IInterfaceNode container) {
 			bool numeric;
@@ -24,16 +33,5 @@ namespace Mycena {
 
 			return true;
 		}
-		private static bool SetAdjustment(Gtk.SpinButton widget, ConfigProperties properties, IInterfaceNode container) {
-			Gtk.Adjustment adjustment = container.GetGadget<Gtk.Adjustment>(properties.GetProperty("adjustment"), null);
-			if (adjustment == null) {
-				return false;
-			} else {
-				widget.Adjustment = adjustment;
-				return true;
-			}
-		}
-
-
 	}
 }

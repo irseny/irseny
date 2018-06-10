@@ -26,7 +26,7 @@ namespace Mycena {
 				throw new ArgumentException("property: Missing name attribute: " + property.OuterXml);
 			}
 			string name = nameAttr.Value;
-			if (property.InnerText == null || property.InnerText.Length == 0) throw new ArgumentException("property: Empty value: " + property.OuterXml);
+			if (property.InnerText == null) throw new ArgumentException("property: Empty value: " + property.OuterXml);
 			if (properties.ContainsKey(name)) {
 				properties[name] = property.InnerText;
 			} else {

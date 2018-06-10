@@ -34,11 +34,17 @@ namespace Irseny {
 			imageLogSplitter.Pack2(logPanel, true, true);
 
 			var window = mainContainer.GetWidget<Gtk.Window>("wn_Main");*/
-			string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
+			string ccFile = Path.Combine(resourceFolder, "gtk/CameraControl.glade");
+			var ccFactory = Mycena.InterfaceFactory.CreateFromFile(ccFile);
+			Gtk.Application.Init();
+			var ccContainer = ccFactory.CreateWidget("win_Main");
+			var window = ccContainer.GetWidget<Gtk.Window>("win_Main");
+
+			/*string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
 			var logFactory = Mycena.InterfaceFactory.CreateFromFile(logFile);
 			Gtk.Application.Init();
 			var logContainer = logFactory.CreateWidget("win_Root");
-			var window = logContainer.GetWidget<Gtk.Window>("win_Root");
+			var window = logContainer.GetWidget<Gtk.Window>("win_Root");*/
 			window.Resize(800, 600);
 			window.ShowAll();
 			window.DeleteEvent += delegate {

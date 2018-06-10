@@ -14,14 +14,12 @@ namespace Mycena {
 			CreationProperties.Add("draw_indicator", ToggleButtonFactory.SetDrawIndicator);
 		}
 		protected override Gtk.ToggleButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.ToggleButton();
-			ApplyProperties(result, properties, container);
-			return result;
+			return new Gtk.ToggleButton();
 		}
 
 		public static bool SetActive<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.ToggleButton {
 			bool active;
-			try {				
+			try {
 				active = TextParseTools.ParseBool(properties.GetProperty("active"));
 			} catch (FormatException) {
 				return false;

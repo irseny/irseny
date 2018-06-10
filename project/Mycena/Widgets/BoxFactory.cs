@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 
 namespace Mycena {
-	internal abstract class BoxFactory<T> : WidgetFactory<T> where T : Gtk.Box {
-		public BoxFactory() {
-			
+	internal abstract class BoxFactory : WidgetFactory<Gtk.Box> {
+		public BoxFactory() : base() {
+
 		}
-		protected override bool PackWidget(T container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.Box container, Gtk.Widget child, ConfigProperties properties) {
 			Gtk.PackType packType;
 			bool expand;
 			bool fill;
@@ -32,17 +32,15 @@ namespace Mycena {
 		}
 	}
 
-	internal class HorizontalBoxFactory : BoxFactory<Gtk.HBox> {
-		protected override Gtk.HBox CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.HBox();
-			ApplyProperties(result, properties, container);
-			return result;
+	internal class HorizontalBoxFactory : BoxFactory {
+		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			return new Gtk.HBox();
 		}
 
 	}
 
-	internal class VerticalBoxFactory : BoxFactory<Gtk.VBox> {
-		protected override Gtk.VBox CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+	internal class VerticalBoxFactory : BoxFactory {
+		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container) {
 			return new Gtk.VBox();
 		}
 

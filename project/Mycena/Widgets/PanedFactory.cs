@@ -3,16 +3,15 @@ using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
-	internal abstract class PanedFactory<T> : WidgetFactory<T> where T : Gtk.Paned {
+	internal abstract class PanedFactory : WidgetFactory<Gtk.Paned> {
 		public PanedFactory() {
-			
 			CreationProperties.Add("position", SetPosition);
 			CreationProperties.Add("position_set", ApplyPositionSet);
 			PackProperties.Add("resize");
 			PackProperties.Add("shrink");
 
 		}
-		protected override bool PackWidget(T container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.Paned container, Gtk.Widget child, ConfigProperties properties) {
 			try {
 				bool resize = TextParseTools.ParseBool(properties.GetProperty("resize", "false"));
 				bool shrink = TextParseTools.ParseBool(properties.GetProperty("shrink", "false"));
@@ -50,24 +49,21 @@ namespace Mycena {
 		}
 	}
 
-	internal class HorizontalPanedFactory : PanedFactory<Gtk.HPaned> {
-		
+	internal class HorizontalPanedFactory : PanedFactory {
 
-		protected override Gtk.HPaned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.HPaned();
-			ApplyProperties(result, properties, container);
-			return result;
+
+		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			return new Gtk.HPaned();
+
 		}
 
 
 
 	}
 
-	internal class VerticalPanedFactory : PanedFactory<Gtk.VPaned> {
-		protected override Gtk.VPaned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.VPaned();
-			ApplyProperties(result, properties, container);
-			return result;
+	internal class VerticalPanedFactory : PanedFactory {
+		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			return new Gtk.VPaned();
 		}
 	}
 }
