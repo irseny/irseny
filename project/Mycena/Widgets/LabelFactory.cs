@@ -12,13 +12,13 @@ namespace Mycena {
 			CreationProperties.Add("xpadding", MiscFactory.SetPadding);
 			CreationProperties.Add("ypadding", MiscFactory.SetPadding);
 			// label
-			CreationProperties.Add("text", SetText);
+			CreationProperties.Add("label", SetText);
 		}
 		protected override Gtk.Label CreateWidget(ConfigProperties properties, IInterfaceNode container) {
 			return new Gtk.Label();
 		}
 		private static bool SetText(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container) {
-			string text = properties.GetProperty("text");
+			string text = properties.GetProperty("label");
 			widget.Text = text;
 			return true;
 		}

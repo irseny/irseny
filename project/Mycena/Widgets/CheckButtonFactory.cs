@@ -14,9 +14,7 @@ namespace Mycena {
 			CreationProperties.Add("draw_indicator", ToggleButtonFactory.SetDrawIndicator);
 		}
 		protected override Gtk.CheckButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
-			var result = new Gtk.CheckButton();
-			ApplyProperties(result, properties, container);
-			return result;
+			return new Gtk.CheckButton();
 		}
 	}
 }

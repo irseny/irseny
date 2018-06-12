@@ -4,6 +4,7 @@ namespace Mycena {
 		public ScaleFactory() : base() {
 			CreationProperties.Add("round_digits", SetRoundDigits);
 			CreationProperties.Add("draw_value", SetDrawValue);
+
 		}
 		private static bool SetRoundDigits(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container) {
 			int digits;

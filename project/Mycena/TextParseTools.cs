@@ -174,20 +174,23 @@ namespace Mycena {
 			}
 		}
 		public static Gtk.AttachOptions ParseAttachOptions(string text) {
+			Gtk.AttachOptions result = 0;
 			if (text.Length > 0) {
-				text = text.Trim().ToLower();
-				if (text.Equals("gtk_fill")) {
-					return Gtk.AttachOptions.Fill;
-				} else if (text.Equals("gtk_expand")) {
-					return Gtk.AttachOptions.Expand;
-				} else if (text.Equals("gtk_shrink")) {
-					return Gtk.AttachOptions.Shrink;
-				} else {
-					throw new FormatException(text + " can not be converted to attach options");
+				string[] sComps = text.ToLower().Split('|');
+				for (int i = 0; i < sComps.Length; i++) {
+					string option = sComps[i].Trim();
+					if (option.Equals("gtk_fill")) {
+						result |= Gtk.AttachOptions.Fill;
+					} else if (option.Equals("gtk_expand")) {
+						result |= Gtk.AttachOptions.Expand;
+					} else if (option.Equals("gtk_shrink")) {
+						result |= Gtk.AttachOptions.Shrink;
+					} else {
+						throw new FormatException(text + " can not be converted to attach options");
+					}
 				}
-			} else {
-				return 0;//Gtk.AttachOptions.Expand;
 			}
+			return result;
 		}
 	}
 }

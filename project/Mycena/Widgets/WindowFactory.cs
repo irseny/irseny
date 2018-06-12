@@ -11,7 +11,7 @@ namespace Mycena {
 		protected override Gtk.Window CreateWidget(ConfigProperties properties, IInterfaceNode container) {
 			bool top;
 			try {
-				top = TextParseTools.ParseBool(properties.GetProperty("top_level", false));
+				top = TextParseTools.ParseBool(properties.GetProperty("top_level", true));
 			} catch (FormatException) {
 				return null;
 			}

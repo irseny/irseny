@@ -33,7 +33,7 @@ namespace Mycena {
 					properties.RegisterProperty(propertyNode);
 				}
 			}
-			GLib.Object gadget = CreateGadget(properties, container);
+			T gadget = CreateGadget(properties, container);
 			if (gadget != null) {
 				ApplyProperties(gadget, properties, container);
 				container.RegisterGadget(idAttr.Value, gadget);

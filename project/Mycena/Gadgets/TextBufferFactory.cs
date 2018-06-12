@@ -6,25 +6,26 @@ namespace Mycena {
 			CreationProperties.Add("text", SetText);
 		}
 		protected override Gtk.TextBuffer CreateGadget(ConfigProperties properties, IInterfaceNode container) {
-			Gtk.TextTagTable table;
-			string tableName;
-			if (properties.TryGetProperty("tag_table", out tableName)) {
-				if (!container.TryGetGadget(tableName, out table)) {
-					return null;
-				}
-			} else {
-				table = new Gtk.TextTagTable();
-				container.AddGadget(table);
-			}
-			string text = properties.GetProperty("text", null);
-			var result = new Gtk.TextBuffer(table);
-			ApplyProperties(result, properties, container);
-			return result;
+			Gtk.TextTagTable table = TextTagTableFactory.GetTable(properties, container);
+			return new Gtk.TextBuffer(table);
 		}
 		private static bool SetText(Gtk.TextBuffer gadget, ConfigProperties properties, IInterfaceNode container) {
-			string text = properties.GetProperty("text");
-			gadget.Text = text;
+			gadget.Text = properties.GetProperty("text");
 			return true;
+		}
+		public static Gtk.TextBuffer GetBuffer(ConfigProperties properties, IInterfaceNode container) {
+			Gtk.TextBuffer result;
+			string bufferName;
+			if (properties.TryGetProperty("text_buffer", out bufferName)) {
+				if (!container.TryGetGadget(bufferName, out result)) {
+					result = new Gtk.TextBuffer(TextTagTableFactory.GetTable(properties, container));
+					container.RegisterGadget(bufferName, result);
+				}
+			} else {
+				result = new Gtk.TextBuffer(TextTagTableFactory.GetTable(properties, container));
+				container.AddGadget(result);
+			}
+			return result;
 		}
 	}
 }

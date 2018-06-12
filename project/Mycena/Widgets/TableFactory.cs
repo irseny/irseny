@@ -28,8 +28,8 @@ namespace Mycena {
 				bottom = TextParseTools.ParseUInt(properties.GetProperty("bottom_attach", 1));
 				xpad = TextParseTools.ParseUInt(properties.GetProperty("x_padding", 0));
 				ypad = TextParseTools.ParseUInt(properties.GetProperty("y_padding", 0));
-				xopt = TextParseTools.ParseAttachOptions(properties.GetProperty("x_options", "GTK_EXPAND"));
-				yopt = TextParseTools.ParseAttachOptions(properties.GetProperty("y_options", "GTK_EXPAND"));
+				xopt = TextParseTools.ParseAttachOptions(properties.GetProperty("x_options", "GTK_EXPAND|GTK_FILL"));
+				yopt = TextParseTools.ParseAttachOptions(properties.GetProperty("y_options", "GTK_EXPAND|GTK_FILL"));
 			} catch (FormatException) {
 				return false;
 			}
