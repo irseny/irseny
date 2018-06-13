@@ -18,14 +18,17 @@ namespace Mycena {
 		}
 		public WidgetFactory() {
 			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>();
+			CreationAttributes = new Dictionary<string, PropertyApplicationHandler<T>>();
 			PackProperties = new HashSet<string>();
 		}
 		protected delegate bool PropertyApplicationHandler<TW>(TW widget, ConfigProperties properties, IInterfaceNode container);
 
 		private static IDictionary<string, PropertyApplicationHandler<Gtk.Widget>> CommonCreationProperties { get; set; }
 
+
 		protected ISet<string> PackProperties { get; private set; }
 		protected IDictionary<string, PropertyApplicationHandler<T>> CreationProperties { get; private set; }
+		protected IDictionary<string, PropertyApplicationHandler<T>> CreationAttributes { get; private set; }
 
 
 
@@ -58,6 +61,7 @@ namespace Mycena {
 				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml);
 			}
 			ApplyProperties(widget, creationProperties, container);
+			ApplyAttributes(widget, creationProperties, container);
 			container.RegisterWidget(idAttr.Value, widget);
 			// children pass
 			foreach (XmlNode childNode in rootNode.ChildNodes) {
@@ -113,20 +117,33 @@ namespace Mycena {
 		/// <param name="widget">Widget.</param>
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
-		/// <param name="exclude">Properties to exclude.</param>
-		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container, ISet<string> exclude = null) {
+		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container) {
 			foreach (string p in properties.PropertyNames) {
-				if (exclude == null || !exclude.Contains(p)) {
-					PropertyApplicationHandler<T> handler;
-					PropertyApplicationHandler<Gtk.Widget> commonHandler;
-					if (CreationProperties.TryGetValue(p, out handler)) {
-						if (!handler(widget, properties, container)) {
-							throw new InvalidOperationException("Failed to apply property to widget: " + p);
-						}
-					} else if (CommonCreationProperties.TryGetValue(p, out commonHandler)) {
-						if (!commonHandler(widget, properties, container)) {
-							throw new InvalidOperationException("Failed to apply property to widget: " + p);
-						}
+				PropertyApplicationHandler<T> handler;
+				PropertyApplicationHandler<Gtk.Widget> commonHandler;
+				if (CreationProperties.TryGetValue(p, out handler)) {
+					if (!handler(widget, properties, container)) {
+						throw new InvalidOperationException("Failed to apply property to widget: " + p);
+					}
+				} else if (CommonCreationProperties.TryGetValue(p, out commonHandler)) {
+					if (!commonHandler(widget, properties, container)) {
+						throw new InvalidOperationException("Failed to apply property to widget: " + p);
+					}
+				}
+			}
+		}
+		/// <summary>
+		/// Applies all known attributes to the given widget.
+		/// </summary>
+		/// <param name="widget">Widget.</param>
+		/// <param name="properties">Available properties.</param>
+		/// <param name="container">Widget container.</param>
+		private void ApplyAttributes(T widget, ConfigProperties properties, IInterfaceNode container) {
+			foreach (string a in properties.AttributeNames) {
+				PropertyApplicationHandler<T> handler;
+				if (CreationAttributes.TryGetValue(a, out handler)) {
+					if (!handler(widget, properties, container)) {
+						throw new InvalidOperationException("Failed to apply attribute to widget: " + a);
 					}
 				}
 			}

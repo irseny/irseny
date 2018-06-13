@@ -14,6 +14,7 @@ namespace Mycena {
 			CreationProperties.Add("ypad", MiscFactory.SetPadding);
 			// label
 			CreationProperties.Add("label", SetText);
+			CreationAttributes.Add("underline", SetUnderline);
 		}
 		protected override Gtk.Label CreateWidget(ConfigProperties properties, IInterfaceNode container) {
 			return new Gtk.Label();
@@ -21,6 +22,17 @@ namespace Mycena {
 		private static bool SetText(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container) {
 			string text = properties.GetProperty("label");
 			widget.Text = text;
+			return true;
+		}
+		private static bool SetUnderline(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container) {
+			bool underline;
+			try {
+				underline = TextParseTools.ParseBool(properties.GetAttribute("underline", false));
+			} catch (FormatException) {
+				return false;
+			}
+			Console.WriteLine("setting underline: " + underline);
+			widget.UseUnderline = underline;
 			return true;
 		}
 		/*private static bool SetMaxLength(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container) {
