@@ -5,13 +5,7 @@ using System.Collections.Generic;
 
 namespace Mycena {
 	internal abstract partial class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
-		protected const string ObjectNodeName = "object";
-		protected const string ObjectIdAttribute = "id";
-		protected const string ObjectClassAttribute = "class";
-		protected const string PropertyNodeName = "property";
-		protected const string PropertyNameAttribute = "name";
-		protected const string PackNodeName = "packing";
-		protected const string ChildNodeName = "child";
+		
 
 		static WidgetFactory() {
 			CommonCreationProperties = new Dictionary<string, PropertyApplicationHandler<Gtk.Widget>>();
@@ -38,18 +32,24 @@ namespace Mycena {
 		public Gtk.Widget CreateWidget(XmlNode rootNode, IInterfaceNode container) {
 			if (rootNode == null) throw new ArgumentNullException("rootNode");
 			if (container == null) throw new ArgumentNullException("container");
-			if (!rootNode.Name.Equals(ObjectNodeName)) {
+			if (!rootNode.Name.Equals("object")) {
 				throw new ArgumentException("rootNode: Not an object node: " + rootNode.OuterXml);
 			}
-			var idAttr = rootNode.Attributes[ObjectIdAttribute];
+			var idAttr = rootNode.Attributes["id"];
 			if (idAttr == null) {
 				throw new KeyNotFoundException("Missing id attribute in object node: " + rootNode.OuterXml);
 			}
 			// creation property pass
 			var creationProperties = new ConfigProperties();
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
-				if (propertyNode.Name.Equals(PropertyNodeName)) {
+				if (propertyNode.Name.Equals("property")) {
 					creationProperties.RegisterProperty(propertyNode);
+				} else if (propertyNode.Name.Equals("attributes")) {
+					foreach (XmlNode attributeNode in propertyNode) {
+						if (attributeNode.Name.Equals("attribute")) {
+							creationProperties.RegisterAttribute(attributeNode);
+						}
+					}
 				}
 			}
 			// creation (calls property application)
@@ -61,7 +61,7 @@ namespace Mycena {
 			container.RegisterWidget(idAttr.Value, widget);
 			// children pass
 			foreach (XmlNode childNode in rootNode.ChildNodes) {
-				if (childNode.Name.Equals(ChildNodeName)) {
+				if (childNode.Name.Equals("child")) {
 					Tuple<Gtk.Widget, ConfigProperties> childTuple = WidgetFactory.CreateWidget(childNode, container);
 					Gtk.Widget child = childTuple.Item1;
 					ConfigProperties packProperties = childTuple.Item2;

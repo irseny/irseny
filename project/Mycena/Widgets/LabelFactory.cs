@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Mycena {
 	internal class LabelFactory : WidgetFactory<Gtk.Label> {
 		public LabelFactory() : base() {
@@ -9,8 +10,8 @@ namespace Mycena {
 			// misc
 			CreationProperties.Add("xalign", MiscFactory.SetAligment);
 			CreationProperties.Add("yalign", MiscFactory.SetAligment);
-			CreationProperties.Add("xpadding", MiscFactory.SetPadding);
-			CreationProperties.Add("ypadding", MiscFactory.SetPadding);
+			CreationProperties.Add("xpad", MiscFactory.SetPadding);
+			CreationProperties.Add("ypad", MiscFactory.SetPadding);
 			// label
 			CreationProperties.Add("label", SetText);
 		}

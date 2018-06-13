@@ -6,16 +6,17 @@ namespace Irseny {
 		public static void Main(string[] args) {
 			string[] resourceLocations = {
 				"resources",
-				@"..\resources",
-				@"..\..\resources",
-				@"..\..\..\resources"
+				"../resources",
+				"../../resources",
+				"../../../resources"
 			};
 			string resourceFolder = null;
 			foreach (string path in resourceLocations) {
-				string filePath = Path.Combine(Path.GetFullPath(path), "Resources.root");
+				string filePath = Path.Combine(path, "Resources.root");
 				if (File.Exists(filePath)) {
 					resourceFolder = Path.GetFullPath(path);
 					Console.WriteLine("found resource folder at: " + resourceFolder);
+					break;
 				}
 			}
 			if (resourceFolder == null) {

@@ -34,6 +34,11 @@
     <property name="step_increment">10</property>
     <property name="page_increment">100</property>
   </object>
+  <object class="GtkImage" id="img_Start">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-play</property>
+  </object>
   <object class="GtkWindow" id="win_Main">
     <property name="can_focus">False</property>
     <child>
@@ -52,12 +57,14 @@
                 <property name="xalign">1</property>
                 <property name="label" translatable="yes">Property</property>
                 <attributes>
-                  <attribute name="language" value=""/>
+                  <attribute name="underline" value="True"/>
                 </attributes>
               </object>
               <packing>
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options"/>
+                <property name="x_padding">2</property>
+                <property name="y_padding">4</property>
               </packing>
             </child>
             <child>
@@ -66,14 +73,16 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Value</property>
                 <attributes>
-                  <attribute name="language" value=""/>
+                  <attribute name="underline" value="True"/>
                 </attributes>
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="right_attach">3</property>
+                <property name="right_attach">2</property>
                 <property name="x_options"/>
                 <property name="y_options"/>
+                <property name="x_padding">2</property>
+                <property name="y_padding">4</property>
               </packing>
             </child>
             <child>
@@ -82,7 +91,7 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Auto</property>
                 <attributes>
-                  <attribute name="language" value=""/>
+                  <attribute name="underline" value="True"/>
                 </attributes>
               </object>
               <packing>
@@ -90,6 +99,8 @@
                 <property name="right_attach">4</property>
                 <property name="x_options"/>
                 <property name="y_options"/>
+                <property name="x_padding">2</property>
+                <property name="y_padding">4</property>
               </packing>
             </child>
             <child>
@@ -97,6 +108,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">1</property>
+                <property name="xpad">4</property>
                 <property name="label" translatable="yes">Device ID</property>
               </object>
               <packing>
@@ -135,6 +147,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">1</property>
+                <property name="xpad">4</property>
                 <property name="label" translatable="yes">Frame Width</property>
               </object>
               <packing>
@@ -229,6 +242,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">1</property>
+                <property name="xpad">4</property>
                 <property name="label" translatable="yes">Frame Height</property>
               </object>
               <packing>
@@ -296,6 +310,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">1</property>
+                <property name="xpad">4</property>
                 <property name="label" translatable="yes">Brightness</property>
               </object>
               <packing>
@@ -364,6 +379,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">1</property>
+                <property name="xpad">4</property>
                 <property name="label" translatable="yes">Framerate</property>
               </object>
               <packing>
@@ -426,6 +442,9 @@
                 <property name="y_options"/>
               </packing>
             </child>
+            <child>
+              <placeholder/>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -452,6 +471,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="image">img_Start</property>
+                <property name="image_position">right</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -473,5 +494,10 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="img_Stop">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-stop</property>
   </object>
 </interface>

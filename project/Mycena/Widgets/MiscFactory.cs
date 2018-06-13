@@ -24,10 +24,10 @@ namespace Mycena {
 			widget.GetPadding(out padX, out padY);
 			try {
 				string sPadX, sPadY;
-				if (properties.TryGetProperty("xpadding", out sPadX)) {
+				if (properties.TryGetProperty("xpad", out sPadX)) {
 					padX = TextParseTools.ParseInt(sPadX);
 				}
-				if (properties.TryGetProperty("ypadding", out sPadY)) {
+				if (properties.TryGetProperty("ypad", out sPadY)) {
 					padY = TextParseTools.ParseInt(sPadY);
 				}
 			} catch (FormatException) {
