@@ -2,6 +2,7 @@
 using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Mycena {
 	internal abstract partial class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
@@ -63,21 +64,25 @@ namespace Mycena {
 			ApplyProperties(widget, creationProperties, container);
 			ApplyAttributes(widget, creationProperties, container);
 			container.RegisterWidget(idAttr.Value, widget);
+			var children = new List<Tuple<Gtk.Widget, ConfigProperties>>();
 			// children pass
 			foreach (XmlNode childNode in rootNode.ChildNodes) {
 				if (childNode.Name.Equals("child")) {
 					Tuple<Gtk.Widget, ConfigProperties> childTuple = WidgetFactory.CreateWidget(childNode, container);
 					Gtk.Widget child = childTuple.Item1;
-					ConfigProperties packProperties = childTuple.Item2;
-					try {
-						EnsureRequiredProperties(packProperties, PackProperties);
-					} catch (KeyNotFoundException e) {
-						throw new KeyNotFoundException("Missing packing properties in child node: " + childNode.OuterXml, e);
+					if (child != null) { // can be null for placeholder
+						ConfigProperties packProperties = childTuple.Item2;
+						try {
+							EnsureRequiredProperties(packProperties, PackProperties);
+						} catch (KeyNotFoundException e) {
+							throw new KeyNotFoundException("Missing pack properties in child node: " + childNode.OuterXml, e);
+						}
 					}
-					if (!PackWidget(widget, child, packProperties)) {
-						throw new InvalidOperationException("Unable to pack widget: " + childNode.OuterXml);
-					}
+					children.Add(childTuple);
 				}
+			}
+			if (!PackWidgets(widget, children)) {
+				throw new InvalidOperationException("Unable to pack widgets: " + rootNode.OuterXml);
 			}
 			return widget;
 		}
@@ -118,6 +123,9 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container) {
+			#if DEBUG
+			properties.BeginMark();
+			#endif
 			foreach (string p in properties.PropertyNames) {
 				PropertyApplicationHandler<T> handler;
 				PropertyApplicationHandler<Gtk.Widget> commonHandler;
@@ -131,6 +139,16 @@ namespace Mycena {
 					}
 				}
 			}
+			#if DEBUG
+			var marked = properties.MarkedProperties;
+			var available = properties.PropertyNames;
+			foreach (string name in available) {
+				if (!marked.Contains(name)) {
+					Debug.WriteLine("Property '{0}' unused in: {1}", name, GetType().Name);
+				}
+			}
+			properties.EndMark();
+			#endif
 		}
 		/// <summary>
 		/// Applies all known attributes to the given widget.
@@ -139,6 +157,9 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		private void ApplyAttributes(T widget, ConfigProperties properties, IInterfaceNode container) {
+			#if DEBUG
+			properties.BeginMark();
+			#endif
 			foreach (string a in properties.AttributeNames) {
 				PropertyApplicationHandler<T> handler;
 				if (CreationAttributes.TryGetValue(a, out handler)) {
@@ -147,6 +168,16 @@ namespace Mycena {
 					}
 				}
 			}
+			#if DEBUG
+			var marked = properties.MarkedAttributes;
+			var available = properties.AttributeNames;
+			foreach (string name in available) {
+				if (!marked.Contains(name)) {
+					Debug.WriteLine("Attribute '{0}' unused in: {1}", name, GetType().Name);
+				}
+			}
+			properties.EndMark();
+			#endif
 		}
 		/// <summary>
 		/// Creates a widget with the given properties.
@@ -155,6 +186,22 @@ namespace Mycena {
 		/// <param name="properties">Properties for instantiation.</param>
 		/// <param name="container">Interface element container.</param>
 		protected abstract T CreateWidget(ConfigProperties properties, IInterfaceNode container);
+		/// <summary>
+		/// Packs the given children in the container widget.
+		/// </summary>
+		/// <returns><c>true</c>, if packing was successful, <c>false</c> otherwise.</returns>
+		/// <param name="container">Container to place children in.</param>
+		/// <param name="children">Children and properties to pack.</param>
+		protected virtual bool PackWidgets(T container, IList<Tuple<Gtk.Widget, ConfigProperties>> children) {
+			foreach (var childTuple in children) {
+				if (childTuple.Item1 != null) { // null for placeholder
+					if (!PackWidget(container, childTuple.Item1, childTuple.Item2)) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
 		/// <summary>
 		/// Packs the given child in the container widget.
 		/// </summary>

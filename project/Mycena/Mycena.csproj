@@ -80,6 +80,7 @@
     <Compile Include="Widgets\LabelFactory.cs" />
     <Compile Include="Widgets\MiscFactory.cs" />
     <Compile Include="Widgets\ScaleFactory.cs" />
+    <Compile Include="Widgets\NotebookFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

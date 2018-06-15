@@ -22,30 +22,32 @@ namespace Irseny {
 			if (resourceFolder == null) {
 				throw new FileNotFoundException("resource folder not available");
 			}
-			/*string mainFile = Path.Combine(resourceFolder, "gtk/Main.glade");
+			string mainFile = Path.Combine(resourceFolder, "gtk/Main.glade");
 			string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
+			string controlFile = Path.Combine(resourceFolder, "gtk/Control.glade");
+			string cameraControlFile = Path.Combine(resourceFolder, "gtk/CameraControl.glade");
 			var logFactory = Mycena.InterfaceFactory.CreateFromFile(logFile);
 			var mainFactory = Mycena.InterfaceFactory.CreateFromFile(mainFile);
+			var cameraControlFactory = Mycena.InterfaceFactory.CreateFromFile(cameraControlFile);
+			var controlFactory = Mycena.InterfaceFactory.CreateFromFile(controlFile);
 
 			Gtk.Application.Init();
-			var mainContainer = mainFactory.CreateWidget("wn_Main");
+			var mainContainer = mainFactory.CreateWidget("win_Main");
 			var logContainer = logFactory.CreateWidget("pnl_Root");
-			var imageLogSplitter = mainContainer.GetWidget<Gtk.Paned>("sp_ImageLog");
-			var logPanel = logContainer.GetWidget<Gtk.Widget>("pnl_Root");
-			imageLogSplitter.Pack2(logPanel, true, true);
+			var controlContainer = controlFactory.CreateWidget("ntb_Control");
+			var cameraContontrolContainer = cameraControlFactory.CreateWidget("pnl_Main");
 
-			var window = mainContainer.GetWidget<Gtk.Window>("wn_Main");*/
-			string ccFile = Path.Combine(resourceFolder, "gtk/CameraControl.glade");
-			var ccFactory = Mycena.InterfaceFactory.CreateFromFile(ccFile);
-			Gtk.Application.Init();
-			var ccContainer = ccFactory.CreateWidget("win_Main");
-			var window = ccContainer.GetWidget<Gtk.Window>("win_Main");
+			var pnlCameraControl = cameraContontrolContainer.GetWidget<Gtk.Box>("pnl_Main");
+			var ntbControl = controlContainer.GetWidget<Gtk.Notebook>("ntb_Control");
+			var pnlLog = logContainer.GetWidget<Gtk.Widget>("pnl_Root");
+			var splImageLog = mainContainer.GetWidget<Gtk.Paned>("spl_ImageLog");
+			var pnlControlStatus = mainContainer.GetWidget<Gtk.Box>("pnl_ControlStatus");
 
-			/*string logFile = Path.Combine(resourceFolder, "gtk/Log.glade");
-			var logFactory = Mycena.InterfaceFactory.CreateFromFile(logFile);
-			Gtk.Application.Init();
-			var logContainer = logFactory.CreateWidget("win_Root");
-			var window = logContainer.GetWidget<Gtk.Window>("win_Root");*/
+			pnlControlStatus.PackStart(ntbControl);
+			ntbControl.AppendPage(pnlCameraControl, new Gtk.Label("Camera"));
+			splImageLog.Pack2(pnlLog, true, true);
+
+			var window = mainContainer.GetWidget<Gtk.Window>("win_Main");
 			window.Resize(800, 600);
 			window.ShowAll();
 			window.DeleteEvent += delegate {

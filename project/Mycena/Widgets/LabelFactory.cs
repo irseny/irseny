@@ -31,7 +31,6 @@ namespace Mycena {
 			} catch (FormatException) {
 				return false;
 			}
-			Console.WriteLine("setting underline: " + underline);
 			widget.UseUnderline = underline;
 			return true;
 		}

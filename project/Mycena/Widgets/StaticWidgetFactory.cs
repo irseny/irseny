@@ -19,6 +19,7 @@ namespace Mycena {
 			widgets.Add("GtkHPaned", new HorizontalPanedFactory());
 			widgets.Add("GtkVPaned", new VerticalPanedFactory());
 			widgets.Add("GtkTable", new TableFactory());
+			widgets.Add("GtkNotebook", new NotebookFactory());
 
 			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
 			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
@@ -46,10 +47,12 @@ namespace Mycena {
 			var classAttr = rootNode.Attributes["class"]; // may be null in case of child and not object node
 			XmlNode packNode = null;
 			XmlNode objectNode = null;
+			XmlNode childNode = null;
 			bool hasPlaceholder = false;
 			if (classAttr != null) {
 				objectNode = rootNode;
 			} else {
+				childNode = rootNode;
 				foreach (XmlNode node in rootNode.ChildNodes) {
 					if (node.Name.Equals("object")) {
 						if (objectNode != null) throw new InvalidOperationException("Child node with multiple children: " + rootNode.OuterXml);
@@ -75,7 +78,7 @@ namespace Mycena {
 			if (widgets.TryGetValue(classAttr.Value, out factory)) {
 				var config = new ConfigProperties();
 				if (packNode != null) {
-					ReadPackProperties(packNode, config);
+					ReadPackProperties(childNode, packNode, config);
 				}
 				Gtk.Widget widget = factory.CreateWidget(objectNode, container);
 				return new Tuple<Gtk.Widget, ConfigProperties>(widget, config);
@@ -122,9 +125,16 @@ namespace Mycena {
 		/// <summary>
 		/// Reads the pack properties from the given packing node.
 		/// </summary>
+		/// <param name="childNode">Child node to read type properties from, may be null.</param>
 		/// <param name="packNode">Packing node to read properties from.</param>
 		/// <param name="properties">Properties read from the packing node.</param>
-		private static void ReadPackProperties(XmlNode packNode, ConfigProperties properties) {
+		private static void ReadPackProperties(XmlNode childNode, XmlNode packNode, ConfigProperties properties) {
+			if (childNode != null && childNode.Attributes != null) {
+				foreach (XmlAttribute attr in childNode.Attributes) {
+					var propertyName = "child_" + attr.Name;
+					properties.RegisterAttribute("child_" + attr.Name, attr.Value);
+				}
+			}
 			foreach (XmlNode propertyNode in packNode) {
 				if (propertyNode.Name.Equals("property")) {
 					properties.RegisterProperty(propertyNode);

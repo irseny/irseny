@@ -2,18 +2,18 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkWindow" id="wn_Main">
+  <object class="GtkWindow" id="win_Main">
     <property name="can_focus">False</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <child>
-      <object class="GtkHPaned" id="sp_ShowControl">
+      <object class="GtkHPaned" id="spl_ShowControl">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="position">400</property>
         <property name="position_set">True</property>
         <child>
-          <object class="GtkVPaned" id="sp_ImageLog">
+          <object class="GtkVPaned" id="spl_ImageLog">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="position">360</property>
@@ -31,7 +31,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="pn_ControlStatus">
+          <object class="GtkVBox" id="pnl_ControlStatus">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
