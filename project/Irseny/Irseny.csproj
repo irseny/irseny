@@ -52,6 +52,22 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Viol\InterfaceFactory.cs" />
+    <Compile Include="Viol\InterfaceFactoryState.cs" />
+    <Compile Include="Capture\Video\Manager.cs" />
+    <Compile Include="Viol\IInterfaceFactory.cs" />
+    <Compile Include="Viol\Main\Control\CameraFactory.cs" />
+    <Compile Include="Viol\Main\ControlFactory.cs" />
+    <Compile Include="Viol\MainFactory.cs" />
+    <Compile Include="Viol\Main\LogFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Viol\" />
+    <Folder Include="Capture\" />
+    <Folder Include="Capture\Video\" />
+    <Folder Include="Viol\Main\" />
+    <Folder Include="Viol\Main\Control\" />
+    <Folder Include="Viol\Main\Log\" />
+  </ItemGroup>
 </Project>

@@ -1,10 +1,12 @@
 ﻿using System;
+
 using System.IO;
+using System.Diagnostics;
 
 namespace Irseny {
 	class MainClass {
 		public static void Main(string[] args) {
-			string[] resourceLocations = {
+			/*string[] resourceLocations = {
 				"resources",
 				"../resources",
 				"../../resources",
@@ -53,6 +55,18 @@ namespace Irseny {
 			window.DeleteEvent += delegate {
 				Gtk.Application.Quit();
 			};
+			Gtk.Application.Run();*/
+			Gtk.Application.Init();
+			var mainFactory = new Viol.MainFactory();
+			var logFactory = new Viol.Main.LogFactory();
+			mainFactory.ConstructFloor("log", logFactory);
+			if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
+				Debug.WriteLine("main factory initialization failed");
+				return;
+			}
+			var window = mainFactory.Container.GetWidget<Gtk.Window>("win_Main");
+			window.Resize(800, 600);
+			window.ShowAll();
 			Gtk.Application.Run();
 		}
 	}
