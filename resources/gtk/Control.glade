@@ -8,8 +8,9 @@
       <object class="GtkNotebook" id="ntb_Control">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
+        <property name="homogeneous">True</property>
         <child>
-          <object class="GtkVBox" id="pnl_Camera">
+          <object class="GtkVBox" id="box_Camera">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>

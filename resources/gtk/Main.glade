@@ -7,13 +7,13 @@
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <child>
-      <object class="GtkHPaned" id="spl_ShowControl">
+      <object class="GtkHPaned" id="spt_ShowControl">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="position">400</property>
         <property name="position_set">True</property>
         <child>
-          <object class="GtkVPaned" id="spl_ImageLog">
+          <object class="GtkVPaned" id="spt_ImageLog">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="position">360</property>
