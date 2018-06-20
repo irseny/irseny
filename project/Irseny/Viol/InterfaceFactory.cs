@@ -147,6 +147,9 @@ namespace Irseny.Viol {
 			innerFactories.Clear();
 			Container.Dispose();
 		}
+		protected void EnsureHallAvailable() {
+			if (Hall == null) throw new InvalidOperationException("Hall not available");
+		}
 		protected abstract bool CreateInternal();
 		protected abstract bool ConnectInternal();
 		protected abstract bool DisconnectInternal();

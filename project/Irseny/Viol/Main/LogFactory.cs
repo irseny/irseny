@@ -5,19 +5,20 @@ namespace Irseny.Viol.Main {
 		public LogFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile("../../resources/gtk/Log.glade");
-			Container = factory.CreateWidget("pnl_Root");
+			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.Master.Instance.Resources.InterfaceDefinitions.GetEntry("Log"));
+			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			var hallRoot = Hall.Container.GetWidget<Gtk.Paned>("spl_ImageLog");
-			var pnlRoot = Container.GetWidget("pnl_Root");
-			hallRoot.Pack2(pnlRoot, true, true);
+			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
+			var boxMain = Container.GetWidget("box_Root");
+			boxRoot.PackStart(boxMain);
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			var hallRoot = Hall.Container.GetWidget<Gtk.Paned>("spl_ImageLog");
-			hallRoot.Pack2(null, false, false); // null widget generates criticall assertion fail
+			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
+			var boxMain = Container.GetWidget("box_Root");
+			boxRoot.Remove(boxMain);
 			return true;
 		}
 		protected override bool DestroyInternal() {

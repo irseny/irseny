@@ -57,16 +57,28 @@ namespace Irseny {
 			};
 			Gtk.Application.Run();*/
 			Gtk.Application.Init();
-			var mainFactory = new Viol.MainFactory();
-			var logFactory = new Viol.Main.LogFactory();
-			mainFactory.ConstructFloor("log", logFactory);
-			if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
-				Debug.WriteLine("main factory initialization failed");
-				return;
+			{
+				Content.Master.MakeInstance(new Content.Master());
+				var contentSettings = new Content.ContentManagerSettings();
+				string resourceRoot = Content.Master.FindResourceRoot();
+				contentSettings.SetResourcePaths(resourceRoot, resourceRoot, "(no-file)");
+				string userRoot = Content.Master.FindConfigRoot();
+				contentSettings.SetConfigPaths(userRoot, userRoot, "(no-file)");
+				Content.Master.Instance.Load(contentSettings);
 			}
-			var window = mainFactory.Container.GetWidget<Gtk.Window>("win_Main");
-			window.Resize(800, 600);
-			window.ShowAll();
+			{
+				var mainFactory = new Viol.MainFactory();
+				var logFactory = new Viol.Main.LogFactory();
+				mainFactory.ConstructFloor("log", logFactory);
+				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
+					Debug.WriteLine("main factory initialization failed");
+					return;
+				}
+				var window = mainFactory.Container.GetWidget<Gtk.Window>("win_Main");
+				window.Resize(800, 600);
+				window.ShowAll();
+
+			}
 			Gtk.Application.Run();
 		}
 	}

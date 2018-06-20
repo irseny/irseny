@@ -6,7 +6,7 @@ namespace Irseny.Viol {
 		}
 		protected override bool CreateInternal() {
 			Gtk.Application.Init();
-			var factory = Mycena.InterfaceFactory.CreateFromFile("../../resources/gtk/Main.glade");
+			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.Master.Instance.Resources.InterfaceDefinitions.GetEntry("Main"));
 			Container = factory.CreateWidget("win_Main");
 			return true;
 		}
