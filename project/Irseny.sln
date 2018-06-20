@@ -7,7 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny", "Irseny\Irseny.csp
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Windows Debug|Any CPU = Windows Debug|Any CPU
 		LinuxDebug|Any CPU = LinuxDebug|Any CPU
 		WindowsDebug|Any CPU = WindowsDebug|Any CPU
 	EndGlobalSection
