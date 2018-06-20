@@ -40,7 +40,7 @@
   <object class="GtkWindow" id="win_Root">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkVBox" id="pnl_Root">
+      <object class="GtkVBox" id="box_Root">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
@@ -67,11 +67,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="pnl_Control">
+          <object class="GtkHBox" id="box_Control">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkCheckButton" id="chb_Message">
+              <object class="GtkCheckButton" id="cbx_Message">
                 <property name="label">Messages</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -90,7 +90,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkCheckButton" id="chb_Warning">
+              <object class="GtkCheckButton" id="cbx_Warning">
                 <property name="label">Warnings</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -109,7 +109,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkCheckButton" id="chb_Error">
+              <object class="GtkCheckButton" id="cbx_Error">
                 <property name="label">Errors</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -140,36 +140,10 @@
               <placeholder/>
             </child>
             <child>
-              <object class="GtkToggleButton" id="btn_Toggle">
-                <property name="label" translatable="yes">Toggle</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">img_Custom</property>
-                <property name="use_underline">True</property>
-                <property name="image_position">right</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">7</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
-              <object class="GtkCheckButton" id="checkbutton1">
-                <property name="label">gtk-yes</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">False</property>
-                <property name="use_stock">True</property>
-                <property name="image_position">right</property>
-                <property name="draw_indicator">False</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">8</property>
-              </packing>
+              <placeholder/>
             </child>
           </object>
           <packing>
