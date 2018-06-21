@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="win_Ignored">
     <property name="can_focus">False</property>
     <child>
-      <object class="GtkNotebook" id="ntb_Control">
+      <object class="GtkNotebook" id="ntb_Root">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="homogeneous">True</property>
