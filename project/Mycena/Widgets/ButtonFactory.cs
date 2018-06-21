@@ -1,8 +1,16 @@
 ﻿using System;
 
 namespace Mycena {
-	internal class ButtonFactory {
-		public ButtonFactory() {
+	internal class ButtonFactory : WidgetFactory<Gtk.Button> {
+		public ButtonFactory() : base() {
+			CreationProperties.Add("use_stock", SetUseStock);
+			CreationProperties.Add("label", SetLabel);
+			CreationProperties.Add("image", SetImage);
+			CreationProperties.Add("image_position", SetImagePosition);
+			CreationProperties.Add("use_underline", SetUnderline);
+		}
+		protected override Gtk.Button CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+			return new Gtk.Button();
 		}
 
 		public static bool SetUseStock<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {

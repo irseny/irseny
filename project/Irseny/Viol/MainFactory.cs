@@ -23,7 +23,7 @@ namespace Irseny.Viol {
 			return true;
 		}
 		protected override bool DestroyInternal() {
-			// nothing to do
+			Container.Dispose();
 			return true;
 		}
 

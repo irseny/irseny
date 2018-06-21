@@ -31,6 +31,7 @@ namespace Mycena {
 			widgets.Add("GtkLabel", new LabelFactory());
 			widgets.Add("GtkEntry", new EntryFactory());
 
+			widgets.Add("GtkButton", new ButtonFactory());
 			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 			widgets.Add("GtkSpinButton", new SpinButtonFactory());

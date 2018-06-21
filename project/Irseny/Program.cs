@@ -69,7 +69,11 @@ namespace Irseny {
 			{
 				var mainFactory = new Viol.MainFactory();
 				var logFactory = new Viol.Main.LogFactory();
+				var controlFactory = new Viol.Main.ControlFactory();
 				mainFactory.ConstructFloor("log", logFactory);
+				mainFactory.ConstructFloor("control", controlFactory);
+				var cameraControlFactory = new Viol.Main.Control.CameraFactory();
+				controlFactory.ConstructFloor("camera", cameraControlFactory);
 				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;
