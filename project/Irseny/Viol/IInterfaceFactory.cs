@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Irseny.Viol {
 	public interface IInterfaceFactory : IDisposable {
@@ -17,6 +18,11 @@ namespace Irseny.Viol {
 		/// </summary>
 		/// <value>The widget container.</value>
 		Mycena.IInterfaceNode Container { get; }
+		/// <summary>
+		/// Gets the floors of this instance.
+		/// </summary>
+		/// <value>The floors.</value>
+		ICollection<IInterfaceFactory> Floors { get; }
 		/// <summary>
 		/// Creates the widgets of this instance.
 		/// </summary>
@@ -46,7 +52,28 @@ namespace Irseny.Viol {
 		/// <param name="floor">Inner factory.</param>
 		bool ConstructFloor(string name, IInterfaceFactory floor);
 		/// <summary>
-		/// Removes the inner factory identified by the given name from this instance.
+		/// Gets the floor specified by the given identifier.
+		/// </summary>
+		/// <returns>The floor.</returns>
+		/// <param name="name">Floor identifier.</param>
+		IInterfaceFactory GetFloor(string name);
+		/// <summary>
+		/// Gets the floor specified by name.
+		/// </summary>
+		/// <returns>The floor.</returns>
+		/// <param name="name">Floor identifier.</param>
+		/// <typeparam name="T">Floor type.</typeparam>
+		T GetFloor<T>(string name) where T : IInterfaceFactory;
+		/// <summary>
+		/// Gets the floor specified by the given identifier.
+		/// </summary>
+		/// <returns><c>true</c>, if the operation wass successful, <c>false</c> otherwise.</returns>
+		/// <param name="name">Floor identifier.</param>
+		/// <param name="result">Floor instance.</param>
+		/// <typeparam name="T">Floor type.</typeparam>
+		bool TryGetFloor<T>(string name, out T result) where T : IInterfaceFactory;
+		/// <summary>
+		/// Removes the inner factory identified by the given identifier.
 		/// </summary>
 		/// <returns>The inner factory destructed, null if the operation was not successful.</returns>
 		/// <param name="name">Inner factory identifier.</param>

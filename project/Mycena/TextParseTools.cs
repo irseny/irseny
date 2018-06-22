@@ -192,6 +192,22 @@ namespace Mycena {
 			}
 			return result;
 		}
+		public static Gtk.WrapMode ParseWrapMode(string text) {
+			text = text.Trim().ToLower();
+			if (text.Length > 0) {
+				if (text.Equals("char")) {
+					return Gtk.WrapMode.Char;
+				} else if (text.Equals("word")) {
+					return Gtk.WrapMode.Word;
+				} else if (text.Equals("word_char")) {
+					return Gtk.WrapMode.WordChar;
+				} else {
+					throw new FormatException(text + " can not be converted to wrap mode");
+				}
+			} else {
+				return Gtk.WrapMode.None;
+			}
+		}
 	}
 }
 

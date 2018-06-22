@@ -57,6 +57,9 @@ namespace Irseny {
 			};
 			Gtk.Application.Run();*/
 			Gtk.Application.Init();
+#if WINDOWS
+			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, "");
+#endif
 			{
 				Content.Master.MakeInstance(new Content.Master());
 				var contentSettings = new Content.ContentManagerSettings();

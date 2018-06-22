@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Mycena {
 	internal class NotebookFactory : WidgetFactory<Gtk.Notebook> {
 		public NotebookFactory() : base() {
+			CreationProperties.Add("homogeneous", SetHomogeneous);
+			CreationProperties.Add("homogeneous_tabs", SetHomogeneousTabs);
+			CreationProperties.Add("tab_pos", SetTabPosition);
 		}
 		protected override Gtk.Notebook CreateWidget(ConfigProperties properties, IInterfaceNode container) {
 			return new Gtk.Notebook();
@@ -21,7 +24,7 @@ namespace Mycena {
 					if (types[w].Equals("tab")) {
 						tab = widgets[i - w].Item1; // subtracting 0 or 1 as for types creation
 					} else if (types[w].Equals("content")) {
-						content = widgets[i - w].Item1; 
+						content = widgets[i - w].Item1;
 					} else {
 						return false;
 					}
@@ -35,6 +38,38 @@ namespace Mycena {
 			}
 			return true;
 		}
+		private static bool SetHomogeneous(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
+			bool homogeneous;
+			try {
+				homogeneous = TextParseTools.ParseBool(properties.GetProperty("homogeneous", false));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.Homogeneous = homogeneous;
+			return true;
+		}
+		private static bool SetHomogeneousTabs(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
+			bool homogeneous;
+			try {
+				homogeneous = TextParseTools.ParseBool(properties.GetProperty("homogeneous_tabs", false));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.HomogeneousTabs = homogeneous;
+
+			return true;
+		}
+		public static bool SetTabPosition(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
+			Gtk.PositionType position;
+			try {
+				position = TextParseTools.ParsePositionType(properties.GetProperty("tab_pos", "top"));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.TabPos = position;
+			return true;
+		}
+
 	}
 }
 

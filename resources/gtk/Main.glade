@@ -6,6 +6,7 @@
     <property name="can_focus">False</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
+    <property name="icon">cap.png</property>
     <child>
       <object class="GtkHPaned" id="spt_ShowControl">
         <property name="visible">True</property>

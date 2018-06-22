@@ -27,6 +27,16 @@ namespace Mycena {
 			}
 			return result;
 		}
+		public static Gtk.TextBuffer GetBuffer(string bufferName, IInterfaceNode container) {
+			Gtk.TextBuffer result;
+			if (!container.TryGetGadget(bufferName, out result)) {
+				var tags = new Gtk.TextTagTable();
+				result = new Gtk.TextBuffer(tags);
+				container.RegisterGadget(bufferName, result);
+				container.AddGadget(tags);
+			}
+			return result;
+		}
 	}
 }
 

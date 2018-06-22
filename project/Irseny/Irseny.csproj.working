@@ -14,7 +14,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\LinuxDebug</OutputPath>
-    <DefineConstants>DEBUG;LINUX;</DefineConstants>
+    <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
@@ -25,19 +25,27 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\bin\WindowsDebug</OutputPath>
-    <DefineConstants>DEBUG;WINDOWS;</DefineConstants>
+    <DefineConstants>DEBUG;</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-	<Reference Include="Mycena" Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
-      <HintPath>..\..\lib\WindowsDebug\Mycena.dll</HintPath>
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
     </Reference>
-	<Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-	<Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-	<Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="Mycena">
+      <HintPath>..\..\lib\$(Configuration)\Mycena.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -55,7 +63,6 @@
     <Compile Include="Content\Master.cs" />
     <Compile Include="Content\Manager.cs" />
     <Compile Include="Content\Resources\ResourceManager.cs" />
-    <Compile Include="Viol\Main\Control\Camera\InnerCameraFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -67,7 +74,12 @@
     <Folder Include="Viol\Main\Log\" />
     <Folder Include="Content\" />
     <Folder Include="Content\Resources\" />
-    <Folder Include="Viol\Main\Control\Camera\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mycena\Mycena.csproj">
+      <Project>{D238C375-B51C-45B7-8236-695FE5128F01}</Project>
+      <Name>Mycena</Name>
+    </ProjectReference>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

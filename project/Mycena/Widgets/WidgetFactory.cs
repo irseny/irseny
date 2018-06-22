@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Mycena {
 	internal abstract partial class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
-		
+
 
 		static WidgetFactory() {
 			CommonCreationProperties = new Dictionary<string, PropertyApplicationHandler<Gtk.Widget>>();
@@ -57,12 +57,18 @@ namespace Mycena {
 				}
 			}
 			// creation (calls property application)
+#if DEBUG
+			creationProperties.BeginMark();
+#endif
 			T widget = CreateWidget(creationProperties, container);
 			if (widget == null) {
 				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml);
 			}
 			ApplyProperties(widget, creationProperties, container);
 			ApplyAttributes(widget, creationProperties, container);
+#if DEBUG
+			creationProperties.EndMark();
+#endif
 			container.RegisterWidget(idAttr.Value, widget);
 			var children = new List<Tuple<Gtk.Widget, ConfigProperties>>();
 			// children pass
@@ -123,9 +129,6 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container) {
-			#if DEBUG
-			properties.BeginMark();
-			#endif
 			foreach (string p in properties.PropertyNames) {
 				PropertyApplicationHandler<T> handler;
 				PropertyApplicationHandler<Gtk.Widget> commonHandler;
@@ -139,7 +142,7 @@ namespace Mycena {
 					}
 				}
 			}
-			#if DEBUG
+#if DEBUG
 			var marked = properties.MarkedProperties;
 			var available = properties.PropertyNames;
 			foreach (string name in available) {
@@ -147,8 +150,7 @@ namespace Mycena {
 					Debug.WriteLine("Property '{0}' unused in: {1}", name, GetType().Name);
 				}
 			}
-			properties.EndMark();
-			#endif
+#endif
 		}
 		/// <summary>
 		/// Applies all known attributes to the given widget.
@@ -157,9 +159,6 @@ namespace Mycena {
 		/// <param name="properties">Available properties.</param>
 		/// <param name="container">Widget container.</param>
 		private void ApplyAttributes(T widget, ConfigProperties properties, IInterfaceNode container) {
-			#if DEBUG
-			properties.BeginMark();
-			#endif
 			foreach (string a in properties.AttributeNames) {
 				PropertyApplicationHandler<T> handler;
 				if (CreationAttributes.TryGetValue(a, out handler)) {
@@ -168,7 +167,7 @@ namespace Mycena {
 					}
 				}
 			}
-			#if DEBUG
+#if DEBUG
 			var marked = properties.MarkedAttributes;
 			var available = properties.AttributeNames;
 			foreach (string name in available) {
@@ -176,8 +175,7 @@ namespace Mycena {
 					Debug.WriteLine("Attribute '{0}' unused in: {1}", name, GetType().Name);
 				}
 			}
-			properties.EndMark();
-			#endif
+#endif
 		}
 		/// <summary>
 		/// Creates a widget with the given properties.

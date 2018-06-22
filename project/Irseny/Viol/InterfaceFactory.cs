@@ -5,7 +5,7 @@ namespace Irseny.Viol {
 	public abstract class InterfaceFactory : IInterfaceFactory {
 		Dictionary<string, IInterfaceFactory> innerFactories;
 
-		public InterfaceFactory() {			
+		public InterfaceFactory() {
 			State = InterfaceFactoryState.Initial;
 			innerFactories = new Dictionary<string, IInterfaceFactory>();
 			Container = null;
@@ -14,7 +14,9 @@ namespace Irseny.Viol {
 		public InterfaceFactoryState State { get; private set; }
 		public IInterfaceFactory Hall { get; set; }
 		public Mycena.IInterfaceNode Container { get; protected set; }
-
+		public ICollection<IInterfaceFactory> Floors {
+			get { return innerFactories.Values; }
+		}
 
 		public bool Create() {
 			if (State == InterfaceFactoryState.Initial) {
@@ -80,16 +82,16 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Initial:
 						result = Create();
-					break;
+						break;
 					case InterfaceFactoryState.Created:
 						result = Connect();
-					break;
+						break;
 					default:
 						result = false; // should not occur
-					break;
+						break;
 					}
 					if (!result) {
-						return false; 
+						return false;
 					}
 				} while (state > State);
 			} else if (state < State) {
@@ -98,19 +100,19 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Connected:
 						result = Disconnect();
-					break;
+						break;
 					case InterfaceFactoryState.Created:
 						result = Destroy();
-					break;
+						break;
 					default:
 						result = false; // should not occur
-					break;
+						break;
 					}
 					if (!result) {
 						return false;
 					}
 				} while (state < State);
-			} 
+			}
 			return true; // already in correct state
 		}
 		public bool ConstructFloor(string name, IInterfaceFactory floor) {
@@ -138,6 +140,35 @@ namespace Irseny.Viol {
 			} else {
 				return null;
 			}
+		}
+
+		public T GetFloor<T>(string name) where T : IInterfaceFactory {
+			if (name == null) throw new ArgumentNullException("name");
+			IInterfaceFactory result;
+			if (innerFactories.TryGetValue(name, out result)) {
+				if (result is T) {
+					return (T)result;
+				} else {
+					throw new ArgumentException("type argument T");
+				}
+			} else {
+				throw new KeyNotFoundException("name: " + name);
+			}
+		}
+		public IInterfaceFactory GetFloor(string name) {
+			return GetFloor<IInterfaceFactory>(name);
+		}
+
+		public bool TryGetFloor<T>(string name, out T result) where T : IInterfaceFactory {
+			IInterfaceFactory factory;
+			if (innerFactories.TryGetValue(name, out factory)) {
+				if (factory is T) {
+					result = (T)factory;
+					return true;
+				}
+			}
+			result = default(T);
+			return false;
 		}
 		public void Dispose() {
 			Init(InterfaceFactoryState.Initial); // inner factories uninitialized

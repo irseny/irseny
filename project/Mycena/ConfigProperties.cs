@@ -112,7 +112,7 @@ namespace Mycena {
 			string result;
 			if (attributes.TryGetValue(name, out result)) {
 				if (marking) {
-					markedProperties.AddLast(name);
+					markedAttributes.AddLast(name);
 				}
 				return result;
 			} else {
@@ -146,7 +146,7 @@ namespace Mycena {
 			if (properties.TryGetValue(name, out result)) {
 				if (marking) {
 					markedAttributes.AddLast(name);
-				} 
+				}
 				return true;
 			} else {
 				return false;

@@ -3,7 +3,7 @@ using System.Xml;
 using System.Collections.Generic;
 
 namespace Mycena {
-	
+
 
 	public interface IInterfaceNode : IDisposable {
 		#region Widgets
@@ -63,6 +63,11 @@ namespace Mycena {
 		/// <param name="name">Unique widget name.</param>
 		/// <param name="widget">Widget to store.</param>
 		void RegisterWidget(string name, Gtk.Widget widget);
+		/// <summary>
+		/// Stores the given widget for disposal.
+		/// </summary>
+		/// <param name="widget">Widget to store.</param>
+		void AddWidget(Gtk.Widget widget);
 		#endregion
 
 		#region Gadgets

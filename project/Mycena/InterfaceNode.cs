@@ -47,8 +47,8 @@ namespace Mycena {
 			if (widgets.TryGetValue(name, out result)) {
 				if (result is T) {
 					return (T)result;
-				} 
-			} 
+				}
+			}
 			return defaultValue;
 		}
 		public Gtk.Widget GetWidget(string name, Gtk.Widget defaultValue) {
@@ -76,6 +76,10 @@ namespace Mycena {
 				throw new ArgumentException("name: widget with this name does already exist");
 			}
 		}
+		public void AddWidget(Gtk.Widget widget) {
+			if (widget == null) throw new ArgumentNullException("widget");
+			anonym.Add(widget);
+		}
 		#endregion
 
 		#region Gadget
@@ -101,8 +105,8 @@ namespace Mycena {
 			if (gadgets.TryGetValue(name, out result)) {
 				if (result is T) {
 					return (T)result;
-				} 
-			} 
+				}
+			}
 			return defaultValue;
 		}
 		public GLib.Object GetGadget(string name, GLib.Object defaultValue) {
