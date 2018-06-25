@@ -51,6 +51,7 @@
 	<Reference Include="Emgu.CV.World">
 	  <HintPath>..\..\lib\Common\Emgu.CV.World.dll</HintPath>
 	</Reference>
+	<Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Viol\Main\Control\Camera\InnerCameraFactory.cs" />
     <Compile Include="Capture\Video\CaptureStream.cs" />
     <Compile Include="Capture\Video\CaptureSettings.cs" />
+    <Compile Include="Capture\Video\CaptureProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
