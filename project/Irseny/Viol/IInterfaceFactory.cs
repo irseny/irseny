@@ -78,6 +78,11 @@ namespace Irseny.Viol {
 		/// <returns>The inner factory destructed, null if the operation was not successful.</returns>
 		/// <param name="name">Inner factory identifier.</param>
 		IInterfaceFactory DestructFloor(string name);
+		/// <summary>
+		/// Invokes the given handler in the GUI thread.
+		/// </summary>
+		/// <param name="handler">Handler.</param>
+		void Invoke(EventHandler handler);
 
 	}
 }

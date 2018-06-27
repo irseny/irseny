@@ -2,7 +2,7 @@
 using System.IO;
 
 namespace Irseny.Content.Resources {
-	public class ResourceManager : Manager {
+	public class ResourceManager : ContentManager {
 		
 		public ResourceManager() : base() {
 			InterfaceDefinitions = new InterfaceDefinitionManager();

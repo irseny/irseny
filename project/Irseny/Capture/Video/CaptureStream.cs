@@ -6,15 +6,22 @@ namespace Irseny.Capture.Video {
 
 
 		object captureSync = new object();
-		object eventSync = new object();
+		object imageEventSync = new object();
+		object startedEventSync = new object();
+		object stoppedEventSync = new object();
 		Emgu.CV.VideoCapture capture = null;
-		CaptureSettings settings;
+		CaptureSettings settings = new CaptureSettings();
+		readonly int id;
 		event EventHandler<CaptureImageEventArgs> imageAvailable;
-		event EventHandler captureStarted;
-		event EventHandler capturePaused;
-		event EventHandler captureStopped;
+		event EventHandler<StreamEventArgs> captureStarted;
+		event EventHandler<StreamEventArgs> captureStopped;
 
-		public CaptureStream() {
+		public CaptureStream(int id) {
+			if (id < 0) throw new ArgumentOutOfRangeException("id");
+			this.id = id;
+		}
+		private int Id {
+			get { return id; }
 		}
 		public bool Capturing {
 			get {
@@ -25,52 +32,107 @@ namespace Irseny.Capture.Video {
 		}
 		public event EventHandler<CaptureImageEventArgs> ImageAvailable {
 			add {
-				lock (eventSync) {
+				lock (imageEventSync) {
 					imageAvailable += value;
 				}
 			}
 			remove {
-				lock (eventSync) {
+				lock (imageEventSync) {
 					imageAvailable -= value;
+				}
+			}
+		}
+		public event EventHandler<StreamEventArgs> CaptureStarted {
+			add {
+				lock (startedEventSync) {
+					captureStarted += value;
+				}
+			}
+			remove {
+				lock (startedEventSync) {
+					captureStarted -= value;
+				}
+			}
+		}
+		public event EventHandler<StreamEventArgs> CaptureStopped {
+			add {
+				lock (stoppedEventSync) {
+					captureStopped += value;
+				}
+			}
+			remove {
+				lock (stoppedEventSync) {
+					captureStopped -= value;
 				}
 			}
 		}
 		public CaptureSettings Settings {
 			get {
 				lock (captureSync) {
-					return new CaptureSettings(); //TODO: copy settings
+					return new CaptureSettings(settings);
 				}
 			}
 		}
 		private void ReceiveImage(object sender, EventArgs args) {
 			lock (captureSync) {
-				OnImageAvailable(args);
+				var image = new Emgu.CV.Mat();
+				capture.Retrieve(image);
+				OnImageAvailable(new CaptureImageEventArgs(this, id, image));
 			}
 		}
-		protected void OnImageAvailable(EventArgs args) {
+		protected void OnImageAvailable(CaptureImageEventArgs args) {
 			EventHandler<CaptureImageEventArgs> handler;
-			lock (eventSync) {
+			lock (imageEventSync) {
 				handler = imageAvailable;
 			}
+			if (handler != null) {				
+				handler(this, args);
+			} else {
+				// TODO: put image into auto disposing structure
+				args.Image.Dispose();
+			}
+		}
+		protected void OnCaptureStarted(StreamEventArgs args) {
+			EventHandler<StreamEventArgs> handler;
+			lock (startedEventSync) {
+				handler = captureStarted;
+			}
 			if (handler != null) {
-				var image = new Emgu.CV.Mat(); ;
-				capture.Retrieve(image);
-				handler(this, new CaptureImageEventArgs(image));
+				handler(this, args);
+			}
+		}
+		protected void OnCaptureStopped(StreamEventArgs args) {
+			EventHandler<StreamEventArgs> handler;
+			lock (stoppedEventSync) {
+				handler = captureStopped;
+			}
+			if (handler != null) {
+				handler(this, args);
 			}
 		}
 		public bool Start(CaptureSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
+			bool result;
 			lock (captureSync) {
 				if (capture == null) {
 					capture = new Emgu.CV.VideoCapture(0);
-					capture.ImageGrabbed += ReceiveImage;
 					capture.Start(new CaptureThreadExceptionHandler(this));
-					// TODO: apply settings
-					this.settings = settings;
-					return capture.IsOpened;
+					if (capture.IsOpened) {
+						// TODO: apply settings
+						this.settings = new CaptureSettings(settings);
+						OnCaptureStarted(new StreamEventArgs(this, Id));
+						capture.ImageGrabbed += ReceiveImage;
+						result = true;
+					} else {
+						capture.Dispose();
+						capture = null;
+						result = false;
+					}
+				} else {
+					result = false;
 				}
 			}
-			return false;
+			return result;
 		}
 		public bool Pause() {
 			lock (captureSync) {
@@ -82,15 +144,21 @@ namespace Irseny.Capture.Video {
 			return false;
 		}
 		public bool Stop() {
+			bool result;
 			lock (captureSync) {
 				if (capture != null) {
 					capture.Stop();
 					capture.Dispose();
 					capture = null;
-					return true;
+					result = true;
+				} else {
+					result = false;
 				}
 			}
-			return false;
+			if (result) {
+				OnCaptureStopped(new StreamEventArgs(this, Id));
+			}
+			return result;
 		}
 		private class CaptureThreadExceptionHandler : ExceptionHandler {
 			CaptureStream target;
@@ -100,20 +168,37 @@ namespace Irseny.Capture.Video {
 			}
 			public override bool HandleException(Exception exception) {
 				target.Stop(); // not capturing any longer
-							   // TODO: create log message
+				Console.WriteLine("exception in capture stream:\n" + exception);
+				// TODO: create log message
 				return false;
 			}
 
 		}
 
 	}
-	public class CaptureImageEventArgs : EventArgs {
 
-		public Emgu.CV.Mat Image { get; private set; }
-
-		public CaptureImageEventArgs(Emgu.CV.Mat image) : base() {
-			if (image == null) throw new ArgumentNullException("image");
-			Image = image;
+	public class StreamEventArgs : EventArgs {
+		public StreamEventArgs(CaptureStream stream, int streamId) {
+			if (stream == null) throw new ArgumentNullException("stream");
+			if (streamId < 0) throw new ArgumentOutOfRangeException("streamId");
+			Stream = stream;
+			StreamId = streamId;
 		}
+		public CaptureStream Stream { get; private set; }
+		public int StreamId { get; private set; }
+
+	}
+
+	public class CaptureImageEventArgs : StreamEventArgs {
+		Emgu.CV.Mat image;
+		public CaptureImageEventArgs(CaptureStream stream, int streamId, Emgu.CV.Mat image) : base(stream, streamId) {
+			if (image == null) throw new ArgumentNullException("image");
+			this.image = image;
+		}
+		public Emgu.CV.Mat Image { 
+			// TODO: create shared ref instance
+			get { return image; }
+		}
+
 	}
 }

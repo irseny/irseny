@@ -61,13 +61,16 @@ namespace Irseny {
 			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, "");
 #endif
 			{
-				Content.Master.MakeInstance(new Content.Master());
+				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
+			}
+			{
+				Content.ContentMaster.MakeInstance(new Content.ContentMaster());
 				var contentSettings = new Content.ContentManagerSettings();
-				string resourceRoot = Content.Master.FindResourceRoot();
+				string resourceRoot = Content.ContentMaster.FindResourceRoot();
 				contentSettings.SetResourcePaths(resourceRoot, resourceRoot, "(no-file)");
-				string userRoot = Content.Master.FindConfigRoot();
+				string userRoot = Content.ContentMaster.FindConfigRoot();
 				contentSettings.SetConfigPaths(userRoot, userRoot, "(no-file)");
-				Content.Master.Instance.Load(contentSettings);
+				Content.ContentMaster.Instance.Load(contentSettings);
 			}
 			{
 				var mainFactory = new Viol.MainFactory();
@@ -82,11 +85,16 @@ namespace Irseny {
 					return;
 				}
 				var window = mainFactory.Container.GetWidget<Gtk.Window>("win_Main");
+
 				window.Resize(800, 600);
 				window.ShowAll();
 
 			}
+
 			Gtk.Application.Run();
+			{
+				Capture.Video.CaptureSystem.MakeInstance(null);
+			}
 		}
 	}
 }

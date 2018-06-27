@@ -2,11 +2,11 @@
 using System.IO;
 
 namespace Irseny.Content {
-	public class Master : Manager {
-		public Master() : base() {
+	public class ContentMaster : ContentManager {
+		public ContentMaster() : base() {
 			Resources = new Resources.ResourceManager();
 		}
-		public static Master Instance { get; private set; }
+		public static ContentMaster Instance { get; private set; }
 
 		public Resources.ResourceManager Resources { get; protected set; }
 
@@ -24,7 +24,7 @@ namespace Irseny.Content {
 
 
 
-		public static void MakeInstance(Master instance) {
+		public static void MakeInstance(ContentMaster instance) {
 			if (instance == null) throw new ArgumentNullException("instance");
 			Instance = instance;
 		}

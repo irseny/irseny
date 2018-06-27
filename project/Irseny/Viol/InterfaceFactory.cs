@@ -82,13 +82,13 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Initial:
 						result = Create();
-						break;
+					break;
 					case InterfaceFactoryState.Created:
 						result = Connect();
-						break;
+					break;
 					default:
 						result = false; // should not occur
-						break;
+					break;
 					}
 					if (!result) {
 						return false;
@@ -100,13 +100,13 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Connected:
 						result = Disconnect();
-						break;
+					break;
 					case InterfaceFactoryState.Created:
 						result = Destroy();
-						break;
+					break;
 					default:
 						result = false; // should not occur
-						break;
+					break;
 					}
 					if (!result) {
 						return false;
@@ -169,6 +169,10 @@ namespace Irseny.Viol {
 			}
 			result = default(T);
 			return false;
+		}
+		public void Invoke(EventHandler handler) {
+			if (handler == null) throw new ArgumentNullException("handler");
+			Gtk.Application.Invoke(handler);
 		}
 		public void Dispose() {
 			Init(InterfaceFactoryState.Initial); // inner factories uninitialized

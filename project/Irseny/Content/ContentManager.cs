@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 namespace Irseny.Content {
-	public abstract class Manager {
+	public abstract class ContentManager {
 		
-		public Manager() {
+		public ContentManager() {
 			Loaded = false;
 			Modified = false;
 			Settings = null;
@@ -24,7 +24,7 @@ namespace Irseny.Content {
 		public abstract void Unload();
 	}
 
-	public abstract class Manager<T> : Manager {
+	public abstract class Manager<T> : ContentManager {
 		Dictionary<string, T> entries;
 
 		public Manager() : base() {

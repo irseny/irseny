@@ -5,7 +5,7 @@ namespace Irseny.Viol.Main {
 		public LogFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.Master.Instance.Resources.InterfaceDefinitions.GetEntry("Log"));
+			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Log"));
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
