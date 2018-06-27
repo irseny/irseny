@@ -61,6 +61,7 @@ namespace Irseny {
 			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, "");
 #endif
 			{
+				Log.LogManager.MakeInstance(new Log.LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
 			}
 			{
@@ -74,8 +75,8 @@ namespace Irseny {
 			}
 			{
 				var mainFactory = new Viol.MainFactory();
-				var logFactory = new Viol.Main.LogFactory();
-				var controlFactory = new Viol.Main.ControlFactory();
+				var logFactory = new Viol.Main.Log.MainFactory();
+				var controlFactory = new Viol.Main.Control.MainFactory();
 				mainFactory.ConstructFloor("log", logFactory);
 				mainFactory.ConstructFloor("control", controlFactory);
 				var cameraControlFactory = new Viol.Main.Control.CameraFactory();
@@ -94,6 +95,7 @@ namespace Irseny {
 			Gtk.Application.Run();
 			{
 				Capture.Video.CaptureSystem.MakeInstance(null);
+				Log.LogManager.MakeInstance(null);
 			}
 		}
 	}

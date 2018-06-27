@@ -21,7 +21,11 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
+          <workingdir>${SolutionDir}/../</workingdir>
+        </Command>
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
@@ -36,7 +40,12 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="xcopy /d /y lib\External\cvextern.dll ${TargetDir}" workingdir="${SolutionDir}\..\" externalConsole="True" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>xcopy /d /y lib\External\cvextern.dll ${TargetDir}</command>
+          <workingdir>${SolutionDir}\..\</workingdir>
+          <externalConsole>True</externalConsole>
+        </Command>
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
@@ -71,9 +80,7 @@
     <Compile Include="Capture\Video\CaptureSystem.cs" />
     <Compile Include="Viol\IInterfaceFactory.cs" />
     <Compile Include="Viol\Main\Control\CameraFactory.cs" />
-    <Compile Include="Viol\Main\ControlFactory.cs" />
     <Compile Include="Viol\MainFactory.cs" />
-    <Compile Include="Viol\Main\LogFactory.cs" />
     <Compile Include="Content\ContentManagerSettings.cs" />
     <Compile Include="Content\Resources\InterfaceDefinitionManager.cs" />
     <Compile Include="Content\Resources\ResourceManager.cs" />
@@ -83,6 +90,12 @@
     <Compile Include="Capture\Video\CaptureProperty.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentMaster.cs" />
+    <Compile Include="Viol\Main\Control\MainFactory.cs" />
+    <Compile Include="Viol\Main\Log\MainFactory.cs" />
+    <Compile Include="Log\LogManager.cs" />
+    <Compile Include="Log\LogMessage.cs" />
+    <Compile Include="Log\MessageType.cs" />
+    <Compile Include="Log\MessageEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -95,6 +108,7 @@
     <Folder Include="Content\" />
     <Folder Include="Content\Resources\" />
     <Folder Include="Viol\Main\Control\Camera\" />
+    <Folder Include="Log\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

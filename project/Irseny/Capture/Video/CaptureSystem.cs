@@ -19,13 +19,6 @@ namespace Irseny.Capture.Video {
 		object streamSync = new object();
 		IList<CaptureStream> streams = new List<CaptureStream>(4);
 
-
-		/*static CaptureSystem() {			
-			MakeInstance(new CaptureSystem());
-		}*/
-		public CaptureSystem() {
-			
-		}
 		public event EventHandler<StreamEventArgs> StreamCreated {
 			add {
 				lock (createEventSync) {
@@ -51,15 +44,15 @@ namespace Irseny.Capture.Video {
 			}
 		}
 		public static CaptureSystem Instance {
-			get { 
-				
+			get {
+
 				lock (instanceSync) {
-					return CaptureSystem.instance; 
+					return instance;
 				}
 			}
 		}
 
-		public static void MakeInstance(CaptureSystem instance) {			
+		public static void MakeInstance(CaptureSystem instance) {
 			lock (instanceSync) {
 				if (CaptureSystem.instance != null) {
 					CaptureSystem.instance.SignalStop();
@@ -127,7 +120,7 @@ namespace Irseny.Capture.Video {
 		public int CreateStream() {
 			CaptureStream stream;
 			int index;
-			lock (streamSync) {				
+			lock (streamSync) {
 				// find unused stream id
 				for (index = 0; index < streams.Count; index++) {
 					if (streams[index] == null) {
@@ -146,7 +139,7 @@ namespace Irseny.Capture.Video {
 			return index;
 		}
 		public CaptureStream GetStream(int id) {
-			lock (streamSync) {			
+			lock (streamSync) {
 				if (id >= 0 && id < streams.Count) {
 					return streams[id];
 				}

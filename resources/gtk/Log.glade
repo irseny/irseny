@@ -14,7 +14,6 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="icon_name">emblem-favorite</property>
-    <property name="use_fallback">True</property>
   </object>
   <object class="GtkImage" id="img_Error">
     <property name="visible">True</property>
@@ -37,7 +36,7 @@
     <property name="text">Message Log
 --------------------</property>
   </object>
-  <object class="GtkWindow" id="win_Root">
+  <object class="GtkWindow" id="win_Ignored">
     <property name="can_focus">False</property>
     <child>
       <object class="GtkVBox" id="box_Root">
@@ -71,6 +70,20 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
+              <object class="GtkButton" id="btn_Clear">
+                <property name="label" translatable="yes">Clear</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkCheckButton" id="cbx_Message">
                 <property name="label">Messages</property>
                 <property name="visible">True</property>
@@ -86,7 +99,7 @@
                 <property name="fill">False</property>
                 <property name="padding">5</property>
                 <property name="pack_type">end</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -105,7 +118,7 @@
                 <property name="fill">False</property>
                 <property name="padding">5</property>
                 <property name="pack_type">end</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -124,11 +137,8 @@
                 <property name="fill">False</property>
                 <property name="padding">5</property>
                 <property name="pack_type">end</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
             <child>
               <placeholder/>

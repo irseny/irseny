@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Irseny.Viol.Main {
-	public class ControlFactory : InterfaceFactory {
-		public ControlFactory() {
+namespace Irseny.Viol.Main.Control {
+	public class MainFactory : InterfaceFactory {
+		public MainFactory() {
 		}
 		protected override bool CreateInternal() {
 			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Control"));

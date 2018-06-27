@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.ServiceModel.Dispatcher;
 
 namespace Irseny.Capture.Video {
 	public class CaptureStream {
-
-
 		object captureSync = new object();
 		object imageEventSync = new object();
 		object startedEventSync = new object();
@@ -85,7 +84,7 @@ namespace Irseny.Capture.Video {
 			lock (imageEventSync) {
 				handler = imageAvailable;
 			}
-			if (handler != null) {				
+			if (handler != null) {
 				handler(this, args);
 			} else {
 				// TODO: put image into auto disposing structure
@@ -116,12 +115,32 @@ namespace Irseny.Capture.Video {
 			lock (captureSync) {
 				if (capture == null) {
 					capture = new Emgu.CV.VideoCapture(0);
-					capture.Start(new CaptureThreadExceptionHandler(this));
 					if (capture.IsOpened) {
-						// TODO: apply settings
+
+						if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
+							Log.LogManager.Instance.Log(Log.LogMessage.CreateWarning(this, "unable to apply framerate"));
+						} else {
+							Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
+						}
+						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
+						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -10);
+						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
+																				// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
+
 						OnCaptureStarted(new StreamEventArgs(this, Id));
+						capture.ImageGrabbed += delegate {
+
+							//Thread.Sleep(1);
+						};
 						capture.ImageGrabbed += ReceiveImage;
+						int count = 0;
+						capture.ImageGrabbed += delegate {
+							Console.WriteLine("image grabbed: " + count++);
+						};
 						result = true;
 					} else {
 						capture.Dispose();
@@ -135,13 +154,16 @@ namespace Irseny.Capture.Video {
 			return result;
 		}
 		public bool Pause() {
+			bool result;
 			lock (captureSync) {
 				if (capture != null) {
 					capture.Pause();
-					return true;
+					result = true;
+				} else {
+					result = false;
 				}
 			}
-			return false;
+			return result;
 		}
 		public bool Stop() {
 			bool result;
@@ -170,7 +192,7 @@ namespace Irseny.Capture.Video {
 				target.Stop(); // not capturing any longer
 				Console.WriteLine("exception in capture stream:\n" + exception);
 				// TODO: create log message
-				return false;
+				return true; // do not stop
 			}
 
 		}
@@ -195,7 +217,7 @@ namespace Irseny.Capture.Video {
 			if (image == null) throw new ArgumentNullException("image");
 			this.image = image;
 		}
-		public Emgu.CV.Mat Image { 
+		public Emgu.CV.Mat Image {
 			// TODO: create shared ref instance
 			get { return image; }
 		}
