@@ -12,8 +12,7 @@ namespace Irseny.Capture.Video {
 		volatile bool running = false;
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 		ManualResetEvent invokeSignal = new ManualResetEvent(false);
-		object createEventSync = new object();
-		object destroyEventSync = new object();
+		object streamEventSync = new object();
 		event EventHandler<StreamEventArgs> streamCreated;
 		event EventHandler<StreamEventArgs> streamDestroyed;
 		object streamSync = new object();
@@ -21,24 +20,24 @@ namespace Irseny.Capture.Video {
 
 		public event EventHandler<StreamEventArgs> StreamCreated {
 			add {
-				lock (createEventSync) {
+				lock (streamEventSync) {
 					streamCreated += value;
 				}
 			}
 			remove {
-				lock (createEventSync) {
+				lock (streamEventSync) {
 					streamCreated -= value;
 				}
 			}
 		}
 		public event EventHandler<StreamEventArgs> StreamDestroyed {
 			add {
-				lock (destroyEventSync) {
+				lock (streamEventSync) {
 					streamDestroyed += value;
 				}
 			}
 			remove {
-				lock (destroyEventSync) {
+				lock (streamEventSync) {
 					streamDestroyed -= value;
 				}
 			}
@@ -101,7 +100,7 @@ namespace Irseny.Capture.Video {
 		}
 		private void OnStreamCreated(StreamEventArgs args) {
 			EventHandler<StreamEventArgs> handler;
-			lock (createEventSync) {
+			lock (streamEventSync) {
 				handler = streamCreated;
 			}
 			if (handler != null) {
@@ -110,7 +109,7 @@ namespace Irseny.Capture.Video {
 		}
 		private void OnStreamDestroyed(StreamEventArgs args) {
 			EventHandler<StreamEventArgs> handler;
-			lock (destroyEventSync) {
+			lock (streamEventSync) {
 				handler = streamDestroyed;
 			}
 			if (handler != null) {

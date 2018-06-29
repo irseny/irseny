@@ -6,8 +6,7 @@ namespace Irseny.Capture.Video {
 	public class CaptureStream {
 		object captureSync = new object();
 		object imageEventSync = new object();
-		object startedEventSync = new object();
-		object stoppedEventSync = new object();
+		object runEventSync = new object();
 		Emgu.CV.VideoCapture capture = null;
 		CaptureSettings settings = new CaptureSettings();
 		readonly int id;
@@ -43,24 +42,24 @@ namespace Irseny.Capture.Video {
 		}
 		public event EventHandler<StreamEventArgs> CaptureStarted {
 			add {
-				lock (startedEventSync) {
+				lock (runEventSync) {
 					captureStarted += value;
 				}
 			}
 			remove {
-				lock (startedEventSync) {
+				lock (runEventSync) {
 					captureStarted -= value;
 				}
 			}
 		}
 		public event EventHandler<StreamEventArgs> CaptureStopped {
 			add {
-				lock (stoppedEventSync) {
+				lock (runEventSync) {
 					captureStopped += value;
 				}
 			}
 			remove {
-				lock (stoppedEventSync) {
+				lock (runEventSync) {
 					captureStopped -= value;
 				}
 			}
@@ -77,6 +76,7 @@ namespace Irseny.Capture.Video {
 				var image = new Emgu.CV.Mat();
 				capture.Retrieve(image);
 				OnImageAvailable(new CaptureImageEventArgs(this, id, image));
+				//image.Dispose();
 			}
 		}
 		protected void OnImageAvailable(CaptureImageEventArgs args) {
@@ -93,7 +93,7 @@ namespace Irseny.Capture.Video {
 		}
 		protected void OnCaptureStarted(StreamEventArgs args) {
 			EventHandler<StreamEventArgs> handler;
-			lock (startedEventSync) {
+			lock (runEventSync) {
 				handler = captureStarted;
 			}
 			if (handler != null) {
@@ -102,7 +102,7 @@ namespace Irseny.Capture.Video {
 		}
 		protected void OnCaptureStopped(StreamEventArgs args) {
 			EventHandler<StreamEventArgs> handler;
-			lock (stoppedEventSync) {
+			lock (runEventSync) {
 				handler = captureStopped;
 			}
 			if (handler != null) {
@@ -117,7 +117,7 @@ namespace Irseny.Capture.Video {
 					capture = new Emgu.CV.VideoCapture(0);
 					if (capture.IsOpened) {
 
-						if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
+						if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30)) {
 							Log.LogManager.Instance.Log(Log.LogMessage.CreateWarning(this, "unable to apply framerate"));
 						} else {
 							Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
@@ -126,9 +126,13 @@ namespace Irseny.Capture.Video {
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -10);
+						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, 0.0);
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
+
 						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
-																				// TODO: apply settings
+						// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
 
 						OnCaptureStarted(new StreamEventArgs(this, Id));
@@ -146,8 +150,9 @@ namespace Irseny.Capture.Video {
 						capture.Dispose();
 						capture = null;
 						result = false;
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "unable to open capture"));
 					}
-				} else {
+				} else {										
 					result = false;
 				}
 			}

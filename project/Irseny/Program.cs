@@ -61,6 +61,7 @@ namespace Irseny {
 			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, "");
 #endif
 			{
+				Listing.EquipmentMaster.MakeInstance(new Listing.EquipmentMaster());
 				Log.LogManager.MakeInstance(new Log.LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
 			}
@@ -77,10 +78,14 @@ namespace Irseny {
 				var mainFactory = new Viol.MainFactory();
 				var logFactory = new Viol.Main.Log.MainFactory();
 				var controlFactory = new Viol.Main.Control.MainFactory();
+				var imageFactory = new Viol.Main.Image.MainFactory();
 				mainFactory.ConstructFloor("log", logFactory);
 				mainFactory.ConstructFloor("control", controlFactory);
-				var cameraControlFactory = new Viol.Main.Control.CameraFactory();
+				mainFactory.ConstructFloor("image", imageFactory);
+				var cameraControlFactory = new Viol.Main.Control.Camera.CameraBaseFactory();
 				controlFactory.ConstructFloor("camera", cameraControlFactory);
+				var cameraImageFactory = new Viol.Main.Image.Camera.CameraBaseFactory();
+				imageFactory.ConstructFloor("camera", cameraImageFactory);
 				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;
@@ -96,6 +101,7 @@ namespace Irseny {
 			{
 				Capture.Video.CaptureSystem.MakeInstance(null);
 				Log.LogManager.MakeInstance(null);
+				Listing.EquipmentMaster.MakeInstance(null);
 			}
 		}
 	}

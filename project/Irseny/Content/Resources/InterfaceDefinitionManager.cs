@@ -9,9 +9,11 @@ namespace Irseny.Content {
 			SetEntry("Main", Path.Combine(settings.ResourceDirectory, "Main.glade"));
 			SetEntry("Log", Path.Combine(settings.ResourceDirectory, "Log.glade"));
 			SetEntry("Image", Path.Combine(settings.ResourceDirectory, "Image.glade"));
+			SetEntry("CameraImageBase", Path.Combine(settings.ResourceDirectory, "CameraImageBase.glade"));
+			SetEntry("CameraImage", Path.Combine(settings.ResourceDirectory, "CameraImage.glade"));
 			SetEntry("Control", Path.Combine(settings.ResourceDirectory, "Control.glade"));
+			SetEntry("CameraControlBase", Path.Combine(settings.ResourceDirectory, "CameraControlBase.glade"));
 			SetEntry("CameraControl", Path.Combine(settings.ResourceDirectory, "CameraControl.glade"));
-			SetEntry("InnerCameraControl", Path.Combine(settings.ResourceDirectory, "InnerCameraControl.glade"));
 		}
 		public override void Reload() {
 			

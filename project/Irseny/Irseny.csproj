@@ -21,11 +21,7 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
@@ -40,14 +36,23 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>xcopy /d /y lib\External\cvextern.dll ${TargetDir}</command>
-          <workingdir>${SolutionDir}\..\</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
+        <Command type="AfterBuild" command="xcopy /d /y lib\External\cvextern.dll ${TargetDir}" workingdir="${SolutionDir}\..\" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\LinuxRelease</OutputPath>
+    <DefineConstants>LINUX;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+      </CustomCommands>
+    </CustomCommands>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -55,6 +60,9 @@
       <HintPath>..\..\lib\WindowsDebug\Mycena.dll</HintPath>
     </Reference>
     <Reference Include="Mycena" Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
+      <HintPath>..\..\lib\LinuxDebug\Mycena.dll</HintPath>
+    </Reference>
+    <Reference Include="Mycena" Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
       <HintPath>..\..\lib\LinuxDebug\Mycena.dll</HintPath>
     </Reference>
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
@@ -79,12 +87,10 @@
     <Compile Include="Viol\InterfaceFactoryState.cs" />
     <Compile Include="Capture\Video\CaptureSystem.cs" />
     <Compile Include="Viol\IInterfaceFactory.cs" />
-    <Compile Include="Viol\Main\Control\CameraFactory.cs" />
     <Compile Include="Viol\MainFactory.cs" />
     <Compile Include="Content\ContentManagerSettings.cs" />
     <Compile Include="Content\Resources\InterfaceDefinitionManager.cs" />
     <Compile Include="Content\Resources\ResourceManager.cs" />
-    <Compile Include="Viol\Main\Control\Camera\InnerCameraFactory.cs" />
     <Compile Include="Capture\Video\CaptureStream.cs" />
     <Compile Include="Capture\Video\CaptureSettings.cs" />
     <Compile Include="Capture\Video\CaptureProperty.cs" />
@@ -96,6 +102,19 @@
     <Compile Include="Log\LogMessage.cs" />
     <Compile Include="Log\MessageType.cs" />
     <Compile Include="Log\MessageEventArgs.cs" />
+    <Compile Include="Listing\EquipmentMaster.cs" />
+    <Compile Include="Listing\EquipmentManager.cs" />
+    <Compile Include="Listing\EquipmentUpdateArgs.cs" />
+    <Compile Include="Listing\EquipmentState.cs" />
+    <Compile Include="Viol\Main\Image\MainFactory.cs" />
+    <Compile Include="Viol\Main\Control\Camera\CameraFactory.cs" />
+    <Compile Include="Viol\Main\Image\Camera\CameraFactory.cs" />
+    <Compile Include="Viol\Main\Image\Camera\CameraBaseFactory.cs" />
+    <Compile Include="Viol\Main\Control\Camera\CameraBaseFactory.cs" />
+    <Compile Include="Tracap\DetectionSystem.cs" />
+    <Compile Include="Tracap\CapDetector.cs" />
+    <Compile Include="Tracap\IHeadDetector.cs" />
+    <Compile Include="Tracap\ImageEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -109,6 +128,10 @@
     <Folder Include="Content\Resources\" />
     <Folder Include="Viol\Main\Control\Camera\" />
     <Folder Include="Log\" />
+    <Folder Include="Listing\" />
+    <Folder Include="Viol\Main\Image\" />
+    <Folder Include="Viol\Main\Image\Camera\" />
+    <Folder Include="Tracap\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
