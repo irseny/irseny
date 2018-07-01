@@ -23,12 +23,12 @@ namespace Irseny.Util {
 			get { return reference == null; }
 		}
 		public T Reference {
-			get { 
+			get {
 				if (Disposed) {
 					Debug.WriteLine(this.GetType().Name + ": Using disposed reference.");
 					return default(T);
 				} else {
-					return reference.Reference; 
+					return reference.Reference;
 				}
 			}
 		}
@@ -119,6 +119,13 @@ namespace Irseny.Util {
 			}
 		}
 	}
-
+	public static class SharedRef {
+		public static SharedRef<T> Create<T>(T obj) {
+			return new SharedRef<T>(obj);
+		}
+		public static SharedRef<T> Copy<T>(SharedRef<T> reference) {
+			return new SharedRef<T>(reference);
+		}
+	}
 }
 

@@ -21,7 +21,11 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
+          <workingdir>${SolutionDir}/../</workingdir>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -37,7 +41,12 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="xcopy /d /y lib\External\cvextern.dll ${TargetDir}" workingdir="${SolutionDir}\..\" externalConsole="True" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>xcopy /d /y lib\External\cvextern.dll ${TargetDir}</command>
+          <workingdir>${SolutionDir}\..\</workingdir>
+          <externalConsole>True</externalConsole>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -50,7 +59,11 @@
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
+          <workingdir>${SolutionDir}/../</workingdir>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
@@ -116,10 +129,13 @@
     <Compile Include="Viol\Main\Image\Camera\CameraBaseFactory.cs" />
     <Compile Include="Viol\Main\Control\Camera\CameraBaseFactory.cs" />
     <Compile Include="Tracap\DetectionSystem.cs" />
-    <Compile Include="Tracap\CapDetector.cs" />
+    <Compile Include="Tracap\HeadDetector.cs" />
     <Compile Include="Tracap\IHeadDetector.cs" />
     <Compile Include="Tracap\ImageEventArgs.cs" />
     <Compile Include="Util\SharedRef.cs" />
+    <Compile Include="Tracap\CapTracker.cs" />
+    <Compile Include="Viol\Main\Control\Tracking\TrackingBaseFactory.cs" />
+    <Compile Include="Viol\Main\Control\Tracking\TrackingFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -138,6 +154,7 @@
     <Folder Include="Viol\Main\Image\Camera\" />
     <Folder Include="Tracap\" />
     <Folder Include="Util\" />
+    <Folder Include="Viol\Main\Control\Tracking\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

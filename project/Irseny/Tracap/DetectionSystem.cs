@@ -8,10 +8,47 @@ namespace Irseny.Tracap {
 		static DetectionSystem instance = null;
 
 		object detectorSync = new object();
-		List<object> detectors = new List<object>(4);
+		List<IHeadDetector> detectors = new List<IHeadDetector>(4);
 		List<Thread> detectorThreads = new List<Thread>(4);
 
 		public DetectionSystem() {
+		}
+		public int Start(IHeadDetector detector) {
+			if (detector == null) throw new ArgumentNullException("detector");
+			lock (detectorSync) {
+				int id;
+				// find unused index
+				for (id = 0; id < detectors.Count; id++) {
+					if (detectors[id] == null) {
+						break;
+					}
+				}
+				if (id < detectors.Count) {
+					detectors[id] = detector;
+				} else {
+					detectors.Add(detector);
+				}
+				if (!detector.Start()) {
+					detectors[id] = null;
+					return -1;
+				} else {
+					return id;
+				}
+			}
+		}
+		public bool Stop(int id) {
+			lock (detectorSync) {
+				if (id < 0 || id >= detectors.Count) {
+					return false;
+				}
+				if (detectors[id] == null) {
+					return false;
+				}
+				detectors[id].Stop();
+				detectors[id].Dispose();
+				detectors[id] = null;
+				return true;
+			}
 		}
 
 
@@ -22,7 +59,7 @@ namespace Irseny.Tracap {
 					DetectionSystem.instance.Dispose();
 					DetectionSystem.instance = null;
 
-				} 
+				}
 				if (instance != null) {
 					DetectionSystem.instance = instance;
 				}
@@ -30,7 +67,11 @@ namespace Irseny.Tracap {
 		}
 
 		public void Dispose() {
-			
+			lock (detectorSync) {
+				for (int id = 0; id < detectors.Count; id++) {
+					Stop(id);
+				}
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@ namespace Irseny.Tracap {
 		event EventHandler<EventArgs> PositionDetected;
 		bool Start();
 		bool Stop();
-		void QueueInput(Emgu.CV.Mat image);
+		void QueueInput(Util.SharedRef<Emgu.CV.Mat> image);
 	}
 }
 

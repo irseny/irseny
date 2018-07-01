@@ -2,11 +2,15 @@
 
 namespace Irseny.Tracap {
 	public class ImageEventArgs : EventArgs {
-		public ImageEventArgs(Emgu.CV.Mat image) {
+		Util.SharedRef<Emgu.CV.Mat> image;
+		public ImageEventArgs(Util.SharedRef<Emgu.CV.Mat> image) {
 			if (image == null) throw new ArgumentNullException("image");
-			Image = image;
+			this.image = image;
 		}
-		public Emgu.CV.Mat Image { get; private set; }
+		public Util.SharedRef<Emgu.CV.Mat> Image {
+			get {
+				return Util.SharedRef.Copy(image);
+			}
+		}
 	}
 }
-

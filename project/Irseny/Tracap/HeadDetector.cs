@@ -3,19 +3,19 @@ using System.Threading;
 using System.Collections.Generic;
 
 namespace Irseny.Tracap {
-	public abstract class CapDetector : IHeadDetector {
-		
-		protected object outputEventSync = new object();
-		protected object inputSync = new object();
-		object runSync = new object();
+	public abstract class HeadDetector : IHeadDetector {
+
+		protected readonly object outputEventSync = new object();
+		protected readonly object inputSync = new object();
+		readonly object runSync = new object();
 		ManualResetEvent stepSignal = new ManualResetEvent(false);
 		volatile bool running = false;
 		Thread thread = null;
-		Queue<Emgu.CV.Mat> pendingInput = new Queue<Emgu.CV.Mat>();
+		Queue<Util.SharedRef<Emgu.CV.Mat>> pendingInput = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
 		protected event EventHandler<ImageEventArgs> inputProcessed;
 		protected event EventHandler<EventArgs> positionDetected;
 
-		public CapDetector() {
+		public HeadDetector() {
 		}
 		public event EventHandler<ImageEventArgs> InputProcessed {
 			add {
@@ -33,12 +33,32 @@ namespace Irseny.Tracap {
 			add {
 				lock (outputEventSync) {
 					positionDetected += value;
-				} 
+				}
 			}
 			remove {
 				lock (outputEventSync) {
 					positionDetected -= value;
 				}
+			}
+		}
+		protected void OnInputProcessed(ImageEventArgs args) {
+			if (args == null) throw new ArgumentNullException("args");
+			EventHandler<ImageEventArgs> handler;
+			lock (outputEventSync) {
+				handler = inputProcessed;
+			}
+			if (handler != null) {
+				handler(this, args);
+			}
+		}
+		protected void OnPositionDetected(EventArgs args) {
+			if (args == null) throw new ArgumentNullException("args");
+			EventHandler<EventArgs> handler;
+			lock (outputEventSync) {
+				handler = positionDetected;
+			}
+			if (handler != null) {
+				handler(this, args);
 			}
 		}
 		protected abstract void Step(Emgu.CV.Mat image);
@@ -52,17 +72,23 @@ namespace Irseny.Tracap {
 			}
 		}
 		private void ProcessPending() {
-			Queue<Emgu.CV.Mat> input;
+			Queue<Util.SharedRef<Emgu.CV.Mat>> input;
 			lock (inputSync) {
 				input = pendingInput;
-				pendingInput = new Queue<Emgu.CV.Mat>();
+				pendingInput = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
 			}
-			foreach (Emgu.CV.Mat image in input) {
-				Step(image);
+			foreach (var image in input) {
+				Step(image.Reference);
+				image.Dispose();
 			}
 		}
-		public void Dispose() {
-			// TODO: clear resources
+		public virtual void Dispose() {
+			lock (inputSync) {
+				foreach (var image in pendingInput) {
+					image.Dispose();
+				}
+				pendingInput.Clear();
+			}
 		}
 
 		public bool Start() {
@@ -82,15 +108,16 @@ namespace Irseny.Tracap {
 					running = false;
 					stepSignal.Set();
 					thread.Join();
+					thread = null;
 					return true;
 				}
 			}
 			return false;
 		}
-		public void QueueInput(Emgu.CV.Mat image) {
+		public void QueueInput(Util.SharedRef<Emgu.CV.Mat> image) {
 			if (image == null) throw new ArgumentNullException("image");
 			lock (inputSync) {
-				pendingInput.Enqueue(image);
+				pendingInput.Enqueue(Util.SharedRef.Copy(image));
 			}
 			stepSignal.Set();
 		}

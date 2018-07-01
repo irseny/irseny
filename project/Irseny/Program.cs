@@ -64,6 +64,7 @@ namespace Irseny {
 				Listing.EquipmentMaster.MakeInstance(new Listing.EquipmentMaster());
 				Log.LogManager.MakeInstance(new Log.LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
+				Tracap.DetectionSystem.MakeInstance(new Tracap.DetectionSystem());
 			}
 			{
 				Content.ContentMaster.MakeInstance(new Content.ContentMaster());
@@ -84,6 +85,8 @@ namespace Irseny {
 				mainFactory.ConstructFloor("image", imageFactory);
 				var cameraControlFactory = new Viol.Main.Control.Camera.CameraBaseFactory();
 				controlFactory.ConstructFloor("camera", cameraControlFactory);
+				var trackingControlFactory = new Viol.Main.Control.Tracking.TrackingBaseFactory();
+				controlFactory.ConstructFloor("tracking", trackingControlFactory);
 				var cameraImageFactory = new Viol.Main.Image.Camera.CameraBaseFactory();
 				imageFactory.ConstructFloor("camera", cameraImageFactory);
 				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
@@ -99,6 +102,7 @@ namespace Irseny {
 
 			Gtk.Application.Run();
 			{
+				Tracap.DetectionSystem.MakeInstance(null);
 				Capture.Video.CaptureSystem.MakeInstance(null);
 				Log.LogManager.MakeInstance(null);
 				Listing.EquipmentMaster.MakeInstance(null);

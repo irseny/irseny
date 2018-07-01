@@ -29,7 +29,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="box_Detection">
+          <object class="GtkHBox" id="box_Tracking">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -41,10 +41,10 @@
           </packing>
         </child>
         <child type="tab">
-          <object class="GtkLabel" id="lbl_Detect">
+          <object class="GtkLabel" id="lbl_Tracking">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Detection</property>
+            <property name="label" translatable="yes">Tracking</property>
           </object>
           <packing>
             <property name="position">1</property>

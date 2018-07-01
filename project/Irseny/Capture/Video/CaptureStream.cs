@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading;
+using System.Diagnostics;
+using System.Collections.Generic;
 using System.ServiceModel.Dispatcher;
 
 namespace Irseny.Capture.Video {
@@ -10,6 +12,8 @@ namespace Irseny.Capture.Video {
 		Emgu.CV.VideoCapture capture = null;
 		CaptureSettings settings = new CaptureSettings();
 		readonly int id;
+		List<Util.SharedRef<Emgu.CV.Mat>> usedImages = new List<Util.SharedRef<Emgu.CV.Mat>>();
+		int imageCheckIndex = 0;
 		event EventHandler<CaptureImageEventArgs> imageAvailable;
 		event EventHandler<StreamEventArgs> captureStarted;
 		event EventHandler<StreamEventArgs> captureStopped;
@@ -74,14 +78,39 @@ namespace Irseny.Capture.Video {
 		private void ReceiveImage(object sender, EventArgs args) {
 			lock (captureSync) {
 				var image = new Util.SharedRef<Emgu.CV.Mat>(new Emgu.CV.Mat());
+
 				capture.Retrieve(image.Reference);
 				OnImageAvailable(new CaptureImageEventArgs(this, id, image));
 				if (!image.LastReference) {
 					Console.WriteLine("image is not last reference");
 				}
-				image.Dispose(); // TODO: remove when finished testing
+				if (image.LastReference) {
+					image.Dispose();
+				} else {
+					usedImages.Add(image);
+				}
+				if (usedImages.Count > 0) {
+					if (imageCheckIndex < 0 || imageCheckIndex >= usedImages.Count) {
+						// occasionally add warning
+						if (usedImages.Count > 32) {
+							Debug.WriteLine(this.GetType().Name + ": Many captured images still in use: " + usedImages.Count);
+						}
+						imageCheckIndex = 0; // reset if out of bounds
+					}
+					for (int bound = Math.Min(imageCheckIndex + 2, usedImages.Count); imageCheckIndex < bound; imageCheckIndex++) {
+						if (usedImages[imageCheckIndex].LastReference) {
+							usedImages[imageCheckIndex].Dispose(); // disposing on the creation thread
+							int lastIndex = usedImages.Count - 1;
+							if (lastIndex > 0) { // only replace with other instances
+								usedImages[imageCheckIndex] = usedImages[lastIndex];
+							}
+							usedImages.RemoveAt(lastIndex);
+							bound = Math.Min(bound, usedImages.Count); // update after modification
+						}
+					}
+				}
 				long total = GC.GetTotalMemory(true);
-				//Console.WriteLine("total memory used {0:#,##0}k", total/1000);
+				//Console.WriteLine("total memory used {0:#,##0}k", total / 1000);
 			}
 		}
 		protected void OnImageAvailable(CaptureImageEventArgs args) {
@@ -133,11 +162,11 @@ namespace Irseny.Capture.Video {
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, 0.0);
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20.0);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
 
 						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
-						// TODO: apply settings
+																				// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
 
 						OnCaptureStarted(new StreamEventArgs(this, Id));
@@ -157,7 +186,7 @@ namespace Irseny.Capture.Video {
 						result = false;
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "unable to open capture"));
 					}
-				} else {										
+				} else {
 					result = false;
 				}
 			}
