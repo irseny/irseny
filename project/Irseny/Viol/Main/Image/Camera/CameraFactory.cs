@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
+		Gdk.Pixbuf imgShow;
 		public CameraFactory(int index) : base() {
 			Index = index;
 		}
@@ -13,6 +15,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 		protected override bool CreateInternal() {
 			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraImage"));
 			Container = factory.CreateWidget("box_Root");
+			imgShow = null; // target size unknown
 			return true;
 		}
 		protected override bool ConnectInternal() {
@@ -25,6 +28,10 @@ namespace Irseny.Viol.Main.Image.Camera {
 		}
 		protected override bool DestroyInternal() {
 			Container.Dispose();
+			if (imgShow != null) {
+				imgShow.Dispose();
+				imgShow = null;
+			}
 			return true;
 		}
 		private void StreamStateChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
@@ -74,6 +81,8 @@ namespace Irseny.Viol.Main.Image.Camera {
 					}
 					Marshal.Copy(imgSource.DataPointer, pixelBuffer, 0, totalBytes);
 					pixelsAvailable = true;
+				} else {
+					Debug.WriteLine(this.GetType().Name + ": Retrieved image unusable.");
 				}
 			}
 			Invoke(delegate {
@@ -89,18 +98,17 @@ namespace Irseny.Viol.Main.Image.Camera {
 					//data.Deserialize((uint)buffer.Length, buffer); // unable to determine format
 					//var pixels = Gdk.Pixbuf.FromPixdata(data, true);
 					//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
-					bool overwritePixels = true;
-					var pixels = videoOut.Pixbuf;
-					if (pixels == null || pixels.Colorspace != Gdk.Colorspace.Rgb || pixels.HasAlpha || pixels.Width != width || pixels.Height != height || pixels.BitsPerSample != 8) {
-						if (pixels != null) {
-							pixels.Dispose();
+					bool updatePixBuf = false;
+					if (imgShow == null || imgShow.Width != width || imgShow.Height != height) {
+						if (imgShow != null) {
+							imgShow.Dispose();
 						}
-						pixels = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
-						overwritePixels = false;
+						imgShow = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
+						updatePixBuf = true;
 					}
-					Marshal.Copy(pixelBuffer, 0, pixels.Pixels, totalBytes);
-					if (!overwritePixels) {						
-						videoOut.Pixbuf = pixels;
+					Marshal.Copy(pixelBuffer, 0, imgShow.Pixels, totalBytes);
+					if (!updatePixBuf) {						
+						videoOut.Pixbuf = imgShow;
 					}
 					videoOut.QueueDraw();
 				}
