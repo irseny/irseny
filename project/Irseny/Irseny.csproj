@@ -24,6 +24,7 @@
         <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,7 @@
         <Command type="AfterBuild" command="xcopy /d /y lib\External\cvextern.dll ${TargetDir}" workingdir="${SolutionDir}\..\" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -53,6 +55,8 @@
     </CustomCommands>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <Externalconsole>true</Externalconsole>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -115,6 +119,7 @@
     <Compile Include="Tracap\CapDetector.cs" />
     <Compile Include="Tracap\IHeadDetector.cs" />
     <Compile Include="Tracap\ImageEventArgs.cs" />
+    <Compile Include="Util\SharedRef.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -132,6 +137,7 @@
     <Folder Include="Viol\Main\Image\" />
     <Folder Include="Viol\Main\Image\Camera\" />
     <Folder Include="Tracap\" />
+    <Folder Include="Util\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

@@ -73,10 +73,15 @@ namespace Irseny.Capture.Video {
 		}
 		private void ReceiveImage(object sender, EventArgs args) {
 			lock (captureSync) {
-				var image = new Emgu.CV.Mat();
-				capture.Retrieve(image);
+				var image = new Util.SharedRef<Emgu.CV.Mat>(new Emgu.CV.Mat());
+				capture.Retrieve(image.Reference);
 				OnImageAvailable(new CaptureImageEventArgs(this, id, image));
-				//image.Dispose();
+				if (!image.LastReference) {
+					Console.WriteLine("image is not last reference");
+				}
+				image.Dispose(); // TODO: remove when finished testing
+				long total = GC.GetTotalMemory(true);
+				//Console.WriteLine("total memory used {0:#,##0}k", total/1000);
 			}
 		}
 		protected void OnImageAvailable(CaptureImageEventArgs args) {
@@ -88,7 +93,7 @@ namespace Irseny.Capture.Video {
 				handler(this, args);
 			} else {
 				// TODO: put image into auto disposing structure
-				args.Image.Dispose();
+				//args.Image.Dispose();
 			}
 		}
 		protected void OnCaptureStarted(StreamEventArgs args) {
@@ -141,10 +146,10 @@ namespace Irseny.Capture.Video {
 							//Thread.Sleep(1);
 						};
 						capture.ImageGrabbed += ReceiveImage;
-						int count = 0;
+						/*int count = 0;
 						capture.ImageGrabbed += delegate {
 							Console.WriteLine("image grabbed: " + count++);
-						};
+						};*/
 						result = true;
 					} else {
 						capture.Dispose();
@@ -217,14 +222,14 @@ namespace Irseny.Capture.Video {
 	}
 
 	public class CaptureImageEventArgs : StreamEventArgs {
-		Emgu.CV.Mat image;
-		public CaptureImageEventArgs(CaptureStream stream, int streamId, Emgu.CV.Mat image) : base(stream, streamId) {
+		Util.SharedRef<Emgu.CV.Mat> image;
+		public CaptureImageEventArgs(CaptureStream stream, int streamId, Util.SharedRef<Emgu.CV.Mat> image) : base(stream, streamId) {
 			if (image == null) throw new ArgumentNullException("image");
 			this.image = image;
 		}
-		public Emgu.CV.Mat Image {
+		public Util.SharedRef<Emgu.CV.Mat> Image {
 			// TODO: create shared ref instance
-			get { return image; }
+			get { return new Util.SharedRef<Emgu.CV.Mat>(image); }
 		}
 
 	}

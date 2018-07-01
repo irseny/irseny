@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
+		byte[] pixelBuffer = new byte[0];
 		public CameraFactory(int index) : base() {
 			Index = index;
 		}
@@ -34,54 +36,79 @@ namespace Irseny.Viol.Main.Image.Camera {
 						StopCapture();
 					}
 				});
-				Console.WriteLine("capture equipment available: " + args.Available);
 			}
 		}
 		private void RetrieveImage(object sender, Capture.Video.CaptureImageEventArgs args) {
-			Invoke(delegate {				
-				var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-				//var imgMatrix = args.Image;
-				using (var imgSource = args.Image) { // TODO: outsource disposing to shared reference
-					//using (var imgMatrix = new Emgu.CV.Mat(args.Image.Size, Emgu.CV.CvEnum.DepthType.Cv8U, 1)) {
-					//args.Image.ConvertTo(imgMatrix, Emgu.CV.CvEnum.DepthType.Cv8U);
-					//Emgu.CV.CvInvoke.Threshold(args.Image, imgMatrix, 50, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
-					//Emgu.CV.CvInvoke.CvtColor(imgSource, imgMatrix, Emgu.CV.CvEnum.ColorConversion.Bgr2Gray);
-
-					using (var imgStream = new MemoryStream()) {
-						using (var bmp = imgSource.Bitmap) {
-							bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.Bmp);
-						}
-//						if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == 1) {
-//							byte[] buffer = new byte[imgSource.Width*imgSource.Height];
-//							Array.Copy(imgSource.Data, buffer, buffer.Length);
-//							Gdk.Pixdata data;
-//							new Gdk.Pixbuf(buffer, Gdk.Colorspace.Rgb, false, 8, imgSource.Width, imgSource.Height, imgSource.Width);
-//							Gdk.Pixbuf.FromPixdata(data, false);
-//						}
-
-						//new Gdk.Pixbuf()
-						imgStream.Position = 0;
-						//Gdk.Pixbuf.FromPixdata(new Gdk.Pixdata().)
-						if (videoOut.Pixbuf != null) {
-							videoOut.Pixbuf.Dispose();
-						}
-						videoOut.Pixbuf = new Gdk.Pixbuf(imgStream);
-					}
-					//}
+			/*int width = 0;
+			int height = 0;
+			MemoryStream imgStream;
+			using (var imgRef = args.Image) {
+				var imgSource = imgRef.Reference;
+				width = imgSource.Width;
+				height = imgSource.Height;
+				imgStream = new MemoryStream(imgSource.Width*imgSource.Height*imgSource.ElementSize);
+				using (var bmp = imgSource.Bitmap) {
+					bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.MemoryBmp);
 				}
+				imgStream.Position = 0;
+			}
+			Invoke(delegate {
+				Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+				videoOut.Pixbuf = new Gdk.Pixbuf(imgStream, width, height);
 				videoOut.QueueDraw();
+				imgStream.Dispose();
+			});*/
+			//byte[] buffer = null;
+			int width = 0;
+			int height = 0;
+			int totalBytes = 0;
+			bool pixelsAvailable = false;
+			using (var imgRef = args.Image) {
+				var imgSource = imgRef.Reference;
+				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte)*3 && imgSource.DataPointer != IntPtr.Zero) {
+					width = imgSource.Width;
+					height = imgSource.Height;
+					totalBytes = width*height*imgSource.ElementSize*sizeof(byte);
+					if (pixelBuffer.Length < totalBytes) {
+						pixelBuffer = new byte[totalBytes];
+					}
+					Marshal.Copy(imgSource.DataPointer, pixelBuffer, 0, totalBytes);
+					pixelsAvailable = true;
+				}
+			}
+			Invoke(delegate {
+				if (pixelsAvailable) {
+					Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+					/*var pixels = new Gdk.Pixbuf(buffer, Gdk.Colorspace.Rgb, false, 8, width, height, stride, (byte[] buf) => {
+						Console.WriteLine("pixbuf destroy"); // not called
+					});*/
+					//var pixels = new Gdk.Pixbuf(buffer); // unable to determine format
+					//var pixels = new Gdk.Pixbuf(buffer, false); // header corrupt
+					//
+					//var data = new Gdk.Pixdata();
+					//data.Deserialize((uint)buffer.Length, buffer); // unable to determine format
+					//var pixels = Gdk.Pixbuf.FromPixdata(data, true);
+					//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
+					bool overwritePixels = true;
+					var pixels = videoOut.Pixbuf;
+					if (pixels == null || pixels.Colorspace != Gdk.Colorspace.Rgb || pixels.HasAlpha || pixels.Width != width || pixels.Height != height || pixels.BitsPerSample != 8) {
+						if (pixels != null) {
+							pixels.Dispose();
+						}
+						pixels = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
+						overwritePixels = false;
+					}
+					Marshal.Copy(pixelBuffer, 0, pixels.Pixels, totalBytes);
+					if (!overwritePixels) {						
+						videoOut.Pixbuf = pixels;
+					}
+					videoOut.QueueDraw();
+				}
 			});
-			/*Invoke(delegate {
-				args.Image.Dispose();
-				Console.WriteLine("disposing captured image");
-			});*/
-			/*Invoke(delegate {
-				args.Image.Dispose();
-				long mem = GC.GetTotalMemory(false);
-				Console.WriteLine("Memory being used: {0:0,0}", mem);
-				
-			});*/
 		}
+		[DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+		public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+
 		public bool StartCapture() {
 			Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(Index);
 			if (stream != null) {
