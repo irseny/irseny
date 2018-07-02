@@ -33,16 +33,16 @@ namespace Irseny.Viol.Main.Image.Camera {
 				var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
 				int pages = ntbCamera.NPages;
 				if (args.Available) {
-					if (args.IndexChanged == pages) {
+					if (args.Index == pages) {
 						AddCamera();
 					} else {
-						Debug.WriteLine("changed camera source index out of order: " + args.IndexChanged);
+						Debug.WriteLine("changed camera source index out of order: " + args.Index);
 					}
 				} else {
-					if (args.IndexChanged == pages - 1) {
+					if (args.Index == pages - 1) {
 						RemoveCamera();
 					} else {
-						Debug.WriteLine("changed camera source index out of order: " + args.IndexChanged);
+						Debug.WriteLine("changed camera source index out of order: " + args.Index);
 					}
 				}
 			});

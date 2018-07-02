@@ -54,6 +54,12 @@ namespace Mycena {
 							creationProperties.RegisterAttribute(attributeNode);
 						}
 					}
+				} else if (propertyNode.Name.Equals("items")) {
+					foreach (XmlNode itemNode in propertyNode) {
+						if (itemNode.Name.Equals("item")) {
+							creationProperties.RegisterItem(itemNode);
+						}
+					}
 				}
 			}
 			// creation (calls property application)

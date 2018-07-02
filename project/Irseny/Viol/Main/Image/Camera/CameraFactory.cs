@@ -7,10 +7,11 @@ namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf imgShow;
+		private readonly int index;
 		public CameraFactory(int index) : base() {
-			Index = index;
+			this.index = index;
 		}
-		private readonly int Index;
+
 
 		protected override bool CreateInternal() {
 			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraImage"));
@@ -35,7 +36,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 			return true;
 		}
 		private void StreamStateChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
-			if (args.IndexChanged == Index) {
+			if (args.Index == index) {
 				Invoke(delegate {
 					if (args.Available) {
 						StartCapture();
@@ -114,18 +115,17 @@ namespace Irseny.Viol.Main.Image.Camera {
 				}
 			});
 		}
-		[DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
-		public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
 		public bool StartCapture() {
-			Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(Index);
+			// TODO: read stream from listing
+			Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(index);
 			if (stream != null) {
 				stream.ImageAvailable += RetrieveImage;
 			}
 			return false;
 		}
 		public bool StopCapture() {
-			Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(Index);
+			Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(index);
 			if (stream != null) {
 				stream.ImageAvailable -= RetrieveImage;
 			}

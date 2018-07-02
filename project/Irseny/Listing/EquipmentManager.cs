@@ -5,7 +5,7 @@ using System.Threading;
 namespace Irseny.Listing {
 	public class EquipmentManager<T> {
 		object equipmentSync = new object();
-		List<Tuple<bool, T>> equipment = new List<Tuple<bool,T>>(32);
+		List<Tuple<EquipmentState, T>> equipment = new List<Tuple<EquipmentState,T>>(32);
 		object updateEventSync = new object();
 		event EventHandler<EquipmentUpdateArgs<T>> updated;
 		public EquipmentManager() {
@@ -32,10 +32,10 @@ namespace Irseny.Listing {
 				handler(this, args);
 			}
 		}
-		public bool Available(int index) {
+		public EquipmentState GetState(int index) {
 			lock (equipmentSync) {
 				if (index < 0 || index >= equipment.Count) {
-					return false;
+					return EquipmentState.Missing;
 				} else {
 					return equipment[index].Item1;
 				}
@@ -43,7 +43,7 @@ namespace Irseny.Listing {
 		}
 		public TE GetEquipment<TE>(int index, TE defaultValue) where TE : T {
 			lock (equipmentSync) {
-				if (index < 0 || index >= equipment.Count || !equipment[index].Item1) {
+				if (index < 0 || index >= equipment.Count || equipment[index].Item1 == EquipmentState.Missing) {
 					return defaultValue;
 				} else {
 					if (equipment[index].Item2 is TE) {
@@ -59,7 +59,7 @@ namespace Irseny.Listing {
 		}
 		public bool TryGetEquipment<TE>(int index, out TE result) where TE : T {
 			lock (equipmentSync) {
-				if (index >= 0 && index < equipment.Count && equipment[index].Item1 && equipment[index].Item2 is TE) {
+				if (index >= 0 && index < equipment.Count && equipment[index].Item1 != EquipmentState.Missing && equipment[index].Item2 is TE) {
 					result = (TE)equipment[index].Item2;
 					return true;
 				} 
@@ -67,7 +67,7 @@ namespace Irseny.Listing {
 			result = default(TE);
 			return false;
 		}
-		public void Update(int index, bool available, T equipment) {
+		public void Update(int index, EquipmentState state, T equipment) {
 			if (index < 0) throw new ArgumentOutOfRangeException("index");
 			lock (equipmentSync) {
 				if (index >= this.equipment.Count) {
@@ -75,12 +75,12 @@ namespace Irseny.Listing {
 						this.equipment.Capacity = index + 1;
 					}
 					for (int i = this.equipment.Count; i <= index; i++) {
-						this.equipment.Add(new Tuple<bool, T>(false, default(T)));
+						this.equipment.Add(Tuple.Create(EquipmentState.Missing, default(T)));
 					}
 				}
-				this.equipment[index] = new Tuple<bool, T>(available, equipment);
+				this.equipment[index] = Tuple.Create(state, equipment);
 			}
-			OnUpdated(new EquipmentUpdateArgs<T>(index, available, equipment));
+			OnUpdated(new EquipmentUpdateArgs<T>(index, state, equipment));
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Irseny.Viol.Main.Control.Tracking {
 	public class TrackingFactory : InterfaceFactory {
 		readonly int index;
@@ -11,6 +12,14 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Track");
+			btnTrack.Clicked += delegate {
+				if (btnTrack.Active) {
+					StartTracking();
+				} else {
+					StopTracking();
+				}
+			}; 
 			return true;
 		}
 		protected override bool DisconnectInternal() {
@@ -18,6 +27,13 @@ namespace Irseny.Viol.Main.Control.Tracking {
 		}
 		protected override bool DestroyInternal() {
 			Container.Dispose();
+			return true;
+		}
+		private bool StartTracking() {
+			
+			return true;
+		}
+		private bool StopTracking() {
 			return true;
 		}
 	}

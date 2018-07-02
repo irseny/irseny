@@ -1,12 +1,16 @@
 ﻿using System;
+using InternalProperty = Emgu.CV.CvEnum.CapProp;
+
 namespace Irseny.Capture.Video {
-	public enum CaptureProperty : int {
+	public enum CaptureProperty {
 		CameraId = 0,
-		FrameRate,
-		FrameWidth,
-		FrameHeight,
-		Brightness,
-		Contrast,
-		Exposure
+		FrameWidth = InternalProperty.FrameWidth,
+		FrameHeight = InternalProperty.FrameHeight,
+		FrameRate = InternalProperty.Fps,
+		Exposure = InternalProperty.Exposure,
+		Brightness = InternalProperty.Brightness,
+		Contrast = InternalProperty.Contrast,
+		Gain = InternalProperty.Gain
+
 	}
 }

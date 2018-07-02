@@ -52,7 +52,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 				ntbCamera.AppendPage(boxInner, label);
 				ntbCamera.ShowAll();
 				// update video sources
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, true, page);
+				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Passive, page);
 				return true;
 			} else {
 				return false;
@@ -63,7 +63,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 			int page = ntbCamera.NPages - 1;
 			// remove last
 			if (page > -1) {
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, false, page);
+				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Missing, page);
 				ntbCamera.RemovePage(page);
 				IInterfaceFactory floor = DestructFloor(string.Format("Camera{0}", page));
 				floor.Dispose();

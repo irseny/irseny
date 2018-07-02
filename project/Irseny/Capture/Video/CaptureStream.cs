@@ -162,11 +162,12 @@ namespace Irseny.Capture.Video {
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20.0);
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, 0.0);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
-
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
 						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
-																				// TODO: apply settings
+						// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
 
 						OnCaptureStarted(new StreamEventArgs(this, Id));
@@ -179,14 +180,16 @@ namespace Irseny.Capture.Video {
 						capture.ImageGrabbed += delegate {
 							Console.WriteLine("image grabbed: " + count++);
 						};*/
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "Capture stream started"));
 						result = true;
 					} else {
 						capture.Dispose();
 						capture = null;
 						result = false;
-						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "unable to open capture"));
+						Log.LogManager.Instance.Log(Log.LogMessage.CreateError(this, "Failed to start capture stream"));
 					}
 				} else {
+					Log.LogManager.Instance.Log(Log.LogMessage.CreateWarning(this, "Unable to start capture: Already open"));
 					result = false;
 				}
 			}
@@ -211,8 +214,10 @@ namespace Irseny.Capture.Video {
 					capture.Stop();
 					capture.Dispose();
 					capture = null;
+					Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "Capture stream stopped"));
 					result = true;
 				} else {
+					Log.LogManager.Instance.Log(Log.LogMessage.CreateWarning(this, "Unable to stop capture stream: Already stopped"));
 					result = false;
 				}
 			}

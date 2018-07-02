@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Irseny.Viol.Main.Control.Tracking {
 	public class TrackingBaseFactory : InterfaceFactory {
 		public TrackingBaseFactory() : base() {
@@ -39,14 +40,14 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			// create and append
 			if (page < 10) {
 				var factory = new TrackingFactory(page);
-				ConstructFloor(string.Format("Tracker{0}", page), factory);
+				ConstructFloor(string.Format("Track{0}", page), factory);
 				var boxInner = factory.Container.GetWidget("box_Root");
-				var label = new Gtk.Label(string.Format("Tracker{0}", page));
+				var label = new Gtk.Label(string.Format("Track{0}", page));
 				factory.Container.AddWidget(label);
 				ntbTracker.AppendPage(boxInner, label);
 				ntbTracker.ShowAll();
 				// update video sources
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, true, page);
+				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Passive, page);
 				return true;
 			} else {
 				return false;
@@ -57,9 +58,9 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int page = ntbTracker.NPages - 1;
 			// remove last
 			if (page > -1) {
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, false, page);
+				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Missing, page);
 				ntbTracker.RemovePage(page);
-				IInterfaceFactory floor = DestructFloor(string.Format("Tracker{0}", page));
+				IInterfaceFactory floor = DestructFloor(string.Format("Track{0}", page));
 				floor.Dispose();
 				return true;
 			} else {

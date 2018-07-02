@@ -35,6 +35,8 @@ namespace Mycena {
 			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 			widgets.Add("GtkSpinButton", new SpinButtonFactory());
+
+			widgets.Add("GtkComboBoxText", new ComboBoxFactory());
 		}
 		/// <summary>
 		/// Creates the widget defined by the given node alongside its children.

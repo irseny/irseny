@@ -6,6 +6,7 @@ namespace Mycena {
 	internal class ConfigProperties {
 		Dictionary<string, string> properties;
 		Dictionary<string, string> attributes;
+		List<string> items;
 		LinkedList<string> markedProperties;
 		LinkedList<string> markedAttributes;
 		bool marking;
@@ -13,6 +14,7 @@ namespace Mycena {
 		public ConfigProperties() {
 			properties = new Dictionary<string, string>(32);
 			attributes = new Dictionary<string, string>(32);
+			items = new List<string>(32);
 			markedProperties = new LinkedList<string>();
 			markedAttributes = new LinkedList<string>();
 		}
@@ -28,6 +30,7 @@ namespace Mycena {
 		public ICollection<string> MarkedAttributes {
 			get { return markedAttributes; }
 		}
+
 		public void RegisterProperty(XmlNode property) {
 			if (property == null) throw new ArgumentNullException("property");
 			if (property.Attributes == null) throw new ArgumentException("property: Has no attributes.");
@@ -65,6 +68,14 @@ namespace Mycena {
 			} else {
 				attributes.Add(name, value);
 			}
+		}
+		public void RegisterItem(XmlNode item) {
+			if (item == null) throw new ArgumentNullException("item");
+			if (item.InnerText == null) throw new ArgumentException("item: Missing value");
+			items.Add(item.InnerText);
+		}
+		public IList<string> GetItems() {
+			return new List<string>(items);
 		}
 		public string GetProperty(string name) {
 			if (name == null) throw new ArgumentNullException("name");

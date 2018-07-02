@@ -75,6 +75,7 @@ namespace Irseny {
 				contentSettings.SetConfigPaths(userRoot, userRoot, "(no-file)");
 				Content.ContentMaster.Instance.Load(contentSettings);
 			}
+			bool stopped = false;
 			{
 				var mainFactory = new Viol.MainFactory();
 				var logFactory = new Viol.Main.Log.MainFactory();
@@ -97,10 +98,17 @@ namespace Irseny {
 
 				window.Resize(800, 600);
 				window.ShowAll();
+				window.DeleteEvent += delegate {
+					stopped = true;
+				};
 
 			}
 
-			Gtk.Application.Run();
+			Gtk.Application.RunIteration();
+			while (!stopped) {
+				Gtk.Application.RunIteration();
+			}
+			//Gtk.Application.Run();
 			{
 				Tracap.DetectionSystem.MakeInstance(null);
 				Capture.Video.CaptureSystem.MakeInstance(null);

@@ -14,7 +14,7 @@ namespace Irseny.Content {
 			SetEntry("Control", Path.Combine(settings.ResourceDirectory, "Control.glade"));
 			SetEntry("CameraControlBase", Path.Combine(settings.ResourceDirectory, "CameraControlBase.glade"));
 			SetEntry("CameraControl", Path.Combine(settings.ResourceDirectory, "CameraControl.glade"));
-			SetEntry("TrackingControlBase", Path.Combine(settings.ResourceDirectory, "TrackingControlbase.glade"));
+			SetEntry("TrackingControlBase", Path.Combine(settings.ResourceDirectory, "TrackingControlBase.glade"));
 			SetEntry("TrackingControl", Path.Combine(settings.ResourceDirectory, "TrackingControl.glade"));
 		}
 		public override void Reload() {

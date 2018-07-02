@@ -3,10 +3,12 @@ using System.IO;
 
 namespace Irseny.Viol.Main.Control.Camera {
 	public class CameraFactory : InterfaceFactory {
+		private readonly int index;
+
 		public CameraFactory(int index) : base() {
-			Index = index;
+			this.index = index;
 		}
-		private readonly int Index;
+
 		protected override bool CreateInternal() {
 			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraControl"));
 			Container = factory.CreateWidget("box_Root");
@@ -24,8 +26,10 @@ namespace Irseny.Viol.Main.Control.Camera {
 			btnCapture.Clicked += delegate {
 				if (btnCapture.Active) {
 					StartCapture();
+					Console.WriteLine("start");
 				} else {
 					StopCapture();
+					Console.WriteLine("stop");
 				}
 				/*Console.WriteLine("capture button clicked");
 				var btn = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
@@ -38,7 +42,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			
+			StopCapture();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -46,31 +50,25 @@ namespace Irseny.Viol.Main.Control.Camera {
 			return true;
 		}
 		private void StartCapture() {
-			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-				int streamId = Capture.Video.CaptureSystem.Instance.CreateStream();
-				Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
-				stream.CaptureStarted += delegate {
-					Invoke(delegate {
-						//StartImageUpdate(stream);
-						Console.WriteLine("capture started");
-					});
-				};
-				stream.CaptureStarted += delegate {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(Index, true, streamId);
-				};
-				stream.CaptureStopped += delegate {
-					Invoke(delegate {
-						StopCapture();
-					});
-				};
-				stream.CaptureStopped += delegate {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(Index, false, -1);
-				};
-				stream.Start(new Capture.Video.CaptureSettings());
-				if (!stream.Capturing) {
-					Console.WriteLine("failed to start video capture stream");
-				}
-			});
+			bool streamAvailable = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) != Irseny.Listing.EquipmentState.Missing;
+			if (!streamAvailable) {
+				Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+					int streamId = Capture.Video.CaptureSystem.Instance.CreateStream();
+					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
+					stream.CaptureStarted += delegate {
+						Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
+					};
+					stream.CaptureStarted += delegate {
+						Capture.Video.CaptureSettings settings = stream.Settings;
+						Invoke(delegate {
+							// TODO: apply settings
+						});
+					};
+					stream.Start(new Capture.Video.CaptureSettings()); // TODO: get settings
+				});
+			} else {
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to start capture: still running"));
+			}
 		}
 		/*private void StartImageUpdate(Capture.Video.CaptureStream stream) {
 			stream.ImageAvailable += (object sender, Capture.Video.CaptureImageEventArgs args) => {
@@ -94,7 +92,20 @@ namespace Irseny.Viol.Main.Control.Camera {
 			};
 		}*/
 		private void StopCapture() {
-			Console.WriteLine("stop capture stub");
+			bool streamAvailable = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) != Irseny.Listing.EquipmentState.Missing;
+			if (streamAvailable) {
+				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
+				if (streamId > -1) {
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Missing, -1);
+					Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+						Capture.Video.CaptureSystem.Instance.DestroyStream(streamId);
+						Console.WriteLine("stream destroyed");
+					});
+				}
+
+			} else {
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to stop capture: unavailable"));
+			}
 		}
 	}
 }
