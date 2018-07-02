@@ -8,6 +8,7 @@ namespace Irseny.Listing {
 		public EquipmentMaster() {
 			VideoCaptureStream = new EquipmentManager<int>();
 			VideoSource = new EquipmentManager<int>();
+			HeadTracker = new EquipmentManager<int>();
 		}
 		public static EquipmentMaster Instance {
 			get {
@@ -18,7 +19,9 @@ namespace Irseny.Listing {
 		}
 		public EquipmentManager<int> VideoCaptureStream { get; private set; }
 		public EquipmentManager<int> VideoSource { get; private set; }
-		public static void MakeInstance(EquipmentMaster instance) {			
+		public EquipmentManager<int> HeadTracker { get; private set; }
+
+		public static void MakeInstance(EquipmentMaster instance) {
 			lock (instanceSync) {
 				EquipmentMaster.instance = instance;
 			}

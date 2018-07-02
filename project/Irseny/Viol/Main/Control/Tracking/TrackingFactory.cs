@@ -19,10 +19,11 @@ namespace Irseny.Viol.Main.Control.Tracking {
 				} else {
 					StopTracking();
 				}
-			}; 
+			};
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+			StopTracking();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -30,11 +31,29 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			return true;
 		}
 		private bool StartTracking() {
-			
-			return true;
+			int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(index, -1);
+			if (trackerId < 0) {
+				var tracker = new Tracap.CapTracker();
+				trackerId = Tracap.DetectionSystem.Instance.Start(tracker);
+				Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Active, trackerId);
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Head tracker started"));
+				// TODO: connect with video capture
+				return true;
+			} else {
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to start head tracker: Already running"));
+				return false;
+			}
 		}
 		private bool StopTracking() {
-			return true;
+			int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(index, -1);
+			if (trackerId > -1) {
+				Tracap.DetectionSystem.Instance.Stop(trackerId);
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Head tracker stopped"));
+				return true;
+			} else {
+				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to stop head tracker: Not running"));
+				return false;
+			}
 		}
 	}
 }

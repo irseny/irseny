@@ -107,7 +107,7 @@ namespace Irseny.Tracap {
 				if (running) {
 					running = false;
 					stepSignal.Set();
-					thread.Join();
+					thread.Join(); // TODO: move processing to detection system thread
 					thread = null;
 					return true;
 				}

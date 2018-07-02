@@ -13,6 +13,13 @@ namespace Irseny.Tracap {
 
 		public DetectionSystem() {
 		}
+		public static DetectionSystem Instance {
+			get {
+				lock (instanceSync) {
+					return instance;
+				}
+			}
+		}
 		public int Start(IHeadDetector detector) {
 			if (detector == null) throw new ArgumentNullException("detector");
 			lock (detectorSync) {
@@ -36,6 +43,15 @@ namespace Irseny.Tracap {
 				}
 			}
 		}
+		public IHeadDetector GetDetector(int id) {
+			lock (detectorSync) {
+				if (id < 0 || id >= detectors.Count) {
+					return null;
+				} else {
+					return detectors[id];
+				}
+			}
+		}
 		public bool Stop(int id) {
 			lock (detectorSync) {
 				if (id < 0 || id >= detectors.Count) {
@@ -50,7 +66,7 @@ namespace Irseny.Tracap {
 				return true;
 			}
 		}
-
+		// TODO: create detection system thread and invoke method
 
 
 		public static void MakeInstance(DetectionSystem instance) {
