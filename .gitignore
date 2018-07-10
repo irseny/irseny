@@ -2,6 +2,9 @@
 bin
 obj
 lib
+project/Extrack/bin
+project/Extrack/obj
+project/Extrack/build
 project/Mycena/bin
 project/Mycena/obj
 project/Irseny/bin

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 set(TRANSMITTER_NAME Extrack)
-set(SUPPLIER_NAME Genate)
+set(SUPPLIER_NAME Generate)
 set(CONSUMER_NAME Tell)
 project(${TRANSMITTER_NAME} C)
 project(${SUPPLIER_NAME} C)
