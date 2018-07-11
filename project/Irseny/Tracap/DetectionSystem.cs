@@ -13,7 +13,7 @@ namespace Irseny.Tracap {
 		AutoResetEvent invokeSignal = new AutoResetEvent(false);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 		readonly object detectorSync = new object();
-		List<IHeadDetector> detectors = new List<IHeadDetector>(4);
+		List<IPoseDetector> detectors = new List<IPoseDetector>(4);
 		List<Thread> detectorThreads = new List<Thread>(4);
 
 		public DetectionSystem() {
@@ -25,7 +25,7 @@ namespace Irseny.Tracap {
 				}
 			}
 		}
-		public int Start(IHeadDetector detector) {
+		public int Start(IPoseDetector detector) {
 			if (detector == null) throw new ArgumentNullException("detector");
 			lock (detectorSync) {
 				int id;
@@ -48,7 +48,7 @@ namespace Irseny.Tracap {
 				}
 			}
 		}
-		public IHeadDetector GetDetector(int id) {
+		public IPoseDetector GetDetector(int id) {
 			lock (detectorSync) {
 				if (id < 0 || id >= detectors.Count) {
 					return null;
@@ -113,8 +113,8 @@ namespace Irseny.Tracap {
 		// TODO: create detection system thread and invoke method
 
 
-		public static void MakeInstance(DetectionSystem instance) {			
-			lock (instanceSync) {				
+		public static void MakeInstance(DetectionSystem instance) {
+			lock (instanceSync) {
 				if (DetectionSystem.instance != null) {
 					DetectionSystem.instance.SignalStop();
 					DetectionSystem.instanceThread.Join();

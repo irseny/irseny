@@ -33,7 +33,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 		private bool StartTracking() {
 			int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(index, -1);
 			if (trackerId < 0) {
-				var tracker = new Tracap.CapTracker();
+				var tracker = new Tracap.Basic3PointCapTracker();
 				trackerId = Tracap.DetectionSystem.Instance.Start(tracker);
 				Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Active, trackerId);
 				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Head tracker started"));

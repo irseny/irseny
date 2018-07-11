@@ -120,9 +120,6 @@ namespace Irseny.Capture.Video {
 			}
 			if (handler != null) {
 				handler(this, args);
-			} else {
-				// TODO: put image into auto disposing structure
-				//args.Image.Dispose();
 			}
 		}
 		protected void OnCaptureStarted(StreamEventArgs args) {
@@ -167,7 +164,7 @@ namespace Irseny.Capture.Video {
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
 						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
-						// TODO: apply settings
+																				// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
 
 						OnCaptureStarted(new StreamEventArgs(this, Id));
@@ -234,9 +231,8 @@ namespace Irseny.Capture.Video {
 			}
 			public override bool HandleException(Exception exception) {
 				target.Stop(); // not capturing any longer
-				Console.WriteLine("exception in capture stream:\n" + exception);
-				// TODO: create log message
-				return true; // do not stop
+				Log.LogManager.Instance.Log(Log.LogMessage.CreateError(this, "Video capture failed with exception: " + exception.Message));
+				return true; // do not abort
 			}
 
 		}
