@@ -20,11 +20,20 @@ namespace Irseny.Log {
 		public static LogMessage CreateMessage(object source, string text) {
 			return new LogMessage(MessageType.Signal, source, text);
 		}
+		public static LogMessage CreateMessage(object source, string format, params object[] args) {
+			return new LogMessage(MessageType.Signal, source, string.Format(format, args));
+		}
 		public static LogMessage CreateWarning(object source, string text) {
 			return new LogMessage(MessageType.Warning, source, text);
 		}
+		public static LogMessage CreateWarning(object source, string format, params object[] args) {
+			return new LogMessage(MessageType.Warning, source, string.Format(format, args));
+		}
 		public static LogMessage CreateError(object source, string text) {
 			return new LogMessage(MessageType.Error, source, text);
+		}
+		public static LogMessage CreateError(object source, string format, params object[] args) {
+			return new LogMessage(MessageType.Error, source, string.Format(format, args));
 		}
 
 		public override string ToString() {
@@ -35,6 +44,23 @@ namespace Irseny.Log {
 			result.Append('|');
 			result.Append(Timestamp.ToString());
 			result.Append('|');
+			if (Source == null) {
+
+			} else if (Source is string) {
+				result.Append(Source);
+			} else {
+				result.Append(Source.GetType().FullName);
+			}
+			result.Append(": ");
+			AppendMessage(result);
+			return result.ToString();
+		}
+		public string ToDescription() {
+			var result = new StringBuilder(80);
+			AppendMessage(result);
+			return result.ToString();
+		}
+		private void AppendMessage(StringBuilder result) {
 			switch (MessageType) {
 			case MessageType.Signal:
 				result.Append("Message: ");
@@ -46,16 +72,7 @@ namespace Irseny.Log {
 				result.Append("Error: ");
 				break;
 			}
-			if (Source == null) {
-
-			} else if (Source is string) {
-				result.Append(Source);
-			} else {
-				result.Append(Source.GetType().FullName);
-			}
-			result.Append(": ");
 			result.Append(InnerText);
-			return result.ToString();
 		}
 	}
 }

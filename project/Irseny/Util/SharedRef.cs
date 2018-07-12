@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 namespace Irseny.Util {
-	public class SharedRef<T> : IDisposable {
+	public class SharedRef<T> : ISharedRef<T> {
 		InternalSharedRef reference;
 
 		public SharedRef(SharedRef<T> source) {

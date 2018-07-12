@@ -21,6 +21,10 @@ namespace Irseny.Tracap {
 				}
 			}
 		}
+		/// <summary>
+		/// Invokes the InputProcessed event.
+		/// </summary>
+		/// <param name="args">Arguments.</param>
 		protected void OnInputProcessed(ImageEventArgs args) {
 			if (args == null) throw new ArgumentNullException("args");
 			EventHandler<ImageEventArgs> handler;
@@ -35,7 +39,7 @@ namespace Irseny.Tracap {
 		/// Processes the given image.
 		/// </summary>
 		/// <returns>Whether the operation was successful.</returns>
-		/// <param name="image">Non disposed an available image to process. May be disposed after the method returns.</param>
+		/// <param name="image">Non disposed and available image to process. May be disposed after the method returns.</param>
 		protected abstract bool Step(Util.SharedRef<Emgu.CV.Mat> image);
 
 		public override bool Step() {
@@ -61,6 +65,18 @@ namespace Irseny.Tracap {
 				pendingImages.Enqueue(Util.SharedRef.Copy(image));
 			}
 			OnInputAvailable(new EventArgs());
+		}
+		public override void Dispose() {
+			base.Dispose();
+			lock (processedEventSync) {
+				imageProcessed = null;
+			}
+			lock (inputSync) {
+				foreach (Util.SharedRef<Emgu.CV.Mat> image in pendingImages) {
+					image.Dispose();
+				}
+				pendingImages.Clear();
+			}
 		}
 	}
 }

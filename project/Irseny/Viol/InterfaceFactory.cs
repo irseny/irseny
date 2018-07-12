@@ -17,6 +17,9 @@ namespace Irseny.Viol {
 		public ICollection<IInterfaceFactory> Floors {
 			get { return innerFactories.Values; }
 		}
+		public bool Initialized {
+			get { return State == InterfaceFactoryState.Connected; }
+		}
 
 		public bool Create() {
 			if (State == InterfaceFactoryState.Initial) {
@@ -82,13 +85,13 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Initial:
 						result = Create();
-					break;
+						break;
 					case InterfaceFactoryState.Created:
 						result = Connect();
-					break;
+						break;
 					default:
 						result = false; // should not occur
-					break;
+						break;
 					}
 					if (!result) {
 						return false;
@@ -100,13 +103,13 @@ namespace Irseny.Viol {
 					switch (State) {
 					case InterfaceFactoryState.Connected:
 						result = Disconnect();
-					break;
+						break;
 					case InterfaceFactoryState.Created:
 						result = Destroy();
-					break;
+						break;
 					default:
 						result = false; // should not occur
-					break;
+						break;
 					}
 					if (!result) {
 						return false;

@@ -42,7 +42,8 @@ namespace Irseny.Viol.Main.Control.Camera {
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			StopCapture();
+			//var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
+			StopCapture(); // TODO: use trystopcapture variant that does not log failures
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -50,62 +51,43 @@ namespace Irseny.Viol.Main.Control.Camera {
 			return true;
 		}
 		private void StartCapture() {
-			bool streamAvailable = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) != Irseny.Listing.EquipmentState.Missing;
-			if (!streamAvailable) {
-				Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-					int streamId = Capture.Video.CaptureSystem.Instance.CreateStream();
-					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
-					stream.CaptureStarted += delegate {
-						Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
-					};
-					stream.CaptureStarted += delegate {
-						Capture.Video.CaptureSettings settings = stream.Settings;
-						Invoke(delegate {
-							// TODO: apply settings
-						});
-					};
-					stream.Start(new Capture.Video.CaptureSettings()); // TODO: get settings
-				});
-			} else {
-				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to start capture: still running"));
-			}
+			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+				bool captureActive = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) == Listing.EquipmentState.Active;
+				if (captureActive) {
+					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to start capture {0}: Already running", index));
+					return;
+				}
+				int streamId = Capture.Video.CaptureSystem.Instance.CreateStream();
+				Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
+				stream.CaptureStarted += delegate {
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
+				};
+				stream.CaptureStarted += delegate {
+					Capture.Video.CaptureSettings settings = stream.Settings;
+					Invoke(delegate {
+						// TODO: apply settings to this instance
+					});
+				};
+				if (stream.Start(new Capture.Video.CaptureSettings())) {
+					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Capture {0} started", index));
+				} else {
+					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Failed to start capture {0}", index));
+				}
+			});
 		}
-		/*private void StartImageUpdate(Capture.Video.CaptureStream stream) {
-			stream.ImageAvailable += (object sender, Capture.Video.CaptureImageEventArgs args) => {
-				Invoke(delegate {
-					var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-					//var imgMatrix = args.Image;
-					var imgMatrix = new Emgu.CV.Mat(args.Image.Size, Emgu.CV.CvEnum.DepthType.Cv8U, 1);
-					//args.Image.ConvertTo(imgMatrix, Emgu.CV.CvEnum.DepthType.Cv8U);
-					//Emgu.CV.CvInvoke.Threshold(args.Image, imgMatrix, 50, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
-					Emgu.CV.CvInvoke.CvtColor(args.Image, imgMatrix, Emgu.CV.CvEnum.ColorConversion.Bgr2Gray);
-
-					var imgStream = new MemoryStream();
-					imgMatrix.Bitmap.Save(imgStream, System.Drawing.Imaging.ImageFormat.Bmp);
-					imgStream.Position = 0;
-					//Gdk.Pixbuf.FromPixdata(new Gdk.Pixdata().)
-					videoOut.Pixbuf = new Gdk.Pixbuf(imgStream);
-					imgMatrix.Dispose();
-					videoOut.QueueDraw();
-
-				});
-			};
-		}*/
 		private void StopCapture() {
-			bool streamAvailable = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) != Irseny.Listing.EquipmentState.Missing;
-			if (streamAvailable) {
+			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
 				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
 				if (streamId > -1) {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Missing, -1);
-					Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-						Capture.Video.CaptureSystem.Instance.DestroyStream(streamId);
-						Console.WriteLine("stream destroyed");
-					});
+					if (!Capture.Video.CaptureSystem.Instance.DestroyStream(streamId)) {
+						Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateError(this, "Capture {0}: Destruction failed", index));
+					}
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Passive, -1); // switched between missing and passive in base factory
+					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Capture {0} stopped", index));
+				} else {
+					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Failed to stop capture {0}: Not running", index));
 				}
-
-			} else {
-				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateWarning(this, "Unable to stop capture: unavailable"));
-			}
+			});
 		}
 	}
 }

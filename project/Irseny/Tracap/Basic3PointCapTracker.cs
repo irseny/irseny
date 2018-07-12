@@ -5,23 +5,26 @@ namespace Irseny.Tracap {
 		public Basic3PointCapTracker() : base() {
 		}
 
-		public override void Dispose() {
-			throw new NotImplementedException();
-		}
-
 		public override bool Start() {
-			throw new NotImplementedException();
+			Running = true;
+			return true;
 		}
 
 		public override bool Stop() {
-			throw new NotImplementedException();
+			Running = false;
+			return true;
 		}
-
+		public override void Dispose() {
+			base.Dispose();
+		}
 		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> image) {
 			var result = Util.SharedRef.Copy(image);
 			OnInputProcessed(new ImageEventArgs(result));
+			var position = new CapPosition();
+			OnPositionDetected(new CapPositionArgs(position));
 			result.Dispose();
 			return true;
 		}
+
 	}
 }

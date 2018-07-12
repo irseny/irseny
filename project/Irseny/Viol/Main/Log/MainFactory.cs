@@ -61,9 +61,10 @@ namespace Irseny.Viol.Main.Log {
 			Irseny.Log.LogMessage remaining = Filter(message);
 			if (remaining != null) {
 				var target = Container.GetWidget<Gtk.TextView>("txt_Log").Buffer;
-				string text = remaining.ToString();
+				string text = remaining.ToDescription();
 				var atEnd = target.EndIter;
 				target.Insert(ref atEnd, text);
+				target.Insert(ref atEnd, "\n");
 			}
 		}
 		private void UpdateFilter() {
@@ -87,9 +88,10 @@ namespace Irseny.Viol.Main.Log {
 			foreach (Irseny.Log.LogMessage message in messages) {
 				Irseny.Log.LogMessage remaining = Filter(message);
 				if (remaining != null) {
-					string text = remaining.ToString();
+					string text = remaining.ToDescription();
 					var atEnd = target.EndIter;
 					target.Insert(ref atEnd, text);
+					target.Insert(ref atEnd, "\n");
 				}
 			}
 		}

@@ -72,6 +72,8 @@ namespace Irseny {
 					Debug.WriteLine("packet not submitted successfully");
 				}*/
 				Gtk.Application.RunIteration();
+				// occuring exceptions:
+				// invalid access to memory
 			}
 			/*watch.Stop();
 			Extrack.Artf.FreePacket(packet);

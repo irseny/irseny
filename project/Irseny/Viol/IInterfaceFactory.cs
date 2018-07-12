@@ -14,6 +14,12 @@ namespace Irseny.Viol {
 		/// <value>The creation state.</value>
 		InterfaceFactoryState State { get; }
 		/// <summary>
+		/// Indicates whether this instance has been fully initialized.
+		/// This is the case if this instance is in <see cref="InterfaceFactoryState.Connected"/> state.
+		/// </summary>
+		/// <value><c>true</c> if fully initialized; otherwise, <c>false</c>.</value>
+		bool Initialized { get; }
+		/// <summary>
 		/// Gets the widget container.
 		/// </summary>
 		/// <value>The widget container.</value>

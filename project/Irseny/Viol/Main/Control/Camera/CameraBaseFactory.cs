@@ -28,10 +28,6 @@ namespace Irseny.Viol.Main.Control.Camera {
 		protected override bool DisconnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var boxMain = Container.GetWidget("box_Root");
-			/*var btnAdd = Container.GetWidget<Gtk.Button>("btn_Add");
-			btnAdd.Clicked = null;
-			var btnRemove = Container.GetWidget<Gtk.Button>("btn_Remove");
-			btnRemove.Clicked = null;*/
 			boxRoot.Remove(boxMain);
 			return true;
 		}
@@ -44,6 +40,8 @@ namespace Irseny.Viol.Main.Control.Camera {
 			int page = ntbCamera.NPages;
 			// create and append
 			if (page < 10) {
+				// also changed in the inner factory
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Passive, page);
 				var factory = new Camera.CameraFactory(page);
 				ConstructFloor(string.Format("Camera{0}", page), factory);
 				var boxInner = factory.Container.GetWidget("box_Root");
@@ -51,8 +49,8 @@ namespace Irseny.Viol.Main.Control.Camera {
 				factory.Container.AddWidget(label);
 				ntbCamera.AppendPage(boxInner, label);
 				ntbCamera.ShowAll();
-				// update video sources
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Passive, page);
+
+
 				return true;
 			} else {
 				return false;
@@ -63,10 +61,11 @@ namespace Irseny.Viol.Main.Control.Camera {
 			int page = ntbCamera.NPages - 1;
 			// remove last
 			if (page > -1) {
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Missing, page);
 				ntbCamera.RemovePage(page);
 				IInterfaceFactory floor = DestructFloor(string.Format("Camera{0}", page));
 				floor.Dispose();
+				// also changed in the floor
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Missing, page);
 				return true;
 			} else {
 				return false;

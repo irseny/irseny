@@ -46,8 +46,6 @@ namespace Irseny.Viol.Main.Control.Tracking {
 				factory.Container.AddWidget(label);
 				ntbTracker.AppendPage(boxInner, label);
 				ntbTracker.ShowAll();
-				// update video sources
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Passive, page);
 				return true;
 			} else {
 				return false;
@@ -58,7 +56,6 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int page = ntbTracker.NPages - 1;
 			// remove last
 			if (page > -1) {
-				Listing.EquipmentMaster.Instance.VideoSource.Update(page, Listing.EquipmentState.Missing, page);
 				ntbTracker.RemovePage(page);
 				IInterfaceFactory floor = DestructFloor(string.Format("Track{0}", page));
 				floor.Dispose();
