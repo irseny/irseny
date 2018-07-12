@@ -96,6 +96,7 @@ namespace Irseny.Tracap {
 					if (detectors[id] == null) {
 						return false;
 					}
+					detectors[id].InputAvailable -= SignalStep;
 					detectors[id].Stop();
 					detectors[id].Dispose();
 					detectors[id] = null;

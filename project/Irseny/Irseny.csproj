@@ -143,6 +143,8 @@
     <Compile Include="Tracap\CapPosition.cs" />
     <Compile Include="Tracap\CapPositionArgs.cs" />
     <Compile Include="Util\ISharedRef.cs" />
+    <Compile Include="Tracap\CapTrackerOptions.cs" />
+    <Compile Include="Util\SharedRefCleaner.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

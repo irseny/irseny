@@ -2,7 +2,10 @@
 
 namespace Irseny.Tracap {
 	public class Basic3PointCapTracker : SingleImageCapTracker {
-		public Basic3PointCapTracker() : base() {
+		CapTrackerOptions options;
+		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner();
+		public Basic3PointCapTracker(CapTrackerOptions options) : base() {
+			this.options = new CapTrackerOptions(options);
 		}
 
 		public override bool Start() {
@@ -15,6 +18,7 @@ namespace Irseny.Tracap {
 			return true;
 		}
 		public override void Dispose() {
+			imageCleaner.DisposeAll(); // should not matter if some images are disposed on non detection threads
 			base.Dispose();
 		}
 		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> image) {
@@ -23,6 +27,8 @@ namespace Irseny.Tracap {
 			var position = new CapPosition();
 			OnPositionDetected(new CapPositionArgs(position));
 			result.Dispose();
+			//imageCleaner.CleanUpStep(2);
+			//imageCleaner.AddReference(result);
 			return true;
 		}
 
