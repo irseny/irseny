@@ -19,6 +19,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 		}
 		protected override bool DisconnectInternal() {
 			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated -= CameraChanged;
+			while (RemoveCamera()) { }
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
@@ -32,17 +33,18 @@ namespace Irseny.Viol.Main.Image.Camera {
 			Invoke(delegate {
 				var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
 				int pages = ntbCamera.NPages;
-				if (args.Available) {
-					if (args.Index == pages) {
-						AddCamera();
-					} else {
-						Debug.WriteLine("changed camera source index out of order: " + args.Index);
-					}
-				} else {
+				if (args.Missing) {
 					if (args.Index == pages - 1) {
 						RemoveCamera();
 					} else {
-						Debug.WriteLine("changed camera source index out of order: " + args.Index);
+						Debug.WriteLine(this.GetType().Name + ": Camera modified out of order: " + args.Index);
+					}
+
+				} else { // can occur multiple times (passive/active) -> debug message
+					if (args.Index == pages) {
+						AddCamera();
+					} else {
+						Debug.WriteLine(this.GetType().Name + ": Camera modified out of order: " + args.Index);
 					}
 				}
 			});
@@ -57,7 +59,6 @@ namespace Irseny.Viol.Main.Image.Camera {
 			factory.Container.AddWidget(label);
 			ntbCamera.AppendPage(boxInner, label);
 			ntbCamera.ShowAll();
-
 			return true;
 		}
 		public bool RemoveCamera() {
@@ -68,9 +69,8 @@ namespace Irseny.Viol.Main.Image.Camera {
 				IInterfaceFactory floor = DestructFloor(string.Format("Camera{0}", page));
 				floor.Dispose();
 				return true;
-			} else {
-				return false;
 			}
+			return false;
 		}
 	}
 }

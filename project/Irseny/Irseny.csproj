@@ -129,7 +129,7 @@
     <Compile Include="Viol\Main\Image\Camera\CameraBaseFactory.cs" />
     <Compile Include="Viol\Main\Control\Camera\CameraBaseFactory.cs" />
     <Compile Include="Tracap\DetectionSystem.cs" />
-    <Compile Include="Tracap\ImageEventArgs.cs" />
+    <Compile Include="Tracap\ImageProcessedEventArgs.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Tracap\Basic3PointCapTracker.cs" />
     <Compile Include="Viol\Main\Control\Tracking\TrackingBaseFactory.cs" />
@@ -141,10 +141,14 @@
     <Compile Include="Tracap\CapTracker.cs" />
     <Compile Include="Tracap\SingleImageCapTracker.cs" />
     <Compile Include="Tracap\CapPosition.cs" />
-    <Compile Include="Tracap\CapPositionArgs.cs" />
     <Compile Include="Util\ISharedRef.cs" />
     <Compile Include="Tracap\CapTrackerOptions.cs" />
     <Compile Include="Util\SharedRefCleaner.cs" />
+    <Compile Include="Capture\Video\StreamEventArgs.cs" />
+    <Compile Include="Capture\Video\ImageCapturedEventArgs.cs" />
+    <Compile Include="Viol\Main\Image\Tracking\TrackingBaseFactory.cs" />
+    <Compile Include="Viol\Main\Image\Tracking\TrackingFactory.cs" />
+    <Compile Include="Tracap\PositionDetectedEventArgs.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -165,6 +169,7 @@
     <Folder Include="Util\" />
     <Folder Include="Viol\Main\Control\Tracking\" />
     <Folder Include="Extrack\" />
+    <Folder Include="Viol\Main\Image\Tracking\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

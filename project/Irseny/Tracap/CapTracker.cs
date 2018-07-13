@@ -4,7 +4,7 @@ namespace Irseny.Tracap {
 		readonly object inputEventSync = new object();
 		readonly object detectedEventSync = new object();
 		readonly object executionEventSync = new object();
-		event EventHandler<EventArgs> positionDetected;
+		event EventHandler<PositionDetectedEventArgs> positionDetected;
 		event EventHandler inputAvailable;
 		event EventHandler started;
 		event EventHandler stopped;
@@ -15,7 +15,7 @@ namespace Irseny.Tracap {
 			Dispose();
 		}
 		public virtual bool Running { get; protected set; }
-		public event EventHandler<EventArgs> PositionDetected {
+		public event EventHandler<PositionDetectedEventArgs> PositionDetected {
 			add {
 				lock (detectedEventSync) {
 					positionDetected += value;
@@ -93,9 +93,9 @@ namespace Irseny.Tracap {
 				handler(this, args);
 			}
 		}
-		protected virtual void OnPositionDetected(EventArgs args) {
+		protected virtual void OnPositionDetected(PositionDetectedEventArgs args) {
 			if (args == null) throw new ArgumentNullException("args");
-			EventHandler<EventArgs> handler;
+			EventHandler<PositionDetectedEventArgs> handler;
 			lock (detectedEventSync) {
 				handler = positionDetected;
 			}

@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
+
 namespace Irseny.Util {
 	public class SharedRefCleaner {
 		List<ISharedRef> usedRefs;
 		int stepIndex;
+		int referenceLimit;
 		/// <summary>
 		/// Creates an empty instance of this class.
 		/// </summary>
-		public SharedRefCleaner() {
-			usedRefs = new List<ISharedRef>(32);
-			stepIndex = 0;
+		public SharedRefCleaner(int referenceLimit) {
+			if (referenceLimit < 0) throw new ArgumentOutOfRangeException("referenceLimit");
+			this.usedRefs = new List<ISharedRef>(referenceLimit);
+			this.stepIndex = 0;
+			this.referenceLimit = referenceLimit;
 		}
 		/// <summary>
 		/// Adds a reference to be disposed by this instance. Disposes the reference if it has no customers.
@@ -34,6 +39,9 @@ namespace Irseny.Util {
 			while (iterations-- > 0) {
 				if (stepIndex >= usedRefs.Count) {
 					stepIndex = 0;
+					if (usedRefs.Count > referenceLimit) {
+						Debug.WriteLine(this.GetType().Name + ": Many captured images still in use: " + usedRefs.Count);
+					}
 				}
 				if (stepIndex < usedRefs.Count) {
 					if (usedRefs[stepIndex].LastReference) {
@@ -69,7 +77,7 @@ namespace Irseny.Util {
 		/// <param name="index">Index.</param>
 		private void OverwriteClean(int index) {
 			usedRefs[index].Dispose();
-			int lastIndex = usedRefs.Count;
+			int lastIndex = usedRefs.Count - 1;
 			if (lastIndex < usedRefs.Count) {
 				usedRefs[index] = usedRefs[lastIndex];
 			}

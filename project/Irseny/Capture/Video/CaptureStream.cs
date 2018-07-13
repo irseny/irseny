@@ -12,9 +12,8 @@ namespace Irseny.Capture.Video {
 		Emgu.CV.VideoCapture capture = null;
 		CaptureSettings settings = new CaptureSettings();
 		readonly int id;
-		List<Util.SharedRef<Emgu.CV.Mat>> usedImages = new List<Util.SharedRef<Emgu.CV.Mat>>();
-		int imageCheckIndex = 0;
-		event EventHandler<CaptureImageEventArgs> imageAvailable;
+		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
+		event EventHandler<ImageCapturedEventArgs> imageAvailable;
 		event EventHandler<StreamEventArgs> captureStarted;
 		event EventHandler<StreamEventArgs> captureStopped;
 
@@ -32,7 +31,7 @@ namespace Irseny.Capture.Video {
 				}
 			}
 		}
-		public event EventHandler<CaptureImageEventArgs> ImageAvailable {
+		public event EventHandler<ImageCapturedEventArgs> ImageAvailable {
 			add {
 				lock (imageEventSync) {
 					imageAvailable += value;
@@ -80,20 +79,25 @@ namespace Irseny.Capture.Video {
 				if (capture == null) {
 					return; // null if capture is stopped but internal capture thread still running
 				}
-				var image = new Util.SharedRef<Emgu.CV.Mat>(new Emgu.CV.Mat());
+				var colorImage = Util.SharedRef.Create(new Emgu.CV.Mat());
+				var grayImage = Util.SharedRef.Create(new Emgu.CV.Mat());
+				capture.Retrieve(colorImage.Reference);
+				Emgu.CV.CvInvoke.CvtColor(colorImage.Reference, grayImage.Reference, Emgu.CV.CvEnum.ColorConversion.Rgb2Gray);
+				OnImageAvailable(new ImageCapturedEventArgs(this, id, colorImage, grayImage));
+				imageCleaner.AddReference(colorImage);
+				imageCleaner.AddReference(grayImage);
+				imageCleaner.CleanUpStep(4); // 2 images potentially added on every receive, try to remove more than are added
 
-				capture.Retrieve(image.Reference);
-				OnImageAvailable(new CaptureImageEventArgs(this, id, image));
-				if (image.LastReference) {
-					image.Dispose();
+				/*if (colorImage.LastReference) {
+					colorImage.Dispose();
 				} else {
-					usedImages.Add(image);
+					usedImages.Add(colorImage);
 				}
 				if (usedImages.Count > 0) {
 					if (imageCheckIndex < 0 || imageCheckIndex >= usedImages.Count) {
 						// occasionally add warning
 						if (usedImages.Count > 32) {
-							Debug.WriteLine(this.GetType().Name + ": Many captured images still in use: " + usedImages.Count);
+
 						}
 						imageCheckIndex = 0; // reset if out of bounds
 					}
@@ -110,11 +114,11 @@ namespace Irseny.Capture.Video {
 					}
 				}
 				long total = GC.GetTotalMemory(true);
-				//Console.WriteLine("total memory used {0:#,##0}k", total / 1000);
+				Console.WriteLine("total memory used {0:#,##0}k", total / 1000);*/
 			}
 		}
-		protected void OnImageAvailable(CaptureImageEventArgs args) {
-			EventHandler<CaptureImageEventArgs> handler;
+		protected void OnImageAvailable(ImageCapturedEventArgs args) {
+			EventHandler<ImageCapturedEventArgs> handler;
 			lock (imageEventSync) {
 				handler = imageAvailable;
 			}
@@ -168,15 +172,7 @@ namespace Irseny.Capture.Video {
 						this.settings = new CaptureSettings(settings);
 
 						OnCaptureStarted(new StreamEventArgs(this, Id));
-						capture.ImageGrabbed += delegate {
-
-							//Thread.Sleep(1);
-						};
 						capture.ImageGrabbed += ReceiveImage;
-						/*int count = 0;
-						capture.ImageGrabbed += delegate {
-							Console.WriteLine("image grabbed: " + count++);
-						};*/
 						result = true;
 					} else {
 						capture.Dispose();
@@ -204,6 +200,7 @@ namespace Irseny.Capture.Video {
 		public bool Stop() {
 			bool result;
 			lock (captureSync) {
+				imageCleaner.CleanUpAll(); // this is a non forced cleanup which can leave some images undisposed
 				if (capture != null) {
 					capture.Stop();
 					capture.Dispose();
@@ -227,6 +224,7 @@ namespace Irseny.Capture.Video {
 			public override bool HandleException(Exception exception) {
 				target.Stop(); // not capturing any longer
 				Log.LogManager.Instance.Log(Log.LogMessage.CreateError(this, "Video capture failed with exception: " + exception.Message));
+				Debug.WriteLine(exception.StackTrace);
 				return true; // do not abort
 			}
 
@@ -234,28 +232,7 @@ namespace Irseny.Capture.Video {
 
 	}
 
-	public class StreamEventArgs : EventArgs {
-		public StreamEventArgs(CaptureStream stream, int streamId) {
-			if (stream == null) throw new ArgumentNullException("stream");
-			if (streamId < 0) throw new ArgumentOutOfRangeException("streamId");
-			Stream = stream;
-			StreamId = streamId;
-		}
-		public CaptureStream Stream { get; private set; }
-		public int StreamId { get; private set; }
 
-	}
 
-	public class CaptureImageEventArgs : StreamEventArgs {
-		Util.SharedRef<Emgu.CV.Mat> image;
-		public CaptureImageEventArgs(CaptureStream stream, int streamId, Util.SharedRef<Emgu.CV.Mat> image) : base(stream, streamId) {
-			if (image == null) throw new ArgumentNullException("image");
-			this.image = image;
-		}
-		public Util.SharedRef<Emgu.CV.Mat> Image {
-			// TODO: create shared ref instance
-			get { return new Util.SharedRef<Emgu.CV.Mat>(image); }
-		}
 
-	}
 }

@@ -70,7 +70,7 @@ namespace Irseny.Tracap {
 		/// Gets the detector specified by the given identifier.
 		/// </summary>
 		/// <returns>The detector. Null if it does not exist.</returns>
-		/// <param name="id">Detector identifier previously returned by <see cref="StartDetector"></see>.</param>
+		/// <param name="id">Detector identifier previously returned by <see cref="StartDetector"/>.</param>
 		public IPoseDetector GetDetector(int id) {
 			lock (detectorSync) {
 				if (id < 0 || id >= detectors.Count) {
@@ -81,6 +81,26 @@ namespace Irseny.Tracap {
 					}
 				}
 			}
+		}
+		/// <summary>
+		/// Gets the detector specified by the given identifier and type.
+		/// </summary>
+		/// <returns>The detector. Null if it does not exist or there is a type mismatch.</returns>
+		/// <param name="id">Detector identifier previously returned by <see cref="StartDetector"/>.</param>
+		/// <param name="defaultValue">Default value.</param>
+		/// <typeparam name="Tdetect">The detector type.</typeparam>
+		public Tdetect GetDetector<Tdetect>(int id, Tdetect defaultValue) where Tdetect : IPoseDetector {
+			lock (detectorSync) {
+				if (id >= 0 && id < detectors.Count) {
+					lock (detectorsSync[id]) {
+						if (detectors[id] is Tdetect) {
+							return (Tdetect)detectors[id];
+						}
+					}
+
+				}
+			}
+			return defaultValue;
 		}
 		/// <summary>
 		/// Stops, disposes and removes the detector specified by the given identifier.

@@ -9,7 +9,7 @@ namespace Irseny {
 		public static void Main(string[] args) {
 			Gtk.Application.Init();
 #if WINDOWS
-			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, "");
+			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, string.Empty);
 #endif
 			{
 				Listing.EquipmentMaster.MakeInstance(new Listing.EquipmentMaster());
@@ -41,6 +41,8 @@ namespace Irseny {
 				controlFactory.ConstructFloor("tracking", trackingControlFactory);
 				var cameraImageFactory = new Viol.Main.Image.Camera.CameraBaseFactory();
 				imageFactory.ConstructFloor("camera", cameraImageFactory);
+				var trackingImageFactory = new Viol.Main.Image.Tracking.TrackingBaseFactory();
+				imageFactory.ConstructFloor("tracking", trackingImageFactory);
 				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;
@@ -71,9 +73,12 @@ namespace Irseny {
 				if (!Extrack.Artf.SubmitPacket(context, device, packet)) {
 					Debug.WriteLine("packet not submitted successfully");
 				}*/
+				// TODO: fix attempted to read or write protected memory through GLib.ToggleRef.Free();
 				Gtk.Application.RunIteration();
+				long memory = GC.GetTotalMemory(true);
+				//Console.WriteLine("total memory used {0:#,##0}k", memory / 1000);
 				// occuring exceptions:
-				// invalid access to memory
+				// invalid access to memory when removing a camera page
 			}
 			/*watch.Stop();
 			Extrack.Artf.FreePacket(packet);

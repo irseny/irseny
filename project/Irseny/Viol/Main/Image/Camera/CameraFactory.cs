@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
-		Gdk.Pixbuf imgShow;
+		Gdk.Pixbuf activeImage = null;
 		string videoOutStock = "gtk-missing-image";
 		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
@@ -18,7 +18,6 @@ namespace Irseny.Viol.Main.Image.Camera {
 		protected override bool CreateInternal() {
 			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraImage"));
 			Container = factory.CreateWidget("box_Root");
-			imgShow = null; // target size unknown
 			return true;
 		}
 		protected override bool ConnectInternal() {
@@ -33,10 +32,6 @@ namespace Irseny.Viol.Main.Image.Camera {
 			return true;
 		}
 		protected override bool DestroyInternal() {
-			if (imgShow != null) {
-				imgShow.Dispose();
-				imgShow = null;
-			}
 			Container.Dispose();
 			return true;
 		}
@@ -52,10 +47,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 				});
 			}
 		}
-		private void RetrieveImage(object sender, Capture.Video.CaptureImageEventArgs args) {
-			if (!Initialized) {
-				return;
-			}
+		private void RetrieveImage(object sender, Capture.Video.ImageCapturedEventArgs args) {
 			/*int width = 0;
 			int height = 0;
 			MemoryStream imgStream;
@@ -80,7 +72,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 			int height = 0;
 			int totalBytes = 0;
 			bool pixelsAvailable = false;
-			using (var imgRef = args.Image) {
+			using (var imgRef = args.ColorImage) {
 				var imgSource = imgRef.Reference;
 				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte) * 3 && imgSource.DataPointer != IntPtr.Zero) {
 					width = imgSource.Width;
@@ -98,39 +90,40 @@ namespace Irseny.Viol.Main.Image.Camera {
 			}
 			if (pixelsAvailable) {
 				Invoke(delegate {
-					if (Initialized) { // can be called after the capture is stopped
-						Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-						/*var pixels = new Gdk.Pixbuf(buffer, Gdk.Colorspace.Rgb, false, 8, width, height, stride, (byte[] buf) => {
-							Console.WriteLine("pixbuf destroy"); // not called
-						});*/
-						//var pixels = new Gdk.Pixbuf(buffer); // unable to determine format
-						//var pixels = new Gdk.Pixbuf(buffer, false); // header corrupt
-						//
-						//var data = new Gdk.Pixdata();
-						//data.Deserialize((uint)buffer.Length, buffer); // unable to determine format
-						//var pixels = Gdk.Pixbuf.FromPixdata(data, true);
-						//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
-						bool updatePixBuf = false;
-						if (imgShow == null || imgShow.Width != width || imgShow.Height != height) {
-							if (imgShow != null) {
-								imgShow.Dispose();
-							}
-							imgShow = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
-							updatePixBuf = true;
-						}
-						Marshal.Copy(pixelBuffer, 0, imgShow.Pixels, totalBytes);
-						if (!updatePixBuf) {
-							videoOut.Pixbuf = imgShow;
-						}
-						videoOut.QueueDraw();
+					if (!Initialized) { // can be called after the capture is stopped
+						return;
 					}
+					Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+					/*var pixels = new Gdk.Pixbuf(buffer, Gdk.Colorspace.Rgb, false, 8, width, height, stride, (byte[] buf) => {
+						Console.WriteLine("pixbuf destroy"); // not called
+					});*/
+					//var pixels = new Gdk.Pixbuf(buffer); // unable to determine format
+					//var pixels = new Gdk.Pixbuf(buffer, false); // header corrupt
+					//
+					//var data = new Gdk.Pixdata();
+					//data.Deserialize((uint)buffer.Length, buffer); // unable to determine format
+					//var pixels = Gdk.Pixbuf.FromPixdata(data, true);
+					//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
+					bool updatePixBuf = false;
+					if (activeImage == null || activeImage.Width != width || activeImage.Height != height) {
+						if (activeImage != null) {
+							activeImage.Dispose();
+						}
+						activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
+						updatePixBuf = true;
+					}
+					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
+					if (!updatePixBuf) {
+						videoOut.Pixbuf = activeImage;
+					}
+					videoOut.QueueDraw();
 				});
 			}
 		}
 
-		public bool StartCapture() {
+		public void StartCapture() {
 			if (!Initialized) {
-				return false;
+				return;
 			}
 			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
 				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
@@ -141,13 +134,8 @@ namespace Irseny.Viol.Main.Image.Camera {
 					}
 				}
 			});
-
-			return true;
 		}
-		public bool StopCapture() {
-			if (!Initialized) {
-				return false; // occurs when the page is removed, although the listing update event should be unsubscribed
-			}
+		public void StopCapture() {
 			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
 				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
 				if (streamId > -1) { // already removed if the stream is no longer available
@@ -157,14 +145,17 @@ namespace Irseny.Viol.Main.Image.Camera {
 					}
 				}
 			});
+			if (!Initialized) {
+				return; // occurs when the page is removed, although the listing update event should be unsubscribed
+			}
 			// reset default image
-			if (imgShow != null) {
-				imgShow.Dispose();
-				imgShow = null;
+			if (activeImage != null) {
+				activeImage.Dispose();
+				activeImage = null;
 			}
 			Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+			// TODO: fix attempted read/write protected memory when page is added and immediately removed
 			videoOut.SetFromStock(videoOutStock, videoOutSize);
-			return true;
 		}
 	}
 }

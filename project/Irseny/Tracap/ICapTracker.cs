@@ -4,6 +4,6 @@ namespace Irseny.Tracap {
 		/// <summary>
 		/// Occurs when the head position has been detected.
 		/// </summary>
-		event EventHandler<EventArgs> PositionDetected;
+		event EventHandler<PositionDetectedEventArgs> PositionDetected;
 	}
 }

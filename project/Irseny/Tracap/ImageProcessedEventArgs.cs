@@ -1,14 +1,14 @@
 ﻿using System;
 
 namespace Irseny.Tracap {
-	public class ImageEventArgs : EventArgs {
+	public class ImageProcessedEventArgs : EventArgs {
 		Util.SharedRef<Emgu.CV.Mat> image;
 		/// <summary>
 		/// Creates an instance of this class that holds the given image.
 		/// </summary>
 		/// <param name="image">Image argument. 
 		/// Copies of the given instance are created when the image is used through the respective property of this class.</param>
-		public ImageEventArgs(Util.SharedRef<Emgu.CV.Mat> image) {
+		public ImageProcessedEventArgs(Util.SharedRef<Emgu.CV.Mat> image) {
 			if (image == null) throw new ArgumentNullException("image");
 			this.image = image;
 		}

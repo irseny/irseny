@@ -3,7 +3,7 @@
 namespace Irseny.Tracap {
 	public class Basic3PointCapTracker : SingleImageCapTracker {
 		CapTrackerOptions options;
-		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner();
+		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
 		public Basic3PointCapTracker(CapTrackerOptions options) : base() {
 			this.options = new CapTrackerOptions(options);
 		}
@@ -23,10 +23,11 @@ namespace Irseny.Tracap {
 		}
 		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> image) {
 			var result = Util.SharedRef.Copy(image);
-			OnInputProcessed(new ImageEventArgs(result));
-			var position = new CapPosition();
-			OnPositionDetected(new CapPositionArgs(position));
+			OnInputProcessed(new ImageProcessedEventArgs(result));
 			result.Dispose();
+			var position = new CapPosition();
+			OnPositionDetected(new PositionDetectedEventArgs(position));
+
 			//imageCleaner.CleanUpStep(2);
 			//imageCleaner.AddReference(result);
 			return true;

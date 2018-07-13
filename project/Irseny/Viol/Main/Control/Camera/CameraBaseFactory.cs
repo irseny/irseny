@@ -41,7 +41,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 			// create and append
 			if (page < 10) {
 				// also changed in the inner factory
-				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Passive, page);
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Passive, -1);
 				var factory = new Camera.CameraFactory(page);
 				ConstructFloor(string.Format("Camera{0}", page), factory);
 				var boxInner = factory.Container.GetWidget("box_Root");
@@ -65,7 +65,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 				IInterfaceFactory floor = DestructFloor(string.Format("Camera{0}", page));
 				floor.Dispose();
 				// also changed in the floor
-				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Missing, page);
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(page, Listing.EquipmentState.Missing, -1);
 				return true;
 			} else {
 				return false;

@@ -4,7 +4,7 @@ namespace Irseny.Tracap {
 		/// <summary>
 		/// Occurs when an input image has been processed.
 		/// </summary>
-		event EventHandler<ImageEventArgs> InputProcessed;
+		event EventHandler<ImageProcessedEventArgs> InputProcessed;
 		/// <summary>
 		/// Queues an image for pose detection. Creates a copy of the given reference.
 		/// </summary>

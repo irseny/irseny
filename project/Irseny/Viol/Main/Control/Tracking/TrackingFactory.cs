@@ -82,7 +82,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			Tracap.ICapTracker loadedTarget;
 			EventHandler<Listing.EquipmentUpdateArgs<int>> sourceListener = null;
 			EventHandler<Listing.EquipmentUpdateArgs<int>> targetListener = null;
-			EventHandler<Capture.Video.CaptureImageEventArgs> transmitImage = null;
+			EventHandler<Capture.Video.ImageCapturedEventArgs> transmitImage = null;
 
 			public VideoTrackerConnection(int targetIndex, int[] sourceIndexes) {
 				this.targetIndex = targetIndex;
@@ -136,8 +136,8 @@ namespace Irseny.Viol.Main.Control.Tracking {
 					loadedTarget = variableTarget;
 					lock (sourceSync) {
 						if (TargetFound && SourcesFound) {
-							transmitImage = (object sender, Capture.Video.CaptureImageEventArgs args) => {
-								using (Util.SharedRef<Emgu.CV.Mat> image = args.Image) {
+							transmitImage = (object sender, Capture.Video.ImageCapturedEventArgs args) => {
+								using (Util.SharedRef<Emgu.CV.Mat> image = args.GrayImage) {
 									//loadedTarget.(image);
 									if (loadedTarget is Tracap.ISingleImageCapTracker) {
 										((Tracap.ISingleImageCapTracker)loadedTarget).QueueInput(image);

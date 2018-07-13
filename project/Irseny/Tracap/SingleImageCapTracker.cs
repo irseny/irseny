@@ -5,11 +5,11 @@ namespace Irseny.Tracap {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
 		Queue<Util.SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
-		event EventHandler<ImageEventArgs> imageProcessed;
+		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
 		public SingleImageCapTracker() : base() {
 		}
-		public event EventHandler<ImageEventArgs> InputProcessed {
+		public event EventHandler<ImageProcessedEventArgs> InputProcessed {
 			add {
 				lock (processedEventSync) {
 					imageProcessed += value;
@@ -25,9 +25,9 @@ namespace Irseny.Tracap {
 		/// Invokes the InputProcessed event.
 		/// </summary>
 		/// <param name="args">Arguments.</param>
-		protected void OnInputProcessed(ImageEventArgs args) {
+		protected void OnInputProcessed(ImageProcessedEventArgs args) {
 			if (args == null) throw new ArgumentNullException("args");
-			EventHandler<ImageEventArgs> handler;
+			EventHandler<ImageProcessedEventArgs> handler;
 			lock (processedEventSync) {
 				handler = imageProcessed;
 			}
