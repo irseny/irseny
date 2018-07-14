@@ -7,8 +7,8 @@ namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
-		string videoOutStock = "gtk-missing-image";
-		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
+		//string videoOutStock = "gtk-missing-image";
+		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
 		public CameraFactory(int index) : base() {
 			this.index = index;
@@ -22,8 +22,8 @@ namespace Irseny.Viol.Main.Image.Camera {
 		}
 		protected override bool ConnectInternal() {
 			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated += StreamStateChanged;
-			var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			videoOut.GetStock(out videoOutStock, out videoOutSize);
+			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			return true;
 		}
 		protected override bool DisconnectInternal() {
@@ -106,14 +106,14 @@ namespace Irseny.Viol.Main.Image.Camera {
 					//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
 					bool updatePixBuf = false;
 					if (activeImage == null || activeImage.Width != width || activeImage.Height != height) {
-						if (activeImage != null) {
-							activeImage.Dispose();
-						}
 						activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
 						updatePixBuf = true;
 					}
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-					if (!updatePixBuf) {
+					if (updatePixBuf) {
+						if (videoOut.Pixbuf != null) {
+							videoOut.Pixbuf.Dispose();
+						}
 						videoOut.Pixbuf = activeImage;
 					}
 					videoOut.QueueDraw();
@@ -149,13 +149,13 @@ namespace Irseny.Viol.Main.Image.Camera {
 				return; // occurs when the page is removed, although the listing update event should be unsubscribed
 			}
 			// reset default image
-			if (activeImage != null) {
+			/*if (activeImage != null) {
 				activeImage.Dispose();
 				activeImage = null;
 			}
 			Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			// TODO: fix attempted read/write protected memory when page is added and immediately removed
-			videoOut.SetFromStock(videoOutStock, videoOutSize);
+			videoOut.SetFromStock(videoOutStock, videoOutSize);*/
 		}
 	}
 }

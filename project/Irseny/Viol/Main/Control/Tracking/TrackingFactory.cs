@@ -5,7 +5,6 @@ namespace Irseny.Viol.Main.Control.Tracking {
 	public class TrackingFactory : InterfaceFactory {
 		readonly int index;
 		VideoTrackerConnection connection = null;
-		//EventHandler<Listing.EquipmentUpdateArgs<int>> videoConnector = null;
 		public TrackingFactory(int index) : base() {
 			this.index = index;
 		}
@@ -15,6 +14,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+			Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Passive, -1);
 			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Track");
 			btnTrack.Clicked += delegate {
 				if (btnTrack.Active) {
@@ -27,6 +27,8 @@ namespace Irseny.Viol.Main.Control.Tracking {
 		}
 		protected override bool DisconnectInternal() {
 			StopTracking();
+			// TODO: make sure that the tracker is stopped before unregistering it
+			Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Missing, -1);
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -61,7 +63,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(index, -1);
 			if (trackerId > -1) {
 				Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Passive, -1);
-				Tracap.DetectionSystem.Instance.StopDetector(trackerId); // auto disconnect from video capture in dispose
+				Tracap.DetectionSystem.Instance.StopDetector(trackerId); // auto disconnect from events in dispose
 				Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Head tracker {0} stopped", index));
 				return true;
 			} else {

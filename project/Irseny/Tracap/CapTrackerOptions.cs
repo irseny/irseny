@@ -7,16 +7,22 @@ namespace Irseny.Tracap {
 
 		public CapTrackerOptions() {
 			streams = new List<int>(2);
-			Threshold = 0.5f;
+			Threshold = 254;
 			Smoothing = 0;
+			PointBufferLength = 1000;
+			MaxLights = 3;
 		}
 		public CapTrackerOptions(CapTrackerOptions source) {
 			streams = new List<int>(source.streams);
 			Threshold = source.Threshold;
 			Smoothing = source.Smoothing;
+			PointBufferLength = source.PointBufferLength;
+			MaxLights = source.MaxLights;
 		}
-		public float Threshold { get; set; }
+		public int Threshold { get; set; }
 		public int Smoothing { get; set; }
+		public int PointBufferLength { get; set; }
+		public int MaxLights { get; set; }
 
 		public int StreamNo {
 			get { return streams.Count; }

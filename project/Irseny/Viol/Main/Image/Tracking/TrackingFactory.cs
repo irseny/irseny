@@ -6,9 +6,9 @@ namespace Irseny.Viol.Main.Image.Tracking {
 	public class TrackingFactory : InterfaceFactory {
 		int trackerIndex;
 		byte[] pixelBuffer = new byte[0];
-		Gdk.Pixbuf activeImage;
-		string videoOutStock = "gtk-missing-image";
-		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
+		Gdk.Pixbuf activeImage = null;
+		/*string videoOutStock = "gtk-missing-image";
+		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;*/
 
 		public TrackingFactory(int trackerIndex) : base() {
 			this.trackerIndex = trackerIndex;
@@ -20,8 +20,8 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		}
 		protected override bool ConnectInternal() {
 			Listing.EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
-			var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			videoOut.GetStock(out videoOutStock, out videoOutSize);
+			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			return true;
 		}
 
@@ -32,6 +32,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		}
 
 		protected override bool DestroyInternal() {
+			// TODO: fix bug: removing a started tracker will make subsequently added trackers not receive images
 			Container.Dispose();
 			return true;
 		}
@@ -74,12 +75,12 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			if (!Initialized) {
 				return;
 			}
-			if (activeImage != null) {
+			/*if (activeImage != null) {
 				activeImage.Dispose();
 				activeImage = null;
 			}
 			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			imgVideoOut.SetFromStock(videoOutStock, videoOutSize);
+			imgVideoOut.SetFromStock(videoOutStock, videoOutSize);*/
 		}
 		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
 			int width = 0;
@@ -109,14 +110,16 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 					bool updatePixBuf = false;
 					if (activeImage == null || activeImage.Width != width || activeImage.Height != height) {
-						if (activeImage != null) {
-							activeImage.Dispose();
-						}
 						activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
 						updatePixBuf = true;
 					}
-					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-					if (!updatePixBuf) {
+					for (int i = 0; i < 3; i++) {
+						Marshal.Copy(pixelBuffer, 0, activeImage.Pixels + totalBytes * i, totalBytes);
+					}
+					if (updatePixBuf) {
+						if (videoOut.Pixbuf != null) {
+							videoOut.Pixbuf.Dispose();
+						}
 						videoOut.Pixbuf = activeImage;
 					}
 					videoOut.QueueDraw();

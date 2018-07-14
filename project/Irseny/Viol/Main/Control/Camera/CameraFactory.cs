@@ -15,6 +15,10 @@ namespace Irseny.Viol.Main.Control.Camera {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Passive, -1);
+			});
+
 			var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
 			/*btnCapture.Toggled += delegate {
 				if (btnCapture.Active) {
@@ -26,10 +30,8 @@ namespace Irseny.Viol.Main.Control.Camera {
 			btnCapture.Clicked += delegate {
 				if (btnCapture.Active) {
 					StartCapture();
-					Console.WriteLine("start");
 				} else {
 					StopCapture();
-					Console.WriteLine("stop");
 				}
 				/*Console.WriteLine("capture button clicked");
 				var btn = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
@@ -43,7 +45,11 @@ namespace Irseny.Viol.Main.Control.Camera {
 		}
 		protected override bool DisconnectInternal() {
 			//var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
-			StopCapture(); // TODO: use trystopcapture variant that does not log failures
+			StopCapture();
+			// update as missing after the capture has been stopped
+			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Missing, -1);
+			});
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -59,17 +65,11 @@ namespace Irseny.Viol.Main.Control.Camera {
 				}
 				int streamId = Capture.Video.CaptureSystem.Instance.CreateStream();
 				Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
-				stream.CaptureStarted += delegate {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
-				};
-				stream.CaptureStarted += delegate {
-					Capture.Video.CaptureSettings settings = stream.Settings;
-					Invoke(delegate {
-						// TODO: apply settings to this instance
-					});
-				};
 				if (stream.Start(new Capture.Video.CaptureSettings())) {
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
 					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Capture {0} started", index));
+					// TODO: apply stream settings to this instance
+					Capture.Video.CaptureSettings settings = stream.Settings;
 				} else {
 					Irseny.Log.LogManager.Instance.Log(Irseny.Log.LogMessage.CreateMessage(this, "Failed to start capture {0}", index));
 				}
@@ -77,6 +77,8 @@ namespace Irseny.Viol.Main.Control.Camera {
 		}
 		private void StopCapture() {
 			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
+				// keep in mind that the capture could be missing here 
+				// this is currently prohibited by implicitly enforcing an order: all updates are performed on the capture thread
 				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
 				if (streamId > -1) {
 					if (!Capture.Video.CaptureSystem.Instance.DestroyStream(streamId)) {

@@ -39,7 +39,6 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int page = ntbTracker.NPages;
 			// create and append
 			if (page < 10) {
-
 				var factory = new TrackingFactory(page);
 				ConstructFloor(string.Format("Track{0}", page), factory);
 				var boxInner = factory.Container.GetWidget("box_Root");
@@ -47,7 +46,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 				factory.Container.AddWidget(label);
 				ntbTracker.AppendPage(boxInner, label);
 				ntbTracker.ShowAll();
-				Listing.EquipmentMaster.Instance.HeadTracker.Update(page, Listing.EquipmentState.Passive, -1);
+
 				return true;
 			} else {
 				return false;
@@ -58,7 +57,6 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int page = ntbTracker.NPages - 1;
 			// remove last
 			if (page > -1) {
-				Listing.EquipmentMaster.Instance.HeadTracker.Update(page, Listing.EquipmentState.Missing, -1);
 				ntbTracker.RemovePage(page);
 				IInterfaceFactory floor = DestructFloor(string.Format("Track{0}", page));
 				floor.Dispose();

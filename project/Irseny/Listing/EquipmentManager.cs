@@ -4,9 +4,12 @@ using System.Threading;
 
 namespace Irseny.Listing {
 	public class EquipmentManager<T> {
-		object equipmentSync = new object();
-		List<Tuple<EquipmentState, T>> equipment = new List<Tuple<EquipmentState,T>>(32);
-		object updateEventSync = new object();
+		readonly object equipmentSync = new object();
+		readonly object updateSync = new object();
+		readonly object updateEventSync = new object();
+		Queue<EquipmentUpdateArgs<T>> updateQueue = new Queue<EquipmentUpdateArgs<T>>();
+		List<Tuple<EquipmentState, T>> equipment = new List<Tuple<EquipmentState, T>>(32);
+
 		event EventHandler<EquipmentUpdateArgs<T>> updated;
 		public EquipmentManager() {
 		}
@@ -22,7 +25,15 @@ namespace Irseny.Listing {
 				}
 			}
 		}
-
+		private void ShareUpdates() {
+			// updates can arrive out of order if multiple threads can share them at the same time
+			// need to stay in lock here
+			lock (updateSync) {
+				while (updateQueue.Count > 0) {
+					OnUpdated(updateQueue.Dequeue());
+				}
+			}
+		}
 		protected void OnUpdated(EquipmentUpdateArgs<T> args) {
 			EventHandler<EquipmentUpdateArgs<T>> handler;
 			lock (updateEventSync) {
@@ -62,7 +73,7 @@ namespace Irseny.Listing {
 				if (index >= 0 && index < equipment.Count && equipment[index].Item1 != EquipmentState.Missing && equipment[index].Item2 is TE) {
 					result = (TE)equipment[index].Item2;
 					return true;
-				} 
+				}
 			}
 			result = default(TE);
 			return false;
@@ -79,8 +90,11 @@ namespace Irseny.Listing {
 					}
 				}
 				this.equipment[index] = Tuple.Create(state, equipment);
+				lock (updateSync) {
+					updateQueue.Enqueue(new EquipmentUpdateArgs<T>(index, state, equipment));
+				}
 			}
-			OnUpdated(new EquipmentUpdateArgs<T>(index, state, equipment));
+			ShareUpdates();
 		}
 	}
 }

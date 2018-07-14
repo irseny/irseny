@@ -52,9 +52,9 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
 			int page = ntbTracker.NPages;
 			var factory = new TrackingFactory(page);
-			ConstructFloor("Tracker" + page, factory);
+			ConstructFloor("Track" + page, factory);
 			var boxTracker = factory.Container.GetWidget("box_Root");
-			var label = new Gtk.Label("Tracker" + page);
+			var label = new Gtk.Label("Track" + page);
 			Container.AddWidget(label);
 			ntbTracker.AppendPage(boxTracker, label);
 			ntbTracker.ShowAll();
@@ -65,7 +65,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			int page = ntbTracker.NPages - 1;
 			if (page > -1) {
 				ntbTracker.RemovePage(page);
-				var floor = DestructFloor("Tracker" + page);
+				var floor = DestructFloor("Track" + page);
 				floor.Dispose();
 				return true;
 			}
