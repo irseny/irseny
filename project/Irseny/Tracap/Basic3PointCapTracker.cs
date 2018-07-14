@@ -68,20 +68,22 @@ namespace Irseny.Tracap {
 			int stride = width;
 			int length = width * height;
 			int threshold = options.Threshold;
-			for (int c = 0; c < width; c++) {
-				for (int r = 0; r < height; r++) {
-					byte pixel = image.GetAt(r, c);
+			IntPtr dataIn = image.DataPointer;
+			IntPtr dataOut = result.DataPointer;
+			for (int r = 0; r < height; r++) {
+				for (int c = 0; c < width; c++) {
+					byte pixel = Marshal.ReadByte(dataIn, r * stride + c);
+					//byte pixel = image.GetAt(r, c, stride);
 					if (pixel > threshold) {
-						result.SetAt(r, c, pixel);
+						Marshal.WriteByte(dataOut, r * stride + c, pixel);
+						//result.SetAt(r, c, stride, pixel);
 					} else {
-						result.SetAt(r, c, 0);
+						Marshal.WriteByte(dataOut, r * stride + c, 0);
+						//result.SetAt(r, c, 0);
 					}
 
 				}
 			}
-		}
-		private int GetMatAt(int row, int column, int stride) {
-			return row * stride + column;
 		}
 
 	}
@@ -89,11 +91,11 @@ namespace Irseny.Tracap {
 		public static int MaxLines(this CapTrackerOptions options) {
 			return (int)Math.Sqrt(options.PointBufferLength) + 1;
 		}
-		public static byte GetAt(this Emgu.CV.Mat matrix, int row, int column) {
+		/*public static byte GetAt(this Emgu.CV.Mat matrix, int row, int column) {
 			return Marshal.ReadByte(matrix.DataPointer, row * matrix.Width + column);
 		}
 		public static void SetAt(this Emgu.CV.Mat matrix, int row, int column, byte bright) {
 			Marshal.WriteByte(matrix.DataPointer, row * matrix.Width + column, bright);
-		}
+		}*/
 	}
 }

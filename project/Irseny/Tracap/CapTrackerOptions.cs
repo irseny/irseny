@@ -7,7 +7,7 @@ namespace Irseny.Tracap {
 
 		public CapTrackerOptions() {
 			streams = new List<int>(2);
-			Threshold = 254;
+			Threshold = 250;
 			Smoothing = 0;
 			PointBufferLength = 1000;
 			MaxLights = 3;
