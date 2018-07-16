@@ -113,6 +113,32 @@ namespace Irseny.Viol.Main.Image.Tracking {
 						activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
 						updatePixBuf = true;
 					}
+					IntPtr target = activeImage.Pixels;
+					for (int p = 0; p < pixelBuffer.Length; p++) {
+						int b = pixelBuffer[p];
+						int pixel = b << 16 | b << 8 | b;
+						// this writes one byte outside image bounds
+						// we can solve this by omiting the last pixel
+						Marshal.WriteInt32(target, p * 3, pixel); // works as expected, but where is the forth byte located?
+					}
+					if (updatePixBuf) {
+						if (videoOut.Pixbuf != null) {
+							videoOut.Pixbuf.Dispose();
+						}
+						videoOut.Pixbuf = activeImage;
+					}
+					videoOut.QueueDraw();
+				});
+				/*Invoke(delegate {
+					if (!Initialized) {
+						return;
+					}
+					Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+					bool updatePixBuf = false;
+					if (activeImage == null || activeImage.Width != width || activeImage.Height != height) {
+						activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
+						updatePixBuf = true;
+					}
 					for (int i = 0; i < 3; i++) {
 						Marshal.Copy(pixelBuffer, 0, activeImage.Pixels + totalBytes * i, totalBytes);
 					}
@@ -123,7 +149,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 						videoOut.Pixbuf = activeImage;
 					}
 					videoOut.QueueDraw();
-				});
+				});*/
 			}
 		}
 
