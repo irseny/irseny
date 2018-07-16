@@ -21,11 +21,7 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -41,12 +37,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>..\..\maketools\copylibs.bat ${TargetDir}</command>
-          <workingdir>${SolutionDir}\..\maketools</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
+        <Command type="AfterBuild" command="..\..\maketools\copylibs.bat ${TargetDir}" workingdir="${SolutionDir}\..\maketools" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -59,11 +50,7 @@
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
@@ -150,6 +137,9 @@
     <Compile Include="Viol\Main\Image\Tracking\TrackingFactory.cs" />
     <Compile Include="Tracap\PositionDetectedEventArgs.cs" />
     <Compile Include="Tracap\Basic3PointOptions.cs" />
+    <Compile Include="Tracap\KeypointDetector.cs" />
+    <Compile Include="Tracap\IKeypointDetectorOptions.cs" />
+    <Compile Include="Tracap\ICapTrackerOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

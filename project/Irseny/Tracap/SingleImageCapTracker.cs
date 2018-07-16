@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+
 namespace Irseny.Tracap {
 	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
-		CapTrackerOptions options;
+		ICapTrackerOptions options;
 		Queue<Util.SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
 		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
-		public SingleImageCapTracker(CapTrackerOptions options) : base() {
+		public SingleImageCapTracker(ICapTrackerOptions options) : base() {
 			if (options == null) throw new ArgumentNullException("options");
 			this.options = options;
 		}
@@ -70,7 +71,7 @@ namespace Irseny.Tracap {
 			if (image == null) throw new ArgumentNullException("image");
 			lock (inputSync) {
 				pendingImages.Enqueue(Util.SharedRef.Copy(image));
-				while (pendingImages.Count > options.MaxImagesQueued && pendingImages.Count >= 0) {
+				while (pendingImages.Count > options.MaxQueuedImages && pendingImages.Count >= 0) {
 					pendingImages.Dequeue().Dispose();
 				}
 			}

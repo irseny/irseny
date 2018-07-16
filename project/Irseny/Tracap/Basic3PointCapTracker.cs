@@ -8,14 +8,14 @@ using Point2f = System.Drawing.PointF;
 namespace Irseny.Tracap {
 	public class Basic3PointCapTracker : SingleImageCapTracker {
 		Basic3PointOptions options;
-		Point2i[] visiblePoints;
+		/*Point2i[] visiblePoints;
 		int visiblePointNo;
 		Point2i[] clusterCenters;
 		int clusterCenterNo;
 		bool[,] suppressMap;
 		bool[,] visibleMap;
-		Point2i[] clusterPoints;
-		Util.SharedRef<Emgu.CV.Mat> visibleOut = Util.SharedRef.Create(new Emgu.CV.Mat());
+		Point2i[] clusterPoints;*/
+		Util.SharedRef<Emgu.CV.Mat> imageOut = Util.SharedRef.Create(new Emgu.CV.Mat());
 
 		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
 		public Basic3PointCapTracker(Basic3PointOptions options) : base(options) {
@@ -24,11 +24,11 @@ namespace Irseny.Tracap {
 
 		public override bool Start() {
 			Running = true;
-			visiblePoints = new Point2i[options.MaxPointNo];
+			/*visiblePoints = new Point2i[options.MaxPointNo];
 			clusterCenters = new Point2i[options.MaxClusterNo];
 			suppressMap = new bool[options.ApproximateImageSize.Height, options.ApproximateImageSize.Width];
 			visibleMap = new bool[options.ApproximateImageSize.Height, options.ApproximateImageSize.Width];
-			clusterPoints = new Point2i[options.MaxClusterPoints];
+			clusterPoints = new Point2i[options.MaxClusterPointNo];*/
 			return true;
 		}
 
@@ -41,12 +41,14 @@ namespace Irseny.Tracap {
 			imageCleaner.DisposeAll(); // should not matter if some images are disposed on non detection threads
 			base.Dispose();
 		}
-		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> image) {
-			SetupStep(image.Reference);
+		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> imageIn) {
+			/*SetupStep(image.Reference);
 			ThresholdSource(image.Reference);
 			FindClusters();
-			MarkClusters();
-			OnInputProcessed(new ImageProcessedEventArgs(visibleOut));
+			MarkClusters();*/
+			SetupStep(imageIn);
+			// TODO: call keypoint detector
+			OnInputProcessed(new ImageProcessedEventArgs(imageOut));
 			var position = new CapPosition();
 			OnPositionDetected(new PositionDetectedEventArgs(position));
 
@@ -54,7 +56,16 @@ namespace Irseny.Tracap {
 
 			return true;
 		}
-		private void SetupStep(Emgu.CV.Mat image) {
+		private void SetupStep(Util.SharedRef<Emgu.CV.Mat> imageIn) {
+			Emgu.CV.Mat imgIn = imageIn.Reference;
+			Emgu.CV.Mat imgOut = imageOut.Reference;
+			if (imgIn.Width != imgOut.Width || imgIn.Height != imgOut.Height) {
+				imageCleaner.AddReference(imageOut);
+				imageCleaner.CleanUpAll(); 
+				imageOut = Util.SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
+			}
+		}
+		/*private void SetupStep(Emgu.CV.Mat image) {
 			Emgu.CV.Mat result = visibleOut.Reference;
 			int width = image.Width;
 			int height = image.Height;
@@ -78,23 +89,23 @@ namespace Irseny.Tracap {
 			int width = image.Width;
 			int height = image.Height;
 			int stride = width;
-			int length = width * height;
-			int threshold = options.Threshold;
+			int length = width*height;
+			int threshold = options.BrightnessThreshold;
 			IntPtr dataIn = image.DataPointer;
 			IntPtr dataOut = visibleOut.Reference.DataPointer; // same size as source image
 			for (int r = 0; r < height; r++) {
 				for (int c = 0; c < width; c++) {
-					byte brightness = Marshal.ReadByte(dataIn, r * stride + c);
+					byte brightness = Marshal.ReadByte(dataIn, r*stride + c);
 					if (brightness > threshold) {
 						if (visiblePointNo < visiblePoints.Length) {
 							visiblePoints[visiblePointNo] = new Point2i(c, r);
 							visiblePointNo += 1;
 						}
 						visibleMap[r, c] = true;
-						Marshal.WriteByte(dataOut, r * stride + c, brightness);
+						Marshal.WriteByte(dataOut, r*stride + c, brightness);
 					} else {
 						visibleMap[r, c] = false;
-						Marshal.WriteByte(dataOut, r * stride + c, 0);
+						Marshal.WriteByte(dataOut, r*stride + c, 0);
 					}
 
 				}
@@ -124,7 +135,7 @@ namespace Irseny.Tracap {
 			int height = source.Height;
 			int stride = width; // image stride
 			int gapLimit = options.MaxClusterGap;
-			int minStrideEnergy = options.MinStrideEnergy;
+			int minStrideEnergy = options.MinLayerEnergy;
 			int rBoundLow = height;
 			int rBoundHigh = 0;
 			int cBoundLow = width;
@@ -174,7 +185,7 @@ namespace Irseny.Tracap {
 
 				}
 			}
-			mid = new Point2i((cBoundLow + cBoundHigh) / 2, (rBoundLow + rBoundHigh) / 2);
+			mid = new Point2i((cBoundLow + cBoundHigh)/2, (rBoundLow + rBoundHigh)/2);
 			size = new Size2i(cBoundHigh - cBoundLow, rBoundHigh - rBoundLow);
 			energy = clusterEnergy;
 			if (clusterEnergy >= options.MinClusterEnergy) {
@@ -197,23 +208,14 @@ namespace Irseny.Tracap {
 			for (int m = 0; m < clusterCenterNo; m++) {
 				Point2i center = clusterCenters[m];
 				for (int r = center.Y - crossRadius; r < center.Y + crossRadius && r > -1 && r < height; r++) {
-					Marshal.WriteByte(dataOut, r * stride + center.X, 255);
+					Marshal.WriteByte(dataOut, r*stride + center.X, 255);
 				}
 				for (int c = center.X - crossRadius; c < center.X + crossRadius && c > -1 && c < width; c++) {
-					Marshal.WriteByte(dataOut, center.Y * stride + c, 255);
+					Marshal.WriteByte(dataOut, center.Y*stride + c, 255);
 				}
 			}
-		}
-	}
-	public static class CapTrackerOptionExtension {
-		public static int MaxLines(this CapTrackerOptions options) {
-			return (int)Math.Sqrt(options.MaxPointNo) + 1;
-		}
-		/*public static byte GetAt(this Emgu.CV.Mat matrix, int row, int column) {
-			return Marshal.ReadByte(matrix.DataPointer, row * matrix.Width + column);
-		}
-		public static void SetAt(this Emgu.CV.Mat matrix, int row, int column, byte bright) {
-			Marshal.WriteByte(matrix.DataPointer, row * matrix.Width + column, bright);
 		}*/
 	}
+
+
 }
