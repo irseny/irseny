@@ -149,6 +149,7 @@
     <Compile Include="Viol\Main\Image\Tracking\TrackingBaseFactory.cs" />
     <Compile Include="Viol\Main\Image\Tracking\TrackingFactory.cs" />
     <Compile Include="Tracap\PositionDetectedEventArgs.cs" />
+    <Compile Include="Tracap\Basic3PointOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

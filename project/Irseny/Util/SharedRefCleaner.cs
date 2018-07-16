@@ -39,7 +39,7 @@ namespace Irseny.Util {
 			while (iterations-- > 0) {
 				if (stepIndex >= usedRefs.Count) {
 					stepIndex = 0;
-					if (usedRefs.Count > referenceLimit) {
+					if (usedRefs.Count > referenceLimit) { // occasional warning when cleanup operation finished
 						Debug.WriteLine(this.GetType().Name + ": Many captured images still in use: " + usedRefs.Count);
 					}
 				}

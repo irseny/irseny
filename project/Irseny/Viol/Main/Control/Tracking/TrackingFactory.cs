@@ -39,7 +39,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(index, -1);
 			if (trackerId < 0) {
 				// TODO: parse options
-				var options = new Tracap.CapTrackerOptions();
+				var options = new Tracap.Basic3PointOptions();
 				var tracker = new Tracap.Basic3PointCapTracker(options);
 				trackerId = Tracap.DetectionSystem.Instance.StartDetector(tracker);
 				Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Active, trackerId);

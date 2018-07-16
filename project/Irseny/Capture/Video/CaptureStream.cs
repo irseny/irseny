@@ -86,35 +86,7 @@ namespace Irseny.Capture.Video {
 				OnImageAvailable(new ImageCapturedEventArgs(this, id, colorImage, grayImage));
 				imageCleaner.AddReference(colorImage);
 				imageCleaner.AddReference(grayImage);
-				imageCleaner.CleanUpStep(4); // 2 images potentially added on every receive, try to remove more than are added
-
-				/*if (colorImage.LastReference) {
-					colorImage.Dispose();
-				} else {
-					usedImages.Add(colorImage);
-				}
-				if (usedImages.Count > 0) {
-					if (imageCheckIndex < 0 || imageCheckIndex >= usedImages.Count) {
-						// occasionally add warning
-						if (usedImages.Count > 32) {
-
-						}
-						imageCheckIndex = 0; // reset if out of bounds
-					}
-					for (int bound = Math.Min(imageCheckIndex + 2, usedImages.Count); imageCheckIndex < bound; imageCheckIndex++) {
-						if (usedImages[imageCheckIndex].LastReference) {
-							usedImages[imageCheckIndex].Dispose(); // disposing on the creation thread
-							int lastIndex = usedImages.Count - 1;
-							if (lastIndex > 0) { // only replace with other instances
-								usedImages[imageCheckIndex] = usedImages[lastIndex];
-							}
-							usedImages.RemoveAt(lastIndex);
-							bound = Math.Min(bound, usedImages.Count); // update after modification
-						}
-					}
-				}
-				long total = GC.GetTotalMemory(true);
-				Console.WriteLine("total memory used {0:#,##0}k", total / 1000);*/
+				imageCleaner.CleanUpStep(4); // 2 images potentially added on every receive, try to free more than those added
 			}
 		}
 		protected void OnImageAvailable(ImageCapturedEventArgs args) {
@@ -157,13 +129,14 @@ namespace Irseny.Capture.Video {
 						} else {
 							Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
 						}
+						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
 						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20.0);
+						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -5.0);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
 						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
 						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));

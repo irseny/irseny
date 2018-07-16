@@ -4,10 +4,13 @@ namespace Irseny.Tracap {
 	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
+		CapTrackerOptions options;
 		Queue<Util.SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
 		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
-		public SingleImageCapTracker() : base() {
+		public SingleImageCapTracker(CapTrackerOptions options) : base() {
+			if (options == null) throw new ArgumentNullException("options");
+			this.options = options;
 		}
 		public event EventHandler<ImageProcessedEventArgs> InputProcessed {
 			add {
@@ -39,23 +42,27 @@ namespace Irseny.Tracap {
 		/// Processes the given image.
 		/// </summary>
 		/// <returns>Whether the operation was successful.</returns>
-		/// <param name="image">Non disposed and available image to process. May be disposed after the method returns.</param>
+		/// <param name="image">Image ready for processing. Disposed after the method returns.</param>
 		protected abstract bool Step(Util.SharedRef<Emgu.CV.Mat> image);
 
 		public override bool Step() {
+			if (!Running) {
+				return false;
+			}
 			Util.SharedRef<Emgu.CV.Mat> image = null;
 			lock (inputSync) {
 				if (pendingImages.Count > 0) {
 					image = pendingImages.Dequeue();
 				}
 			}
-			if (image != null && image.Reference != null) {
-				bool result = false;
-				if (image.Reference != null) {
-					result = Step(image);
+			if (image != null) {
+				using (image) {
+					bool result = false;
+					if (image.Reference != null) {
+						result = Step(image);
+						return true;
+					}
 				}
-				image.Dispose();
-				return true;
 			}
 			return false;
 		}
@@ -63,7 +70,11 @@ namespace Irseny.Tracap {
 			if (image == null) throw new ArgumentNullException("image");
 			lock (inputSync) {
 				pendingImages.Enqueue(Util.SharedRef.Copy(image));
+				while (pendingImages.Count > options.MaxImagesQueued && pendingImages.Count >= 0) {
+					pendingImages.Dequeue().Dispose();
+				}
 			}
+
 			OnInputAvailable(new EventArgs());
 		}
 		public override void Dispose() {
