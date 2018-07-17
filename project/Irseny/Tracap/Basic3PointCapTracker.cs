@@ -15,11 +15,13 @@ namespace Irseny.Tracap {
 		bool[,] suppressMap;
 		bool[,] visibleMap;
 		Point2i[] clusterPoints;*/
+		KeypointDetector preprocessor;
 		Util.SharedRef<Emgu.CV.Mat> imageOut = Util.SharedRef.Create(new Emgu.CV.Mat());
-
 		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
+
 		public Basic3PointCapTracker(Basic3PointOptions options) : base(options) {
 			this.options = new Basic3PointOptions(options);
+			this.preprocessor = new KeypointDetector(this.options);
 		}
 
 		public override bool Start() {
@@ -47,7 +49,7 @@ namespace Irseny.Tracap {
 			FindClusters();
 			MarkClusters();*/
 			SetupStep(imageIn);
-			// TODO: call keypoint detector
+			preprocessor.Process(imageIn.Reference, imageOut.Reference);
 			OnInputProcessed(new ImageProcessedEventArgs(imageOut));
 			var position = new CapPosition();
 			OnPositionDetected(new PositionDetectedEventArgs(position));
