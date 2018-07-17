@@ -9,7 +9,6 @@ namespace Irseny.Tracap {
 		Point2i[] imagePoints = new Point2i[0];
 		int imagePointNo;
 		Point2i[] clusterPoints = new Point2i[0];
-		int clusterPointNo;
 		Point2i[] clusterCenters = new Point2i[0];
 		int clusterCenterNo;
 		bool[] suppressionMap = new bool[0];
@@ -23,13 +22,15 @@ namespace Irseny.Tracap {
 			this.options = options;
 		}
 
-		public void Process(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
+		public int Detect(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut, out Point2i[] keypoints) {
 			Setup(imageIn, imageOut);
 			Threshold(imageIn, imageOut);
 			FindClusters(imageIn);
 			if (options.MarkClusters) {
 				MarkClusters(imageOut);
 			}
+			keypoints = clusterCenters;
+			return clusterCenterNo;
 		}
 		private void Setup(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
 			if (imageIn.ElementSize != sizeof(byte)) throw new ArgumentException("imageIn: Wrong pixel format");
@@ -57,7 +58,6 @@ namespace Irseny.Tracap {
 			Array.Clear(suppressionMap, 0, suppressionMap.Length);
 			// counters
 			imagePointNo = 0;
-			clusterPointNo = 0;
 			clusterCenterNo = 0;
 
 		}
@@ -99,13 +99,19 @@ namespace Irseny.Tracap {
 				}
 			}
 		}
-		private bool DetectCluster(Point2i start, out Point2i center, out int radius) {
-			int minLayerEnergy = options.MinLayerEnergy;
+		private bool DetectCluster(Point2i start, out Point2i center, out int radius) {			
+			// initialization to be able to return at any point
+			radius = 0;
+			center = new Point2i(-1, -1);
 			Point2i averageClusterPoint = new Point2i(0, 0);
+			int clusterPointNo = 0;
 			int layerNo;
-			for (layerNo = 1;; layerNo += 1) {
-				if (start.X - layerNo < 0 || start.X + layerNo >= imageWidth || start.Y - layerNo < 0 || start.Y >= imageHeight) {
-					break; // eventually end loop as an image border is encountered
+			for (layerNo = 1; layerNo < options.MaxClusterRadius; layerNo += 1) {
+				
+				if (start.X - layerNo < 0 || start.X + layerNo >= imageWidth || start.Y - layerNo < 0 || start.Y + layerNo >= imageHeight) {
+					// we get multiple clusters at edges if not omitted
+					return false; // eventually end loop as an image border is encountered
+					// TODO: do evaluation on a pixel level to allow for better edge cluster detection
 				}
 				int layerEnergy = 0;
 				// evaluate horizontal edge points
@@ -143,17 +149,18 @@ namespace Irseny.Tracap {
 						}
 					}
 				}
-				if (layerEnergy < minLayerEnergy) {
+				if (layerEnergy < options.MinLayerEnergy) {
 					// finished if no more layers can be applied
 					break;
 				}
+
 				// TODO: break on layer boundary pass
 			}
 			radius = layerNo;
 			if (clusterPointNo > 0) {
 				center = new Point2i(averageClusterPoint.X/clusterPointNo, averageClusterPoint.Y/clusterPointNo);
-			} else {
-				center = new Point2i(0, 0);
+			} else {				
+				return false;
 			}
 			// check for size constraints
 			if (layerNo < options.MinClusterRadius) {

@@ -140,6 +140,8 @@
     <Compile Include="Tracap\KeypointDetector.cs" />
     <Compile Include="Tracap\IKeypointDetectorOptions.cs" />
     <Compile Include="Tracap\ICapTrackerOptions.cs" />
+    <Compile Include="Tracap\PointLabeler.cs" />
+    <Compile Include="Tracap\IPointLabelerOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

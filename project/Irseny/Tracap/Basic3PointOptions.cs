@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Irseny.Tracap {
-	public class Basic3PointOptions : CapTrackerOptions, IKeypointDetectorOptions {
+	public class Basic3PointOptions : CapTrackerOptions, IKeypointDetectorOptions, IPointLabelerOptions {
 		/// <summary>
 		/// Creates a new instance of this class with default values.
 		/// </summary>
@@ -10,18 +10,15 @@ namespace Irseny.Tracap {
 			this.MaxPointNo = 1024;
 			this.MaxClusterNo = 8;
 			this.MaxClusterPointNo = 512;
+			this.MinLayerEnergy = 6;
 			this.MinClusterRadius = 2;
 			this.MaxClusterRadius = 32;
 			this.MarkClusters = true;
-			/*this.MaxClusterGap = 2;
-			this.MinClusterEnergy = 16;
-			this.VoidEnergy = 0;
-			this.PointEnergy = 0;
-			this.MinLineWidth = 4;
-			this.MinClusterRadius = 4;
-			this.MaxClusterRadius = 64;
-			this.MinStrideEnergy = 4;
-			this.MaxClusterPoints = 256;*/
+
+			this.LabelNo = 3;
+			this.MissingLabelDistance = 800; // diagonal of 640x480
+			this.FastApproximationThreshold = 200;
+			this.ShowLabels = true;
 
 
 		}
@@ -43,6 +40,11 @@ namespace Irseny.Tracap {
 			this.MinClusterRadius = source.MinClusterRadius;
 			this.MaxClusterRadius = source.MaxClusterRadius;
 			this.MarkClusters = source.MarkClusters;
+
+			this.LabelNo = source.LabelNo;
+			this.MissingLabelDistance = source.MissingLabelDistance;
+			this.FastApproximationThreshold = source.FastApproximationThreshold;
+			this.ShowLabels = source.ShowLabels;
 		}
 
 		/// <summary>
@@ -79,5 +81,9 @@ namespace Irseny.Tracap {
 		public int MaxClusterNo { get; set; }
 		public bool MarkClusters { get; set; }
 
+		public int LabelNo { get; set; }
+		public int MissingLabelDistance { get; set; }
+		public int FastApproximationThreshold { get; set; }
+		public bool ShowLabels { get; set; }
 	}
 }
