@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Irseny.Tracap {
-	public class Basic3PointOptions : CapTrackerOptions, IKeypointDetectorOptions, IPointLabelerOptions {
+	public class Basic3PointOptions : CapTrackerOptions, IKeypointDetectorOptions, IPointLabelerOptions, IBasicPoseEstimatorOptions {
 		/// <summary>
 		/// Creates a new instance of this class with default values.
 		/// </summary>

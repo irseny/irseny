@@ -8,20 +8,24 @@ using Point2f = System.Drawing.PointF;
 namespace Irseny.Tracap {
 	public class Basic3PointCapTracker : SingleImageCapTracker {
 		Basic3PointOptions options;
-		KeypointDetector preprocessor;
-		PointLabeler labeler;
+		KeypointDetector pointDetector;
+		PointLabeler pointLabeler;
+		BasicPoseEstimator poseEstimator;
 		Util.SharedRef<Emgu.CV.Mat> imageOut = Util.SharedRef.Create(new Emgu.CV.Mat());
 		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
 
 		public Basic3PointCapTracker(Basic3PointOptions options) : base(options) {
 			this.options = new Basic3PointOptions(options);
-			this.preprocessor = new KeypointDetector(this.options);
-			this.labeler = new PointLabeler(this.options);
+			this.pointDetector = new KeypointDetector(this.options);
+			this.pointLabeler = new PointLabeler(this.options);
+			this.poseEstimator = new BasicPoseEstimator(this.options);
 		}
 
 		public override bool Start() {
 			Running = true;
-
+			pointDetector = new KeypointDetector(options);
+			pointLabeler = new PointLabeler(options);
+			poseEstimator = new BasicPoseEstimator(options);
 			return true;
 		}
 
@@ -38,12 +42,12 @@ namespace Irseny.Tracap {
 			SetupStep(imageIn);
 			// keypoint detection
 			Point2i[] keypoints;
-			int keypointNo = preprocessor.Detect(imageIn.Reference, imageOut.Reference, out keypoints);
+			int keypointNo = pointDetector.Detect(imageIn.Reference, imageOut.Reference, out keypoints);
 			// keypoint labeling
 			int[] labels;
-			int labelNo = labeler.Label(keypoints, keypointNo, imageOut.Reference, out labels);
+			int labelNo = pointLabeler.Label(keypoints, keypointNo, imageOut.Reference, out labels);
 			// TODO: pose detection
-			var position = new CapPosition();
+			var position = poseEstimator.Estimate(keypoints, labels, labelNo);
 			// spread results
 			OnInputProcessed(new ImageProcessedEventArgs(imageOut));
 			OnPositionDetected(new PositionDetectedEventArgs(position));
