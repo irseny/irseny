@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Size2i = System.Drawing.Size;
 using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
+using Irseny.Util;
 
 namespace Irseny.Tracap {
 	public class Basic3PointCapTracker : SingleImageCapTracker {
@@ -11,8 +12,8 @@ namespace Irseny.Tracap {
 		KeypointDetector pointDetector;
 		PointLabeler pointLabeler;
 		BasicPoseEstimator poseEstimator;
-		Util.SharedRef<Emgu.CV.Mat> imageOut = Util.SharedRef.Create(new Emgu.CV.Mat());
-		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
+		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
+		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
 		public Basic3PointCapTracker(Basic3PointOptions options) : base(options) {
 			this.options = new Basic3PointOptions(options);
@@ -38,7 +39,7 @@ namespace Irseny.Tracap {
 			imageCleaner.DisposeAll(); // should not matter if some images are disposed on non detection threads
 			base.Dispose();
 		}
-		protected override bool Step(Util.SharedRef<Emgu.CV.Mat> imageIn) {			
+		protected override bool Step(SharedRef<Emgu.CV.Mat> imageIn) {
 			SetupStep(imageIn);
 			// keypoint detection
 			Point2i[] keypoints;
@@ -51,15 +52,17 @@ namespace Irseny.Tracap {
 			// spread results
 			OnInputProcessed(new ImageProcessedEventArgs(imageOut));
 			OnPositionDetected(new PositionDetectedEventArgs(position));
+			Console.WriteLine("Yaw: " + position.Yaw);
+			Console.WriteLine("Pitch: " + position.Pitch);
 			return true;
 		}
-		private void SetupStep(Util.SharedRef<Emgu.CV.Mat> imageIn) {
+		private void SetupStep(SharedRef<Emgu.CV.Mat> imageIn) {
 			Emgu.CV.Mat imgIn = imageIn.Reference;
 			Emgu.CV.Mat imgOut = imageOut.Reference;
 			if (imgIn.Width != imgOut.Width || imgIn.Height != imgOut.Height) {
 				imageCleaner.AddReference(imageOut);
-				imageCleaner.CleanUpAll(); 
-				imageOut = Util.SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
+				imageCleaner.CleanUpAll();
+				imageOut = SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
 			}
 		}
 

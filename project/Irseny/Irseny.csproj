@@ -21,7 +21,11 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
+          <workingdir>${SolutionDir}/../</workingdir>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -37,7 +41,12 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="..\..\maketools\copylibs.bat ${TargetDir}" workingdir="${SolutionDir}\..\maketools" externalConsole="True" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>..\..\maketools\copylibs.bat ${TargetDir}</command>
+          <workingdir>${SolutionDir}\..\maketools</workingdir>
+          <externalConsole>True</externalConsole>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -50,7 +59,11 @@
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
+          <workingdir>${SolutionDir}/../</workingdir>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
@@ -144,6 +157,7 @@
     <Compile Include="Tracap\IPointLabelerOptions.cs" />
     <Compile Include="Tracap\IBasicPoseEstimatorOptions.cs" />
     <Compile Include="Tracap\BasicPoseEstimator.cs" />
+    <Compile Include="Util\ImageTools.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

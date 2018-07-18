@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Irseny.Log;
 namespace Irseny.Viol.Main.Log {
 	public class MainFactory : InterfaceFactory {
 
-		LinkedList<Irseny.Log.LogMessage> messages = new LinkedList<Irseny.Log.LogMessage>();
+		LinkedList<LogMessage> messages = new LinkedList<LogMessage>();
 		bool[] filter;
 		public MainFactory() : base() {
-			filter = new bool[Enum.GetValues(typeof(Irseny.Log.MessageType)).Length];
+			filter = new bool[Enum.GetValues(typeof(MessageType)).Length];
 			for (int i = 0; i < filter.Length; i++) {
 				filter[i] = true;
 			}
@@ -20,7 +21,7 @@ namespace Irseny.Viol.Main.Log {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.PackStart(boxMain);
-			Irseny.Log.LogManager.Instance.MessageAvailable += AddMessage;
+			LogManager.Instance.MessageAvailable += AddMessage;
 			var btnClear = Container.GetWidget<Gtk.Button>("btn_Clear");
 			btnClear.Clicked += delegate {
 				ClearMessages();
@@ -41,7 +42,7 @@ namespace Irseny.Viol.Main.Log {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
-			Irseny.Log.LogManager.Instance.MessageAvailable -= AddMessage;
+			LogManager.Instance.MessageAvailable -= AddMessage;
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -51,14 +52,14 @@ namespace Irseny.Viol.Main.Log {
 		public void ClearMessages() {
 			messages.Clear();
 		}
-		private void AddMessage(object sender, Irseny.Log.MessageEventArgs args) {
+		private void AddMessage(object sender, MessageEventArgs args) {
 			Invoke(delegate {
 				AddMessage(args.Message);
 			});
 		}
-		public void AddMessage(Irseny.Log.LogMessage message) {
+		public void AddMessage(LogMessage message) {
 			messages.AddLast(message);
-			Irseny.Log.LogMessage remaining = Filter(message);
+			LogMessage remaining = Filter(message);
 			if (remaining != null) {
 				var target = Container.GetWidget<Gtk.TextView>("txt_Log").Buffer;
 				string text = remaining.ToDescription();
@@ -71,11 +72,11 @@ namespace Irseny.Viol.Main.Log {
 			var cbxMessage = Container.GetWidget<Gtk.CheckButton>("cbx_Message");
 			var cbxWarning = Container.GetWidget<Gtk.CheckButton>("cbx_Warning");
 			var cbxError = Container.GetWidget<Gtk.CheckButton>("cbx_Error");
-			filter[(int)Irseny.Log.MessageType.Signal] = cbxMessage.Active;
-			filter[(int)Irseny.Log.MessageType.Warning] = cbxWarning.Active;
-			filter[(int)Irseny.Log.MessageType.Error] = cbxError.Active;
+			filter[(int)MessageType.Signal] = cbxMessage.Active;
+			filter[(int)MessageType.Warning] = cbxWarning.Active;
+			filter[(int)MessageType.Error] = cbxError.Active;
 		}
-		public Irseny.Log.LogMessage Filter(Irseny.Log.LogMessage message) {
+		public LogMessage Filter(LogMessage message) {
 			if (message != null && filter[(int)message.MessageType]) {
 				return message;
 			} else {
@@ -85,8 +86,8 @@ namespace Irseny.Viol.Main.Log {
 		public void Rewrite() {
 			var target = Container.GetWidget<Gtk.TextView>("txt_Log").Buffer;
 			target.Clear();
-			foreach (Irseny.Log.LogMessage message in messages) {
-				Irseny.Log.LogMessage remaining = Filter(message);
+			foreach (LogMessage message in messages) {
+				LogMessage remaining = Filter(message);
 				if (remaining != null) {
 					string text = remaining.ToDescription();
 					var atEnd = target.EndIter;

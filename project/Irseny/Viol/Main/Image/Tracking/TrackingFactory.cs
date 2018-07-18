@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Irseny.Content;
+using Irseny.Listing;
 
 namespace Irseny.Viol.Main.Image.Tracking {
 	public class TrackingFactory : InterfaceFactory {
@@ -14,19 +16,19 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			this.trackerIndex = trackerIndex;
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingImage"));
+			var factory = Mycena.InterfaceFactory.CreateFromFile(ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingImage"));
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			Listing.EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
+			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			return true;
 		}
 
 		protected override bool DisconnectInternal() {
-			Listing.EquipmentMaster.Instance.HeadTracker.Updated -= TrackerStateChanged;
+			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerStateChanged;
 			StopCapture();
 			return true;
 		}
@@ -36,7 +38,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			Container.Dispose();
 			return true;
 		}
-		private void TrackerStateChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
+		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
 			if (args.Index == trackerIndex) {
 				bool start = args.Active;
 				Invoke(delegate {
@@ -53,7 +55,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 				return;
 			}
 			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId > -1) {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
@@ -64,7 +66,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		}
 		private void StopCapture() {
 			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId > -1) {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
@@ -96,6 +98,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					if (pixelBuffer.Length < totalBytes) {
 						pixelBuffer = new byte[totalBytes];
 					}
+
 					Marshal.Copy(imgSource.DataPointer, pixelBuffer, 0, totalBytes);
 					pixelsAvailable = true;
 				} else {
@@ -114,11 +117,10 @@ namespace Irseny.Viol.Main.Image.Tracking {
 						updatePixBuf = true;
 					}
 					IntPtr target = activeImage.Pixels;
-					for (int p = 0; p < pixelBuffer.Length; p++) {
+					int bufferLength = pixelBuffer.Length - 1; // prevent writing outside buffer bounds
+					for (int p = 0; p < bufferLength; p++) {
 						int b = pixelBuffer[p];
 						int pixel = b << 16 | b << 8 | b;
-						// this writes one byte outside image bounds
-						// we can solve this by omiting the last pixel
 						Marshal.WriteInt32(target, p * 3, pixel); // works as expected, but where is the forth byte located?
 					}
 					if (updatePixBuf) {

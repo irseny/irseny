@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Irseny.Util;
 
 namespace Irseny.Tracap {
 	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
 		ICapTrackerOptions options;
-		Queue<Util.SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<Util.SharedRef<Emgu.CV.Mat>>();
+		Queue<SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<SharedRef<Emgu.CV.Mat>>();
 		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
 		public SingleImageCapTracker(ICapTrackerOptions options) : base() {
@@ -44,13 +45,13 @@ namespace Irseny.Tracap {
 		/// </summary>
 		/// <returns>Whether the operation was successful.</returns>
 		/// <param name="image">Image ready for processing. Disposed after the method returns.</param>
-		protected abstract bool Step(Util.SharedRef<Emgu.CV.Mat> image);
+		protected abstract bool Step(SharedRef<Emgu.CV.Mat> image);
 
 		public override bool Step() {
 			if (!Running) {
 				return false;
 			}
-			Util.SharedRef<Emgu.CV.Mat> image = null;
+			SharedRef<Emgu.CV.Mat> image = null;
 			lock (inputSync) {
 				if (pendingImages.Count > 0) {
 					image = pendingImages.Dequeue();
@@ -67,10 +68,10 @@ namespace Irseny.Tracap {
 			}
 			return false;
 		}
-		public void QueueInput(Util.SharedRef<Emgu.CV.Mat> image) {
+		public void QueueInput(SharedRef<Emgu.CV.Mat> image) {
 			if (image == null) throw new ArgumentNullException("image");
 			lock (inputSync) {
-				pendingImages.Enqueue(Util.SharedRef.Copy(image));
+				pendingImages.Enqueue(SharedRef.Copy(image));
 				while (pendingImages.Count > options.MaxQueuedImages && pendingImages.Count >= 0) {
 					pendingImages.Dequeue().Dispose();
 				}
@@ -84,7 +85,7 @@ namespace Irseny.Tracap {
 				imageProcessed = null;
 			}
 			lock (inputSync) {
-				foreach (Util.SharedRef<Emgu.CV.Mat> image in pendingImages) {
+				foreach (SharedRef<Emgu.CV.Mat> image in pendingImages) {
 					image.Dispose();
 				}
 				pendingImages.Clear();

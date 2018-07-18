@@ -2,11 +2,13 @@
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Irseny.Util;
 
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
+		float angle = 0;
 		//string videoOutStock = "gtk-missing-image";
 		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
@@ -110,10 +112,20 @@ namespace Irseny.Viol.Main.Image.Camera {
 						updatePixBuf = true;
 					}
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
+
+					// TODO: remove
+					Gdk.Pixbuf oldActiveImage = activeImage;
+					activeImage = ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
+					//ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
+					updatePixBuf = true;
+					angle = (angle + 0.01f) % (float)(2 * Math.PI);
+
 					if (updatePixBuf) {
 						if (videoOut.Pixbuf != null) {
-							videoOut.Pixbuf.Dispose();
+							videoOut.Pixbuf.Dispose(); // dipose seems not to be required
 						}
+						videoOut.Pixbuf = oldActiveImage;
+						videoOut.QueueDraw();
 						videoOut.Pixbuf = activeImage;
 					}
 					videoOut.QueueDraw();
