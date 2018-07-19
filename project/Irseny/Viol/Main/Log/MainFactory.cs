@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irseny.Log;
+
 namespace Irseny.Viol.Main.Log {
 	public class MainFactory : InterfaceFactory {
 
@@ -20,7 +21,7 @@ namespace Irseny.Viol.Main.Log {
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
 			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain);
+			boxRoot.PackStart(boxMain, true, true, 0);
 			LogManager.Instance.MessageAvailable += AddMessage;
 			var btnClear = Container.GetWidget<Gtk.Button>("btn_Clear");
 			btnClear.Clicked += delegate {

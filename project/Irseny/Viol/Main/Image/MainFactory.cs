@@ -12,7 +12,7 @@ namespace Irseny.Viol.Main.Image {
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Image");
 			var ntbMain = Container.GetWidget("ntb_Root");
-			boxRoot.PackStart(ntbMain);
+			boxRoot.PackStart(ntbMain, true, true, 0);
 			return true;
 		}
 		protected override bool DisconnectInternal() {

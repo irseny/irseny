@@ -22,7 +22,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 				RemoveCamera();
 			};
 
-			boxRoot.PackStart(boxMain);
+			boxRoot.PackStart(boxMain, true, true, 0);
 			return true;
 		}
 		protected override bool DisconnectInternal() {

@@ -12,7 +12,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain);
+			boxRoot.PackStart(boxMain, true, true, 0);
 			var btnAdd = Container.GetWidget<Gtk.Button>("btn_Add");
 			btnAdd.Clicked += delegate {
 				AddTracker();

@@ -45,7 +45,8 @@ namespace Mycena {
 			string vName = properties.GetProperty("vadjustment", "adj_Default");
 			Gtk.Adjustment hAdjustment = AdjustmentFactory.GetAdjustment(hName, container);
 			Gtk.Adjustment vAdjustment = AdjustmentFactory.GetAdjustment(vName, container);
-			widget.SetScrollAdjustments(hAdjustment, vAdjustment);
+			// TODO: set scroll adjustment
+			//widget.SetScrollAdjustments(hAdjustment, vAdjustment);
 			return true;
 		}
 	}

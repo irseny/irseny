@@ -13,13 +13,14 @@ namespace Irseny.Viol.Main.Image.Camera {
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain);
+			boxRoot.PackStart(boxMain, true, true, 0);
 			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated += CameraChanged;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
 			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated -= CameraChanged;
-			while (RemoveCamera()) { }
+			while (RemoveCamera()) {
+			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);

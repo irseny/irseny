@@ -45,7 +45,8 @@ namespace Mycena {
 			} catch (FormatException) {
 				return false;
 			}
-			widget.Homogeneous = homogeneous;
+			// TODO: set homogeneousity 
+			//widget.Homogeneous = homogeneous;
 			return true;
 		}
 		private static bool SetHomogeneousTabs(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
@@ -55,7 +56,7 @@ namespace Mycena {
 			} catch (FormatException) {
 				return false;
 			}
-			widget.HomogeneousTabs = homogeneous;
+			//widget.HomogeneousTabs = homogeneous;
 
 			return true;
 		}

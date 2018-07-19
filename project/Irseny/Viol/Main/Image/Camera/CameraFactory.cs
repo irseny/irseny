@@ -8,7 +8,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
-		float angle = 0;
+		float angle = 0.0f;
 		//string videoOutStock = "gtk-missing-image";
 		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
@@ -76,10 +76,10 @@ namespace Irseny.Viol.Main.Image.Camera {
 			bool pixelsAvailable = false;
 			using (var imgRef = args.ColorImage) {
 				var imgSource = imgRef.Reference;
-				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte) * 3 && imgSource.DataPointer != IntPtr.Zero) {
+				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte)*3 && imgSource.DataPointer != IntPtr.Zero) {
 					width = imgSource.Width;
 					height = imgSource.Height;
-					totalBytes = width * height * imgSource.ElementSize * sizeof(byte);
+					totalBytes = width*height*imgSource.ElementSize*sizeof(byte);
 					if (pixelBuffer.Length < totalBytes) {
 						pixelBuffer = new byte[totalBytes];
 					}
@@ -114,20 +114,23 @@ namespace Irseny.Viol.Main.Image.Camera {
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
 
 					// TODO: remove
-					Gdk.Pixbuf oldActiveImage = activeImage;
-					activeImage = ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
-					//ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
-					updatePixBuf = true;
-					angle = (angle + 0.01f) % (float)(2 * Math.PI);
+					Gdk.Pixbuf rotatedImage = ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
+					angle = (angle + 0.004f)%(float)(2*Math.PI);
 
-					if (updatePixBuf) {
+					/*if (updatePixBuf) {
 						if (videoOut.Pixbuf != null) {
 							videoOut.Pixbuf.Dispose(); // dipose seems not to be required
 						}
-						videoOut.Pixbuf = oldActiveImage;
 						videoOut.QueueDraw();
 						videoOut.Pixbuf = activeImage;
+					}*/
+					var lastImage = videoOut.Pixbuf;
+					videoOut.Pixbuf = rotatedImage;
+					if (lastImage != null) {
+						lastImage.Dispose();
 					}
+
+					//videoOut.Pixbuf = activeImage;
 					videoOut.QueueDraw();
 				});
 			}

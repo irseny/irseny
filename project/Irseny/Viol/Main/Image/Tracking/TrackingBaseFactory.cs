@@ -13,13 +13,14 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain);
+			boxRoot.PackStart(boxMain, true, true, 0);
 			Listing.EquipmentMaster.Instance.HeadTracker.Updated += TrackerChanged;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
 			Listing.EquipmentMaster.Instance.HeadTracker.Updated -= TrackerChanged;
-			while (RemoveTracker()) { }
+			while (RemoveTracker()) {
+			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
