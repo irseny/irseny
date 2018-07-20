@@ -62,6 +62,10 @@ namespace Irseny {
 				window.DeleteEvent += delegate {
 					stopped = true;
 				};
+				GLib.ExceptionManager.UnhandledException += (GLib.UnhandledExceptionArgs e) => {
+					Debug.WriteLine(e.ExceptionObject.ToString());
+					e.ExitApplication = false;
+				};
 
 			}
 			/*IntPtr context = Extrack.Artf.CreateContext();
@@ -83,6 +87,7 @@ namespace Irseny {
 				}*/
 				// TODO: fix attempted to read or write protected memory through GLib.ToggleRef.Free();
 				Gtk.Application.RunIteration();
+
 				long memory = GC.GetTotalMemory(true);
 				//Console.WriteLine("total memory used {0:#,##0}k", memory / 1000);
 				// occuring exceptions:

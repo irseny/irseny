@@ -21,7 +21,7 @@ namespace Mycena {
 			if (pixbuf == null) throw new ArgumentNullException("pixbuf");
 			string name = TrimPath(path);
 			try {
-				pixbufs.Add(path, pixbuf);
+				pixbufs.Add(name, pixbuf);
 			} catch (ArgumentException) {
 				throw new ArgumentException("path: Pixbuf with this path does already exist");
 			}
@@ -72,7 +72,11 @@ namespace Mycena {
 			if (accessConfig.CutDirectoryPath) {
 				directory = string.Empty;
 			}
-			return Path.Combine(directory, file);
+			if (directory.Length > 0) {
+				return Path.Combine(directory, file);
+			} else {
+				return file;
+			}
 		}
 		public void Dispose() {
 			foreach (Gdk.Pixbuf pixbuf in pixbufs.Values) {

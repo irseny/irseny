@@ -16,6 +16,8 @@ namespace Mycena {
 			CreationProperties.Add("label", SetText);
 			CreationAttributes.Add("underline", SetUnderline);
 			CreationProperties.Add("angle", SetAngle);
+			CreationProperties.Add("width_chars", SetChars);
+			CreationProperties.Add("max_width_chars", SetChars);
 		}
 		protected override Gtk.Label CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Label();
@@ -45,11 +47,17 @@ namespace Mycena {
 			widget.Angle = angle;
 			return true;
 		}
-		/*private static bool SetMaxLength(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container) {
-			int length;
+		private static bool SetChars(Gtk.Label widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			int widthChars, maxWidthChars;
 			try {
-				length = TextParseTools.ParseInt(properties.GetProperty("max_length"));
+				widthChars = TextParseTools.ParseInt(properties.GetProperty("width_chars", -1));
+				maxWidthChars = TextParseTools.ParseInt(properties.GetProperty("max_width_chars", -1));
+			} catch (FormatException) {
+				return false;
 			}
-		}*/
+			widget.MaxWidthChars = maxWidthChars;
+			widget.WidthChars = widthChars;
+			return true;
+		}
 	}
 }

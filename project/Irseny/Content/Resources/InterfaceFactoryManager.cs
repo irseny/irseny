@@ -16,6 +16,7 @@ namespace Irseny.Content.Resources {
 				"CameraControlBase",
 				"CameraControl",
 				"TrackingControlBase",
+				"TrackingControl",
 				"TrackingOutputBase",
 				"TrackingOutput"
 			};

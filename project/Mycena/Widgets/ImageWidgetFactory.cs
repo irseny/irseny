@@ -10,23 +10,32 @@ namespace Mycena {
 			CreationProperties.Add("icon_name", SetIcon);*/
 		}
 		protected override Gtk.Image CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
-			return CreateImage(properties, container);
+			return CreateImage(properties, container, stock);
 		}
-		public static Gtk.Image CreateImage(ConfigProperties properties, IInterfaceNode container) {
-			string stock = properties.GetProperty("stock", null);
-			string icon = properties.GetProperty("icon_name", null);
+		public static Gtk.Image CreateImage(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			string stockName = properties.GetProperty("stock", null);
+			string iconName = properties.GetProperty("icon_name", null);
 			Gtk.IconSize size;
+			string pixbufName;
 			try {
 				size = TextParseTools.ParseIconSize(properties.GetProperty("icon-size", (int)Gtk.IconSize.Button));
+				pixbufName = properties.GetProperty("pixbuf", null);
 			} catch (FormatException) {
 				return null;
 			}
-			if (stock != null) {
-				return new Gtk.Image(stock, size);
-			} else if (icon != null) {
-				return new Gtk.Image(icon, size);
+			if (stockName != null) {
+				return new Gtk.Image(stockName, size);
+			} else if (iconName != null) {
+				return new Gtk.Image(iconName, size);
+			} else if (pixbufName != null) {
+				Gdk.Pixbuf pixbuf = stock.GetPixbuf(pixbufName, null);
+				if (pixbuf != null) {
+					return new Gtk.Image(pixbuf);
+				} else {
+					return null; // results in error
+				}
 			} else {
-				return new Gtk.Image();
+				return new Gtk.Image(); // emtpy image
 			}
 
 		}

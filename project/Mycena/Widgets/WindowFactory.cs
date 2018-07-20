@@ -7,6 +7,7 @@ namespace Mycena {
 		public WindowFactory() : base() {
 			CreationProperties.Add("default_width", SetDefaultSize);
 			CreationProperties.Add("default_height", SetDefaultSize);
+			CreationProperties.Add("icon", SetIcon);
 		}
 
 		protected override Gtk.Window CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {

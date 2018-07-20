@@ -36,7 +36,7 @@ namespace Irseny.Content {
 			if (entries.TryGetValue(name, out result)) {
 				return result;
 			} else {
-				throw new KeyNotFoundException("name");
+				throw new KeyNotFoundException(name);
 			}
 		}
 		public T GetEntry(string name, T defaultValue) {

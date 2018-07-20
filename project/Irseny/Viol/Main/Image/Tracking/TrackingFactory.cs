@@ -77,12 +77,25 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			if (!Initialized) {
 				return;
 			}
+			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+			var imgMissingVideo = Container.GetGadget<Gtk.Image>("img_MissingVideo");
+			imgVideoOut.Pixbuf = imgMissingVideo.Pixbuf;
+			imgVideoOut.QueueDraw();
 			/*if (activeImage != null) {
 				activeImage.Dispose();
 				activeImage = null;
 			}
 			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			imgVideoOut.SetFromStock(videoOutStock, videoOutSize);*/
+		}
+		private void RetrievePosition(object sender, Tracap.PositionDetectedEventArgs args) {
+			Tracap.CapPosition position = args.Position;
+			Invoke(delegate {
+				if (!Initialized) {
+					return;
+				}
+
+			});
 		}
 		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
 			int width = 0;
