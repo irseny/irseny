@@ -208,6 +208,17 @@ namespace Mycena {
 				return Gtk.WrapMode.None;
 			}
 		}
+		public static Gtk.Orientation ParseOrientation(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("horizontal")) {
+				return Gtk.Orientation.Horizontal;
+			} else if (text.Equals("vertical")) {
+				return Gtk.Orientation.Vertical;
+			} else {
+				throw new FormatException(text + " can not be converted to orientation");
+			}
+
+		}
 	}
 }
 

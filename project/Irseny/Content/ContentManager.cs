@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Irseny.Content {
 	public abstract class ContentManager {
-		
+
 		public ContentManager() {
 			Loaded = false;
 			Modified = false;
@@ -24,13 +24,13 @@ namespace Irseny.Content {
 		public abstract void Unload();
 	}
 
-	public abstract class Manager<T> : ContentManager {
+	public abstract class ContentManager<T> : ContentManager {
 		Dictionary<string, T> entries;
 
-		public Manager() : base() {
+		public ContentManager() : base() {
 			entries = new Dictionary<string, T>(64);
 		}
-		public T GetEntry(string name) {			
+		public T GetEntry(string name) {
 			if (name == null) throw new ArgumentNullException("name");
 			T result;
 			if (entries.TryGetValue(name, out result)) {
@@ -58,7 +58,7 @@ namespace Irseny.Content {
 			entries[name] = value;
 			Modified = true;
 		}
-		public void ClearEntries() {			
+		public void ClearEntries() {
 			entries.Clear();
 			Modified = true;
 		}

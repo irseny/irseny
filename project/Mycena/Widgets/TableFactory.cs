@@ -5,7 +5,7 @@ namespace Mycena {
 		public TableFactory() : base() {
 
 		}
-		protected override Gtk.Table CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Table CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			uint rows, columns;
 			bool homogenous;
 			try {
@@ -17,7 +17,7 @@ namespace Mycena {
 			}
 			return new Gtk.Table(rows, columns, homogenous);
 		}
-		protected override bool PackWidget(Gtk.Table container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.Table container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			uint left, right, top, bottom;
 			uint xpad, ypad;
 			Gtk.AttachOptions xopt, yopt;

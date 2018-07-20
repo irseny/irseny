@@ -11,7 +11,7 @@ namespace Mycena {
 			PackProperties.Add("shrink");
 
 		}
-		protected override bool PackWidget(Gtk.Paned container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.Paned container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			try {
 				bool resize = TextParseTools.ParseBool(properties.GetProperty("resize", "false"));
 				bool shrink = TextParseTools.ParseBool(properties.GetProperty("shrink", "false"));
@@ -29,7 +29,7 @@ namespace Mycena {
 			}
 
 		}
-		private static bool SetPosition(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetPosition(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			try {
 				int position = TextParseTools.ParseInt(properties.GetProperty("position"));
 				widget.Position = position;
@@ -38,7 +38,7 @@ namespace Mycena {
 				return false;
 			}
 		}
-		private static bool ApplyPositionSet(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool ApplyPositionSet(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			try {
 				bool enabled = TextParseTools.ParseBool(properties.GetProperty("position_set"));
 				widget.PositionSet = enabled;
@@ -52,7 +52,7 @@ namespace Mycena {
 	internal class HorizontalPanedFactory : PanedFactory {
 
 
-		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.HPaned();
 
 		}
@@ -62,7 +62,7 @@ namespace Mycena {
 	}
 
 	internal class VerticalPanedFactory : PanedFactory {
-		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.VPaned();
 		}
 	}

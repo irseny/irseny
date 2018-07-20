@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using Irseny.Content;
+using Irseny.Listing;
 
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraBaseFactory : InterfaceFactory {
 		public CameraBaseFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraImageBase"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraOutputBase");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

@@ -9,26 +9,26 @@ namespace Mycena {
 			CreationProperties.Add("image_position", SetImagePosition);
 			CreationProperties.Add("use_underline", SetUnderline);
 		}
-		protected override Gtk.Button CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Button CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Button();
 		}
 
-		public static bool SetUseStock<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
-			bool stock;
+		public static bool SetUseStock<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
+			bool useStock;
 			try {
-				stock = TextParseTools.ParseBool(properties.GetProperty("use_stock"));
+				useStock = TextParseTools.ParseBool(properties.GetProperty("use_stock"));
 			} catch (FormatException) {
 				return false;
 			}
-			widget.UseStock = stock;
+			widget.UseStock = useStock;
 			return true;
 		}
-		public static bool SetLabel<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
+		public static bool SetLabel<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
 			string label = properties.GetProperty("label");
 			widget.Label = label;
 			return true;
 		}
-		public static bool SetImage<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
+		public static bool SetImage<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
 			Gtk.Image image = container.GetGadget<Gtk.Image>(properties.GetProperty("image"), null);
 			if (image == null) {
 				return false;
@@ -37,7 +37,7 @@ namespace Mycena {
 				return true;
 			}
 		}
-		public static bool SetImagePosition<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
+		public static bool SetImagePosition<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
 			Gtk.PositionType position;
 			try {
 				position = TextParseTools.ParsePositionType(properties.GetProperty("image_position"));
@@ -47,7 +47,7 @@ namespace Mycena {
 			widget.ImagePosition = position;
 			return true;
 		}
-		public static bool SetUnderline<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Button {
+		public static bool SetUnderline<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
 			bool underline;
 			try {
 				underline = TextParseTools.ParseBool(properties.GetProperty("use_underline"));

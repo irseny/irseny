@@ -4,7 +4,7 @@ namespace Mycena {
 	internal class HorizontalSeparatorFactory : WidgetFactory<Gtk.HSeparator> {
 		public HorizontalSeparatorFactory() : base() {
 		}
-		protected override Gtk.HSeparator CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.HSeparator CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.HSeparator();
 		}
 	}
@@ -12,7 +12,7 @@ namespace Mycena {
 		public VerticalSeparatorFactory() : base() {
 
 		}
-		protected override Gtk.VSeparator CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.VSeparator CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.VSeparator();
 		}
 	}

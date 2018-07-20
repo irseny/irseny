@@ -35,7 +35,7 @@ namespace Irseny.Content {
 				"../../resources",
 				"../../../resources"
 			};
-			foreach (string path in resourceLocations) {				
+			foreach (string path in resourceLocations) {
 				string filePath = Path.Combine(path, ".resroot");
 				if (File.Exists(filePath)) {
 					return Path.GetFullPath(path);

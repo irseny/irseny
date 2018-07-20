@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace Mycena {
 	internal class NotebookFactory : WidgetFactory<Gtk.Notebook> {
 		public NotebookFactory() : base() {
-			CreationProperties.Add("homogeneous", SetHomogeneous);
-			CreationProperties.Add("homogeneous_tabs", SetHomogeneousTabs);
+			/*CreationProperties.Add("homogeneous", SetHomogeneous);
+			CreationProperties.Add("homogeneous_tabs", SetHomogeneousTabs);*/
 			CreationProperties.Add("tab_pos", SetTabPosition);
 		}
-		protected override Gtk.Notebook CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Notebook CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Notebook();
 		}
-		protected override bool PackWidgets(Gtk.Notebook container, IList<Tuple<Gtk.Widget, ConfigProperties>> widgets) {
+		protected override bool PackWidgets(Gtk.Notebook container, IList<Tuple<Gtk.Widget, ConfigProperties>> widgets, IInterfaceStock stock) {
 			for (int i = 1; i < widgets.Count; i += 2) {
 				Gtk.Widget tab = null;
 				Gtk.Widget content = null;
@@ -38,7 +38,7 @@ namespace Mycena {
 			}
 			return true;
 		}
-		private static bool SetHomogeneous(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
+		/*private static bool SetHomogeneous(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
 			bool homogeneous;
 			try {
 				homogeneous = TextParseTools.ParseBool(properties.GetProperty("homogeneous", false));
@@ -46,6 +46,7 @@ namespace Mycena {
 				return false;
 			}
 			// TODO: set homogeneousity 
+			w
 			//widget.Homogeneous = homogeneous;
 			return true;
 		}
@@ -57,10 +58,10 @@ namespace Mycena {
 				return false;
 			}
 			//widget.HomogeneousTabs = homogeneous;
-
+			widget.tab
 			return true;
-		}
-		public static bool SetTabPosition(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container) {
+		}*/
+		public static bool SetTabPosition(Gtk.Notebook widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.PositionType position;
 			try {
 				position = TextParseTools.ParsePositionType(properties.GetProperty("tab_pos", "top"));

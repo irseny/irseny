@@ -13,7 +13,7 @@ namespace Mycena {
 			CreationProperties.Add("active", ToggleButtonFactory.SetActive);
 			CreationProperties.Add("draw_indicator", ToggleButtonFactory.SetDrawIndicator);
 		}
-		protected override Gtk.CheckButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.CheckButton CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.CheckButton();
 		}
 	}

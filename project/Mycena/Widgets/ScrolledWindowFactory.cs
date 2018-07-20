@@ -9,14 +9,14 @@ namespace Mycena {
 			CreationProperties.Add("vscrollbar_policy", SetPolicy);
 		}
 
-		protected override Gtk.ScrolledWindow CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.ScrolledWindow CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.ScrolledWindow();
 		}
-		protected override bool PackWidget(Gtk.ScrolledWindow container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.ScrolledWindow container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			container.AddWithViewport(child);
 			return true;
 		}
-		private static bool SetPolicy(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetPolicy(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.PolicyType horizontalPolicy, verticalPolicy;
 			widget.GetPolicy(out horizontalPolicy, out verticalPolicy);
 

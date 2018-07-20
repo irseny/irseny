@@ -8,7 +8,8 @@ namespace Mycena {
 		/// </summary>
 		/// <param name="rootNode">Node to create the gadget from.</param>
 		/// <param name="container">Gadget container.</param>
-		void CreateGadget(XmlNode rootNode, IInterfaceNode container);
+		/// <param name="rootFactory">Factory for stock resource access.</param>
+		void CreateGadget(XmlNode rootNode, IInterfaceNode container, GadgetFactory rootFactory);
 	}
 }
 

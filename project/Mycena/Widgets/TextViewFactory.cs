@@ -11,13 +11,13 @@ namespace Mycena {
 			CreationProperties.Add("buffer", SetBuffer);
 		}
 
-		protected override Gtk.TextView CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.TextView CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 
 
 			Gtk.TextBuffer buffer = TextBufferFactory.GetBuffer(properties, container);
 			return new Gtk.TextView(buffer);
 		}
-		private static bool SetEditable(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetEditable(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool editable;
 			try {
 				editable = TextParseTools.ParseBool(properties.GetProperty("editable", true));
@@ -27,7 +27,7 @@ namespace Mycena {
 			widget.Editable = editable;
 			return true;
 		}
-		private static bool SetWrapMode(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetWrapMode(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.WrapMode mode;
 			try {
 				mode = TextParseTools.ParseWrapMode(properties.GetProperty("wrap_mode", String.Empty));
@@ -37,7 +37,7 @@ namespace Mycena {
 			widget.WrapMode = mode;
 			return true;
 		}
-		private static bool SetTabAcceptance(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetTabAcceptance(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool accepted;
 			try {
 				accepted = TextParseTools.ParseBool(properties.GetProperty("accepts_tab", true));
@@ -47,7 +47,7 @@ namespace Mycena {
 			widget.AcceptsTab = accepted;
 			return true;
 		}
-		private static bool SetBuffer(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetBuffer(Gtk.TextView widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			string bufferName = properties.GetProperty("buffer", null);
 			if (bufferName != null) {
 				Gtk.TextBuffer buffer = TextBufferFactory.GetBuffer(bufferName, container);

@@ -5,7 +5,7 @@ namespace Mycena {
 		public AdjustmentFactory() : base() {
 
 		}
-		protected override Gtk.Adjustment CreateGadget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Adjustment CreateGadget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			double value, lower, upper, stepInc, pageInc, pageSize;
 			try {
 				value = TextParseTools.ParseDouble(properties.GetProperty("value", 0));

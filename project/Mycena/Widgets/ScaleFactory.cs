@@ -6,7 +6,7 @@ namespace Mycena {
 			CreationProperties.Add("draw_value", SetDrawValue);
 
 		}
-		private static bool SetRoundDigits(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetRoundDigits(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			int digits;
 			try {
 				digits = TextParseTools.ParseInt(properties.GetProperty("round_digits"));
@@ -16,7 +16,7 @@ namespace Mycena {
 			widget.Digits = digits;
 			return true;
 		}
-		private static bool SetDrawValue(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetDrawValue(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool draw;
 			try {
 				draw = TextParseTools.ParseBool(properties.GetProperty("draw_value"));
@@ -31,7 +31,7 @@ namespace Mycena {
 		public HorizontalScaleFactory() : base() {
 
 		}
-		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
 			return new Gtk.HScale(adjustment);
 		}
@@ -40,7 +40,7 @@ namespace Mycena {
 		public VerticalScaleFactory() : base() {
 
 		}
-		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
 			return new Gtk.VScale(adjustment);
 		}

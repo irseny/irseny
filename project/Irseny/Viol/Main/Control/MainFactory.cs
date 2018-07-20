@@ -1,11 +1,11 @@
 ﻿using System;
-
+using Irseny.Content;
 namespace Irseny.Viol.Main.Control {
 	public class MainFactory : InterfaceFactory {
 		public MainFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Control"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("Control");
 			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}

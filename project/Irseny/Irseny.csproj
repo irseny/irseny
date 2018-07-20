@@ -112,7 +112,7 @@
     <Compile Include="Viol\IInterfaceFactory.cs" />
     <Compile Include="Viol\MainFactory.cs" />
     <Compile Include="Content\ContentManagerSettings.cs" />
-    <Compile Include="Content\Resources\InterfaceDefinitionManager.cs" />
+    <Compile Include="Content\Resources\InterfaceFactoryManager.cs" />
     <Compile Include="Content\Resources\ResourceManager.cs" />
     <Compile Include="Capture\Video\CaptureStream.cs" />
     <Compile Include="Capture\Video\CaptureSettings.cs" />
@@ -164,6 +164,7 @@
     <Compile Include="Tracap\IBasicPoseEstimatorOptions.cs" />
     <Compile Include="Tracap\BasicPoseEstimator.cs" />
     <Compile Include="Util\ImageTools.cs" />
+    <Compile Include="Content\Resources\InterfaceStockManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

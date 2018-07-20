@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irseny.Log;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Log {
 	public class MainFactory : InterfaceFactory {
@@ -14,7 +15,7 @@ namespace Irseny.Viol.Main.Log {
 			}
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Log"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("Log");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

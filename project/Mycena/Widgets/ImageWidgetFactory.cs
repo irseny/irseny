@@ -9,7 +9,7 @@ namespace Mycena {
 			/*CreationProperties.Add("stock", SetStock);
 			CreationProperties.Add("icon_name", SetIcon);*/
 		}
-		protected override Gtk.Image CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Image CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return CreateImage(properties, container);
 		}
 		public static Gtk.Image CreateImage(ConfigProperties properties, IInterfaceNode container) {

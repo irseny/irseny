@@ -5,11 +5,11 @@ namespace Mycena {
 		public TextBufferFactory() : base() {
 			CreationProperties.Add("text", SetText);
 		}
-		protected override Gtk.TextBuffer CreateGadget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.TextBuffer CreateGadget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.TextTagTable table = TextTagTableFactory.GetTable(properties, container);
 			return new Gtk.TextBuffer(table);
 		}
-		private static bool SetText(Gtk.TextBuffer gadget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetText(Gtk.TextBuffer gadget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			gadget.Text = properties.GetProperty("text");
 			return true;
 		}

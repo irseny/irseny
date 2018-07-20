@@ -9,7 +9,8 @@ namespace Mycena {
 		/// <returns>The widget created.</returns>
 		/// <param name="rootNode">Node to create the widget from.</param>
 		/// <param name="container">Widget container.</param>
-		Gtk.Widget CreateWidget(XmlNode rootNode, IInterfaceNode container);
+		/// <param name="rootFactory">Factory to create child elements with.</param>
+		Gtk.Widget CreateWidget(XmlNode rootNode, IInterfaceNode container, WidgetFactory rootFactory);
 	}
 }
 

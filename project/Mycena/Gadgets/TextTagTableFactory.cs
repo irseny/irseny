@@ -4,7 +4,7 @@ namespace Mycena {
 	internal class TextTagTableFactory : GadgetFactory<Gtk.TextTagTable> {
 		public TextTagTableFactory() : base() {
 		}
-		protected override Gtk.TextTagTable CreateGadget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.TextTagTable CreateGadget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.TextTagTable();
 		}
 		public static Gtk.TextTagTable GetTable(ConfigProperties properties, IInterfaceNode container) {

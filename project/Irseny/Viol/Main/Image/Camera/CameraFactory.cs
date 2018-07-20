@@ -3,12 +3,13 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Irseny.Util;
+using Irseny.Content;
+using Irseny.Listing;
 
 namespace Irseny.Viol.Main.Image.Camera {
 	public class CameraFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
-		float angle = 0.0f;
 		//string videoOutStock = "gtk-missing-image";
 		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
@@ -18,19 +19,19 @@ namespace Irseny.Viol.Main.Image.Camera {
 
 
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraImage"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraOutput");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated += StreamStateChanged;
+			EquipmentMaster.Instance.VideoCaptureStream.Updated += StreamStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			return true;
 		}
 		protected override bool DisconnectInternal() {
 			StopCapture();
-			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated -= StreamStateChanged;
+			EquipmentMaster.Instance.VideoCaptureStream.Updated -= StreamStateChanged;
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -76,10 +77,10 @@ namespace Irseny.Viol.Main.Image.Camera {
 			bool pixelsAvailable = false;
 			using (var imgRef = args.ColorImage) {
 				var imgSource = imgRef.Reference;
-				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte)*3 && imgSource.DataPointer != IntPtr.Zero) {
+				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte) * 3 && imgSource.DataPointer != IntPtr.Zero) {
 					width = imgSource.Width;
 					height = imgSource.Height;
-					totalBytes = width*height*imgSource.ElementSize*sizeof(byte);
+					totalBytes = width * height * imgSource.ElementSize * sizeof(byte);
 					if (pixelBuffer.Length < totalBytes) {
 						pixelBuffer = new byte[totalBytes];
 					}
@@ -112,25 +113,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 						updatePixBuf = true;
 					}
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-
-					// TODO: remove
-					Gdk.Pixbuf rotatedImage = ImageTools.Rotate(activeImage, angle, new Gdk.Color(200, 50, 200), false);
-					angle = (angle + 0.004f)%(float)(2*Math.PI);
-
-					/*if (updatePixBuf) {
-						if (videoOut.Pixbuf != null) {
-							videoOut.Pixbuf.Dispose(); // dipose seems not to be required
-						}
-						videoOut.QueueDraw();
-						videoOut.Pixbuf = activeImage;
-					}*/
-					var lastImage = videoOut.Pixbuf;
-					videoOut.Pixbuf = rotatedImage;
-					if (lastImage != null) {
-						lastImage.Dispose();
-					}
-
-					//videoOut.Pixbuf = activeImage;
+					videoOut.Pixbuf = activeImage;
 					videoOut.QueueDraw();
 				});
 			}
@@ -141,7 +124,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 				return;
 			}
 			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
+				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
 				if (streamId > -1) { // listing will change again when the stream is available
 					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
 					if (stream != null) {
@@ -152,7 +135,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 		}
 		public void StopCapture() {
 			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
+				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
 				if (streamId > -1) { // already removed if the stream is no longer available
 					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
 					if (stream != null) {

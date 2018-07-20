@@ -9,7 +9,7 @@ namespace Mycena {
 			CreationProperties.Add("default_height", SetDefaultSize);
 		}
 
-		protected override Gtk.Window CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Window CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool top;
 			try {
 				top = TextParseTools.ParseBool(properties.GetProperty("top_level", true));
@@ -22,7 +22,7 @@ namespace Mycena {
 				return new Gtk.Window(Gtk.WindowType.Popup);
 			}
 		}
-		protected override bool PackWidget(Gtk.Window container, Gtk.Widget child, ConfigProperties properties) {
+		protected override bool PackWidget(Gtk.Window container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			if (container.Child != null) {
 				return false;
 			} else {
@@ -30,7 +30,20 @@ namespace Mycena {
 				return true;
 			}
 		}
-		private static bool SetDefaultSize(Gtk.Window widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetIcon(Gtk.Window widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			Gdk.Pixbuf icon = null;
+			string iconPath;
+			if (properties.TryGetProperty("icon", out iconPath)) {
+				icon = stock.GetPixbuf(iconPath, null);
+			}
+			if (icon != null) {
+				widget.Icon = icon;
+				return true;
+			} else {
+				return false;
+			}
+		}
+		private static bool SetDefaultSize(Gtk.Window widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			int width, height;
 			try {
 				width = TextParseTools.ParseInt(properties.GetProperty("default_width", -1));

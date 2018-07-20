@@ -5,7 +5,7 @@ namespace Mycena {
 	internal class ComboBoxFactory : WidgetFactory<Gtk.ComboBox> {
 		public ComboBoxFactory() : base() {
 		}
-		protected override Gtk.ComboBox CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.ComboBox CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			IList<string> sourceEntries = properties.GetItems();
 			string[] entries = new string[sourceEntries.Count];
 			sourceEntries.CopyTo(entries, 0);

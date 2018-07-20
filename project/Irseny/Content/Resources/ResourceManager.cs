@@ -3,26 +3,38 @@ using System.IO;
 
 namespace Irseny.Content.Resources {
 	public class ResourceManager : ContentManager {
-		
+
 		public ResourceManager() : base() {
-			InterfaceDefinitions = new InterfaceDefinitionManager();
+			InterfaceFactory = new InterfaceFactoryManager();
+			InterfaceStock = new InterfaceStockManager();
 		}
-		public InterfaceDefinitionManager InterfaceDefinitions { get; private set; }
+		public InterfaceFactoryManager InterfaceFactory { get; private set; }
+		public InterfaceStockManager InterfaceStock { get; private set; }
+
 		public override void Load(ContentManagerSettings settings) {
 			Settings = settings;
-			var iDefSettings = new ContentManagerSettings(settings);
-			iDefSettings.SetResourcePaths(null, Path.Combine(settings.ResourceDirectory, "gtk"), "(no-file)");
-			InterfaceDefinitions.Load(iDefSettings);
+			{
+				var stockSettings = new ContentManagerSettings(settings);
+				stockSettings.SetResourcePaths(null, Path.Combine(settings.ResourceDirectory, "icons"), "(no-file)");
+				InterfaceStock.Load(stockSettings);
+			}
+			{ // depends on stock
+				var factorySettings = new ContentManagerSettings(settings);
+				factorySettings.SetResourcePaths(null, Path.Combine(settings.ResourceDirectory, "gtk"), "(no-file)");
+				InterfaceFactory.Load(factorySettings);
+			}
 			Loaded = true;
 		}
 		public override void Reload() {
-			
+			InterfaceStock.Reload();
+			InterfaceFactory.Reload();
 		}
 		public override void Save() {
-			
+			// nothing to do
 		}
 		public override void Unload() {
-			
+			InterfaceFactory.Unload();
+			InterfaceStock.Unload();
 		}
 	}
 }

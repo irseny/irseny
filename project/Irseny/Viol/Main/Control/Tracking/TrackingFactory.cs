@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Tracking {
 	public class TrackingFactory : InterfaceFactory {
@@ -9,7 +10,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			this.index = index;
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingControl"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingControl");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

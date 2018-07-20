@@ -64,7 +64,6 @@
     <Compile Include="Widgets\WidgetFactory.cs" />
     <Compile Include="Gadgets\IGadgetFactory.cs" />
     <Compile Include="Gadgets\GadgetFactory.cs" />
-    <Compile Include="Gadgets\StaticGadgetFactory.cs" />
     <Compile Include="Gadgets\AdjustmentFactory.cs" />
     <Compile Include="Gadgets\TextTagTableFactory.cs" />
     <Compile Include="Gadgets\TextBufferFactory.cs" />
@@ -84,10 +83,15 @@
     <Compile Include="Widgets\ScaleFactory.cs" />
     <Compile Include="Widgets\NotebookFactory.cs" />
     <Compile Include="Widgets\ComboBoxFactory.cs" />
+    <Compile Include="Widgets\GridFactory.cs" />
+    <Compile Include="Stock\InterfaceStock.cs" />
+    <Compile Include="Stock\StockAccessConfig.cs" />
+    <Compile Include="Stock\IInterfaceStock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Widgets\" />
     <Folder Include="Gadgets\" />
+    <Folder Include="Stock\" />
   </ItemGroup>
 </Project>

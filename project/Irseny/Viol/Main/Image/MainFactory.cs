@@ -1,11 +1,12 @@
 ﻿using System;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Image {
 	public class MainFactory : InterfaceFactory {
 		public MainFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Image"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("Output");
 			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}

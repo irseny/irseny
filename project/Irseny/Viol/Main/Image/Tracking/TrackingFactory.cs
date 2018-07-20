@@ -16,7 +16,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			this.trackerIndex = trackerIndex;
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingImage"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutput");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -123,12 +123,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 						int pixel = b << 16 | b << 8 | b;
 						Marshal.WriteInt32(target, p * 3, pixel); // works as expected, but where is the forth byte located?
 					}
-					if (updatePixBuf) {
-						if (videoOut.Pixbuf != null) {
-							videoOut.Pixbuf.Dispose();
-						}
-						videoOut.Pixbuf = activeImage;
-					}
+					videoOut.Pixbuf = activeImage;
 					videoOut.QueueDraw();
 				});
 				/*Invoke(delegate {

@@ -8,15 +8,15 @@ namespace Mycena {
 			CreationProperties.Add("invisible_char", SetInvisibleChar);
 			CreationProperties.Add("width_chars", SetWidthChars);
 		}
-		protected override Gtk.Entry CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Entry CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Entry();
 		}
-		public static bool SetText<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Entry {
+		public static bool SetText<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			string text = properties.GetProperty("text");
 			widget.Text = text;
 			return true;
 		}
-		public static bool SetEditable<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Entry {
+		public static bool SetEditable<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			bool editable;
 			try {
 				editable = TextParseTools.ParseBool(properties.GetProperty("editable"));
@@ -26,7 +26,7 @@ namespace Mycena {
 			widget.IsEditable = editable;
 			return true;
 		}
-		public static bool SetMaxLength<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Entry {
+		public static bool SetMaxLength<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			int maxLength;
 			try {
 				maxLength = TextParseTools.ParseInt(properties.GetProperty("max_length"));
@@ -36,7 +36,7 @@ namespace Mycena {
 			widget.MaxLength = maxLength;
 			return true;
 		}
-		public static bool SetInvisibleChar<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Entry {
+		public static bool SetInvisibleChar<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			char invisible;
 			try {
 				invisible = TextParseTools.ParseChar(properties.GetProperty("invisible_char"));
@@ -46,7 +46,7 @@ namespace Mycena {
 			widget.InvisibleChar = invisible;
 			return true;
 		}
-		public static bool SetWidthChars<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Entry {
+		public static bool SetWidthChars<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			int width;
 			try {
 				width = TextParseTools.ParseInt(properties.GetProperty("width_chars"));

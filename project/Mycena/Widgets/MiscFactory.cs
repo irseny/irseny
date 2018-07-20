@@ -2,7 +2,7 @@
 
 namespace Mycena {
 	internal class MiscFactory {
-		public static bool SetAligment<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Misc {
+		public static bool SetAligment<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Misc {
 			float alignX, alignY;
 			widget.GetAlignment(out alignX, out alignY);
 			try {
@@ -19,7 +19,7 @@ namespace Mycena {
 			widget.SetAlignment(alignX, alignY);
 			return true;
 		}
-		public static bool SetPadding<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.Misc {
+		public static bool SetPadding<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Misc {
 			int padX, padY;
 			widget.GetPadding(out padX, out padY);
 			try {

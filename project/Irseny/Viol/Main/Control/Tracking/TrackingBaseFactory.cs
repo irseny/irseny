@@ -1,11 +1,12 @@
 ﻿using System;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Tracking {
 	public class TrackingBaseFactory : InterfaceFactory {
 		public TrackingBaseFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingControlBase"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingControlBase");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Camera {
 	public class CameraFactory : InterfaceFactory {
@@ -10,7 +11,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 		}
 
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraControl"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraControl");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

@@ -2,11 +2,22 @@
 using System.Collections.Generic;
 
 namespace Mycena {
-	internal abstract class BoxFactory : WidgetFactory<Gtk.Box> {
+	internal class BoxFactory : WidgetFactory<Gtk.Box> {
 		public BoxFactory() : base() {
 
 		}
-		protected override bool PackWidget(Gtk.Box container, Gtk.Widget child, ConfigProperties properties) {
+		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			Gtk.Orientation orientation;
+			int spacing;
+			try {
+				orientation = TextParseTools.ParseOrientation(properties.GetProperty("orientation", Gtk.Orientation.Horizontal));
+				spacing = TextParseTools.ParseInt(properties.GetProperty("spacing", 0));
+			} catch (FormatException) {
+				return null;
+			}
+			return new Gtk.Box(orientation, spacing);
+		}
+		protected override bool PackWidget(Gtk.Box container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			Gtk.PackType packType;
 			bool expand;
 			bool fill;
@@ -33,14 +44,14 @@ namespace Mycena {
 	}
 
 	internal class HorizontalBoxFactory : BoxFactory {
-		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.HBox();
 		}
 
 	}
 
 	internal class VerticalBoxFactory : BoxFactory {
-		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.Box CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.VBox();
 		}
 

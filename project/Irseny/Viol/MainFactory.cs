@@ -1,4 +1,5 @@
 ﻿using System;
+using Irseny.Content;
 
 namespace Irseny.Viol {
 	public class MainFactory : InterfaceFactory {
@@ -6,7 +7,7 @@ namespace Irseny.Viol {
 		}
 		protected override bool CreateInternal() {
 			Gtk.Application.Init();
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("Main"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("Main");
 			Container = factory.CreateWidget("win_Main");
 			return true;
 		}

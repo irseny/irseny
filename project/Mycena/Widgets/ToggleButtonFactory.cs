@@ -13,11 +13,11 @@ namespace Mycena {
 			CreationProperties.Add("active", ToggleButtonFactory.SetActive);
 			CreationProperties.Add("draw_indicator", ToggleButtonFactory.SetDrawIndicator);
 		}
-		protected override Gtk.ToggleButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.ToggleButton CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.ToggleButton();
 		}
 
-		public static bool SetActive<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.ToggleButton {
+		public static bool SetActive<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.ToggleButton {
 			bool active;
 			try {
 				active = TextParseTools.ParseBool(properties.GetProperty("active"));
@@ -27,7 +27,7 @@ namespace Mycena {
 			widget.Active = active;
 			return true;
 		}
-		public static bool SetDrawIndicator<T>(T widget, ConfigProperties properties, IInterfaceNode container) where T : Gtk.ToggleButton {
+		public static bool SetDrawIndicator<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.ToggleButton {
 			bool drawIndicator;
 			try {
 				drawIndicator = TextParseTools.ParseBool(properties.GetProperty("draw_indicator"));

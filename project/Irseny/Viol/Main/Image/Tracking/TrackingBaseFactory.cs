@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-
+using Irseny.Content;
+using Irseny.Listing;
 namespace Irseny.Viol.Main.Image.Tracking {
 	public class TrackingBaseFactory : InterfaceFactory {
 		public TrackingBaseFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("TrackingImageBase"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutputBase");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -14,11 +15,11 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.PackStart(boxMain, true, true, 0);
-			Listing.EquipmentMaster.Instance.HeadTracker.Updated += TrackerChanged;
+			EquipmentMaster.Instance.HeadTracker.Updated += TrackerChanged;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			Listing.EquipmentMaster.Instance.HeadTracker.Updated -= TrackerChanged;
+			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerChanged;
 			while (RemoveTracker()) {
 			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
@@ -30,7 +31,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 			Container.Dispose();
 			return true;
 		}
-		private void TrackerChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
+		private void TrackerChanged(object sender, EquipmentUpdateArgs<int> args) {
 			if (!Initialized) {
 				return;
 			}

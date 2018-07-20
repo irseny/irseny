@@ -3,6 +3,9 @@
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
+using Irseny.Listing;
+using Irseny.Log;
+using Irseny.Content;
 
 namespace Irseny {
 	class MainClass {
@@ -12,19 +15,19 @@ namespace Irseny {
 			Gtk.Settings.Default.SetLongProperty("gtk-button-images", 1, string.Empty);
 #endif
 			{
-				Listing.EquipmentMaster.MakeInstance(new Listing.EquipmentMaster());
-				Log.LogManager.MakeInstance(new Log.LogManager());
+				EquipmentMaster.MakeInstance(new EquipmentMaster());
+				LogManager.MakeInstance(new LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
 				Tracap.DetectionSystem.MakeInstance(new Tracap.DetectionSystem());
 			}
 			{
-				Content.ContentMaster.MakeInstance(new Content.ContentMaster());
-				var contentSettings = new Content.ContentManagerSettings();
-				string resourceRoot = Content.ContentMaster.FindResourceRoot();
+				ContentMaster.MakeInstance(new Content.ContentMaster());
+				var contentSettings = new ContentManagerSettings();
+				string resourceRoot = ContentMaster.FindResourceRoot();
 				contentSettings.SetResourcePaths(resourceRoot, resourceRoot, "(no-file)");
-				string userRoot = Content.ContentMaster.FindConfigRoot();
+				string userRoot = ContentMaster.FindConfigRoot();
 				contentSettings.SetConfigPaths(userRoot, userRoot, "(no-file)");
-				Content.ContentMaster.Instance.Load(contentSettings);
+				ContentMaster.Instance.Load(contentSettings);
 			}
 			bool stopped = false;
 			{
@@ -32,18 +35,23 @@ namespace Irseny {
 				var logFactory = new Viol.Main.Log.MainFactory();
 				var controlFactory = new Viol.Main.Control.MainFactory();
 				var imageFactory = new Viol.Main.Image.MainFactory();
-				mainFactory.ConstructFloor("log", logFactory);
-				mainFactory.ConstructFloor("control", controlFactory);
-				mainFactory.ConstructFloor("image", imageFactory);
+				mainFactory.ConstructFloor("Log", logFactory);
+				mainFactory.ConstructFloor("Control", controlFactory);
+				mainFactory.ConstructFloor("Output", imageFactory);
 				var cameraControlFactory = new Viol.Main.Control.Camera.CameraBaseFactory();
-				controlFactory.ConstructFloor("camera", cameraControlFactory);
+				controlFactory.ConstructFloor("Camera", cameraControlFactory);
 				var trackingControlFactory = new Viol.Main.Control.Tracking.TrackingBaseFactory();
-				controlFactory.ConstructFloor("tracking", trackingControlFactory);
+				controlFactory.ConstructFloor("Tracking", trackingControlFactory);
 				var cameraImageFactory = new Viol.Main.Image.Camera.CameraBaseFactory();
-				imageFactory.ConstructFloor("camera", cameraImageFactory);
+				imageFactory.ConstructFloor("Camera", cameraImageFactory);
 				var trackingImageFactory = new Viol.Main.Image.Tracking.TrackingBaseFactory();
-				imageFactory.ConstructFloor("tracking", trackingImageFactory);
-				if (!mainFactory.Init(Irseny.Viol.InterfaceFactoryState.Connected)) {
+				imageFactory.ConstructFloor("Tracking", trackingImageFactory);
+
+				{
+					var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutput");
+					var container = factory.CreateWidget("box_Root");
+				}
+				if (!mainFactory.Init(Viol.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;
 				}
@@ -88,8 +96,8 @@ namespace Irseny {
 			{
 				Tracap.DetectionSystem.MakeInstance(null);
 				Capture.Video.CaptureSystem.MakeInstance(null);
-				Log.LogManager.MakeInstance(null);
-				Listing.EquipmentMaster.MakeInstance(null);
+				LogManager.MakeInstance(null);
+				EquipmentMaster.MakeInstance(null);
 			}
 		}
 	}

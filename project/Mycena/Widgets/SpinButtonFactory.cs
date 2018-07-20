@@ -10,7 +10,7 @@ namespace Mycena {
 			//CreationProperties.Add("adjustment", SetAdjustment);
 			CreationProperties.Add("numeric", SetNumeric);
 		}
-		protected override Gtk.SpinButton CreateWidget(ConfigProperties properties, IInterfaceNode container) {
+		protected override Gtk.SpinButton CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
 			double climb;
 			uint digits;
@@ -22,7 +22,7 @@ namespace Mycena {
 			}
 			return new Gtk.SpinButton(adjustment, climb, digits);
 		}
-		private static bool SetNumeric(Gtk.SpinButton widget, ConfigProperties properties, IInterfaceNode container) {
+		private static bool SetNumeric(Gtk.SpinButton widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool numeric;
 			try {
 				numeric = TextParseTools.ParseBool(properties.GetProperty("numeric"));
@@ -30,7 +30,6 @@ namespace Mycena {
 				return false;
 			}
 			widget.Numeric = numeric;
-
 			return true;
 		}
 	}

@@ -1,11 +1,12 @@
 ﻿using System;
+using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Camera {
 	public class CameraBaseFactory : InterfaceFactory {
 		public CameraBaseFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = Mycena.InterfaceFactory.CreateFromFile(Content.ContentMaster.Instance.Resources.InterfaceDefinitions.GetEntry("CameraControlBase"));
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraControlBase");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
