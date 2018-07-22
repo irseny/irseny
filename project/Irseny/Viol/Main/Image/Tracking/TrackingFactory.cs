@@ -3,12 +3,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Irseny.Content;
 using Irseny.Listing;
+using Irseny.Util;
 
 namespace Irseny.Viol.Main.Image.Tracking {
 	public class TrackingFactory : InterfaceFactory {
 		int trackerIndex;
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
+		Gdk.Pixbuf rotatedImage = null;
+		float angle = 0;
 		/*string videoOutStock = "gtk-missing-image";
 		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;*/
 
@@ -60,6 +63,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
 						tracker.InputProcessed += RetrieveImage;
+						tracker.PositionDetected += RetrievePosition;
 					}
 				}
 			});
@@ -71,6 +75,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
 						tracker.InputProcessed -= RetrieveImage;
+						tracker.PositionDetected -= RetrievePosition;
 					}
 				}
 			});
@@ -94,7 +99,28 @@ namespace Irseny.Viol.Main.Image.Tracking {
 				if (!Initialized) {
 					return;
 				}
-
+				{
+					var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
+					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
+						imgTopSource.Pixbuf, angle, ImageTools.RotatedImageSize.Maximized,
+						ImageTools.RotatedImageAlpha.Enabled, new Gdk.Color(), rotatedImage);
+					var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
+					imgTopTarget.Pixbuf = nRotatedImage;
+					imgTopTarget.QueueDraw();
+					if (rotatedImage != nRotatedImage) {
+						if (rotatedImage != null) {
+							rotatedImage.Dispose();
+						}
+						rotatedImage = nRotatedImage;
+					}
+				}
+				angle += 0.01f;
+				/*{
+					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
+					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
+						imgSideSource.Pixbuf, angle, ImageTools.RotatedImageSize.Maximized,
+						ImageTools.RotatedImageAlpha.Enabled, new Gdk.Color(), rotatedImage);
+				}*/
 			});
 		}
 		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
