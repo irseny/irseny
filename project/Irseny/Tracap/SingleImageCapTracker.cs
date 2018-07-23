@@ -51,18 +51,27 @@ namespace Irseny.Tracap {
 			if (!Running) {
 				return false;
 			}
+
 			SharedRef<Emgu.CV.Mat> image = null;
 			lock (inputSync) {
 				if (pendingImages.Count > 0) {
 					image = pendingImages.Dequeue();
 				}
 			}
-			if (image != null) {
+			while (image != null) {
 				using (image) {
 					bool result = false;
 					if (image.Reference != null) {
 						result = Step(image);
 						return true;
+					}
+				}
+
+				lock (inputSync) {
+					if (pendingImages.Count > 0) {
+						image = pendingImages.Dequeue();
+					} else {
+						image = null;
 					}
 				}
 			}

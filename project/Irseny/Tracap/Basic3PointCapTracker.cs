@@ -52,8 +52,6 @@ namespace Irseny.Tracap {
 			// spread results
 			OnInputProcessed(new ImageProcessedEventArgs(imageOut));
 			OnPositionDetected(new PositionDetectedEventArgs(position));
-			Console.WriteLine("Yaw: " + position.Yaw);
-			Console.WriteLine("Pitch: " + position.Pitch);
 			return true;
 		}
 		private void SetupStep(SharedRef<Emgu.CV.Mat> imageIn) {

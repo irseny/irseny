@@ -47,10 +47,6 @@ namespace Irseny {
 				var trackingImageFactory = new Viol.Main.Image.Tracking.TrackingBaseFactory();
 				imageFactory.ConstructFloor("Tracking", trackingImageFactory);
 
-				{
-					var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutput");
-					var container = factory.CreateWidget("box_Root");
-				}
 				if (!mainFactory.Init(Viol.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;

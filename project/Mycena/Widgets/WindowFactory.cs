@@ -35,7 +35,7 @@ namespace Mycena {
 			Gdk.Pixbuf icon = null;
 			string iconPath;
 			if (properties.TryGetProperty("icon", out iconPath)) {
-				icon = stock.GetPixbuf(iconPath, null);
+				icon = stock.GetPixbuf(TextParseTools.ParsePath(iconPath), null);
 			}
 			if (icon != null) {
 				widget.Icon = icon;

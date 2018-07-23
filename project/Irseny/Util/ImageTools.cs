@@ -23,8 +23,8 @@ namespace Irseny.Util {
 			float m22 = m11;
 			int sourceWidth = source.Width;
 			int sourceHeight = source.Height;
-			int halfSourceWidth = sourceWidth / 2;
-			int halfSourceHeight = source.Height / 2;
+			int halfSourceWidth = sourceWidth/2;
+			int halfSourceHeight = source.Height/2;
 			int sourceStride = source.Rowstride;
 			// determine size of target image
 			int targetWidth;
@@ -34,17 +34,17 @@ namespace Irseny.Util {
 			switch (size) {
 			case RotatedImageSize.Minimized:
 				// rotate corner points to determine the target pixbuf size
-				float width1 = Math.Abs(m11 * sourceWidth + m12 * sourceHeight);
-				float height1 = Math.Abs(m21 * sourceWidth + m22 * sourceHeight);
-				float width2 = Math.Abs(m11 * sourceWidth - m12 * sourceHeight);
-				float height2 = Math.Abs(m21 * sourceWidth - m22 * sourceHeight);
+				float width1 = Math.Abs(m11*sourceWidth + m12*sourceHeight);
+				float height1 = Math.Abs(m21*sourceWidth + m22*sourceHeight);
+				float width2 = Math.Abs(m11*sourceWidth - m12*sourceHeight);
+				float height2 = Math.Abs(m21*sourceWidth - m22*sourceHeight);
 				targetWidth = (int)Math.Ceiling(Math.Max(width1, width2));
 				targetHeight = (int)Math.Ceiling(Math.Max(height1, height2));
-				break;
+			break;
 			case RotatedImageSize.Maximized:
-				targetWidth = (int)Math.Ceiling(Math.Sqrt(sourceWidth * sourceWidth + sourceHeight * sourceHeight));
+				targetWidth = (int)Math.Ceiling(Math.Sqrt(sourceWidth*sourceWidth + sourceHeight*sourceHeight));
 				targetHeight = targetWidth;
-				break;
+			break;
 			case RotatedImageSize.Unchanged:
 				if (target != null) {
 					targetWidth = target.Width;
@@ -54,18 +54,18 @@ namespace Irseny.Util {
 					targetWidth = sourceWidth;
 					targetHeight = sourceHeight;
 				}
-				break;
+			break;
 			case RotatedImageSize.Source:
 				targetWidth = sourceWidth;
 				targetHeight = sourceHeight;
-				break;
+			break;
 			default:
 				throw new ArgumentException("size: Unknown value");
 			}
-			postRotationOffsetX = targetWidth / 2;
-			postRotationOffsetY = targetHeight / 2;
-			int halfTargetWidth = targetWidth / 2;
-			int halfTargetHeight = targetHeight / 2;
+			postRotationOffsetX = targetWidth/2;
+			postRotationOffsetY = targetHeight/2;
+			int halfTargetWidth = targetWidth/2;
+			int halfTargetHeight = targetHeight/2;
 			// pixel format
 			int sourceChannels = source.NChannels;
 			int sourcePixelSize = sourceChannels*source.BitsPerSample/8;
@@ -73,20 +73,20 @@ namespace Irseny.Util {
 			switch (alpha) {
 			case RotatedImageAlpha.Disabled:
 				targetChannels = 3;
-				break;
+			break;
 			case RotatedImageAlpha.Enabled:
 				targetChannels = 4;
-				break;
+			break;
 			case RotatedImageAlpha.Source:
 				targetChannels = sourceChannels;
-				break;
+			break;
 			case RotatedImageAlpha.Unchanged:
 				if (target != null) {
 					targetChannels = target.NChannels;
 				} else {
 					targetChannels = source.NChannels;
 				}
-				break;
+			break;
 			default:
 				throw new ArgumentException("alpha: Unknown value");
 			}
@@ -97,22 +97,23 @@ namespace Irseny.Util {
 			}
 			int targetPixelSize = targetChannels*source.BitsPerSample/8;
 			int targetStride = target.Rowstride;
+			bool alphaExtend = sourceChannels < targetChannels;
+			bool alphaDiscard = sourceChannels > targetChannels;
 			// default color
 			// only RGB is supported so every pixel consists of 3 or 4 bytes depending on whether alpha is enabled
 			uint defaultColor;
 			Gdk.Color packedDefaultColor = fillColor.GetValueOrDefault(new Gdk.Color(255, 255, 255));
-			if (targetChannels > 3) { // expecting 4 channels
+			if (sourceChannels > 3 || alphaExtend) {
 				defaultColor = unchecked(
-					(packedDefaultColor.Pixel & 0xFF) << 24 |
-					(uint)(packedDefaultColor.Red & 0xFF) << 16 |
-					(uint)(packedDefaultColor.Green & 0xFF) << 8 |
-					(uint)(packedDefaultColor.Blue & 0xFF));
-			} else { // expecting 3 channels
+					(uint)(packedDefaultColor.Red & 0xFF)<<24 |
+				(uint)(packedDefaultColor.Green & 0xFF)<<16 |
+				(uint)(packedDefaultColor.Blue & 0xFF)<<8 |
+				(packedDefaultColor.Pixel & 0xFF));
+			} else {
 				defaultColor = unchecked(
-					(uint)(0xFF << 24) |
-					(uint)(packedDefaultColor.Red & 0xFF) << 16 |
-					(uint)(packedDefaultColor.Green & 0xFF) << 8 |
-					(uint)(packedDefaultColor.Blue & 0xFF));
+					(uint)(packedDefaultColor.Red & 0xFF)<<16 |
+				(uint)(packedDefaultColor.Green & 0xFF)<<8 |
+				(uint)(packedDefaultColor.Blue%0xFF));
 			}
 			/*if (targetChannels == sourceChannels) { // specialized cases
 				if (targetChannels == 3) {
@@ -127,10 +128,10 @@ namespace Irseny.Util {
 
 			}*/
 			// copy pixel data
-			bool alphaExtend = sourceChannels < targetChannels;
+
 			IntPtr sourcePixels = source.Pixels;
 			IntPtr targetPixels = target.Pixels;
-			for (int targetY = 0; targetY < targetHeight; targetY++) {
+			/*for (int targetY = 0; targetY < targetHeight; targetY++) {
 				int currentTargetChannels = targetY < targetHeight - 1 ? 4 : targetChannels;
 				for (int targetX = 0; targetX < targetWidth; targetX++) {
 					float centerX = targetX - halfTargetWidth;
@@ -152,6 +153,42 @@ namespace Irseny.Util {
 						Marshal.WriteInt32(targetPixels, targetY * targetStride + targetX * targetPixelSize, unchecked((int)color));
 					}
 				}
+			}*/
+			for (int targetY = 0; targetY < targetHeight; targetY++) {				
+				for (int targetX = 0; targetX < targetWidth; targetX++) {
+					float centerX = targetX - halfTargetWidth;
+					float centerY = targetY - halfTargetHeight;
+					float sourceX = m11*centerX + m12*centerY + halfSourceWidth;
+					float sourceY = m21*centerX + m22*centerY + halfSourceHeight;
+					int sourceX1 = (int)sourceX;
+					int sourceY1 = (int)sourceY;
+					uint color;
+					if (sourceX1 < 0 || sourceX1 >= sourceWidth || sourceY1 < 0 || sourceY1 >= sourceHeight) {						
+						color = defaultColor;
+					} else {
+						int sourceOffset = sourceY1*sourceStride + sourceX1*sourcePixelSize;
+						if (sourcePixelSize < 4) {
+							color = unchecked((uint)Marshal.ReadInt16(sourcePixels, sourceOffset)<<8 |
+							(uint)Marshal.ReadByte(sourcePixels, sourceOffset + 2));
+							if (alphaExtend) {
+								color = color<<8 | 0xFF;
+							}
+						} else {
+							color = unchecked((uint)Marshal.ReadInt32(sourcePixels, sourceY1*sourceStride + sourceX1*sourcePixelSize));
+						}
+
+					}
+					int targetOffset = targetY*targetStride + targetX*targetPixelSize;
+					if (targetPixelSize < 4) {
+						if (alphaDiscard) {
+							color = color>>8;
+						}
+						Marshal.WriteInt16(targetPixels, targetOffset, unchecked((short)(color>>8)));
+						Marshal.WriteByte(targetPixels, targetOffset + 2, unchecked((byte)color));
+					} else {						
+						Marshal.WriteInt32(targetPixels, targetY*targetStride + targetX*targetPixelSize, unchecked((int)color));
+					}
+				}
 			}
 			return target;
 		}
@@ -161,6 +198,7 @@ namespace Irseny.Util {
 			Minimized,
 			Maximized
 		}
+
 		public enum RotatedImageAlpha {
 			Source,
 			Unchanged,

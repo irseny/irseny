@@ -100,7 +100,7 @@ namespace Irseny.Tracap {
 			for (int i = 0; i < 3; i++) {
 				float dx = inPoints[i].X - averagePoints[i].X;
 				float dy = inPoints[i].Y - averagePoints[i].Y;
-				averagePoints[i] = new Point2f(averagePoints[i].X + dx * weight, averagePoints[i].Y + dy * weight);
+				averagePoints[i] = new Point2f(averagePoints[i].X + dx*weight, averagePoints[i].Y + dy*weight);
 			}
 			float minTop = 1080;
 			float minLeft = 1920;
@@ -139,29 +139,29 @@ namespace Irseny.Tracap {
 				Point2i leftCenter = centerPoints[labelCenterPointMap[leftPointLabel]];
 				Point2i leftIn = inPoints[labelInPointMap[leftPointLabel]];
 				var leftTranslation = new Point2i(
-					leftIn.X - leftCenter.X,
-					leftIn.Y - leftCenter.Y);
+					                      leftIn.X - leftCenter.X,
+					                      leftIn.Y - leftCenter.Y);
 				// right difference
 				Point2i rightCenter = centerPoints[labelCenterPointMap[rightPointLabel]];
 				Point2i rightIn = inPoints[labelInPointMap[rightPointLabel]];
 				var rightTranslation = new Point2i(
-					rightIn.X - rightCenter.X,
-					rightIn.Y - rightCenter.Y);
+					                       rightIn.X - rightCenter.X,
+					                       rightIn.Y - rightCenter.Y);
 				// horizontal difference
 				horizontalDelta = new Point2i(rightIn.X - leftIn.X, rightIn.Y - leftIn.Y);
 				bottomTranslation = new Point2i(
-					(leftTranslation.X + rightTranslation.X) / 2,
-					(leftTranslation.Y + rightTranslation.Y) / 2);
-				Point2i bottomIn = new Point2i((rightIn.X + leftIn.X) / 2, (rightIn.Y + leftIn.Y) / 2);
+					(leftTranslation.X + rightTranslation.X)/2,
+					(leftTranslation.Y + rightTranslation.Y)/2);
+				Point2i bottomIn = new Point2i((rightIn.X + leftIn.X)/2, (rightIn.Y + leftIn.Y)/2);
 				// vertical difference
 				verticalDelta = new Point2i(bottomIn.X - topIn.X, bottomIn.Y - topIn.Y);
 				averageTranslation = new Point2i(
-					(topTranslation.X + rightTranslation.X + leftTranslation.X) / 3,
-					(topTranslation.Y + rightTranslation.Y + leftTranslation.Y) / 3);
+					(topTranslation.X + rightTranslation.X + leftTranslation.X)/3,
+					(topTranslation.Y + rightTranslation.Y + leftTranslation.Y)/3);
 			}
 			var result = new CapPosition();
-			result.Yaw = horizontalDelta.X; // TODO: implement usable functions
-			result.Pitch = verticalDelta.Y;
+			result.Yaw = horizontalDelta.X*0.024f; // TODO: implement usable functions
+			result.Pitch = verticalDelta.Y*0.024f;
 			return result;
 		}
 	}

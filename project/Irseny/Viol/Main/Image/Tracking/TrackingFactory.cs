@@ -10,8 +10,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		int trackerIndex;
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
-		Gdk.Pixbuf rotatedImage = null;
-		float angle = 0;
+		Gdk.Color backgroundColor = new Gdk.Color(0xFF, 0xFF, 0xFF) { Pixel = 0xFF };
 		/*string videoOutStock = "gtk-missing-image";
 		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;*/
 
@@ -21,6 +20,19 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutput");
 			Container = factory.CreateWidget("box_Root");
+			{
+				var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
+				var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
+				imgTopTarget.Pixbuf = ImageTools.Rotate(imgTopSource.Pixbuf, 0, 
+					ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source);
+				
+			}
+			{
+				var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
+				var imgSideTarget = Container.GetWidget<Gtk.Image>("img_Side");
+				imgSideTarget.Pixbuf = ImageTools.Rotate(imgSideSource.Pixbuf, 0, 
+					ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source);
+			}
 			return true;
 		}
 		protected override bool ConnectInternal() {
@@ -100,21 +112,47 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					return;
 				}
 				{
-					var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
-					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
-						imgTopSource.Pixbuf, angle, ImageTools.RotatedImageSize.Maximized,
-						ImageTools.RotatedImageAlpha.Enabled, new Gdk.Color(), rotatedImage);
 					var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
-					imgTopTarget.Pixbuf = nRotatedImage;
-					imgTopTarget.QueueDraw();
-					if (rotatedImage != nRotatedImage) {
-						if (rotatedImage != null) {
-							rotatedImage.Dispose();
-						}
-						rotatedImage = nRotatedImage;
+					var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
+					Gdk.Pixbuf rotated = ImageTools.Rotate(imgTopSource.Pixbuf, position.Yaw, 
+						                     ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
+						                     backgroundColor, imgTopTarget.Pixbuf);
+					
+					if (imgTopTarget.Pixbuf != rotated) {
+						imgTopTarget.Pixbuf.Dispose();
 					}
+					imgTopTarget.Pixbuf = rotated;
+					imgTopTarget.QueueDraw();
 				}
-				angle += 0.01f;
+				{
+					var imgSideTarget = Container.GetWidget<Gtk.Image>("img_Side");
+					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
+					Gdk.Pixbuf rotated = ImageTools.Rotate(imgSideSource.Pixbuf, position.Pitch,
+						                     ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
+						                     backgroundColor, imgSideTarget.Pixbuf);
+					if (imgSideTarget.Pixbuf != rotated) {
+						imgSideTarget.Pixbuf.Dispose();
+					}
+					imgSideTarget.Pixbuf = rotated;
+					imgSideTarget.QueueDraw();
+				}
+				{
+					string sYaw = string.Format("{0}", position.Yaw);
+					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw");
+					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_YawYaw");
+					txtYaw1.Text = sYaw;
+					txtYaw2.Text = sYaw;
+				}
+				{
+					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch");
+					txtPitch.Text = string.Format("{0}", position.Pitch);
+				}
+				{
+					string sRoll = string.Format("{0}", 0);
+					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
+					txtRoll.Text = sRoll;
+
+				}
 				/*{
 					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
 					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
@@ -133,7 +171,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 				if (imgSource.NumberOfChannels == 1 && imgSource.ElementSize == sizeof(byte)) {
 					width = imgSource.Width;
 					height = imgSource.Height;
-					totalBytes = width * height * imgSource.ElementSize;
+					totalBytes = width*height*imgSource.ElementSize;
 					if (pixelBuffer.Length < totalBytes) {
 						pixelBuffer = new byte[totalBytes];
 					}
@@ -159,8 +197,8 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					int bufferLength = pixelBuffer.Length - 1; // prevent writing outside buffer bounds
 					for (int p = 0; p < bufferLength; p++) {
 						int b = pixelBuffer[p];
-						int pixel = b << 16 | b << 8 | b;
-						Marshal.WriteInt32(target, p * 3, pixel); // works as expected, but where is the forth byte located?
+						int pixel = b<<16 | b<<8 | b;
+						Marshal.WriteInt32(target, p*3, pixel); // works as expected, but where is the forth byte located?
 					}
 					videoOut.Pixbuf = activeImage;
 					videoOut.QueueDraw();

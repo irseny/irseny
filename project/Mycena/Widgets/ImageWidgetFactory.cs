@@ -19,7 +19,9 @@ namespace Mycena {
 			string pixbufName;
 			try {
 				size = TextParseTools.ParseIconSize(properties.GetProperty("icon-size", (int)Gtk.IconSize.Button));
-				pixbufName = properties.GetProperty("pixbuf", null);
+				if (properties.TryGetProperty("pixbuf", out pixbufName)) {
+					pixbufName = TextParseTools.ParsePath(pixbufName);
+				}
 			} catch (FormatException) {
 				return null;
 			}

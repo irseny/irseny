@@ -1,7 +1,17 @@
 ﻿using System;
+using System.IO;
 
 namespace Mycena {
 	internal static class TextParseTools {
+		public static string ParsePath(string text) {
+			#if LINUX
+			return text.Replace('\\', Path.DirectorySeparatorChar);
+			#elif WINDOWS
+			return text.Replace('/', Path.DirectorySeparatorChar);
+			#else
+			return text;
+			#endif
+		}
 		public static char ParseChar(string text) {
 			if (text.Length > 0) {
 				return text[0];
@@ -217,7 +227,6 @@ namespace Mycena {
 			} else {
 				throw new FormatException(text + " can not be converted to orientation");
 			}
-
 		}
 	}
 }
