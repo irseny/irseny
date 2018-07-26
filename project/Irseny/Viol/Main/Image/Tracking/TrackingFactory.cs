@@ -148,10 +148,24 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					txtPitch.Text = string.Format("{0}", position.Pitch);
 				}
 				{
-					string sRoll = string.Format("{0}", 0);
 					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
-					txtRoll.Text = sRoll;
+					txtRoll.Text = string.Format("{0:N3}", position.Roll);
 
+				}
+				{
+					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX");
+					txtPosX.Text = string.Format("{0}", position.PosX);
+				}
+				{
+					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY");
+					txtPosY.Text = string.Format("{0}", position.PosY);
+				}
+				{
+					string sPosZ = string.Format("{0}", position.PosZ);
+					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ");
+					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZZ");
+					txtPosZ.Text = sPosZ;
+					txtPosZZ.Text = sPosZ;
 				}
 				/*{
 					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
