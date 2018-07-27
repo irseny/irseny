@@ -137,7 +137,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 					imgSideTarget.QueueDraw();
 				}
 				{
-					string sYaw = string.Format("{0}", position.Yaw);
+					string sYaw = string.Format("{0:N2}", position.Yaw);
 					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw");
 					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_YawYaw");
 					txtYaw1.Text = sYaw;
@@ -145,23 +145,23 @@ namespace Irseny.Viol.Main.Image.Tracking {
 				}
 				{
 					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch");
-					txtPitch.Text = string.Format("{0}", position.Pitch);
+					txtPitch.Text = string.Format("{0:N2}", position.Pitch);
 				}
 				{
 					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
-					txtRoll.Text = string.Format("{0:N3}", position.Roll);
+					txtRoll.Text = string.Format("{0:N2}", position.Roll);
 
 				}
 				{
 					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX");
-					txtPosX.Text = string.Format("{0}", position.PosX);
+					txtPosX.Text = string.Format("{0:N2}", position.PosX);
 				}
 				{
 					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY");
-					txtPosY.Text = string.Format("{0}", position.PosY);
+					txtPosY.Text = string.Format("{0:N2}", position.PosY);
 				}
 				{
-					string sPosZ = string.Format("{0}", position.PosZ);
+					string sPosZ = string.Format("{0:N2}", position.PosZ);
 					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ");
 					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZZ");
 					txtPosZ.Text = sPosZ;

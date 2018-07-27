@@ -124,8 +124,39 @@ namespace Irseny.Tracap {
 			}
 		}
 		private CapPosition EstimatePose() {
+			var result = new CapPosition();
+			Point2i tPos, rPos, lPos, bMid;
+			Point2i tDelta, rDelta, lDelta, bDelta, mDelta; // position relative to centered
+			{ // position
+				Point2i tCenter = centerPoints[labelCenterPointMap[topPointLabel]];
+				tPos = inPoints[labelInPointMap[topPointLabel]];
+				tDelta = new Point2i(tPos.X - tCenter.X, tPos.Y - tCenter.Y);
+				Point2i lCenter = centerPoints[labelCenterPointMap[leftPointLabel]];
+				lPos = inPoints[labelInPointMap[leftPointLabel]];
+				lDelta = new Point2i(lPos.X - lCenter.X, lPos.Y - lCenter.Y);
+				Point2i rCenter = centerPoints[labelCenterPointMap[rightPointLabel]];
+				rPos = inPoints[labelInPointMap[rightPointLabel]];
+				rDelta = new Point2i(rPos.X - rCenter.X, rPos.Y - rCenter.Y);
+				bDelta = new Point2i((lDelta.X + rDelta.X)/2, (lDelta.Y + rDelta.Y)/2);
+				bMid = new Point2i((rPos.X + lPos.X)/2, (rPos.Y + lPos.Y)/2);
+				Point2i pMid = new Point2i((rPos.X + lPos.X + tPos.X)/3, (rPos.Y + lPos.Y + tPos.Y)/3);
+				Point2i refMid = new Point2i((tCenter.X + lCenter.X + rCenter.X)/3, (tCenter.Y + lCenter.Y + rCenter.Y)/3);
+				mDelta = new Point2i(pMid.X - refMid.X, pMid.Y - refMid.Y);
+			}
+			{
+				result.PosX = tDelta.X*0.02f;
+				result.PosY = tDelta.Y*0.02f;
+			}
+			{
+				Point2i bRelDelta = new Point2i(bDelta.X - tDelta.X, bDelta.Y - tDelta.Y);
+				result.Yaw = -bRelDelta.X*0.02f;
+				result.Pitch = bRelDelta.Y*0.02f;
+			}
+			return result;
 
-			Point2i bottomTranslation; // average bottom point movement
+
+
+			/*Point2i bottomTranslation; // average bottom point movement
 			Point2i horizontalDelta; // bottom point distance
 			Point2i topTranslation; // top point movement
 			Point2i verticalDelta; // distance bottom to top
@@ -162,7 +193,7 @@ namespace Irseny.Tracap {
 			var result = new CapPosition();
 			result.Yaw = horizontalDelta.X*0.024f; // TODO: implement usable functions
 			result.Pitch = verticalDelta.Y*0.024f;
-			return result;
+			return result;*/
 		}
 	}
 }
