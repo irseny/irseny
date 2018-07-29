@@ -7,34 +7,39 @@ using Size2i = System.Drawing.Size;
 
 namespace Irseny.Tracap {
 	public class BasicPoseEstimator {
+		const int TopPointIndex = 0;
+		const int RightPointIndex = 1;
+		const int LeftPointIndex = 2;
+		const int AcceptedPointNo = 3;
+
 		IBasicPoseEstimatorOptions options;
 		Point2i[] inPoints;
 		int[] inLabels;
-		int[] labelInPointMap;
-		Point2f[] averagePoints;
-		int[] labelAveragePointMap;
 		Point2i[] centerPoints;
-		int[] labelCenterPointMap;
 
 		int topPointLabel;
 		int rightPointLabel;
 		int leftPointLabel;
-		LinkedList<CapPosition> poseHistory = new LinkedList<CapPosition>();
+
+		LinkedList<CapPosition> positionHistory = new LinkedList<CapPosition>();
 
 		public BasicPoseEstimator(IBasicPoseEstimatorOptions options) {
 			this.options = options;
-
-			this.labelInPointMap = new int[0];
-			this.averagePoints = new Point2f[0];
-			this.labelAveragePointMap = new int[0];
+			this.inPoints = new Point2i[0];
+			this.inLabels = new int[0];
 			this.centerPoints = new Point2i[0];
-			this.labelCenterPointMap = new int[0];
+			this.topPointLabel = -1;
+			this.rightPointLabel = -1;
+			this.leftPointLabel = -1;
 
 		}
-		private CapPosition LastPose {
+		public bool Centered {
+			get { return topPointLabel > -1 && rightPointLabel > -1 && leftPointLabel > -1; }
+		}
+		private CapPosition LastPosition {
 			get {
-				if (poseHistory.Count > 0) {
-					return poseHistory.Last.Value;
+				if (positionHistory.Count > 0) {
+					return positionHistory.Last.Value;
 				} else {
 					return new CapPosition();
 				}
@@ -42,100 +47,119 @@ namespace Irseny.Tracap {
 		}
 		public CapPosition Estimate(Point2i[] points, int[] labels, int pointNo) {
 			if (!Setup(points, labels, pointNo)) {
-				return LastPose;
+				return LastPosition;
 			}
-			ClassifyPoints();
-			// TODO: smooth with history
-			CapPosition pose = EstimatePose();
-			return pose;
+			if (!Centered) {
+				if (!Center()) {
+					return LastPosition;
+				}
+			}
+
+			CapPosition position = EstimatePosition();
+			position = RegisterPosition(position);
+			return position;
 		}
 		public bool Center() {
-			if (averagePoints.Length < 3 || centerPoints.Length < 3) {
+			topPointLabel = -1;
+			leftPointLabel = -1;
+			rightPointLabel = -1;
+			// break if not enough information available
+			// assumes that the labels are also set correctly
+			if (inPoints.Length != AcceptedPointNo) {
 				return false;
 			}
-			for (int i = 0; i < 3; i++) {
-				Point2f source = inPoints[labelInPointMap[i]];
-				// put point iwth label i at index i
-				centerPoints[i] = new Point2i((int)source.X, (int)source.Y);
-				labelCenterPointMap[i] = i;
+			if (centerPoints.Length < AcceptedPointNo) {
+				centerPoints = new Point2i[AcceptedPointNo];
 			}
+			// classify points
+			// associate required point names with labels
+			// maximum expected image extends
+			int minTop = 1080;
+			int minLeft = 1920;
+			int minRight = 0;
+			for (int i = 0; i < AcceptedPointNo; i++) {
+				if (inPoints[i].Y < minTop) {
+					topPointLabel = inLabels[i];
+					centerPoints[TopPointIndex] = inPoints[i];
+					minTop = inPoints[i].Y;
+				}
+				if (inPoints[i].X < minLeft) {
+					leftPointLabel = inLabels[i];
+					centerPoints[LeftPointIndex] = inPoints[i];
+					minLeft = inPoints[i].X;
+				}
+				if (inPoints[i].X > minRight) {
+					rightPointLabel = inLabels[i];
+					centerPoints[RightPointIndex] = inPoints[i];
+					minRight = inPoints[i].X;
+				}
+			}
+			// break if labels can not be set uniquely or some points are not usable
+			if (topPointLabel == leftPointLabel || topPointLabel == rightPointLabel || leftPointLabel == rightPointLabel ||
+				topPointLabel < 0 || leftPointLabel < 0 || rightPointLabel < 0) {
+				topPointLabel = -1;
+				leftPointLabel = -1;
+				rightPointLabel = -1;
+				return false;
+			}
+			// bring points into default order
+			// create copy to not read and write from inPoints/inLabels
+			MakeDefaultOrdering((Point2i[])inPoints.Clone(), (int[])inLabels.Clone());
 			return true;
 		}
-		private bool Setup(Point2i[] points, int[] labels, int pointNo) {
-			if (pointNo != 3) {
-				return false;
-			}
-			if (averagePoints.Length != 3) {
-				averagePoints = new Point2f[3];
-				labelAveragePointMap = new int[3];
-				for (int i = 0; i < 3; i++) {
-					// put point with label i at index i
-					averagePoints[i] = new Point2f(0, 0);
-					labelAveragePointMap[i] = i;
+		private void MakeDefaultOrdering(Point2i[] points, int[] labels) {
+			// sort with respect to constant label-index order
+			for (int i = 0; i < AcceptedPointNo; i++) {
+				if (labels[i] == topPointLabel) {
+					inPoints[TopPointIndex] = points[i];
+					inLabels[TopPointIndex] = topPointLabel;
+				} else if (labels[i] == leftPointLabel) {
+					inPoints[LeftPointIndex] = points[i];
+					inLabels[LeftPointIndex] = leftPointLabel;
+				} else if (labels[i] == rightPointLabel) {
+					inPoints[RightPointIndex] = points[i];
+					inLabels[RightPointIndex] = rightPointLabel;
+				} else {
+					throw new ArgumentException("labels: Unknown label: " + labels[i]);
 				}
 
 			}
-			inPoints = points;
-			inLabels = labels;
-			if (labelInPointMap.Length != 3) {
-				labelInPointMap = new int[3];
+		}
+		private bool Setup(Point2i[] points, int[] labels, int pointNo) {
+			if (pointNo != AcceptedPointNo) {
+				return false;
 			}
-			for (int i = 0; i < 3; i++) {
-				// updated every frame, point with label i can have variable index
-				labelInPointMap[inLabels[i]] = i;
+			if (inPoints.Length != AcceptedPointNo) {
+				inPoints = new Point2i[AcceptedPointNo];
+				inLabels = new int[AcceptedPointNo];
 			}
-			if (centerPoints.Length != 3) {
-				centerPoints = new Point2i[3];
-				labelCenterPointMap = new int[3];
-				for (int i = 0; i < 3; i++) {
-					// put point with label i at index i
-					centerPoints[i] = inPoints[labelInPointMap[i]];
-					labelCenterPointMap[i] = i;
+			if (Centered) {
+				MakeDefaultOrdering(points, labels);
+			} else {
+				// just copy the input for classification
+				for (int i = 0; i < AcceptedPointNo; i++) {
+					inPoints[i] = points[i];
+					inLabels[i] = labels[i];
+				}
+				if (!Center()) {
+					return false;
 				}
 			}
 			return true;
 		}
-		private void ClassifyPoints() {
-			float weight = options.PointFrameLocationWeight;
-			for (int i = 0; i < 3; i++) {
-				float dx = inPoints[i].X - averagePoints[i].X;
-				float dy = inPoints[i].Y - averagePoints[i].Y;
-				averagePoints[i] = new Point2f(averagePoints[i].X + dx*weight, averagePoints[i].Y + dy*weight);
-			}
-			float minTop = 1080;
-			float minLeft = 1920;
-			float minRight = 0;
-			topPointLabel = -1;
-			rightPointLabel = -1;
-			leftPointLabel = -1;
-			for (int i = 0; i < 3; i++) {
-				if (averagePoints[i].Y < minTop) {
-					topPointLabel = inLabels[i];
-					minTop = averagePoints[i].Y;
-				}
-				if (averagePoints[i].X < minLeft) {
-					leftPointLabel = inLabels[i];
-					minLeft = averagePoints[i].X;
-				}
-				if (averagePoints[i].X > minRight) {
-					rightPointLabel = inLabels[i];
-					minRight = averagePoints[i].X;
-				}
-			}
-		}
-		private CapPosition EstimatePose() {
+		private CapPosition EstimatePosition() {
 			var result = new CapPosition();
 			Point2i tPos, rPos, lPos, bMid;
 			Point2i tDelta, rDelta, lDelta, bDelta, mDelta; // position relative to centered
 			{ // position
-				Point2i tCenter = centerPoints[labelCenterPointMap[topPointLabel]];
-				tPos = inPoints[labelInPointMap[topPointLabel]];
+				Point2i tCenter = centerPoints[TopPointIndex];
+				tPos = inPoints[TopPointIndex];
 				tDelta = new Point2i(tPos.X - tCenter.X, tPos.Y - tCenter.Y);
-				Point2i lCenter = centerPoints[labelCenterPointMap[leftPointLabel]];
-				lPos = inPoints[labelInPointMap[leftPointLabel]];
+				Point2i lCenter = centerPoints[LeftPointIndex];
+				lPos = inPoints[LeftPointIndex];
 				lDelta = new Point2i(lPos.X - lCenter.X, lPos.Y - lCenter.Y);
-				Point2i rCenter = centerPoints[labelCenterPointMap[rightPointLabel]];
-				rPos = inPoints[labelInPointMap[rightPointLabel]];
+				Point2i rCenter = centerPoints[RightPointIndex];
+				rPos = inPoints[RightPointIndex];
 				rDelta = new Point2i(rPos.X - rCenter.X, rPos.Y - rCenter.Y);
 				bDelta = new Point2i((lDelta.X + rDelta.X)/2, (lDelta.Y + rDelta.Y)/2);
 				bMid = new Point2i((rPos.X + lPos.X)/2, (rPos.Y + lPos.Y)/2);
@@ -153,47 +177,13 @@ namespace Irseny.Tracap {
 				result.Pitch = bRelDelta.Y*0.02f;
 			}
 			return result;
+		}
 
-
-
-			/*Point2i bottomTranslation; // average bottom point movement
-			Point2i horizontalDelta; // bottom point distance
-			Point2i topTranslation; // top point movement
-			Point2i verticalDelta; // distance bottom to top
-			Point2i averageTranslation; // point movement
-			{
-				// translation
-				Point2i topCenter = centerPoints[labelCenterPointMap[topPointLabel]];
-				Point2i topIn = inPoints[labelInPointMap[topPointLabel]];
-				topTranslation = new Point2i(topIn.X - topCenter.X, topIn.Y - topCenter.Y);
-				// left difference
-				Point2i leftCenter = centerPoints[labelCenterPointMap[leftPointLabel]];
-				Point2i leftIn = inPoints[labelInPointMap[leftPointLabel]];
-				var leftTranslation = new Point2i(
-					                      leftIn.X - leftCenter.X,
-					                      leftIn.Y - leftCenter.Y);
-				// right difference
-				Point2i rightCenter = centerPoints[labelCenterPointMap[rightPointLabel]];
-				Point2i rightIn = inPoints[labelInPointMap[rightPointLabel]];
-				var rightTranslation = new Point2i(
-					                       rightIn.X - rightCenter.X,
-					                       rightIn.Y - rightCenter.Y);
-				// horizontal difference
-				horizontalDelta = new Point2i(rightIn.X - leftIn.X, rightIn.Y - leftIn.Y);
-				bottomTranslation = new Point2i(
-					(leftTranslation.X + rightTranslation.X)/2,
-					(leftTranslation.Y + rightTranslation.Y)/2);
-				Point2i bottomIn = new Point2i((rightIn.X + leftIn.X)/2, (rightIn.Y + leftIn.Y)/2);
-				// vertical difference
-				verticalDelta = new Point2i(bottomIn.X - topIn.X, bottomIn.Y - topIn.Y);
-				averageTranslation = new Point2i(
-					(topTranslation.X + rightTranslation.X + leftTranslation.X)/3,
-					(topTranslation.Y + rightTranslation.Y + leftTranslation.Y)/3);
-			}
-			var result = new CapPosition();
-			result.Yaw = horizontalDelta.X*0.024f; // TODO: implement usable functions
-			result.Pitch = verticalDelta.Y*0.024f;
-			return result;*/
+		private CapPosition RegisterPosition(CapPosition position) {
+			positionHistory.Clear();
+			positionHistory.AddLast(position);
+			// TODO: smooth with history
+			return position;
 		}
 	}
 }

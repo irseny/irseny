@@ -21,7 +21,14 @@ namespace Irseny.Tracap {
 			this.pointLabeler = new PointLabeler(this.options);
 			this.poseEstimator = new BasicPoseEstimator(this.options);
 		}
-
+		public override bool Centered {
+			get {
+				return poseEstimator.Centered;
+			}
+		}
+		public override bool Center() {
+			return poseEstimator.Center();
+		}
 		public override bool Start() {
 			Running = true;
 			pointDetector = new KeypointDetector(options);

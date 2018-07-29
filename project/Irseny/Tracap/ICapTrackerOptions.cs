@@ -3,7 +3,7 @@ using Size2i = System.Drawing.Size;
 
 namespace Irseny.Tracap {
 	public interface ICapTrackerOptions {
-		
+
 
 		/// <summary>
 		/// Gets the amount of smoothing to apply to detected head positions.
@@ -22,19 +22,22 @@ namespace Irseny.Tracap {
 		/// </summary>
 		/// <value>The maximum number of images queued at a time.</value>
 		int MaxQueuedImages { get; }
-
 		/// <summary>
 		/// Gets the number of capture streams to retrieve images from.
 		/// </summary>
 		/// <value>The stream number.</value>
 		int StreamNo { get; }
 		/// <summary>
+		/// Gets the identifier of the cap model.
+		/// </summary>
+		/// <value>The model identifier.</value>
+		int ModelId { get; }
+		/// <summary>
 		/// Gets the id of a capture stream that was previously added.
 		/// </summary>
 		/// <returns>The stream identifier.</returns>
 		/// <param name="index">Index.</param>
 		int GetStreamId(int index);
-
 		/// <summary>
 		/// Adds the given id of a capture stream for image retrieval.
 		/// </summary>
