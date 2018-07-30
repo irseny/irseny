@@ -14,6 +14,7 @@ namespace Irseny.Tracap {
 		~CapTracker() {
 			Dispose();
 		}
+		public abstract bool Centered { get; }
 		public virtual bool Running { get; protected set; }
 		public event EventHandler<PositionDetectedEventArgs> PositionDetected {
 			add {
@@ -115,6 +116,7 @@ namespace Irseny.Tracap {
 				stopped = null;
 			}
 		}
+		public abstract bool Center();
 		public abstract bool Start();
 		public abstract bool Step();
 		public abstract bool Stop();
