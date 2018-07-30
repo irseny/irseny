@@ -59,7 +59,7 @@ namespace Irseny {
 					stopped = true;
 				};
 				GLib.ExceptionManager.UnhandledException += (GLib.UnhandledExceptionArgs e) => {
-					Debug.WriteLine(e.ExceptionObject.ToString());
+					LogManager.Instance.Log(LogMessage.CreateError(e.ExceptionObject, e.ExceptionObject.ToString()));
 					e.ExitApplication = false;
 				};
 

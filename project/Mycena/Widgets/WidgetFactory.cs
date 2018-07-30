@@ -17,6 +17,7 @@ namespace Mycena {
 			widgets.Add("GtkImage", new ImageWidgetFactory());
 
 			widgets.Add("GtkScrolledWindow", new ScrolledWindowFactory());
+			widgets.Add("GtkViewport", new ViewportFactory());
 			widgets.Add("GtkWindow", new WindowFactory());
 			widgets.Add("GtkBox", new BoxFactory());
 			widgets.Add("GtkHBox", new HorizontalBoxFactory());
@@ -158,6 +159,7 @@ namespace Mycena {
 			}
 		}
 	}
+
 	internal abstract class WidgetFactory<T> : IWidgetFactory where T : Gtk.Widget {
 
 
@@ -193,7 +195,7 @@ namespace Mycena {
 				throw new ArgumentException("rootNode: Not an object node: " + rootNode.OuterXml);
 			}
 			var idAttr = rootNode.Attributes["id"]; // may be null
-													// creation property pass
+			// creation property pass
 			var creationProperties = new ConfigProperties();
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
 				if (propertyNode.Name.Equals("property")) {

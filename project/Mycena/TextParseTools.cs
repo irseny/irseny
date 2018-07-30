@@ -120,6 +120,16 @@ namespace Mycena {
 				throw new FormatException(text + " not convertible to policy type");
 			}
 		}
+		public static Gtk.ScrollablePolicy ParseScrollablePolicy(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("minimum")) {
+				return Gtk.ScrollablePolicy.Minimum;
+			} else if (text.Equals("natural")) {
+				return Gtk.ScrollablePolicy.Natural;
+			} else {
+				throw new FormatException(text + " not converticable to scrollable policy");
+			}
+		}
 		public static Gtk.IconSize ParseIconSize(string text) {
 			int value;
 			if (int.TryParse(text, out value)) {

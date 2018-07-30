@@ -20,7 +20,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Passive, -1);
 			});
 
-			var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Capture");
+			var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Start");
 			/*btnCapture.Toggled += delegate {
 				if (btnCapture.Active) {
 					StartCapture();
