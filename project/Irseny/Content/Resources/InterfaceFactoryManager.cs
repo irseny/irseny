@@ -9,16 +9,16 @@ namespace Irseny.Content.Resources {
 			string[] entryNames = new string[] {
 				"Main",
 				"Log",
-				"Output",
-				"CameraOutputBase",
-				"CameraOutput",
+				"Display",
+				"CameraDisplay",
+				"WebcamDisplay",
 				"Control",
-				"CameraControlBase",
 				"CameraControl",
-				"TrackingControlBase",
+				"WebcamControl",
 				"TrackingControl",
-				"TrackingOutputBase",
-				"TrackingOutput"
+				"CapTrackingControl",
+				"TrackingDisplay",
+				"CapTrackingDisplay"
 			};
 			for (int i = 0; i < entryNames.Length; i++) {
 				var stock = ContentMaster.Instance.Resources.InterfaceStock.GetEntry("Main"); // load this first

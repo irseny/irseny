@@ -33,18 +33,18 @@ namespace Irseny {
 			{
 				var mainFactory = new Viol.MainFactory();
 				var logFactory = new Viol.Main.Log.MainFactory();
-				var controlFactory = new Viol.Main.Control.MainFactory();
-				var imageFactory = new Viol.Main.Image.MainFactory();
+				var controlFactory = new Viol.Main.Control.ControlFactory();
+				var imageFactory = new Irseny.Viol.Main.Display.DisplayFactory();
 				mainFactory.ConstructFloor("Log", logFactory);
 				mainFactory.ConstructFloor("Control", controlFactory);
 				mainFactory.ConstructFloor("Output", imageFactory);
-				var cameraControlFactory = new Viol.Main.Control.Camera.CameraBaseFactory();
+				var cameraControlFactory = new Viol.Main.Control.Camera.CameraFactory();
 				controlFactory.ConstructFloor("Camera", cameraControlFactory);
-				var trackingControlFactory = new Viol.Main.Control.Tracking.TrackingBaseFactory();
+				var trackingControlFactory = new Viol.Main.Control.Tracking.TrackingFactory();
 				controlFactory.ConstructFloor("Tracking", trackingControlFactory);
-				var cameraImageFactory = new Viol.Main.Image.Camera.CameraBaseFactory();
+				var cameraImageFactory = new Irseny.Viol.Main.Display.Camera.CameraFactory();
 				imageFactory.ConstructFloor("Camera", cameraImageFactory);
-				var trackingImageFactory = new Viol.Main.Image.Tracking.TrackingBaseFactory();
+				var trackingImageFactory = new Irseny.Viol.Main.Display.Tracking.TrackingFactory();
 				imageFactory.ConstructFloor("Tracking", trackingImageFactory);
 
 				if (!mainFactory.Init(Viol.InterfaceFactoryState.Connected)) {

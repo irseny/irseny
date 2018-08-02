@@ -6,20 +6,20 @@ using Irseny.Util;
 using Irseny.Content;
 using Irseny.Listing;
 
-namespace Irseny.Viol.Main.Image.Camera {
-	public class CameraFactory : InterfaceFactory {
+namespace Irseny.Viol.Main.Display.Camera {
+	public class WebcamFactory : InterfaceFactory {
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
 		//string videoOutStock = "gtk-missing-image";
 		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
 		private readonly int index;
-		public CameraFactory(int index) : base() {
+		public WebcamFactory(int index) : base() {
 			this.index = index;
 		}
 
 
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraOutput");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamDisplay");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -77,10 +77,10 @@ namespace Irseny.Viol.Main.Image.Camera {
 			bool pixelsAvailable = false;
 			using (var imgRef = args.ColorImage) {
 				var imgSource = imgRef.Reference;
-				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte) * 3 && imgSource.DataPointer != IntPtr.Zero) {
+				if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte)*3 && imgSource.DataPointer != IntPtr.Zero) {
 					width = imgSource.Width;
 					height = imgSource.Height;
-					totalBytes = width * height * imgSource.ElementSize * sizeof(byte);
+					totalBytes = width*height*imgSource.ElementSize*sizeof(byte);
 					if (pixelBuffer.Length < totalBytes) {
 						pixelBuffer = new byte[totalBytes];
 					}

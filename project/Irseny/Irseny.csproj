@@ -21,11 +21,7 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -41,12 +37,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>..\..\maketools\copylibs.bat ${TargetDir}</command>
-          <workingdir>${SolutionDir}\..\maketools</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
+        <Command type="AfterBuild" command="..\..\maketools\copylibs.bat ${TargetDir}" workingdir="${SolutionDir}\..\maketools" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -59,11 +50,7 @@
     <WarningLevel>4</WarningLevel>
     <CustomCommands>
       <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
+        <Command type="AfterBuild" command="cp -u &quot;lib/External/libcvextern.so&quot; &quot;${TargetDir}&quot;" workingdir="${SolutionDir}/../" />
       </CustomCommands>
     </CustomCommands>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
@@ -88,13 +75,13 @@
     <Reference Include="gdk-sharp">
       <HintPath>..\..\lib\Common\gdk-sharp.dll</HintPath>
     </Reference>
-	<Reference Include="atk-sharp">
+    <Reference Include="atk-sharp">
       <HintPath>..\..\lib\Common\atk-sharp.dll</HintPath>
     </Reference>
     <Reference Include="glib-sharp">
       <HintPath>..\..\lib\Common\glib-sharp.dll</HintPath>
     </Reference>
-	<Reference Include="gio-sharp">
+    <Reference Include="gio-sharp">
       <HintPath>..\..\lib\Common\gio-sharp.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.World">
@@ -119,7 +106,6 @@
     <Compile Include="Capture\Video\CaptureProperty.cs" />
     <Compile Include="Content\ContentManager.cs" />
     <Compile Include="Content\ContentMaster.cs" />
-    <Compile Include="Viol\Main\Control\MainFactory.cs" />
     <Compile Include="Viol\Main\Log\MainFactory.cs" />
     <Compile Include="Log\LogManager.cs" />
     <Compile Include="Log\LogMessage.cs" />
@@ -129,17 +115,10 @@
     <Compile Include="Listing\EquipmentManager.cs" />
     <Compile Include="Listing\EquipmentUpdateArgs.cs" />
     <Compile Include="Listing\EquipmentState.cs" />
-    <Compile Include="Viol\Main\Image\MainFactory.cs" />
-    <Compile Include="Viol\Main\Control\Camera\CameraFactory.cs" />
-    <Compile Include="Viol\Main\Image\Camera\CameraFactory.cs" />
-    <Compile Include="Viol\Main\Image\Camera\CameraBaseFactory.cs" />
-    <Compile Include="Viol\Main\Control\Camera\CameraBaseFactory.cs" />
     <Compile Include="Tracap\DetectionSystem.cs" />
     <Compile Include="Tracap\ImageProcessedEventArgs.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Tracap\Basic3PointCapTracker.cs" />
-    <Compile Include="Viol\Main\Control\Tracking\TrackingBaseFactory.cs" />
-    <Compile Include="Viol\Main\Control\Tracking\TrackingFactory.cs" />
     <Compile Include="Extrack\Artf.cs" />
     <Compile Include="Tracap\IPoseDetector.cs" />
     <Compile Include="Tracap\ISingleImageCapTracker.cs" />
@@ -152,8 +131,6 @@
     <Compile Include="Util\SharedRefCleaner.cs" />
     <Compile Include="Capture\Video\StreamEventArgs.cs" />
     <Compile Include="Capture\Video\ImageCapturedEventArgs.cs" />
-    <Compile Include="Viol\Main\Image\Tracking\TrackingBaseFactory.cs" />
-    <Compile Include="Viol\Main\Image\Tracking\TrackingFactory.cs" />
     <Compile Include="Tracap\PositionDetectedEventArgs.cs" />
     <Compile Include="Tracap\Basic3PointOptions.cs" />
     <Compile Include="Tracap\KeypointDetector.cs" />
@@ -165,6 +142,16 @@
     <Compile Include="Tracap\BasicPoseEstimator.cs" />
     <Compile Include="Util\ImageTools.cs" />
     <Compile Include="Content\Resources\InterfaceStockManager.cs" />
+    <Compile Include="Viol\Main\Control\Camera\WebcamFactory.cs" />
+    <Compile Include="Viol\Main\Control\Camera\CameraFactory.cs" />
+    <Compile Include="Viol\Main\Control\Tracking\CapTrackingFactory.cs" />
+    <Compile Include="Viol\Main\Control\Tracking\TrackingFactory.cs" />
+    <Compile Include="Viol\Main\Display\Camera\WebcamFactory.cs" />
+    <Compile Include="Viol\Main\Display\Camera\CameraFactory.cs" />
+    <Compile Include="Viol\Main\Display\Tracking\CapTrackingFactory.cs" />
+    <Compile Include="Viol\Main\Display\Tracking\TrackingFactory.cs" />
+    <Compile Include="Viol\Main\Display\DisplayFactory.cs" />
+    <Compile Include="Viol\Main\Control\ControlFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -179,13 +166,14 @@
     <Folder Include="Viol\Main\Control\Camera\" />
     <Folder Include="Log\" />
     <Folder Include="Listing\" />
-    <Folder Include="Viol\Main\Image\" />
-    <Folder Include="Viol\Main\Image\Camera\" />
     <Folder Include="Tracap\" />
     <Folder Include="Util\" />
     <Folder Include="Viol\Main\Control\Tracking\" />
     <Folder Include="Extrack\" />
-    <Folder Include="Viol\Main\Image\Tracking\" />
+    <Folder Include="Viol\Main\Display\" />
+    <Folder Include="Viol\Main\Display\Camera\" />
+    <Folder Include="Viol\Main\Display\Tracking\" />
+    <Folder Include="Viol\Main\Control\Output\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

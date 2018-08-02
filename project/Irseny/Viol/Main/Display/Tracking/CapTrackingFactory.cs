@@ -5,8 +5,8 @@ using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Util;
 
-namespace Irseny.Viol.Main.Image.Tracking {
-	public class TrackingFactory : InterfaceFactory {
+namespace Irseny.Viol.Main.Display.Tracking {
+	public class CapTrackingFactory : InterfaceFactory {
 		int trackerIndex;
 		byte[] pixelBuffer = new byte[0];
 		Gdk.Pixbuf activeImage = null;
@@ -14,11 +14,11 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		/*string videoOutStock = "gtk-missing-image";
 		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;*/
 
-		public TrackingFactory(int trackerIndex) : base() {
+		public CapTrackingFactory(int trackerIndex) : base() {
 			this.trackerIndex = trackerIndex;
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutput");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingDisplay");
 			Container = factory.CreateWidget("box_Root");
 			{
 				var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");

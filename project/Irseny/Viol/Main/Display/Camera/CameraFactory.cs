@@ -3,12 +3,12 @@ using System.Diagnostics;
 using Irseny.Content;
 using Irseny.Listing;
 
-namespace Irseny.Viol.Main.Image.Camera {
-	public class CameraBaseFactory : InterfaceFactory {
-		public CameraBaseFactory() : base() {
+namespace Irseny.Viol.Main.Display.Camera {
+	public class CameraFactory : InterfaceFactory {
+		public CameraFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraOutputBase");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraDisplay");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -55,7 +55,7 @@ namespace Irseny.Viol.Main.Image.Camera {
 		public bool AddCamera() {
 			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
 			int page = ntbCamera.NPages;
-			var factory = new Camera.CameraFactory(page);
+			var factory = new Irseny.Viol.Main.Display.Camera.WebcamFactory(page);
 			ConstructFloor(string.Format("Camera{0}", page), factory);
 			var boxInner = factory.Container.GetWidget("box_Root");
 			var label = new Gtk.Label(string.Format("Cam{0}", page));

@@ -2,12 +2,13 @@
 using System.Diagnostics;
 using Irseny.Content;
 using Irseny.Listing;
-namespace Irseny.Viol.Main.Image.Tracking {
-	public class TrackingBaseFactory : InterfaceFactory {
-		public TrackingBaseFactory() : base() {
+
+namespace Irseny.Viol.Main.Display.Tracking {
+	public class TrackingFactory : InterfaceFactory {
+		public TrackingFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingOutputBase");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingDisplay");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -53,7 +54,7 @@ namespace Irseny.Viol.Main.Image.Tracking {
 		private bool AddTracker() {
 			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
 			int page = ntbTracker.NPages;
-			var factory = new TrackingFactory(page);
+			var factory = new CapTrackingFactory(page);
 			ConstructFloor("Track" + page, factory);
 			var boxTracker = factory.Container.GetWidget("box_Root");
 			var label = new Gtk.Label("Track" + page);
