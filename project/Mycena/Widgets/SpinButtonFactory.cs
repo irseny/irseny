@@ -11,7 +11,8 @@ namespace Mycena {
 			CreationProperties.Add("numeric", SetNumeric);
 		}
 		protected override Gtk.SpinButton CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
-			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
+			string adjName = properties.GetProperty("adjustment", AdjustmentFactory.DefaultAdjustment);
+			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(adjName, container);
 			double climb;
 			uint digits;
 			try {

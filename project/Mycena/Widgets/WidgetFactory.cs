@@ -20,10 +20,7 @@ namespace Mycena {
 			widgets.Add("GtkViewport", new ViewportFactory());
 			widgets.Add("GtkWindow", new WindowFactory());
 			widgets.Add("GtkBox", new BoxFactory());
-			widgets.Add("GtkHBox", new HorizontalBoxFactory());
-			widgets.Add("GtkVBox", new VerticalBoxFactory());
-			widgets.Add("GtkHPaned", new HorizontalPanedFactory());
-			widgets.Add("GtkVPaned", new VerticalPanedFactory());
+			widgets.Add("GtkPaned", new PanedFactory());
 			widgets.Add("GtkTable", new TableFactory());
 			widgets.Add("GtkGrid", new GridFactory());
 			widgets.Add("GtkNotebook", new NotebookFactory());
@@ -31,8 +28,7 @@ namespace Mycena {
 			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
 			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
 
-			widgets.Add("GtkHScale", new HorizontalScaleFactory());
-			widgets.Add("GtkVScale", new VerticalScaleFactory());
+			widgets.Add("GtkScale", new ScaleFactory());
 
 			widgets.Add("GtkTextView", new TextViewFactory());
 			widgets.Add("GtkLabel", new LabelFactory());
@@ -43,7 +39,7 @@ namespace Mycena {
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 			widgets.Add("GtkSpinButton", new SpinButtonFactory());
 
-			widgets.Add("GtkComboBoxText", new ComboBoxFactory());
+			widgets.Add("GtkComboBoxText", new ComboBoxTextFactory());
 		}
 		/// <summary>
 		/// Gets the stock resources for widget creation.

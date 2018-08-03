@@ -36,7 +36,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			return true;
 		}
 		public bool AddTracker() {
-			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages;
 			// create and append
 			if (page < 10) {
@@ -54,7 +54,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 			}
 		}
 		public bool RemoveTracker() {
-			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages - 1;
 			// remove last
 			if (page > -1) {

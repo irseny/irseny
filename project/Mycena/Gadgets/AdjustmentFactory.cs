@@ -2,6 +2,7 @@
 
 namespace Mycena {
 	internal class AdjustmentFactory : GadgetFactory<Gtk.Adjustment> {
+		public const string DefaultAdjustment = "adj_Default";
 		public AdjustmentFactory() : base() {
 
 		}
@@ -19,18 +20,6 @@ namespace Mycena {
 			}
 			return new Gtk.Adjustment(value, lower, upper, stepInc, pageInc, pageSize);
 
-		}
-		public static Gtk.Adjustment GetAdjustment(ConfigProperties properties, IInterfaceNode container) {
-			string adjName;
-			if (!properties.TryGetProperty("adjustment", out adjName)) {
-				adjName = "adj_Default";
-			}
-			Gtk.Adjustment result;
-			if (!container.TryGetGadget(adjName, out result)) {
-				result = new Gtk.Adjustment(0, 0, 10, 1, 10, 0);
-				container.RegisterGadget(adjName, result);
-			}
-			return result;
 		}
 		public static Gtk.Adjustment GetAdjustment(string adjustment, IInterfaceNode container) {
 			Gtk.Adjustment result;

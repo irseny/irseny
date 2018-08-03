@@ -9,13 +9,13 @@ namespace Irseny.Viol.Main.Display.Tracking {
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingDisplay");
-			Container = factory.CreateWidget("box_Root");
+			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
-			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain, true, true, 0);
+			var ntbMain = Container.GetWidget("ntb_Root");
+			boxRoot.PackStart(ntbMain, true, true, 0);
 			EquipmentMaster.Instance.HeadTracker.Updated += TrackerChanged;
 			return true;
 		}
@@ -24,8 +24,8 @@ namespace Irseny.Viol.Main.Display.Tracking {
 			while (RemoveTracker()) {
 			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
-			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.Remove(boxMain);
+			var ntbMain = Container.GetWidget("ntb_Root");
+			boxRoot.Remove(ntbMain);
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -36,7 +36,7 @@ namespace Irseny.Viol.Main.Display.Tracking {
 			if (!Initialized) {
 				return;
 			}
-			var ntbTrackers = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
+			var ntbTrackers = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			if (args.Missing) {
 				if (args.Index == ntbTrackers.NPages - 1) {
 					RemoveTracker();
@@ -52,7 +52,7 @@ namespace Irseny.Viol.Main.Display.Tracking {
 			}
 		}
 		private bool AddTracker() {
-			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages;
 			var factory = new CapTrackingFactory(page);
 			ConstructFloor("Track" + page, factory);
@@ -64,7 +64,7 @@ namespace Irseny.Viol.Main.Display.Tracking {
 			return true;
 		}
 		private bool RemoveTracker() {
-			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Tracker");
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages - 1;
 			if (page > -1) {
 				ntbTracker.RemovePage(page);

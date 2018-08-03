@@ -152,6 +152,10 @@
     <Compile Include="Viol\Main\Display\Tracking\TrackingFactory.cs" />
     <Compile Include="Viol\Main\Display\DisplayFactory.cs" />
     <Compile Include="Viol\Main\Control\ControlFactory.cs" />
+    <Compile Include="Viol\Main\Control\Output\OutputFactory.cs" />
+    <Compile Include="Viol\Main\Control\Output\OutputDeviceFactory.cs" />
+    <Compile Include="Viol\Main\Control\Output\OutputAssignmentFactory.cs" />
+    <Compile Include="Viol\Main\Control\Output\VirtualKeyboardFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

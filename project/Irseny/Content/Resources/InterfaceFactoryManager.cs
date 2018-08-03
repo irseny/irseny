@@ -18,7 +18,12 @@ namespace Irseny.Content.Resources {
 				"TrackingControl",
 				"CapTrackingControl",
 				"TrackingDisplay",
-				"CapTrackingDisplay"
+				"CapTrackingDisplay",
+				"OutputControl",
+				"OutputDeviceControl",
+				"VirtualKeyboardControl",
+				"OutputAssignmentControl",
+
 			};
 			for (int i = 0; i < entryNames.Length; i++) {
 				var stock = ContentMaster.Instance.Resources.InterfaceStock.GetEntry("Main"); // load this first

@@ -9,13 +9,13 @@ namespace Irseny.Viol.Main.Display.Camera {
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraDisplay");
-			Container = factory.CreateWidget("box_Root");
+			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
-			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.PackStart(boxMain, true, true, 0);
+			var ntbMain = Container.GetWidget("ntb_Root");
+			boxRoot.PackStart(ntbMain, true, true, 0);
 			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated += CameraChanged;
 			return true;
 		}
@@ -24,8 +24,8 @@ namespace Irseny.Viol.Main.Display.Camera {
 			while (RemoveCamera()) {
 			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
-			var boxMain = Container.GetWidget("box_Root");
-			boxRoot.Remove(boxMain);
+			var ntbMain = Container.GetWidget("ntb_Root");
+			boxRoot.Remove(ntbMain);
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -34,7 +34,7 @@ namespace Irseny.Viol.Main.Display.Camera {
 		}
 		private void CameraChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
 			Invoke(delegate {
-				var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+				var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 				int pages = ntbCamera.NPages;
 				if (args.Missing) {
 					if (args.Index == pages - 1) {
@@ -53,7 +53,7 @@ namespace Irseny.Viol.Main.Display.Camera {
 			});
 		}
 		public bool AddCamera() {
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbCamera.NPages;
 			var factory = new Irseny.Viol.Main.Display.Camera.WebcamFactory(page);
 			ConstructFloor(string.Format("Camera{0}", page), factory);
@@ -65,7 +65,7 @@ namespace Irseny.Viol.Main.Display.Camera {
 			return true;
 		}
 		public bool RemoveCamera() {
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbCamera.NPages - 1;
 			if (page > -1) {
 				ntbCamera.RemovePage(page);

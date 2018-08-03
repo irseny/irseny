@@ -1,10 +1,22 @@
 ﻿using System;
+
 namespace Mycena {
-	internal abstract class ScaleFactory : WidgetFactory<Gtk.Scale> {
+	internal class ScaleFactory : WidgetFactory<Gtk.Scale> {
 		public ScaleFactory() : base() {
 			CreationProperties.Add("round_digits", SetRoundDigits);
 			CreationProperties.Add("draw_value", SetDrawValue);
 
+		}
+		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			Gtk.Orientation orientation;
+			try {
+				orientation = TextParseTools.ParseOrientation(properties.GetProperty("orientation", Gtk.Orientation.Horizontal));
+			} catch (FormatException) {
+				return null;
+			}
+			string adjName = properties.GetProperty("adjustment", AdjustmentFactory.DefaultAdjustment);
+			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(adjName, container);
+			return new Gtk.Scale(orientation, adjustment);
 		}
 		private static bool SetRoundDigits(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			int digits;
@@ -27,24 +39,4 @@ namespace Mycena {
 			return true;
 		}
 	}
-	internal class HorizontalScaleFactory : ScaleFactory {
-		public HorizontalScaleFactory() : base() {
-
-		}
-		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
-			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
-			return new Gtk.HScale(adjustment);
-		}
-	}
-	internal class VerticalScaleFactory : ScaleFactory {
-		public VerticalScaleFactory() : base() {
-
-		}
-		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
-			Gtk.Adjustment adjustment = AdjustmentFactory.GetAdjustment(properties, container);
-			return new Gtk.VScale(adjustment);
-		}
-	}
-
-
 }

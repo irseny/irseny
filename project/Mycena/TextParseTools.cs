@@ -238,6 +238,22 @@ namespace Mycena {
 				throw new FormatException(text + " can not be converted to orientation");
 			}
 		}
+		public static Gtk.ShadowType ParseShadowType(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("none")) {
+				return Gtk.ShadowType.None;
+			} else if (text.Equals("in")) {
+				return Gtk.ShadowType.In;
+			} else if (text.Equals("out")) {
+				return Gtk.ShadowType.Out;
+			} else if (text.Equals("etched_in")) {
+				return Gtk.ShadowType.EtchedIn;
+			} else if (text.Equals("etched_out")) {
+				return Gtk.ShadowType.EtchedOut;
+			} else {
+				throw new FormatException(text + " can not be converted to shadow type");
+			}
+		}
 	}
 }
 

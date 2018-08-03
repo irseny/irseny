@@ -88,6 +88,7 @@
     <Compile Include="Stock\StockAccessConfig.cs" />
     <Compile Include="Stock\IInterfaceStock.cs" />
     <Compile Include="Widgets\ViewportFactory.cs" />
+    <Compile Include="Widgets\ComboBoxTextFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

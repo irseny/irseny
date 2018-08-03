@@ -8,6 +8,7 @@ namespace Mycena {
 			CreationProperties.Add("default_width", SetDefaultSize);
 			CreationProperties.Add("default_height", SetDefaultSize);
 			CreationProperties.Add("icon", SetIcon);
+			CreationProperties.Add("title", SetTitle);
 		}
 
 		protected override Gtk.Window CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
@@ -60,6 +61,13 @@ namespace Mycena {
 				height = widget.DefaultHeight;
 			}
 			widget.SetDefaultSize(width, height);
+			return true;
+		}
+		private static bool SetTitle(Gtk.Window widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			string title = properties.GetProperty("title", null);
+			if (title != null) {
+				widget.Title = title;
+			}
 			return true;
 		}
 	}

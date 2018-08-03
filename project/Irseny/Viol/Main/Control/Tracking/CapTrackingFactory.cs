@@ -16,7 +16,7 @@ namespace Irseny.Viol.Main.Control.Tracking {
 		}
 		protected override bool ConnectInternal() {
 			Listing.EquipmentMaster.Instance.HeadTracker.Update(index, Listing.EquipmentState.Passive, -1);
-			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Track");
+			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Start");
 			btnTrack.Clicked += delegate {
 				if (btnTrack.Active) {
 					StartTracking();

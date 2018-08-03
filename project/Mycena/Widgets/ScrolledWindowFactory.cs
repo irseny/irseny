@@ -7,6 +7,7 @@ namespace Mycena {
 		public ScrolledWindowFactory() : base() {
 			CreationProperties.Add("hscrollbar_policy", SetPolicy);
 			CreationProperties.Add("vscrollbar_policy", SetPolicy);
+			CreationProperties.Add("shadow_type", SetShadow);
 		}
 
 		protected override Gtk.ScrolledWindow CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
@@ -34,9 +35,16 @@ namespace Mycena {
 			widget.SetPolicy(horizontalPolicy, verticalPolicy);
 			return true;
 		}
-
-
-
+		private static bool SetShadow(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			Gtk.ShadowType shadow;
+			try {
+				shadow = TextParseTools.ParseShadowType(properties.GetProperty("shadow_type", Gtk.ShadowType.In));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.ShadowType = shadow;
+			return true;
+		}
 	}
 }
 

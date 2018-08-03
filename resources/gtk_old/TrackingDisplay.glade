@@ -2,15 +2,10 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkImage" id="img_Add">
+  <object class="GtkImage" id="img_Hide">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-add</property>
-  </object>
-  <object class="GtkImage" id="img_Remove">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-remove</property>
+    <property name="stock">gtk-missing-image</property>
   </object>
   <object class="GtkWindow" id="win_Ignored">
     <property name="can_focus">False</property>
@@ -23,37 +18,18 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkButton" id="btn_Remove">
-                <property name="label" translatable="yes">Remove</property>
+              <object class="GtkToggleButton" id="btn_Hide">
+                <property name="label" translatable="yes">Hide</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">img_Remove</property>
+                <property name="image">img_Hide</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="pack_type">end</property>
                 <property name="position">0</property>
               </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="btn_Add">
-                <property name="label" translatable="yes">Add</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="image">img_Add</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="pack_type">end</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
@@ -66,7 +42,7 @@
           <object class="GtkNotebook" id="ntb_Tracker">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="tab_pos">right</property>
+            <property name="tab_pos">left</property>
           </object>
           <packing>
             <property name="expand">True</property>
