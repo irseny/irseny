@@ -2,30 +2,25 @@
 <!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
-  <object class="GtkTextBuffer" id="buf_Log"/>
-  <object class="GtkImage" id="img_Error">
+  <object class="GtkImage" id="img_Collapse">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-dialog-error</property>
+    <property name="stock">gtk-justify-left</property>
+  </object>
+  <object class="GtkImage" id="img_Remove">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-remove</property>
   </object>
   <object class="GtkBox" id="box_Root">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="orientation">vertical</property>
     <child>
-      <object class="GtkScrolledWindow" id="win_Log">
+      <object class="GtkNotebook" id="ntb_Device">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="vscrollbar_policy">always</property>
-        <property name="shadow_type">in</property>
-        <child>
-          <object class="GtkTextView" id="txt_Log">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="editable">False</property>
-            <property name="buffer">buf_Log</property>
-          </object>
-        </child>
+        <property name="tab_pos">right</property>
       </object>
       <packing>
         <property name="expand">True</property>
@@ -38,77 +33,64 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkButton" id="btn_Clear">
-            <property name="label" translatable="yes">Clear</property>
+          <object class="GtkButton" id="btn_Collapse">
+            <property name="label" translatable="yes">Collapse</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="image">img_Collapse</property>
             <property name="image_position">right</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="padding">3</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="cbx_Message">
-            <property name="label" translatable="yes">Messages</property>
+          <object class="GtkButton" id="btn_Remove">
+            <property name="label" translatable="yes">Remove</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="image">img_Message</property>
-            <property name="xalign">0</property>
+            <property name="receives_default">True</property>
+            <property name="image">img_Remove</property>
             <property name="image_position">right</property>
-            <property name="active">True</property>
-            <property name="draw_indicator">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="padding">5</property>
+            <property name="padding">4</property>
             <property name="pack_type">end</property>
             <property name="position">1</property>
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="cbx_Warning">
-            <property name="label" translatable="yes">Warnings</property>
+          <object class="GtkComboBoxText" id="cbb_Type">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="image">img_Warning</property>
-            <property name="xalign">0</property>
-            <property name="image_position">right</property>
-            <property name="active">True</property>
-            <property name="draw_indicator">True</property>
+            <property name="can_focus">False</property>
+            <items>
+              <item id="0" translatable="yes">Keyboard</item>
+              <item id="1" translatable="yes">Joystick</item>
+              <item id="2" translatable="yes">TrackIR</item>
+            </items>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="padding">5</property>
             <property name="pack_type">end</property>
             <property name="position">2</property>
           </packing>
         </child>
         <child>
-          <object class="GtkCheckButton" id="cbx_Error">
-            <property name="label" translatable="yes">Errors</property>
+          <object class="GtkImage" id="img_Add">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="image">img_Error</property>
-            <property name="xalign">0</property>
-            <property name="image_position">right</property>
-            <property name="active">True</property>
-            <property name="draw_indicator">True</property>
+            <property name="can_focus">False</property>
+            <property name="stock">gtk-add</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="padding">5</property>
             <property name="pack_type">end</property>
             <property name="position">3</property>
           </packing>
@@ -120,15 +102,5 @@
         <property name="position">1</property>
       </packing>
     </child>
-  </object>
-  <object class="GtkImage" id="img_Message">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-file</property>
-  </object>
-  <object class="GtkImage" id="img_Warning">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-dialog-warning</property>
   </object>
 </interface>

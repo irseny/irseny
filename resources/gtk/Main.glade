@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.3 -->
 <interface>
-  <requires lib="gtk+" version="2.24"/>
-  <!-- interface-naming-policy project-wide -->
+  <requires lib="gtk+" version="3.12"/>
   <object class="GtkWindow" id="win_Main">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Irseny</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <property name="icon">Icon.png</property>
     <child>
-      <object class="GtkHPaned" id="spt_ShowControl">
+      <object class="GtkPaned" id="spt_ShowControl">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="position">400</property>
         <property name="position_set">True</property>
+        <property name="wide_handle">True</property>
         <child>
-          <object class="GtkVPaned" id="spt_ImageLog">
+          <object class="GtkPaned" id="spt_DisplayLog">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="position">360</property>
+            <property name="orientation">vertical</property>
+            <property name="position">340</property>
             <property name="position_set">True</property>
+            <property name="wide_handle">True</property>
             <child>
-              <object class="GtkHBox" id="box_Image">
+              <object class="GtkBox" id="box_Display">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -33,9 +38,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="box_Log">
+              <object class="GtkBox" id="box_Log">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -47,18 +53,20 @@
             </child>
           </object>
           <packing>
-            <property name="resize">True</property>
+            <property name="resize">False</property>
             <property name="shrink">True</property>
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="box_ControlStatus">
+          <object class="GtkBox" id="box_ControlStatus">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkHBox" id="box_Control">
+              <object class="GtkBox" id="box_Control">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -70,15 +78,16 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="box_Status">
+              <object class="GtkBox" id="box_Status">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
