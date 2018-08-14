@@ -3,8 +3,8 @@
 namespace Mycena {
 	internal class GridFactory : WidgetFactory<Gtk.Grid> {
 		public GridFactory() : base() {
-			CreationProperties.Add("row_homogenous", SetHomogenous);
-			CreationProperties.Add("column_homogenous", SetHomogenous);
+			CreationProperties.Add("row_homogeneous", SetHomogenous);
+			CreationProperties.Add("column_homogeneous", SetHomogenous);
 		}
 		protected override Gtk.Grid CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Grid();
@@ -25,8 +25,8 @@ namespace Mycena {
 		private static bool SetHomogenous(Gtk.Grid widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool rowHomogenous, columnHomogenous;
 			try {
-				rowHomogenous = TextParseTools.ParseBool(properties.GetProperty("row_homogenous", false));
-				columnHomogenous = TextParseTools.ParseBool(properties.GetProperty("column_homogenous", false));
+				rowHomogenous = TextParseTools.ParseBool(properties.GetProperty("row_homogeneous", false));
+				columnHomogenous = TextParseTools.ParseBool(properties.GetProperty("column_homogeneous", false));
 			} catch (FormatException) {
 				return false;
 			}

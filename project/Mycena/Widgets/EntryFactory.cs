@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Mycena {
 	internal class EntryFactory : WidgetFactory<Gtk.Entry> {
 		public EntryFactory() : base() {
@@ -6,7 +7,8 @@ namespace Mycena {
 			CreationProperties.Add("editable", SetEditable);
 			CreationProperties.Add("max_length", SetMaxLength);
 			CreationProperties.Add("invisible_char", SetInvisibleChar);
-			CreationProperties.Add("width_chars", SetWidthChars);
+			CreationProperties.Add("width_chars", SetWidth);
+			CreationProperties.Add("max_width_chars", SetMaxWidth);
 		}
 		protected override Gtk.Entry CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Entry();
@@ -46,7 +48,7 @@ namespace Mycena {
 			widget.InvisibleChar = invisible;
 			return true;
 		}
-		public static bool SetWidthChars<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
+		public static bool SetWidth<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			int width;
 			try {
 				width = TextParseTools.ParseInt(properties.GetProperty("width_chars"));
@@ -54,6 +56,16 @@ namespace Mycena {
 				return false;
 			}
 			widget.WidthChars = width;
+			return true;
+		}
+		public static bool SetMaxWidth<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
+			int width;
+			try {
+				width = TextParseTools.ParseInt(properties.GetProperty("max_width_chars"));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.MaxLength = width;
 			return true;
 		}
 	}

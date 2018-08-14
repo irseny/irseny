@@ -6,7 +6,7 @@ namespace Mycena {
 		public SpinButtonFactory() : base() {
 			CreationProperties.Add("max_length", EntryFactory.SetMaxLength);
 			CreationProperties.Add("invisible_char", EntryFactory.SetInvisibleChar);
-			CreationProperties.Add("width_chars", EntryFactory.SetWidthChars);
+			CreationProperties.Add("width_chars", EntryFactory.SetWidth);
 			//CreationProperties.Add("adjustment", SetAdjustment);
 			CreationProperties.Add("numeric", SetNumeric);
 		}

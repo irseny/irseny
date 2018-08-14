@@ -5,6 +5,7 @@ namespace Mycena {
 		public ScaleFactory() : base() {
 			CreationProperties.Add("round_digits", SetRoundDigits);
 			CreationProperties.Add("draw_value", SetDrawValue);
+			CreationProperties.Add("fill_level", SetFillLevel);
 
 		}
 		protected override Gtk.Scale CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
@@ -36,6 +37,16 @@ namespace Mycena {
 				return false;
 			}
 			widget.DrawValue = draw;
+			return true;
+		}
+		private static bool SetFillLevel(Gtk.Scale widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			float level;
+			try {
+				level = TextParseTools.ParseFloat(properties.GetProperty("fill_level"));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.FillLevel = level;
 			return true;
 		}
 	}
