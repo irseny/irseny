@@ -49,6 +49,14 @@ namespace Mycena {
 			//widget.SetScrollAdjustments(hAdjustment, vAdjustment);
 			return true;
 		}
+		/*public static bool SetActive<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock strock) where T : Gtk.Widget {
+			bool active;
+			try {
+				active = TextParseTools.ParseBool(properties.GetProperty("active", true));
+			}
+
+
+		}*/
 	}
 }
 

@@ -89,6 +89,8 @@
     <Compile Include="Stock\IInterfaceStock.cs" />
     <Compile Include="Widgets\ViewportFactory.cs" />
     <Compile Include="Widgets\ComboBoxTextFactory.cs" />
+    <Compile Include="Widgets\RadioButtonFactory.cs" />
+    <Compile Include="Gadgets\RadioButtonGroupFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

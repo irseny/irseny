@@ -8,7 +8,7 @@ namespace Mycena {
 			CreationProperties.Add("max_length", SetMaxLength);
 			CreationProperties.Add("invisible_char", SetInvisibleChar);
 			CreationProperties.Add("width_chars", SetWidth);
-			CreationProperties.Add("max_width_chars", SetMaxWidth);
+			//CreationProperties.Add("max_width_chars", SetMaxWidth);
 		}
 		protected override Gtk.Entry CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Entry();
@@ -58,15 +58,15 @@ namespace Mycena {
 			widget.WidthChars = width;
 			return true;
 		}
-		public static bool SetMaxWidth<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
+		/*public static bool SetMaxWidth<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			int width;
 			try {
 				width = TextParseTools.ParseInt(properties.GetProperty("max_width_chars"));
 			} catch (FormatException) {
 				return false;
 			}
-			widget.MaxLength = width;
+			widget.MaxWidth = width;
 			return true;
-		}
+		}*/
 	}
 }

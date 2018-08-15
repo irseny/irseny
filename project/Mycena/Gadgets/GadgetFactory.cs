@@ -13,6 +13,7 @@ namespace Mycena {
 			gadgets.Add("GtkAdjustment", new AdjustmentFactory());
 			gadgets.Add("GtkImage", new ImageGadgetFactory());
 			gadgets.Add("GtkTextTagTable", new TextTagTableFactory());
+			gadgets.Add("GtkRadioButton", new RadioButtonGroupFactory());
 		}
 		/// <summary>
 		/// Gets the stock resoruces.

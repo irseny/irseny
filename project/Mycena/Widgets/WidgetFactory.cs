@@ -38,6 +38,7 @@ namespace Mycena {
 			widgets.Add("GtkToggleButton", new ToggleButtonFactory());
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 			widgets.Add("GtkSpinButton", new SpinButtonFactory());
+			widgets.Add("GtkRadioButton", new RadioButtonFactory());
 
 			widgets.Add("GtkComboBoxText", new ComboBoxTextFactory());
 		}
@@ -167,6 +168,7 @@ namespace Mycena {
 			CommonCreationProperties.Add("sensitive", CommonWidgetMods.SetSensitivity);
 			CommonCreationProperties.Add("hadjustment", CommonWidgetMods.SetScrollAdjustment);
 			CommonCreationProperties.Add("vadjustment", CommonWidgetMods.SetScrollAdjustment);
+			//CommonCreationProperties.Add("active", CommonWidgetMods.SetActive);
 		}
 		public WidgetFactory() {
 			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>();
@@ -191,7 +193,7 @@ namespace Mycena {
 				throw new ArgumentException("rootNode: Not an object node: " + rootNode.OuterXml);
 			}
 			var idAttr = rootNode.Attributes["id"]; // may be null
-			// creation property pass
+													// creation property pass
 			var creationProperties = new ConfigProperties();
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
 				if (propertyNode.Name.Equals("property")) {

@@ -35,6 +35,7 @@ namespace Mycena {
 			} catch (FormatException) {
 				return false;
 			}
+
 			widget.DrawIndicator = drawIndicator;
 			return true;
 		}
