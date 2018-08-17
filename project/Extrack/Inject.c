@@ -1,5 +1,6 @@
 #include "InjectTypes.h"
 
+#if WITH_UINPUT
 #if LINUX
 #define IVJ_CONTEXT_CANDIDATE_NUM 2
 char* ivjContextCandidates[IVJ_CONTEXT_CANDIDATE_NUM] = {
@@ -38,15 +39,15 @@ bool EXTRACK_EXPORT ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo*
 	return true;
 }
 
-IvjKeyboard* EXTRACK_EXPORT ivjOpenKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* constructionInfo) {
+IvjKeyboard* EXTRACK_EXPORT ivjOpenKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
 	// description
 	struct uinput_user_dev deviceDescription;
 	memset(&deviceDescription, 0, sizeof(struct uinput_user_dev));
-	snprintf(deviceDescription.name, UINPUT_MAX_NAME_SIZE, constructionInfo->Name);
+	snprintf(deviceDescription.name, UINPUT_MAX_NAME_SIZE, info->Name);
 	deviceDescription.id.bustype = BUS_USB;
 	deviceDescription.id.version = 0x1;
-	deviceDescription.id.vendor = constructionInfo->Vendor;
-	deviceDescription.id.product = constructionInfo->Product;
+	deviceDescription.id.vendor = info->Vendor;
+	deviceDescription.id.product = info->Product;
 	// transmit description
 	if (write(context->FileHandle, &deviceDescription, sizeof(struct uinput_user_dev)) < sizeof(struct uinput_user_dev)) {
 		return NULL;
@@ -67,12 +68,40 @@ IvjKeyboard* EXTRACK_EXPORT ivjOpenKeyboard(IvjContext* context, IvjKeyboardCons
 	//keyboard->FilePath = iotcl(deviceHandle, UI_GET_SYSNAME, NULL);
 	return keyboard;
 }
-	
-	
-#endif
+bool EXTRACK_EXPORT	ivjCloseKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
+	free(keyboard);
+	return true;
+}
+#endif // LINUX
+#endif // WITH_UINPUT
+
 
 
 
 #if WINDOWS
-
-#endif
+IvjContext* EXTRACK_EXPORT ivjCreateContext() {
+	IvjContext* context = (IvjContext*)malloc(sizeof(IvjContext));
+	return context;
+}
+bool EXTRACK_EXPORT ivjDestroyContext(IvjContext* context) {
+	free(context);
+	return true;
+}
+IvjKeyboardConstructionInfo* EXTRACK_EXPORT ivjAllocKeyboardConstructionInfo() {
+	IvjKeyboardConstructionInfo* info = (IvjKeyboardConstructionInfo*)malloc(sizeof(IvjKeyboardConstructionInfo));
+	return info;
+}
+bool EXTRACK_EXPORT ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info) {
+	free(info);
+	return true;
+}
+IvjKeyboard* EXTRACK_EXPORT ivjOpenKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
+	IvjKeyboard* keyboard = (IvjKeyboard*)malloc(sizeof(IvjKeyboard));
+	keyboard->BufferedEventNo = 0;
+	return keyboard;
+}
+bool EXTRACK_EXPORT ivjCloseKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
+	free(keyboard);
+	return true;
+}
+#endif // WINDOWS

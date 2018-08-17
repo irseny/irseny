@@ -94,9 +94,11 @@ EXTRACK_EXPORT bool artfSubmitPacket(ArtfContext* context, ArtfDevice* device, A
 	}
 	return false;
 }
-#endif
+#endif // WINDOWS
+
+
 
 #if LINUX
-#endif
+#endif // LINUX
 
-#endif
+#endif // WITH_TIFC

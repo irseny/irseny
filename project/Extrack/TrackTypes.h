@@ -1,4 +1,5 @@
-
+#ifndef EXTRACK_TRACK_TYPES_H
+#define EXTRACK_TRACK_TYPES_H
 
 #if WITH_TIFC
 #if WINDOWS
@@ -46,10 +47,14 @@ typedef struct {
 	int32_t DeviceId;
 	ArtfPacket* FileMap;
 } ArtfDevice;
-#endif
+#endif // WINDOWS
+
+
+
 
 #if LINUX
 #define EXTRACK_EXPORT
-#endif
+#endif // LINUX
 
-#endif
+#endif // WITH_TIFC
+#endif // EXTRACK_TRACK_TYPES_H
