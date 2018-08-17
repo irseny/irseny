@@ -1,9 +1,13 @@
+
+
+#if WITH_TIFC
+#if WINDOWS
+#define EXTRACK_EXPORT __cdecl
+
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <windows.h>
-
-#define EXTRACK_EXPORT __cdecl
 
 typedef struct {
 	uint32_t PacketId;
@@ -42,3 +46,10 @@ typedef struct {
 	int32_t DeviceId;
 	ArtfPacket* FileMap;
 } ArtfDevice;
+#endif
+
+#if LINUX
+#define EXTRACK_EXPORT
+#endif
+
+#endif

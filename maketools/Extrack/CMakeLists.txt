@@ -37,6 +37,7 @@ include_directories("${EXTERNAL_LIB_DIR}")
 
 # project sources
 list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/Track.c")
+list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/Inject.c")
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_FILES})
 
 # compiler flags
@@ -55,8 +56,8 @@ if (WITH_VJOY)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_VJOY")
 endif()
 # enable freetrack
-if (WITH_FREETRACK)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_FREETRACK")
+if (WITH_TIFC)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_TIFC")
 endif()
 # enable uinput
 if (WITH_UINPUT)
@@ -64,4 +65,4 @@ if (WITH_UINPUT)
 endif()
 # move library post build
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND
-	${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${LIB_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>")
+	${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${PROJECT_NAME}>" "${EXTERNAL_LIB_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>")

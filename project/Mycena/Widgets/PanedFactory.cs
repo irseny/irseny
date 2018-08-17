@@ -7,7 +7,7 @@ namespace Mycena {
 		public PanedFactory() {
 			CreationProperties.Add("position", SetPosition);
 			CreationProperties.Add("position_set", ApplyPositionSet);
-			CreationProperties.Add("wide_handle", SetHandleWidth);
+			//CreationProperties.Add("wide_handle", SetHandleWidth);
 		}
 		protected override Gtk.Paned CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			Gtk.Orientation orientation;
@@ -58,16 +58,17 @@ namespace Mycena {
 			widget.PositionSet = enabled;
 			return true;
 		}
-		private static bool SetHandleWidth(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+		/*private static bool SetHandleWidth(Gtk.Paned widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			bool wide;
 			try {
 				bool enabled = TextParseTools.ParseBool(properties.GetProperty("wide_handle", false));
 			} catch (FormatException) {
 				return false;
 			}
+
 			// TODO: set handle width
 			return true;
-		}
+		}*/
 	}
 
 

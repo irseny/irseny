@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Mycena {
 	internal class RadioButtonFactory : WidgetFactory<Gtk.RadioButton> {
 		public RadioButtonFactory() : base() {
@@ -25,10 +26,8 @@ namespace Mycena {
 				return null;
 			}
 			if (group != null) {
-				Console.WriteLine("group: " + group.Label);
 				return new Gtk.RadioButton(group, label);
 			} else {
-				Console.WriteLine("no group");
 				return new Gtk.RadioButton(label);
 			}
 

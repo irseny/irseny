@@ -1,6 +1,7 @@
 #include "TrackTypes.h"
 
-
+#if WITH_TIFC
+#if WINDOWS
 
 EXTRACK_EXPORT ArtfContext* artfCreateContext() {	
 	ArtfContext* context = (ArtfContext*)malloc(sizeof(ArtfContext));	
@@ -93,3 +94,9 @@ EXTRACK_EXPORT bool artfSubmitPacket(ArtfContext* context, ArtfDevice* device, A
 	}
 	return false;
 }
+#endif
+
+#if LINUX
+#endif
+
+#endif
