@@ -11,10 +11,12 @@ namespace Irseny.Inco.Device {
 			get { return contextHandle != IntPtr.Zero; }
 		}
 		public bool Create() {
-			
+
+			return true;
 		}
 		public bool Destroy() {
-			
+
+			return true;
 		}
 	}
 }

@@ -44,7 +44,7 @@ namespace Irseny.Extrack {
 		public static extern IntPtr OpenKeyboard(IntPtr context, IntPtr constructionInfo);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjCloseKeyboard")]
-		public static extern IntPtr OpenKeyboard(IntPtr context, IntPtr keyboard);
+		public static extern bool CloseKeyboard(IntPtr context, IntPtr keyboard);
 	}
 }
 

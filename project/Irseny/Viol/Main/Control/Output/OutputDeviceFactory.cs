@@ -58,12 +58,13 @@ namespace Irseny.Viol.Main.Control.Output {
 
 		}
 		private void AddKeyboard() {
-			string name = RegisterAvailableName("Key");
-			if (name.Length <= 0) {
+			string name;
+			int index;
+			if (!RegisterAvailableName("Key", 0, 16, out name, out index)) {
 				return;
 			}
 			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
-			var floor = new VirtualKeyboardFactory();
+			var floor = new VirtualKeyboardFactory(index);
 			ConstructFloor(name, floor);
 			usedNames.Add(name);
 			var label = new Gtk.Label(name);
@@ -73,8 +74,9 @@ namespace Irseny.Viol.Main.Control.Output {
 
 		}
 		private void AddJoystick() {
-			string name = RegisterAvailableName("Joy");
-			if (name.Length <= 0) {
+			/*string name;
+			int index;
+			if (!RegisterAvailableName("Key", 0, 16, out name, out index)) {
 				return;
 			}
 			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
@@ -83,11 +85,12 @@ namespace Irseny.Viol.Main.Control.Output {
 			var label = new Gtk.Label(name);
 			Container.AddGadget(label);
 			ntbDevice.AppendPage(floor.Container.GetWidget("box_Root"), label);
-			ntbDevice.ShowAll();
+			ntbDevice.ShowAll();*/
 		}
 		private void AddTrackInterface() {
-			string name = RegisterAvailableName("Tif");
-			if (name.Length <= 0) {
+			/*string name;
+			int index;
+			if (!RegisterAvailableName("Tif", 0, 16, out name, out index)) {
 				return;
 			}
 			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
@@ -96,17 +99,21 @@ namespace Irseny.Viol.Main.Control.Output {
 			var label = new Gtk.Label(name);
 			Container.AddGadget(label);
 			ntbDevice.AppendPage(floor.Container.GetWidget("box_Root"), label);
-			ntbDevice.ShowAll();
+			ntbDevice.ShowAll();*/
 		}
-		private string RegisterAvailableName(string prefix, int startAt = 0, int attempts = 8) {
+		private bool RegisterAvailableName(string prefix, int startAt, int attempts, out string name, out int index) {
 			for (int i = startAt; i < attempts + startAt; i++) {
 				string candidate = string.Format("{0}{1}", prefix, i);
 				if (!usedNames.Contains(candidate)) {
 					usedNames.Add(candidate);
-					return candidate;
+					name = candidate;
+					index = i;
+					return true;
 				}
 			}
-			return string.Empty;
+			name = string.Empty;
+			index = -1;
+			return false;
 		}
 		private void Remove() {
 			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");

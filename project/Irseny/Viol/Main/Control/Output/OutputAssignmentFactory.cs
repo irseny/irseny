@@ -11,6 +11,7 @@ namespace Irseny.Viol.Main.Control.Output {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+			// TODO: listen to equipment master
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Assignment");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.PackStart(ntbMain, true, true, 0);
