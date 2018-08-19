@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Output {
-	public class OutputDeviceFactory : InterfaceFactory {
+	public class OutputDeviceConfigFactory : InterfaceFactory {
 		ISet<string> usedNames = new HashSet<string>();
 
-		public OutputDeviceFactory() : base() {
+		public OutputDeviceConfigFactory() : base() {
 
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("OutputDeviceControl");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("OutputDeviceConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -64,7 +64,7 @@ namespace Irseny.Viol.Main.Control.Output {
 				return;
 			}
 			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
-			var floor = new VirtualKeyboardFactory(index);
+			var floor = new VirtualKeyboardConfigFactory(index);
 			ConstructFloor(name, floor);
 			usedNames.Add(name);
 			var label = new Gtk.Label(name);

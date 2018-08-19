@@ -20,9 +20,9 @@ namespace Irseny.Content.Resources {
 				"TrackingDisplay",
 				"CapTrackingDisplay",
 				"OutputControl",
-				"OutputDeviceControl",
-				"VirtualKeyboardControl",
-				"OutputAssignmentControl",
+				"OutputDeviceConfig",
+				"VirtualKeyboardConfig",
+				"OutputDeviceBindings",
 
 			};
 			for (int i = 0; i < entryNames.Length; i++) {

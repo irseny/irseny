@@ -19,6 +19,7 @@ namespace Irseny {
 				LogManager.MakeInstance(new LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
 				Tracap.DetectionSystem.MakeInstance(new Tracap.DetectionSystem());
+				Inco.Device.VirtualDeviceManager.MakeInstance(new Inco.Device.VirtualDeviceManager());
 			}
 			{
 				ContentMaster.MakeInstance(new Content.ContentMaster());
@@ -46,9 +47,9 @@ namespace Irseny {
 					var outputControlFactory = new Viol.Main.Control.Output.OutputFactory();
 					controlFactory.ConstructFloor("Output", outputControlFactory);
 					{
-						var deviceControlFactory = new Viol.Main.Control.Output.OutputDeviceFactory();
+						var deviceControlFactory = new Viol.Main.Control.Output.OutputDeviceConfigFactory();
 						outputControlFactory.ConstructFloor("Device", deviceControlFactory);
-						var assignmentControlFactory = new Viol.Main.Control.Output.OutputAssignmentFactory();
+						var assignmentControlFactory = new Viol.Main.Control.Output.OutputDeviceBindingsFactory();
 						outputControlFactory.ConstructFloor("Assignment", assignmentControlFactory);
 					}
 				}
@@ -107,6 +108,7 @@ namespace Irseny {
 			Extrack.Artf.DestroyContext(context);*/
 			//Gtk.Application.Run();
 			{
+				Inco.Device.VirtualDeviceManager.MakeInstance(null);
 				Tracap.DetectionSystem.MakeInstance(null);
 				Capture.Video.CaptureSystem.MakeInstance(null);
 				LogManager.MakeInstance(null);

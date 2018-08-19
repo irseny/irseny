@@ -9,9 +9,11 @@ namespace Irseny.Inco.Device {
 		static Thread instanceThread;
 
 		volatile int stopSignal = 0;
+		readonly VirtualDeviceContext context = new VirtualDeviceContext();
 		readonly AutoResetEvent invokeSignal = new AutoResetEvent(false);
 		readonly object invokeSync = new object();
 		readonly object deviceSync = new object();
+		List<IVirtualDevice> devices = new List<IVirtualDevice>(16);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 
 		public VirtualDeviceManager() {
@@ -19,7 +21,7 @@ namespace Irseny.Inco.Device {
 		public static VirtualDeviceManager Instance {
 			get { return instance; }
 		}
-		public void Start() {			
+		public void Start() {
 			while (stopSignal < 1) {
 				invokeSignal.WaitOne();
 				InvokePending();
@@ -48,8 +50,47 @@ namespace Irseny.Inco.Device {
 			}
 			invokeSignal.Set();
 		}
-
-		public void MakeInstance(VirtualDeviceManager manager) {
+		public int MountDevice(IVirtualDevice device) {
+			if (device == null) throw new ArgumentNullException("device");
+			lock (deviceSync) {
+				// find empty device index
+				int mountIndex = -1;
+				for (int i = 0; i < devices.Count; i++) {
+					if (devices[i] == null) {
+						mountIndex = i;
+						break;
+					}
+				}
+				// add at empty index or append to end
+				if (mountIndex < 0) {
+					mountIndex = devices.Count;
+					devices.Add(device);
+				} else {
+					devices[mountIndex] = device;
+				}
+				// TODO: initialize device
+				return mountIndex;
+			}
+		}
+		public IVirtualDevice GetDevice(int deviceId) {
+			lock (deviceSync) {
+				if (deviceId < 0 || deviceId >= devices.Count) {
+					return null;
+				}
+				return devices[deviceId];
+			}
+		}
+		public IVirtualDevice UnmountDevice(int deviceId) {
+			lock (deviceSync) {
+				if (deviceId < 0 || deviceId >= devices.Count) {
+					return null;
+				}
+				IVirtualDevice result = devices[deviceId];
+				// TODO: uninitialize device
+				return result;
+			}
+		}
+		public static void MakeInstance(VirtualDeviceManager manager) {
 			lock (instanceSync) {
 				if (VirtualDeviceManager.instance != null) {
 					VirtualDeviceManager.instance.Stop();

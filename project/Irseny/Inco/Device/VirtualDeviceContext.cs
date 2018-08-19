@@ -18,6 +18,7 @@ namespace Irseny.Inco.Device {
 
 			return true;
 		}
+		// TODO: create context, add/remove devices
 	}
 }
 
