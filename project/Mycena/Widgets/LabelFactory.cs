@@ -24,6 +24,7 @@ namespace Mycena {
 			CreationProperties.Add("max_width_chars", SetChars);
 			CreationProperties.Add("margin", MiscFactory.SetMargin);
 
+
 		}
 		protected override Gtk.Label CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Label();

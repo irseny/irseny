@@ -23,6 +23,7 @@ namespace Irseny.Content.Resources {
 				"OutputDeviceConfig",
 				"VirtualKeyboardConfig",
 				"OutputDeviceBindings",
+				"VirtualKeyboardBindings"
 
 			};
 			for (int i = 0; i < entryNames.Length; i++) {

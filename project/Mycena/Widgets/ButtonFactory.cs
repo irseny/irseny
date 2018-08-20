@@ -15,6 +15,7 @@ namespace Mycena {
 			CreationProperties.Add("margin_right", SetRightMargin);
 			CreationProperties.Add("margin_top", SetTopMargin);
 			CreationProperties.Add("margin_bottom", SetBottomMargin);
+			CreationProperties.Add("relief", SetRelief);
 		}
 		protected override Gtk.Button CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Button();
@@ -129,6 +130,16 @@ namespace Mycena {
 				return false;
 			}
 			widget.MarginBottom = margin;
+			return true;
+		}
+		public static bool SetRelief<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Button {
+			Gtk.ReliefStyle style;
+			try {
+				style = TextParseTools.ParseReliefStyle(properties.GetProperty("relief", Gtk.ReliefStyle.Normal));
+			} catch (FormatException) {
+				return false;
+			}
+			widget.Relief = style;
 			return true;
 		}
 	}

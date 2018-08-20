@@ -66,7 +66,6 @@ namespace Irseny {
 				}
 				var window = mainFactory.Container.GetWidget<Gtk.Window>("win_Main");
 
-				window.Resize(800, 600);
 				window.ShowAll();
 				window.DeleteEvent += delegate {
 					stopped = true;

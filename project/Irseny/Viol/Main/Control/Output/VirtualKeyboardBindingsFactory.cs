@@ -1,19 +1,28 @@
 ﻿using System;
+using Irseny.Content;
 namespace Irseny.Viol.Main.Control.Output {
 	public class VirtualKeyboardBindingsFactory : InterfaceFactory {
-		public VirtualKeyboardBindingsFactory() {
+		readonly int index;
+		public VirtualKeyboardBindingsFactory(int index) : base() {
+			this.index = index;
 		}
 		protected override bool CreateInternal() {
-			return false;
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("VirtualKeyboardBindings");
+			Container = factory.CreateWidget("box_Root");
+			return true;
 		}
 		protected override bool ConnectInternal() {
-			throw new NotImplementedException();
+
+			return true;
 		}
 		protected override bool DisconnectInternal() {
-			throw new NotImplementedException();
+
+			return true;
 		}
 		protected override bool DestroyInternal() {
-			throw new NotImplementedException();
+
+			Container.Dispose();
+			return true;
 		}
 	}
 }

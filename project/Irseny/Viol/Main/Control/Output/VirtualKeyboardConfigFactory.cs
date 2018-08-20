@@ -6,10 +6,12 @@ using Irseny.Listing;
 
 namespace Irseny.Viol.Main.Control.Output {
 	public class VirtualKeyboardConfigFactory : InterfaceFactory {
-		readonly int index;
+		readonly int keyboardIndex;
+		readonly int deviceIndex;
 
-		public VirtualKeyboardConfigFactory(int index) : base() {
-			this.index = index;
+		public VirtualKeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
+			this.keyboardIndex = keyboardIndex;
+			this.deviceIndex = deviceIndex;
 		}
 		protected override bool CreateInternal() {
 
@@ -20,9 +22,10 @@ namespace Irseny.Viol.Main.Control.Output {
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = VirtualDeviceManager.Instance.MountDevice(new VirtualKeyboard());
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to mount keyboard: " + index));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to mount keyboard: " + keyboardIndex));
 				}
-				EquipmentMaster.Instance.OutputDevice.Update(index, EquipmentState.Active, deviceId);
+				// TODO: translate from keyboard to device index
+				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
 			});
 
 
@@ -37,14 +40,14 @@ namespace Irseny.Viol.Main.Control.Output {
 		}
 		protected override bool DestroyInternal() {
 			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(index, -1);
+				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(keyboardIndex, -1);
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount unregistered device: " + index));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount unregistered keyboard: " + keyboardIndex));
 					return;
 				}
-				EquipmentMaster.Instance.OutputDevice.Update(index, EquipmentState.Missing, -1);
+				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Missing, -1);
 				if (VirtualDeviceManager.Instance.UnmountDevice(deviceId) == null) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount device: " + index));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount keyboard: " + keyboardIndex));
 					return;
 				}
 			});

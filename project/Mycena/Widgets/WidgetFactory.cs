@@ -15,6 +15,7 @@ namespace Mycena {
 			widgets = new Dictionary<string, IWidgetFactory>(32);
 			widgets.Add("GtkEntryBuffer", new IgnoreWidgetFactory());
 			widgets.Add("GtkImage", new ImageWidgetFactory());
+			widgets.Add("GtkAlignment", new AlignmentFactory());
 
 			widgets.Add("GtkScrolledWindow", new ScrolledWindowFactory());
 			widgets.Add("GtkViewport", new ViewportFactory());
@@ -24,6 +25,7 @@ namespace Mycena {
 			widgets.Add("GtkTable", new TableFactory());
 			widgets.Add("GtkGrid", new GridFactory());
 			widgets.Add("GtkNotebook", new NotebookFactory());
+			widgets.Add("GtkFrame", new FrameFactory());
 
 			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
 			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());

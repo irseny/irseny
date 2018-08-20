@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Collections.Generic;
 using Irseny.Log;
 using Irseny.Listing;
 using Irseny.Inco.Device;
@@ -6,6 +8,8 @@ using Irseny.Content;
 
 namespace Irseny.Viol.Main.Control.Output {
 	public class OutputDeviceBindingsFactory : InterfaceFactory {
+		ISet<string> usedNames = new HashSet<string>();
+		IDictionary<int, string> deviceFloorMap = new Dictionary<int, string>(32);
 		public OutputDeviceBindingsFactory() : base() {
 		}
 
@@ -16,7 +20,7 @@ namespace Irseny.Viol.Main.Control.Output {
 		}
 		protected override bool ConnectInternal() {
 			// TODO: listen to equipment master
-			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Assignment");
+			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Bindings");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.PackStart(ntbMain, true, true, 0);
 			EquipmentMaster.Instance.OutputDevice.Updated += DeviceUpdated;
@@ -24,7 +28,7 @@ namespace Irseny.Viol.Main.Control.Output {
 		}
 		protected override bool DisconnectInternal() {
 			EquipmentMaster.Instance.OutputDevice.Updated -= DeviceUpdated;
-			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Assignment");
+			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Bindings");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.Remove(ntbMain);
 			return true;
@@ -43,39 +47,105 @@ namespace Irseny.Viol.Main.Control.Output {
 							// ignore changes out of order
 							var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 							int nextIndex = ntbRoot.NPages;
-							if (nextIndex != args.Index) {
-								AddDevice(device);
-							} else {
-								LogManager.Instance.Log(LogMessage.CreateError(this, string.Format("Device {0} modified out of order", args.Index)));
-							}
+							AddDevice(device.DeviceType, args.Index, args.Equipment);
 						});
 					}
 				});
 			} else {
 				Invoke(delegate {
-					var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
-					int lastIndex = ntbRoot.NPages - 1;
-					// ignore all changes out of order
-					if (lastIndex == args.Index) {
-						RemoveDevice();
-					} else {
-						LogManager.Instance.Log(LogMessage.CreateError(this, string.Format("Device {0} modified out of order", args.Index)));
-					}
+					RemoveDevice(args.Index);
 				});
 			}
 		}
-		private void AddDevice(IVirtualDevice device) {
+		private bool AddDevice(VirtualDeviceType deviceType, int deviceIndex, int deviceId) {
 			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int nextIndex = ntbRoot.NPages;
-
-			// TODO: add factory
+			int deviceFamilyIndex;
+			string name;
+			string family;
+			IInterfaceFactory floor;
+			switch (deviceType) {
+			case VirtualDeviceType.Keyboard:
+				floor = new VirtualKeyboardBindingsFactory(nextIndex);
+				family = "Key";
+				break;
+			case VirtualDeviceType.Mouse:
+				floor = null;
+				family = "Mouse";
+				break;
+			case VirtualDeviceType.Joystick:
+				floor = null;
+				family = "Joy";
+				break;
+			case VirtualDeviceType.TrackingInterface:
+				floor = null;
+				family = "Tif";
+				break;
+			default:
+				throw new ArgumentException("deviceType: Unknown type: " + deviceType);
+			}
+			if (!RegisterFloorName(family, deviceIndex, 0, 16, out name, out deviceFamilyIndex)) {
+				return false;
+			}
+			ConstructFloor(name, floor);
+			var label = new Gtk.Label(name);
+			floor.Container.AddGadget(label);
+			var boxMain = floor.Container.GetWidget("box_Root");
+			ntbRoot.AppendPage(boxMain, label);
+			ntbRoot.ShowAll();
+			return true;
 		}
-		private void RemoveDevice() {
+		private bool RemoveDevice(int deviceIndex) {
 			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			string floorName = GetDeviceFloor(deviceIndex);
+			if (floorName.Length < 1) {
+				return false;
+			}
 
-			int lastIndex = ntbRoot.NPages - 1;
-
-			// TODO: remove factory
+			IInterfaceFactory floor = GetFloor(floorName);
+			var boxMain = floor.Container.GetWidget("box_Root");
+			ntbRoot.Remove(boxMain);
+			DestructFloor(floorName);
+			UnregisterFloorName(floorName, deviceIndex);
+			return true;
+		}
+		private bool RegisterFloorName(string family, int deviceIndex, int start, int maxNames, out string name, out int index) {
+			// the deviceindex could be known at this point
+			// ignore such entries
+			if (deviceFloorMap.ContainsKey(deviceIndex)) {
+				name = string.Empty;
+				index = start - 1;
+				return false;
+			}
+			// find an unused name consisting of <family><NUMBER>
+			for (int i = start; i < start + maxNames; i++) {
+				string candidate = string.Format("{0}{1}", family, i);
+				if (!usedNames.Contains(candidate)) {
+					usedNames.Add(candidate);
+					name = candidate;
+					index = i;
+					// register the floor name that corresponds to the given device index
+					deviceFloorMap.Add(deviceIndex, name);
+					return true;
+				}
+			}
+			// all names reserved
+			name = string.Empty;
+			index = start - 1;
+			return false;
+		}
+		private bool UnregisterFloorName(string floorName, int deviceIndex) {
+			deviceFloorMap.Remove(deviceIndex);
+			usedNames.Remove(floorName);
+			return true;
+		}
+		private string GetDeviceFloor(int deviceIndex) {
+			string result;
+			if (deviceFloorMap.TryGetValue(deviceIndex, out result)) {
+				return result;
+			} else {
+				return string.Empty;
+			}
 		}
 	}
 }

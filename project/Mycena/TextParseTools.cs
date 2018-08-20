@@ -4,13 +4,13 @@ using System.IO;
 namespace Mycena {
 	internal static class TextParseTools {
 		public static string ParsePath(string text) {
-			#if LINUX
+#if LINUX
 			return text.Replace('\\', Path.DirectorySeparatorChar);
-			#elif WINDOWS
+#elif WINDOWS
 			return text.Replace('/', Path.DirectorySeparatorChar);
-			#else
+#else
 			return text;
-			#endif
+#endif
 		}
 		public static char ParseChar(string text) {
 			if (text.Length > 0) {
@@ -252,6 +252,18 @@ namespace Mycena {
 				return Gtk.ShadowType.EtchedOut;
 			} else {
 				throw new FormatException(text + " can not be converted to shadow type");
+			}
+		}
+		public static Gtk.ReliefStyle ParseReliefStyle(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("none")) {
+				return Gtk.ReliefStyle.None;
+			} else if (text.Equals("half")) {
+				return Gtk.ReliefStyle.Half;
+			} else if (text.Equals("normal")) {
+				return Gtk.ReliefStyle.Normal;
+			} else {
+				throw new FormatException(text + " can not be converted to relief style");
 			}
 		}
 	}
