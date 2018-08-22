@@ -9,6 +9,10 @@ namespace Mycena {
 		protected override Gtk.Frame CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Frame();
 		}
+		protected override bool PackWidget(Gtk.Frame container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
+			container.Child = child;
+			return true;
+		}
 		private static bool SetLabelAlignmentX(Gtk.Frame widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			float align;
 			try {

@@ -19,6 +19,10 @@ namespace Mycena {
 			}
 			return new Gtk.Alignment(alignX, alignY, scaleX, scaleY);
 		}
+		protected override bool PackWidget(Gtk.Alignment container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
+			container.Child = child;
+			return true;
+		}
 		private static bool SetPadding(Gtk.Alignment widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			uint top, bottom, left, right;
 			try {

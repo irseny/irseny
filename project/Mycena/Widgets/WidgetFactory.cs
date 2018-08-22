@@ -26,6 +26,7 @@ namespace Mycena {
 			widgets.Add("GtkGrid", new GridFactory());
 			widgets.Add("GtkNotebook", new NotebookFactory());
 			widgets.Add("GtkFrame", new FrameFactory());
+			widgets.Add("GtkExpander", new ExpanderFactory());
 
 			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
 			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
@@ -91,9 +92,7 @@ namespace Mycena {
 			IWidgetFactory factory;
 			if (widgets.TryGetValue(classAttr.Value, out factory)) {
 				var config = new ConfigProperties();
-				if (packNode != null) {
-					ReadPackProperties(childNode, packNode, config);
-				}
+				ReadPackProperties(childNode, packNode, config); // nodes may be null
 				Gtk.Widget widget = factory.CreateWidget(objectNode, container, this);
 				return new Tuple<Gtk.Widget, ConfigProperties>(widget, config);
 			} else {
@@ -151,9 +150,11 @@ namespace Mycena {
 					properties.RegisterAttribute("child_" + attr.Name, attr.Value);
 				}
 			}
-			foreach (XmlNode propertyNode in packNode) {
-				if (propertyNode.Name.Equals("property")) {
-					properties.RegisterProperty(propertyNode);
+			if (packNode != null) {
+				foreach (XmlNode propertyNode in packNode) {
+					if (propertyNode.Name.Equals("property")) {
+						properties.RegisterProperty(propertyNode);
+					}
 				}
 			}
 		}

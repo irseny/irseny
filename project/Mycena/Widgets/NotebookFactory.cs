@@ -11,20 +11,20 @@ namespace Mycena {
 		protected override Gtk.Notebook CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Notebook();
 		}
-		protected override bool PackWidgets(Gtk.Notebook container, IList<Tuple<Gtk.Widget, ConfigProperties>> widgets, IInterfaceStock stock) {
-			for (int i = 1; i < widgets.Count; i += 2) {
+		protected override bool PackWidgets(Gtk.Notebook container, IList<Tuple<Gtk.Widget, ConfigProperties>> children, IInterfaceStock stock) {
+			for (int i = 1; i < children.Count; i += 2) {
 				Gtk.Widget tab = null;
 				Gtk.Widget content = null;
 				// tab and content widgets are expected in pairs
 				string[] types = new string[] {
-					widgets[i].Item2.GetAttribute("child_type", "content"),
-					widgets[i - 1].Item2.GetAttribute("child_type", "content")
+					children[i].Item2.GetAttribute("child_type", "content"),
+					children[i - 1].Item2.GetAttribute("child_type", "content")
 				};
 				for (int w = 0; w < types.Length; w++) {
 					if (types[w].Equals("tab")) {
-						tab = widgets[i - w].Item1; // subtracting 0 or 1 as for types creation
+						tab = children[i - w].Item1; // subtracting 0 or 1 as for types creation
 					} else if (types[w].Equals("content")) {
-						content = widgets[i - w].Item1;
+						content = children[i - w].Item1;
 					} else {
 						return false;
 					}

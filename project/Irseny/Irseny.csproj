@@ -178,6 +178,7 @@
     <Compile Include="Inco\Device\VirtualDeviceType.cs" />
     <Compile Include="Inco\Device\IVirtualDevice.cs" />
     <Compile Include="Viol\Main\Control\Output\VirtualKeyboardBindingsFactory.cs" />
+    <Compile Include="Viol\Main\Control\Output\OuputDeviceSignalBindingFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

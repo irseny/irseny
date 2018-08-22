@@ -9,6 +9,7 @@ namespace Irseny.Viol.Main.Control.Output {
 		readonly int keyboardIndex;
 		readonly int deviceIndex;
 
+
 		public VirtualKeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
 			this.keyboardIndex = keyboardIndex;
 			this.deviceIndex = deviceIndex;
@@ -33,6 +34,7 @@ namespace Irseny.Viol.Main.Control.Output {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+
 			return true;
 		}
 		protected override bool DisconnectInternal() {
@@ -40,7 +42,7 @@ namespace Irseny.Viol.Main.Control.Output {
 		}
 		protected override bool DestroyInternal() {
 			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(keyboardIndex, -1);
+				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount unregistered keyboard: " + keyboardIndex));
 					return;
@@ -55,6 +57,8 @@ namespace Irseny.Viol.Main.Control.Output {
 			Container.Dispose();
 			return true;
 		}
+
+
 	}
 }
 

@@ -93,6 +93,7 @@
     <Compile Include="Gadgets\RadioButtonGroupFactory.cs" />
     <Compile Include="Widgets\FrameFactory.cs" />
     <Compile Include="Widgets\AlignmentFactory.cs" />
+    <Compile Include="Widgets\ExpanderFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
