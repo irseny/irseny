@@ -58,6 +58,10 @@ namespace Mycena {
 			widget.WidthChars = width;
 			return true;
 		}
+		/*public static bool SetPlaceholder<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
+			string placeHolder;
+			return true;
+		}*/
 		/*public static bool SetMaxWidth<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) where T : Gtk.Entry {
 			int width;
 			try {

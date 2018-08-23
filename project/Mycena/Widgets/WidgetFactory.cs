@@ -42,8 +42,11 @@ namespace Mycena {
 			widgets.Add("GtkCheckButton", new CheckButtonFactory());
 			widgets.Add("GtkSpinButton", new SpinButtonFactory());
 			widgets.Add("GtkRadioButton", new RadioButtonFactory());
+			widgets.Add("GtkSwitch", new SwitchFactory());
 
 			widgets.Add("GtkComboBoxText", new ComboBoxTextFactory());
+
+			widgets.Add("GtkDrawingArea", new DrawingAreaFactory());
 		}
 		/// <summary>
 		/// Gets the stock resources for widget creation.
@@ -196,7 +199,7 @@ namespace Mycena {
 				throw new ArgumentException("rootNode: Not an object node: " + rootNode.OuterXml);
 			}
 			var idAttr = rootNode.Attributes["id"]; // may be null
-													// creation property pass
+			// creation property pass
 			var creationProperties = new ConfigProperties();
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
 				if (propertyNode.Name.Equals("property")) {
@@ -312,7 +315,7 @@ namespace Mycena {
 			var available = properties.PropertyNames;
 			foreach (string name in available) {
 				if (!marked.Contains(name)) {
-					Debug.WriteLine("Property '{0}' unused in: {1}", name, GetType().Name);
+					Debug.WriteLine("Mycena-Warning: Property '{0}' unused in: {1}", name, GetType().Name);
 				}
 			}
 #endif
@@ -338,7 +341,7 @@ namespace Mycena {
 			var available = properties.AttributeNames;
 			foreach (string name in available) {
 				if (!marked.Contains(name)) {
-					Debug.WriteLine("Attribute '{0}' unused in: {1}", name, GetType().Name);
+					Debug.WriteLine("Mycena-Warning: Attribute '{0}' unused in: {1}", name, GetType().Name);
 				}
 			}
 #endif

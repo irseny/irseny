@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace Mycena {
@@ -8,6 +9,7 @@ namespace Mycena {
 			CreationProperties.Add("active_id", ComboBoxFactory.SetActiveId);
 			CreationProperties.Add("add_tearoffs", ComboBoxFactory.SetTearoffEnabled);
 			CreationProperties.Add("tearoff_title", ComboBoxFactory.SetTearoffTitle);
+			CreationProperties.Add("has_entry", CommonWidgetMods.Noop);
 		}
 		protected override Gtk.ComboBoxText CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			var result = new Gtk.ComboBoxText();
@@ -21,6 +23,11 @@ namespace Mycena {
 				string childInternal = pair.Item2.GetAttribute("child_internal-child", string.Empty);
 				if (childInternal.Equals("entry")) {
 					container.Child = pair.Item1;
+					/*if (pair.Item1 is Gtk.Entry) {
+						container.Child = (Gtk.Entry)pair.Item1;
+					} else {
+						Debug.WriteLine("Mycena-Warning: Attempting to add non entry widget to ComboBoxText");
+					}*/
 				} else {
 					throw new NotSupportedException(GetType().Name + " can not pack generic widgets");
 				}

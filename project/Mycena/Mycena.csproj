@@ -94,6 +94,8 @@
     <Compile Include="Widgets\FrameFactory.cs" />
     <Compile Include="Widgets\AlignmentFactory.cs" />
     <Compile Include="Widgets\ExpanderFactory.cs" />
+    <Compile Include="Widgets\SwitchFactory.cs" />
+    <Compile Include="Widgets\DrawingAreaFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

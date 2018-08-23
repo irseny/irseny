@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace Mycena {
 	internal class FrameFactory : WidgetFactory<Gtk.Frame> {
 		public FrameFactory() : base() {
@@ -9,8 +11,19 @@ namespace Mycena {
 		protected override Gtk.Frame CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Frame();
 		}
-		protected override bool PackWidget(Gtk.Frame container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
+		/*protected override bool PackWidget(Gtk.Frame container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
 			container.Child = child;
+			return true;
+		}*/
+		protected override bool PackWidgets(Gtk.Frame container, IList<Tuple<Gtk.Widget, ConfigProperties>> children, IInterfaceStock stock) {
+			foreach (var pair in children) {
+				string childType = pair.Item2.GetAttribute("child_type", string.Empty);
+				if (childType.Equals("label")) {
+					container.LabelWidget = pair.Item1;
+				} else {
+					container.Child = pair.Item1;
+				}
+			}
 			return true;
 		}
 		private static bool SetLabelAlignmentX(Gtk.Frame widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
