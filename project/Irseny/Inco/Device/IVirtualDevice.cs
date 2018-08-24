@@ -2,11 +2,9 @@
 namespace Irseny.Inco.Device {
 	public interface IVirtualDevice {
 		VirtualDeviceType DeviceType { get; }
-		int ButtonCount { get; }
-		int KeyCount { get; }
-		int AxisCount { get; }
-		string GetButtonDescription(int button);
-		string GetKeyDescription(int key);
-		string GetAxisDescription(int axis);
+		VirtualDeviceCapability[] GetSupportedCapabilities();
+		int GetKeyNo(VirtualDeviceCapability capability);
+		string GetKeyDescription(VirtualDeviceCapability capability, int index);
+		bool SupportsAccess(VirtualDeviceAccess mode);
 	}
 }

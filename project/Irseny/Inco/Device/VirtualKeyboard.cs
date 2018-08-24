@@ -8,24 +8,35 @@ namespace Irseny.Inco.Device {
 		public VirtualDeviceType DeviceType {
 			get { return VirtualDeviceType.Keyboard; }
 		}
-		public int ButtonCount {
-			get { return 0; }
+		public bool SupportsAccess(VirtualDeviceAccess access) {
+			switch (access) {
+			case VirtualDeviceAccess.None:
+				return true;
+			case VirtualDeviceAccess.Read:
+				return true;
+			case VirtualDeviceAccess.Write:
+				return false;
+			default:
+				return false;
+			}
+
 		}
-		public int AxisCount {
-			get { return 0; }
+		public VirtualDeviceCapability[] GetSupportedCapabilities() {
+			return new VirtualDeviceCapability[] { VirtualDeviceCapability.Button };
 		}
-		public int KeyCount {
-			get { throw new NotImplementedException(); }
+		public int GetKeyNo(VirtualDeviceCapability capability) {
+			switch (capability) {
+			case VirtualDeviceCapability.Button:
+				return 255;
+			default:
+				return 0;
+			}
 		}
-		public string GetButtonDescription(int button) {
-			throw new NotSupportedException();
+		public string GetKeyDescription(VirtualDeviceCapability capability, int index) {
+			return string.Empty;
 		}
-		public string GetAxisDescription(int axis) {
-			throw new NotSupportedException();
-		}
-		public string GetKeyDescription(int key) {
-			return key.ToString();
-		}
+
+
 	}
 }
 
