@@ -3,8 +3,9 @@ namespace Irseny.Inco.Device {
 	public interface IVirtualDevice {
 		VirtualDeviceType DeviceType { get; }
 		VirtualDeviceCapability[] GetSupportedCapabilities();
+		string[] GetKeyDescriptions(VirtualDeviceCapability capability);
+		object[] GetKeyHandles(VirtualDeviceCapability capability);
 		int GetKeyNo(VirtualDeviceCapability capability);
-		string GetKeyDescription(VirtualDeviceCapability capability, int index);
 		bool SupportsAccess(VirtualDeviceAccess mode);
 	}
 }

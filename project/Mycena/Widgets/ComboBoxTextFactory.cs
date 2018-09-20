@@ -12,7 +12,18 @@ namespace Mycena {
 			CreationProperties.Add("has_entry", CommonWidgetMods.Noop);
 		}
 		protected override Gtk.ComboBoxText CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
-			var result = new Gtk.ComboBoxText();
+			bool withEntry;
+			try {
+				withEntry = TextParseTools.ParseBool(properties.GetProperty("has_entry", false));
+			} catch (FormatException) {
+				return null;
+			}
+			Gtk.ComboBoxText result;
+			if (withEntry) {
+				result = Gtk.ComboBoxText.NewWithEntry();
+			} else {
+				result = new Gtk.ComboBoxText();
+			}
 			foreach (string item in properties.GetItems()) {
 				result.AppendText(item);
 			}
@@ -22,7 +33,9 @@ namespace Mycena {
 			foreach (var pair in children) {
 				string childInternal = pair.Item2.GetAttribute("child_internal-child", string.Empty);
 				if (childInternal.Equals("entry")) {
-					container.Child = pair.Item1;
+					// TODO: migrate entry properties
+					//container.Child = pair.Item1;
+					//container.Add(pair.Item1);
 					/*if (pair.Item1 is Gtk.Entry) {
 						container.Child = (Gtk.Entry)pair.Item1;
 					} else {

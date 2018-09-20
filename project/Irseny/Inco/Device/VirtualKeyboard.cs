@@ -22,21 +22,35 @@ namespace Irseny.Inco.Device {
 
 		}
 		public VirtualDeviceCapability[] GetSupportedCapabilities() {
-			return new VirtualDeviceCapability[] { VirtualDeviceCapability.Button };
+			return new VirtualDeviceCapability[] { VirtualDeviceCapability.Key };
 		}
 		public int GetKeyNo(VirtualDeviceCapability capability) {
 			switch (capability) {
-			case VirtualDeviceCapability.Button:
+			case VirtualDeviceCapability.Key:
 				return 255;
 			default:
 				return 0;
 			}
 		}
-		public string GetKeyDescription(VirtualDeviceCapability capability, int index) {
-			return string.Empty;
+		public string[] GetKeyDescriptions(VirtualDeviceCapability capability) {
+			switch (capability) {
+			case VirtualDeviceCapability.Key:
+				return new string[] {
+				"Q", "W", "E", "R", "Z"
+			};
+			default:
+				return new string[0];
+			}
 		}
-
-
+		public object[] GetKeyHandles(VirtualDeviceCapability capability) {
+			switch (capability) {
+			case VirtualDeviceCapability.Key:
+				return new object[] {
+					new object(), new object(), new object(), new object(), new object()
+				};
+			default:
+				return new object[0];
+			}
+		}
 	}
 }
-

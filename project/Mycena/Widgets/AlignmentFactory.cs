@@ -10,10 +10,10 @@ namespace Mycena {
 		protected override Gtk.Alignment CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			float alignX, alignY, scaleX, scaleY;
 			try {
-				alignX = TextParseTools.ParseFloat(properties.GetProperty("xalign", 0.5));
-				alignY = TextParseTools.ParseFloat(properties.GetProperty("yalign", 0.5));
-				scaleX = TextParseTools.ParseFloat(properties.GetProperty("xscale", 1.0));
-				scaleY = TextParseTools.ParseFloat(properties.GetProperty("yscale", 1.0));
+				alignX = TextParseTools.ParseFloat(properties.GetProperty("xalign", "0.5"));
+				alignY = TextParseTools.ParseFloat(properties.GetProperty("yalign", "0.5"));
+				scaleX = TextParseTools.ParseFloat(properties.GetProperty("xscale", "1.0"));
+				scaleY = TextParseTools.ParseFloat(properties.GetProperty("yscale", "1.0"));
 			} catch (FormatException) {
 				return null;
 			}

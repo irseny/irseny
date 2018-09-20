@@ -81,17 +81,26 @@ namespace Irseny.Listing {
 		public void Update(int index, EquipmentState state, T equipment) {
 			if (index < 0) throw new ArgumentOutOfRangeException("index");
 			lock (equipmentSync) {
+				EquipmentState lastState;
 				if (index >= this.equipment.Count) {
+					lastState = EquipmentState.Missing;
 					if (index >= this.equipment.Capacity) {
 						this.equipment.Capacity = index + 1;
 					}
 					for (int i = this.equipment.Count; i <= index; i++) {
 						this.equipment.Add(Tuple.Create(EquipmentState.Missing, default(T)));
 					}
+
+				} else {
+					if (this.equipment[index] != null) {
+						lastState = this.equipment[index].Item1;
+					} else {
+						lastState = EquipmentState.Missing;
+					}
 				}
 				this.equipment[index] = Tuple.Create(state, equipment);
 				lock (updateSync) {
-					updateQueue.Enqueue(new EquipmentUpdateArgs<T>(index, state, equipment));
+					updateQueue.Enqueue(new EquipmentUpdateArgs<T>(index, state, lastState, equipment));
 				}
 			}
 			ShareUpdates();

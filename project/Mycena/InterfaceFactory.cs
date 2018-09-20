@@ -58,7 +58,6 @@ namespace Mycena {
 			if (filePath == null) throw new ArgumentNullException("filePath");
 			if (stock == null) throw new ArgumentNullException("stock");
 			var settings = new XmlReaderSettings();
-			//settings.IgnoreComments = true;
 			var doc = new XmlDocument();
 			using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
 				using (var reader = XmlReader.Create(stream, settings)) {

@@ -34,12 +34,19 @@ namespace Irseny.Viol.Main.Control.Output {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-
+			{
+				var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
+				var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
+				var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
+				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_UpdateRate");
+				rdbTimed.Clicked += PolicyUpdated;
+			}
 			return true;
 		}
 		protected override bool DisconnectInternal() {
 			return true;
 		}
+
 		protected override bool DestroyInternal() {
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
@@ -57,7 +64,15 @@ namespace Irseny.Viol.Main.Control.Output {
 			Container.Dispose();
 			return true;
 		}
-
+		private void PolicyUpdated(object sender, EventArgs args) {
+			var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
+			var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
+			var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
+			int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
+			if (deviceId > -1) {
+				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
+			}
+		}
 
 	}
 }

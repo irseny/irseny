@@ -2,11 +2,11 @@
 using Irseny.Content;
 namespace Irseny.Viol.Main.Control.Output {
 	public class VirtualKeyboardBindingsFactory : InterfaceFactory {
-		readonly int index;
+		readonly int deviceIndex;
 		int freeNameId = 0;
 
-		public VirtualKeyboardBindingsFactory(int index) : base() {
-			this.index = index;
+		public VirtualKeyboardBindingsFactory(int deviceIndex) : base() {
+			this.deviceIndex = deviceIndex;
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("VirtualKeyboardBindings");
@@ -43,7 +43,7 @@ namespace Irseny.Viol.Main.Control.Output {
 				string floorName = string.Format("Key{0}", freeNameId);
 				freeNameId += 1;
 				// create floor
-				var floor = new OuputDeviceSignalBindingFactory();
+				var floor = new OuputDeviceSignalBindingFactory(deviceIndex, floorName);
 				ConstructFloor(floorName, floor);
 				var expMain = floor.Container.GetWidget("exp_Root");
 				var boxBindings = Container.GetWidget<Gtk.Box>("box_Bindings");

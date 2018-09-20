@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="img_Apply">
@@ -26,7 +26,6 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">img_Apply</property>
-                <property name="yalign">0.46000000834465027</property>
                 <property name="image_position">right</property>
               </object>
               <packing>
@@ -150,6 +149,20 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
+                          <object class="GtkLabel" id="lbl_TargetDevice">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Placeholder</property>
+                            <property name="width_chars">14</property>
+                            <property name="xalign">0.20000000298023224</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkComboBoxText" id="cbb_TargetCapability">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -157,7 +170,7 @@
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">0</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
@@ -174,7 +187,7 @@
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">1</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -274,7 +287,7 @@
               </object>
             </child>
             <child type="label">
-              <object class="GtkLabel" id="lbl_Targe">
+              <object class="GtkLabel" id="lbl_Target">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Target</property>

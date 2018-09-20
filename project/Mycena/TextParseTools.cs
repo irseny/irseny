@@ -1,8 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Globalization;
 
 namespace Mycena {
+
 	internal static class TextParseTools {
+		readonly static NumberStyles numberStyle = NumberStyles.AllowDecimalPoint;
+		readonly static CultureInfo formatProvider = CultureInfo.InvariantCulture;
 		public static string ParsePath(string text) {
 #if LINUX
 			return text.Replace('\\', Path.DirectorySeparatorChar);
@@ -22,7 +26,7 @@ namespace Mycena {
 		public static float ParseFloat(string text) {
 			if (text.Length > 0) {
 				float result;
-				if (float.TryParse(text, out result)) {
+				if (float.TryParse(text, numberStyle, formatProvider, out result)) {
 					return result;
 				} else {
 					throw new FormatException(text + " not convertible to float");
@@ -34,7 +38,7 @@ namespace Mycena {
 		public static double ParseDouble(string text) {
 			if (text.Length > 0) {
 				double result;
-				if (double.TryParse(text, out result)) {
+				if (double.TryParse(text, numberStyle, formatProvider, out result)) {
 					return result;
 				} else {
 					throw new FormatException(text + " not convertible to double");
