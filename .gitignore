@@ -1,6 +1,11 @@
-bin
+bin/*
 obj
-lib
+lib/Common/*
+lib/External/*
+lib/LinuxDebug
+lib/LinuxRelease
+lib/WindowsRelease
+lib/WindowsDebug
 build
 project/.vs
 project/Extrack/bin

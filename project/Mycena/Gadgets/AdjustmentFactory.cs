@@ -15,8 +15,8 @@ namespace Mycena {
 				stepInc = TextParseTools.ParseDouble(properties.GetProperty("step_increment", 1));
 				pageInc = TextParseTools.ParseDouble(properties.GetProperty("page_increment", 10));
 				pageSize = TextParseTools.ParseDouble(properties.GetProperty("page_size", 0));
-			} catch (FormatException) {
-				return null;
+			} catch (FormatException e) {
+				throw new ArgumentException("Failed to parse properties: " + e.Message);
 			}
 			return new Gtk.Adjustment(value, lower, upper, stepInc, pageInc, pageSize);
 

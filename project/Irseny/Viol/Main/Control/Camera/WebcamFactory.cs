@@ -6,10 +6,10 @@ using Irseny.Capture.Video;
 
 namespace Irseny.Viol.Main.Control.Camera {
 	public class WebcamFactory : InterfaceFactory {
-		private readonly int index;
+		private readonly int factoryIndex;
 
 		public WebcamFactory(int index) : base() {
-			this.index = index;
+			this.factoryIndex = index;
 		}
 
 		protected override bool CreateInternal() {
@@ -19,7 +19,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 		}
 		protected override bool ConnectInternal() {
 			CaptureSystem.Instance.Invoke(delegate {
-				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Passive, -1);
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(factoryIndex, Listing.EquipmentState.Passive, -1);
 			});
 
 			var btnCapture = Container.GetWidget<Gtk.ToggleButton>("btn_Start");
@@ -51,7 +51,7 @@ namespace Irseny.Viol.Main.Control.Camera {
 			StopCapture();
 			// update as missing after the capture has been stopped
 			CaptureSystem.Instance.Invoke(delegate {
-				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Missing, -1);
+				Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(factoryIndex, Listing.EquipmentState.Missing, -1);
 			});
 			return true;
 		}
@@ -61,20 +61,20 @@ namespace Irseny.Viol.Main.Control.Camera {
 		}
 		private void StartCapture() {
 			CaptureSystem.Instance.Invoke(delegate {
-				bool captureActive = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(index) == Listing.EquipmentState.Active;
+				bool captureActive = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetState(factoryIndex) == Listing.EquipmentState.Active;
 				if (captureActive) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Unable to start capture {0}: Already running", index));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Unable to start capture {0}: Already running", factoryIndex));
 					return;
 				}
 				int streamId = CaptureSystem.Instance.CreateStream();
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream.Start(new CaptureSettings())) {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Active, streamId);
-					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Capture {0} started", index));
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(factoryIndex, Listing.EquipmentState.Active, streamId);
+					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Capture {0} started", factoryIndex));
 					// TODO: apply stream settings to this instance
 					CaptureSettings settings = stream.Settings;
 				} else {
-					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Failed to start capture {0}", index));
+					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Failed to start capture {0}", factoryIndex));
 				}
 			});
 		}
@@ -82,15 +82,15 @@ namespace Irseny.Viol.Main.Control.Camera {
 			CaptureSystem.Instance.Invoke(delegate {
 				// keep in mind that the capture could be missing here 
 				// this is currently prohibited by implicitly enforcing an order: all updates are performed on the capture thread
-				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
+				int streamId = Listing.EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(factoryIndex, -1);
 				if (streamId > -1) {
-					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(index, Listing.EquipmentState.Passive, -1); // switched between missing and passive in base factory
+					Listing.EquipmentMaster.Instance.VideoCaptureStream.Update(factoryIndex, Listing.EquipmentState.Passive, -1); // switched between missing and passive in base factory
 					if (!CaptureSystem.Instance.DestroyStream(streamId)) {
-						LogManager.Instance.Log(LogMessage.CreateError(this, "Capture {0}: Destruction failed", index));
+						LogManager.Instance.Log(LogMessage.CreateError(this, "Capture {0}: Destruction failed", factoryIndex));
 					}
-					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Capture {0} stopped", index));
+					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Capture {0} stopped", factoryIndex));
 				} else {
-					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Failed to stop capture {0}: Not running", index));
+					LogManager.Instance.Log(LogMessage.CreateMessage(this, "Failed to stop capture {0}: Not running", factoryIndex));
 				}
 			});
 		}

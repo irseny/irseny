@@ -5,7 +5,7 @@ using System.Globalization;
 namespace Mycena {
 
 	internal static class TextParseTools {
-		readonly static NumberStyles numberStyle = NumberStyles.AllowDecimalPoint;
+		readonly static NumberStyles numberStyle = NumberStyles.Float;
 		readonly static CultureInfo formatProvider = CultureInfo.InvariantCulture;
 		public static string ParsePath(string text) {
 #if LINUX

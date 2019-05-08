@@ -199,7 +199,7 @@ namespace Mycena {
 				throw new ArgumentException("rootNode: Not an object node: " + rootNode.OuterXml);
 			}
 			var idAttr = rootNode.Attributes["id"]; // may be null
-			// creation property pass
+													// creation property pass
 			var creationProperties = new ConfigProperties();
 			foreach (XmlNode propertyNode in rootNode.ChildNodes) {
 				if (propertyNode.Name.Equals("property")) {
@@ -222,7 +222,12 @@ namespace Mycena {
 #if DEBUG
 			creationProperties.BeginMark();
 #endif
-			T widget = CreateWidget(creationProperties, container, rootFactory.Stock);
+			T widget = null;
+			try {
+				widget = CreateWidget(creationProperties, container, rootFactory.Stock);
+			} catch (ArgumentException e) {
+				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml, e);
+			}
 			if (widget == null) {
 				throw new InvalidOperationException("Cannot instantiate widget from: " + rootNode.OuterXml);
 			}
@@ -254,7 +259,13 @@ namespace Mycena {
 					children.Add(childTuple);
 				}
 			}
-			if (!PackWidgets(widget, children, rootFactory.Stock)) {
+			bool packed = false;
+			try {
+				packed = PackWidgets(widget, children, rootFactory.Stock);
+			} catch (ArgumentException e) {
+				throw new InvalidOperationException("Unable to pack widgets: " + rootNode.OuterXml, e);
+			}
+			if (!packed) {
 				throw new InvalidOperationException("Unable to pack widgets: " + rootNode.OuterXml);
 			}
 			return widget;

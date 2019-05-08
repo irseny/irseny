@@ -33,17 +33,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-    <Reference Include="gtk-sharp">
-      <HintPath>..\..\lib\Common\gtk-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="gdk-sharp">
-      <HintPath>..\..\lib\Common\gdk-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="glib-sharp">
-      <HintPath>..\..\lib\Common\glib-sharp.dll</HintPath>
-    </Reference>
     <Reference Include="gio-sharp">
       <HintPath>..\..\lib\Common\gio-sharp.dll</HintPath>
+      <Package>gio-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gdk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=3.0.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-3.0</Package>
     </Reference>
   </ItemGroup>
   <ItemGroup>

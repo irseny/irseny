@@ -136,6 +136,7 @@ namespace Irseny.Capture.Video {
 			lock (captureSync) {
 				if (capture == null) {
 					capture = new Emgu.CV.VideoCapture(0);
+
 					if (capture.IsOpened) {
 
 						if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {

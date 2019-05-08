@@ -78,13 +78,17 @@ namespace Mycena {
 					properties.RegisterProperty(propertyNode);
 				}
 			}
-			T gadget = CreateGadget(properties, container, rootFactory.Stock);
-			if (gadget != null) {
-				ApplyProperties(gadget, properties, container, rootFactory.Stock);
-				container.RegisterGadget(idAttr.Value, gadget);
-			} else {
+			T gadget = null;
+			try {
+				gadget = CreateGadget(properties, container, rootFactory.Stock);
+			} catch (ArgumentException e) {
+				throw new InvalidOperationException("Cannot instantiate gadget from : " + rootNode.OuterXml, e);
+			}
+			if (gadget == null) {
 				throw new InvalidOperationException("Cannot instantiate gadget from : " + rootNode.OuterXml);
 			}
+			ApplyProperties(gadget, properties, container, rootFactory.Stock);
+			container.RegisterGadget(idAttr.Value, gadget);
 		}
 		/// <summary>
 		/// Creates a gadget with the given properties.
@@ -106,7 +110,13 @@ namespace Mycena {
 			foreach (string p in properties.PropertyNames) {
 				PropertyApplicationHandler<T> handler;
 				if (CreationProperties.TryGetValue(p, out handler)) {
-					if (!handler(gadget, properties, container, stock)) {
+					bool applied = false;
+					try {
+						applied = handler(gadget, properties, container, stock);
+					} catch (ArgumentException e) {
+						throw new InvalidOperationException("Failed to apply property to gadget: " + p, e);
+					}
+					if (!applied) {
 						throw new InvalidOperationException("Failed to apply property to gadget: " + p);
 					}
 				}
