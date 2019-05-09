@@ -1,11 +1,9 @@
-bin/*
+bin
 obj
-lib/Common/*
-lib/External/*
-lib/LinuxDebug
-lib/LinuxRelease
-lib/WindowsRelease
-lib/WindowsDebug
+lib/Emgu.CV/*
+lib/Extrack/*
+lib/Gtk/*
+lib/Mycena/*
 build
 project/.vs
 project/Extrack/bin

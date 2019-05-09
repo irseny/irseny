@@ -32,35 +32,35 @@ namespace Irseny {
 			}
 			bool stopped = false;
 			{
-				var mainFactory = new Viol.MainFactory();
-				var logFactory = new Viol.Main.Log.MainFactory();
-				var controlFactory = new Viol.Main.Control.ControlFactory();
-				var displayFactory = new Irseny.Viol.Main.Display.DisplayFactory();
+				var mainFactory = new Iface.MainFactory();
+				var logFactory = new Iface.Main.Log.MainFactory();
+				var controlFactory = new Iface.Main.Control.ControlFactory();
+				var displayFactory = new Irseny.Iface.Main.View.DisplayFactory();
 				mainFactory.ConstructFloor("Log", logFactory);
 				mainFactory.ConstructFloor("Control", controlFactory);
 				mainFactory.ConstructFloor("Display", displayFactory);
 				{ // control
-					var cameraControlFactory = new Viol.Main.Control.Camera.CameraFactory();
+					var cameraControlFactory = new Iface.Main.Control.Camera.CameraFactory();
 					controlFactory.ConstructFloor("Camera", cameraControlFactory);
-					var trackingControlFactory = new Viol.Main.Control.Tracking.TrackingFactory();
+					var trackingControlFactory = new Iface.Main.Control.Tracking.TrackingFactory();
 					controlFactory.ConstructFloor("Tracking", trackingControlFactory);
-					var outputControlFactory = new Viol.Main.Control.Output.OutputFactory();
+					var outputControlFactory = new Iface.Main.Control.Output.OutputFactory();
 					controlFactory.ConstructFloor("Output", outputControlFactory);
 					{
-						var deviceControlFactory = new Viol.Main.Control.Output.OutputDeviceConfigFactory();
+						var deviceControlFactory = new Iface.Main.Control.Output.OutputDeviceConfigFactory();
 						outputControlFactory.ConstructFloor("Device", deviceControlFactory);
-						var assignmentControlFactory = new Viol.Main.Control.Output.OutputDeviceBindingsFactory();
+						var assignmentControlFactory = new Iface.Main.Control.Output.OutputDeviceBindingsFactory();
 						outputControlFactory.ConstructFloor("Assignment", assignmentControlFactory);
 					}
 				}
 				{ // display
-					var cameraDisplayFactory = new Irseny.Viol.Main.Display.Camera.CameraFactory();
+					var cameraDisplayFactory = new Irseny.Iface.Main.View.Camera.CameraFactory();
 					displayFactory.ConstructFloor("Camera", cameraDisplayFactory);
-					var trackingDisplayFactory = new Irseny.Viol.Main.Display.Tracking.TrackingFactory();
+					var trackingDisplayFactory = new Irseny.Iface.Main.View.Tracking.TrackingFactory();
 					displayFactory.ConstructFloor("Tracking", trackingDisplayFactory);
 				}
 
-				if (!mainFactory.Init(Viol.InterfaceFactoryState.Connected)) {
+				if (!mainFactory.Init(Iface.InterfaceFactoryState.Connected)) {
 					Debug.WriteLine("main factory initialization failed");
 					return;
 				}

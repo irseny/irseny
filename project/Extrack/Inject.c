@@ -3,7 +3,7 @@
 #if WITH_UINPUT
 #if LINUX
 #define IVJ_CONTEXT_CANDIDATE_NUM 2
-char* ivjContextCandidates[IVJ_CONTEXT_CANDIDATE_NUM] = {
+const char* ivjContextCandidates[IVJ_CONTEXT_CANDIDATE_NUM] = {
 	"/dev/uinput",
 	"/dev/input/uinput"
 };
@@ -13,8 +13,8 @@ IvjContext* EXTRACK_EXPORT ivjCreateContext() {
 		int32_t file = open(ivjContextCandidates[i], O_WRONLY | O_NDELAY);
 		if (file >= 0) {
 			IvjContext* context = (IvjContext*)malloc(sizeof(IvjContext));
-			context->fileHandle = file;
-			context->filePath = ivjContextCandidates[i];
+			context->FileHandle = file;
+			strcpy(context->FilePath, ivjContextCandidates[i]);
 			return context;
 		}
 	}
@@ -22,14 +22,15 @@ IvjContext* EXTRACK_EXPORT ivjCreateContext() {
 }
 
 bool EXTRACK_EXPORT ivjDestroyContext(IvjContext* context) {
-	close(context->fileHandle);
+	close(context->FileHandle);
 	free(context);
 	return true;
 }
 
 IvjKeyboardConstructionInfo* EXTRACK_EXPORT ivjAllocKeyboardConstructionInfo() {
 	IvjKeyboardConstructionInfo* info = (IvjKeyboardConstructionInfo*)malloc(sizeof(IvjKeyboardConstructionInfo));
-	info->Name = "Ivj Virtual Keyboard";
+	const char* name = "Ivj Virtual Keyboard";
+	strcpy(info->Name, name);
 	info->Vendor = 0x159;
 	info->Product = 0x51A1;
 	return info;

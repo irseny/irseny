@@ -1,3 +1,5 @@
+#!/bin/sh
 TARGET_DIR=$1
-cp ../lib/External/cvextern.so $TARGET_DIR
-cp ../lib/External/libExtrack.so $TARGET_DIR
+# alt: cp -u "lib/Emgu.CV/libcvextern.so" "${TargetDir}"
+cp -u ../lib/Emgu.CV/libcvextern.so $TARGET_DIR
+cp -u ../lib/Extrack/libExtrack.so $TARGET_DIR
