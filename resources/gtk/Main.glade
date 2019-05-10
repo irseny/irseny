@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
   <object class="GtkWindow" id="win_Main">
@@ -9,13 +9,10 @@
     <property name="default_height">768</property>
     <property name="icon">Icon.png</property>
     <child>
-      <placeholder/>
-    </child>
-    <child>
       <object class="GtkPaned" id="spt_ShowControl">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="position">400</property>
+        <property name="position">512</property>
         <property name="position_set">True</property>
         <property name="wide_handle">True</property>
         <child>
@@ -23,7 +20,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="orientation">vertical</property>
-            <property name="position">340</property>
+            <property name="position">468</property>
             <property name="position_set">True</property>
             <property name="wide_handle">True</property>
             <child>

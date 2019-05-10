@@ -1,12 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkImage" id="img_AlignedSide">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">CapSide</property>
+  </object>
+  <object class="GtkImage" id="img_AlignedTop">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">CapTop</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowBottom1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationBottom</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowBottom2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationBottom</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowH1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowDirectionH</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowH2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowDirectionH</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowLeft">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationLeft</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowRight">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationRight</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowV1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowDirectionV</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowV2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowDirectionV</property>
+  </object>
   <object class="GtkWindow">
     <property name="can_focus">False</property>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkBox" id="box_Root">
         <property name="visible">True</property>
@@ -43,7 +90,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkLabel" id="txt_PosY">
+                      <object class="GtkLabel" id="txt_PosY1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -57,40 +104,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowDirectionV.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage" id="img_Side">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\CapSide.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowRotationRight.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">4</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="txt_Pitch">
+                      <object class="GtkLabel" id="txt_Pitch1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -104,18 +118,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowDirectionH.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="top_attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="txt_PosZZ">
+                      <object class="GtkLabel" id="txt_PosZ1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -128,7 +131,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="txt_YawYaw">
+                      <object class="GtkLabel" id="txt_Yaw1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -141,14 +144,62 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="img_Side">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowRotationBottom.png</property>
+                        <property name="resource">CapSide</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_AxisZ1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowH1</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="top_attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_AxisY1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowRight</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">4</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_Yaw1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowBottom1</property>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
                         <property name="top_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_Roll1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowV1</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">2</property>
                       </packing>
                     </child>
                     <child>
@@ -211,29 +262,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImage" id="img_Top">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\CapTop.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">2</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowDirectionV.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">4</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="txt_PosZ">
+                      <object class="GtkLabel" id="txt_PosZ2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -247,18 +276,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowRotationLeft.png</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="txt_Yaw">
+                      <object class="GtkLabel" id="txt_Yaw2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -272,7 +290,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="txt_PosX">
+                      <object class="GtkLabel" id="txt_PosX1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -285,7 +303,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="txt_Roll">
+                      <object class="GtkLabel" id="txt_Roll1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">0.00</property>
@@ -298,10 +316,46 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="img_Top">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowRotationBottom.png</property>
+                        <property name="resource">CapTop</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_AxisX1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowH2</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="top_attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_AxisZ2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowV2</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">4</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToggleButton" id="btn_Roll2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowBottom2</property>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -309,14 +363,15 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkToggleButton" id="btn_Pitch1">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="pixbuf">..\icons\ArrowDirectionH.png</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="image">img_ArrowLeft</property>
                       </object>
                       <packing>
-                        <property name="left_attach">2</property>
-                        <property name="top_attach">0</property>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">2</property>
                       </packing>
                     </child>
                     <child>
@@ -400,16 +455,6 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkImage" id="img_AlignedSide">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">..\icons\CapSide.png</property>
-  </object>
-  <object class="GtkImage" id="img_AlignedTop">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="pixbuf">..\icons\CapTop.png</property>
   </object>
   <object class="GtkImage" id="img_MissingVideo">
     <property name="visible">True</property>

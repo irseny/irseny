@@ -69,6 +69,7 @@ namespace Irseny {
 				window.ShowAll();
 				window.DeleteEvent += delegate {
 					stopped = true;
+					// TODO: remove all new display elements to prevent invinite marshaling
 				};
 				GLib.ExceptionManager.UnhandledException += (GLib.UnhandledExceptionArgs e) => {
 					LogManager.Instance.Log(LogMessage.CreateError(e.ExceptionObject, e.ExceptionObject.ToString()));

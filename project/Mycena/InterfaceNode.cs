@@ -41,7 +41,7 @@ namespace Mycena {
 		public Gtk.Widget GetWidget(string name) {
 			return GetWidget<Gtk.Widget>(name);
 		}
-		public T GetWidget<T>(string name, T defaultValue) where T : Gtk.Widget {
+		public T GetWidget<T>(string name, T fallbak) where T : Gtk.Widget {
 			if (name == null) throw new ArgumentNullException("name");
 			Gtk.Widget result;
 			if (widgets.TryGetValue(name, out result)) {
@@ -49,10 +49,10 @@ namespace Mycena {
 					return (T)result;
 				}
 			}
-			return defaultValue;
+			return fallbak;
 		}
-		public Gtk.Widget GetWidget(string name, Gtk.Widget defaultValue) {
-			return GetWidget<Gtk.Widget>(name, defaultValue);
+		public Gtk.Widget GetWidget(string name, Gtk.Widget fallback) {
+			return GetWidget<Gtk.Widget>(name, fallback);
 		}
 		public bool TryGetWidget<T>(string name, out T result) where T : Gtk.Widget {
 			if (name == null) throw new ArgumentNullException("name");
@@ -73,7 +73,7 @@ namespace Mycena {
 			try {
 				widgets.Add(name, widget);
 			} catch (ArgumentException) {
-				throw new ArgumentException("name: widget with this name does already exist");
+				throw new ArgumentException("name: widget " + name + "does already exist");
 			}
 		}
 		public void AddWidget(Gtk.Widget widget) {
@@ -90,10 +90,10 @@ namespace Mycena {
 				if (result is T) {
 					return (T)result;
 				} else {
-					throw new ArgumentException("type argument");
+					throw new ArgumentException("type argument: cannot cast " + result.GetType() + " to " + typeof(T));
 				}
 			} else {
-				throw new ArgumentException("name");
+				throw new ArgumentException("name", name);
 			}
 		}
 		public GLib.Object GetGadget(string name) {
@@ -131,7 +131,7 @@ namespace Mycena {
 			try {
 				gadgets.Add(name, gadget);
 			} catch (ArgumentException) {
-				throw new ArgumentException("name: Gadget with this name does already exist");
+				throw new ArgumentException("name: Gadget " + name + " does already exist");
 			}
 		}
 		public void AddGadget(GLib.Object gadget) {
