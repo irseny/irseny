@@ -58,6 +58,8 @@ namespace Irseny {
 					displayFactory.ConstructFloor("Camera", cameraDisplayFactory);
 					var trackingDisplayFactory = new Irseny.Iface.Main.View.Tracking.TrackingFactory();
 					displayFactory.ConstructFloor("Tracking", trackingDisplayFactory);
+					var bindingsDisplayFactory = new Irseny.Iface.Main.View.Bindings.BindingsFactory();
+					displayFactory.ConstructFloor("Bindings", bindingsDisplayFactory);
 				}
 
 				if (!mainFactory.Init(Iface.InterfaceFactoryState.Connected)) {

@@ -215,6 +215,8 @@
     <Compile Include="Iface\Main\Control\Output\OuputDeviceSignalBindingFactory.cs" />
     <Compile Include="Inco\Device\VirtualDeviceCapability.cs" />
     <Compile Include="Inco\Device\VirtualDeviceAccess.cs" />
+    <Compile Include="Iface\Main\View\Bindings\BindingsFactory.cs" />
+    <Compile Include="Iface\Main\View\Bindings\CapBindingsFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -239,6 +241,7 @@
     <Folder Include="Iface\Main\Control\Output\" />
     <Folder Include="Inco\" />
     <Folder Include="Inco\Device\" />
+    <Folder Include="Iface\Main\View\Bindings\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

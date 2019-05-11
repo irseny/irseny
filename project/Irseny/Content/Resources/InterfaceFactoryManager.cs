@@ -19,6 +19,8 @@ namespace Irseny.Content.Resources {
 				"CapTrackingControl",
 				"TrackingDisplay",
 				"CapTrackingDisplay",
+				"BindingsDisplay",
+				"CapBindingsDisplay",
 				"OutputControl",
 				"OutputDeviceConfig",
 				"VirtualKeyboardConfig",

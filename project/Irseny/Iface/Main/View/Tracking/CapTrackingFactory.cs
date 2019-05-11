@@ -20,19 +20,6 @@ namespace Irseny.Iface.Main.View.Tracking {
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingDisplay");
 			Container = factory.CreateWidget("box_Root");
-			{
-				var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
-				var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
-				imgTopTarget.Pixbuf = ImageTools.Rotate(imgTopSource.Pixbuf, 0,
-					ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source);
-
-			}
-			{
-				var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
-				var imgSideTarget = Container.GetWidget<Gtk.Image>("img_Side");
-				imgSideTarget.Pixbuf = ImageTools.Rotate(imgSideSource.Pixbuf, 0,
-					ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source);
-			}
 			return true;
 		}
 		protected override bool ConnectInternal() {
@@ -75,7 +62,6 @@ namespace Irseny.Iface.Main.View.Tracking {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
 						tracker.InputProcessed += RetrieveImage;
-						tracker.PositionDetected += RetrievePosition;
 					}
 				}
 			});
@@ -87,7 +73,6 @@ namespace Irseny.Iface.Main.View.Tracking {
 					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 					if (tracker != null) {
 						tracker.InputProcessed -= RetrieveImage;
-						tracker.PositionDetected -= RetrievePosition;
 					}
 				}
 			});
@@ -104,76 +89,6 @@ namespace Irseny.Iface.Main.View.Tracking {
 			}
 			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			imgVideoOut.SetFromStock(videoOutStock, videoOutSize);*/
-		}
-		private void RetrievePosition(object sender, Tracap.PositionDetectedEventArgs args) {
-			Tracap.CapPosition position = args.Position;
-			Invoke(delegate {
-				if (!Initialized) {
-					return;
-				}
-				{
-					var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
-					var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
-					Gdk.Pixbuf rotated = ImageTools.Rotate(imgTopSource.Pixbuf, position.Yaw,
-											 ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
-											 backgroundColor, imgTopTarget.Pixbuf);
-
-					if (imgTopTarget.Pixbuf != rotated) {
-						imgTopTarget.Pixbuf.Dispose();
-					}
-					imgTopTarget.Pixbuf = rotated;
-					imgTopTarget.QueueDraw();
-				}
-				{
-					var imgSideTarget = Container.GetWidget<Gtk.Image>("img_Side");
-					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
-					Gdk.Pixbuf rotated = ImageTools.Rotate(imgSideSource.Pixbuf, position.Pitch,
-											 ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
-											 backgroundColor, imgSideTarget.Pixbuf);
-					if (imgSideTarget.Pixbuf != rotated) {
-						imgSideTarget.Pixbuf.Dispose();
-					}
-					imgSideTarget.Pixbuf = rotated;
-					imgSideTarget.QueueDraw();
-				}
-				{
-					string sYaw = string.Format("{0:N2}", position.Yaw);
-					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw");
-					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_YawYaw");
-					txtYaw1.Text = sYaw;
-					txtYaw2.Text = sYaw;
-				}
-				{
-					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch");
-					txtPitch.Text = string.Format("{0:N2}", position.Pitch);
-				}
-				{
-					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
-					txtRoll.Text = string.Format("{0:N2}", position.Roll);
-
-				}
-				{
-					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX");
-					txtPosX.Text = string.Format("{0:N2}", position.PosX);
-				}
-				{
-					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY");
-					txtPosY.Text = string.Format("{0:N2}", position.PosY);
-				}
-				{
-					string sPosZ = string.Format("{0:N2}", position.PosZ);
-					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ");
-					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZZ");
-					txtPosZ.Text = sPosZ;
-					txtPosZZ.Text = sPosZ;
-				}
-				/*{
-					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
-					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
-						imgSideSource.Pixbuf, angle, ImageTools.RotatedImageSize.Maximized,
-						ImageTools.RotatedImageAlpha.Enabled, new Gdk.Color(), rotatedImage);
-				}*/
-			});
 		}
 		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
 			int width = 0;

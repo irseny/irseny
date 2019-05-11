@@ -22,8 +22,8 @@ namespace Mycena {
 		public Gtk.Widget this[string name] {
 			get { return GetWidget(name); }
 		}
-		public Gtk.Widget this[string name, Gtk.Widget defaultValue] {
-			get { return GetWidget(name, defaultValue); }
+		public Gtk.Widget this[string name, Gtk.Widget fallback] {
+			get { return GetWidget(name, fallback); }
 		}
 		public T GetWidget<T>(string name) where T : Gtk.Widget {
 			if (name == null) throw new ArgumentNullException("name");
@@ -35,7 +35,7 @@ namespace Mycena {
 					throw new ArgumentException("type argument");
 				}
 			} else {
-				throw new ArgumentException("name");
+				throw new ArgumentException("name", name);
 			}
 		}
 		public Gtk.Widget GetWidget(string name) {
