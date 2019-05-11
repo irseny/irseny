@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">LinuxDebug</Configuration>
@@ -8,6 +8,8 @@
     <RootNamespace>Mycena</RootNamespace>
     <AssemblyName>Mycena</AssemblyName>
     <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -19,6 +21,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +31,8 @@
     <DefineConstants>DEBUG;WINDOWS</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <Reference Include="System" />
@@ -47,9 +51,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
+    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-     <Reference Include="GioSharp">
+    <Reference Include="GioSharp">
       <HintPath>..\..\lib\Gtk\GioSharp.dll</HintPath>
       <Package>GioSharp</Package>
     </Reference>
@@ -73,7 +78,7 @@
       <HintPath>..\..\lib\Gtk\CairoSharp.dll</HintPath>
       <Package>CairoSharp</Package>
     </Reference>
-     <Reference Include="PangoSharp">
+    <Reference Include="PangoSharp">
       <HintPath>..\..\lib\Gtk\PangoSharp.dll</HintPath>
       <Package>PangoSharp</Package>
     </Reference>
@@ -130,9 +135,5 @@
     <Compile Include="Widgets\DrawingAreaFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Widgets\" />
-    <Folder Include="Gadgets\" />
-    <Folder Include="Stock\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

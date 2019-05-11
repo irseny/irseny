@@ -8,6 +8,8 @@
     <RootNamespace>Irseny</RootNamespace>
     <AssemblyName>Irseny</AssemblyName>
     <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,26 +53,6 @@
     </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\bin\LinuxRelease</OutputPath>
-    <DefineConstants>LINUX;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp -u "lib/External/libcvextern.so" "${TargetDir}"</command>
-          <workingdir>${SolutionDir}/../</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
-    <Externalconsole>true</Externalconsole>
-    <PlatformTarget>x86</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <Reference Include="System" />
     <Reference Include="System.ServiceModel" />
@@ -98,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
+	<Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Drawing" />
