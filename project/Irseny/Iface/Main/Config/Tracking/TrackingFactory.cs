@@ -1,12 +1,12 @@
 ﻿using System;
 using Irseny.Content;
 
-namespace Irseny.Iface.Main.Control.Tracking {
+namespace Irseny.Iface.Main.Config.Tracking {
 	public class TrackingFactory : InterfaceFactory {
 		public TrackingFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingControl");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

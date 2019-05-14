@@ -8,7 +8,7 @@ namespace Irseny.Iface.Main.View.Camera {
 		public CameraFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraDisplay");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraView");
 			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}

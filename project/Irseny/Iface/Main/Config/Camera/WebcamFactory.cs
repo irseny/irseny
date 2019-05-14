@@ -4,7 +4,7 @@ using Irseny.Content;
 using Irseny.Log;
 using Irseny.Capture.Video;
 
-namespace Irseny.Iface.Main.Control.Camera {
+namespace Irseny.Iface.Main.Config.Camera {
 	public class WebcamFactory : InterfaceFactory {
 		private readonly int factoryIndex;
 
@@ -13,7 +13,7 @@ namespace Irseny.Iface.Main.Control.Camera {
 		}
 
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamControl");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

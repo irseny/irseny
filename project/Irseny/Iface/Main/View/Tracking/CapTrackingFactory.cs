@@ -18,7 +18,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 			this.trackerIndex = trackerIndex;
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingDisplay");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingView");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

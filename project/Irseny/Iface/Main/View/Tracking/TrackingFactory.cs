@@ -8,7 +8,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 		public TrackingFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingDisplay");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingView");
 			Container = factory.CreateWidget("ntb_Root");
 			return true;
 		}

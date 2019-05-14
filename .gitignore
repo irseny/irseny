@@ -1,5 +1,6 @@
 bin
 obj
+trash
 lib/Emgu.CV/*
 lib/Extrack/*
 lib/Gtk/*

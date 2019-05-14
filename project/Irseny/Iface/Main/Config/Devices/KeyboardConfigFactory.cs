@@ -4,20 +4,20 @@ using Irseny.Content;
 using Irseny.Inco.Device;
 using Irseny.Listing;
 
-namespace Irseny.Iface.Main.Control.Output {
-	public class VirtualKeyboardConfigFactory : InterfaceFactory {
+namespace Irseny.Iface.Main.Config.Devices {
+	public class KeyboardConfigFactory : InterfaceFactory {
 		readonly int keyboardIndex;
 		readonly int deviceIndex;
 
 
-		public VirtualKeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
+		public KeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
 			this.keyboardIndex = keyboardIndex;
 			this.deviceIndex = deviceIndex;
 		}
 		protected override bool CreateInternal() {
 
 			// TODO: create device and add to equipment
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("VirtualKeyboardConfig");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("KeyboardConfig");
 			Container = factory.CreateWidget("box_Root");
 
 			VirtualDeviceManager.Instance.Invoke(delegate {
@@ -35,11 +35,11 @@ namespace Irseny.Iface.Main.Control.Output {
 		}
 		protected override bool ConnectInternal() {
 			{
-				var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
+				/*var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
 				var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
 				var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
 				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_UpdateRate");
-				rdbTimed.Clicked += PolicyUpdated;
+				rdbTimed.Clicked += PolicyUpdated;*/
 			}
 			return true;
 		}
@@ -65,13 +65,13 @@ namespace Irseny.Iface.Main.Control.Output {
 			return true;
 		}
 		private void PolicyUpdated(object sender, EventArgs args) {
-			var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
+			/*var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
 			var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
 			var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
 			int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
 			if (deviceId > -1) {
 				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
-			}
+			}*/
 		}
 
 	}

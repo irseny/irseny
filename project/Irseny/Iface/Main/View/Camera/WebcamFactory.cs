@@ -19,7 +19,7 @@ namespace Irseny.Iface.Main.View.Camera {
 
 
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamDisplay");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamView");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

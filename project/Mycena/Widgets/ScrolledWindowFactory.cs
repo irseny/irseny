@@ -7,6 +7,8 @@ namespace Mycena {
 		public ScrolledWindowFactory() : base() {
 			CreationProperties.Add("hscrollbar_policy", SetPolicy);
 			CreationProperties.Add("vscrollbar_policy", SetPolicy);
+			CreationProperties.Add("propagate_natural_width", SetHExpand);
+			CreationProperties.Add("propagate_natural_height", SetVExpand);
 			CreationProperties.Add("shadow_type", SetShadow);
 		}
 
@@ -14,7 +16,37 @@ namespace Mycena {
 			return new Gtk.ScrolledWindow();
 		}
 		protected override bool PackWidget(Gtk.ScrolledWindow container, Gtk.Widget child, ConfigProperties properties, IInterfaceStock stock) {
-			container.AddWithViewport(child);
+			if (child is Gtk.Viewport) {
+				container.Add(child);
+			} else {
+				container.AddWithViewport(child);
+			}
+			return true;
+		}
+		private static bool SetHExpand(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			bool expand = false;
+			try {
+				string sExpand;
+				if (properties.TryGetProperty("propagate_natural_width", out sExpand)) {
+					expand = TextParseTools.ParseBool(sExpand);
+				}
+			} catch (FormatException) {
+				return false;
+			}
+			widget.Hexpand = expand;
+			return true;
+		}
+		private static bool SetVExpand(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
+			bool expand = false;
+			try {
+				string sExpand;
+				if (properties.TryGetProperty("propagate_natural_height", out sExpand)) {
+					expand = TextParseTools.ParseBool(sExpand);
+				}
+			} catch (FormatException) {
+				return false;
+			}
+			widget.Vexpand = expand;
 			return true;
 		}
 		private static bool SetPolicy(Gtk.ScrolledWindow widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {

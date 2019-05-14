@@ -34,24 +34,24 @@ namespace Irseny {
 			{
 				var mainFactory = new Iface.MainFactory();
 				var logFactory = new Iface.Main.Log.MainFactory();
-				var controlFactory = new Iface.Main.Control.ControlFactory();
-				var displayFactory = new Irseny.Iface.Main.View.DisplayFactory();
+				var controlFactory = new Iface.Main.Config.ConfigFactory();
+				var displayFactory = new Irseny.Iface.Main.View.ViewFactory();
 				mainFactory.ConstructFloor("Log", logFactory);
 				mainFactory.ConstructFloor("Control", controlFactory);
 				mainFactory.ConstructFloor("Display", displayFactory);
 				{ // control
-					var cameraControlFactory = new Iface.Main.Control.Camera.CameraFactory();
+					var cameraControlFactory = new Iface.Main.Config.Camera.CameraFactory();
 					controlFactory.ConstructFloor("Camera", cameraControlFactory);
-					var trackingControlFactory = new Iface.Main.Control.Tracking.TrackingFactory();
+					var trackingControlFactory = new Iface.Main.Config.Tracking.TrackingFactory();
 					controlFactory.ConstructFloor("Tracking", trackingControlFactory);
-					var outputControlFactory = new Iface.Main.Control.Output.OutputFactory();
+					var outputControlFactory = new Iface.Main.Config.Devices.DeviceConfigFactory();
 					controlFactory.ConstructFloor("Output", outputControlFactory);
-					{
+					/*{
 						var deviceControlFactory = new Iface.Main.Control.Output.OutputDeviceConfigFactory();
 						outputControlFactory.ConstructFloor("Device", deviceControlFactory);
 						var assignmentControlFactory = new Iface.Main.Control.Output.OutputDeviceBindingsFactory();
 						outputControlFactory.ConstructFloor("Assignment", assignmentControlFactory);
-					}
+					}*/
 				}
 				{ // display
 					var cameraDisplayFactory = new Irseny.Iface.Main.View.Camera.CameraFactory();

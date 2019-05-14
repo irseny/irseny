@@ -14,7 +14,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			this.trackerIndex = trackerIndex;
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapBindingsDisplay");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapBindingsView");
 			Container = factory.CreateWidget("box_Root");
 			{
 				var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");

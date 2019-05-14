@@ -9,26 +9,19 @@ namespace Irseny.Content.Resources {
 			string[] entryNames = new string[] {
 				"Main",
 				"Log",
-				"Display",
-				"CameraDisplay",
-				"WebcamDisplay",
-				"Control",
-				"CameraControl",
-				"WebcamControl",
-				"TrackingControl",
-				"CapTrackingControl",
-				"TrackingDisplay",
-				"CapTrackingDisplay",
-				"BindingsDisplay",
-				"CapBindingsDisplay",
-				"OutputControl",
-				"OutputDeviceConfig",
-				"VirtualKeyboardConfig",
-				"OutputDeviceBindings",
-				"VirtualKeyboardBindings",
-				"OutputDeviceSignalBinding"
-
-
+				"View",
+				"CameraView",
+				"WebcamView",
+				"Config",
+				"CameraConfig",
+				"WebcamConfig",
+				"TrackingConfig",
+				"CapTrackingConfig",
+				"TrackingView",
+				"CapTrackingView",
+				"CapBindingsView",
+				"DeviceConfig",
+				"KeyboardConfig"
 			};
 			for (int i = 0; i < entryNames.Length; i++) {
 				var stock = ContentMaster.Instance.Resources.InterfaceStock.GetEntry("Main"); // load this first

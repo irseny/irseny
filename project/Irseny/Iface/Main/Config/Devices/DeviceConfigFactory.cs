@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irseny.Content;
+using Irseny.Log;
 
-namespace Irseny.Iface.Main.Control.Output {
-	public class OutputDeviceConfigFactory : InterfaceFactory {
+namespace Irseny.Iface.Main.Config.Devices {
+	public class DeviceConfigFactory : InterfaceFactory {
 		ISet<string> usedNames = new HashSet<string>();
 		bool[] deviceClaimed = new bool[32];
-		public OutputDeviceConfigFactory() : base() {
+		public DeviceConfigFactory() : base() {
 
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("OutputDeviceConfig");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("DeviceConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
@@ -91,11 +92,12 @@ namespace Irseny.Iface.Main.Control.Output {
 			IInterfaceFactory floor;
 			switch (deviceType) {
 			case VirtualDeviceType.Keyboard:
-				floor = new VirtualKeyboardConfigFactory(innerIndex, deviceIndex);
+				floor = new KeyboardConfigFactory(innerIndex, deviceIndex);
 				break;
 			case VirtualDeviceType.Joystick:
 			case VirtualDeviceType.Mouse:
 			case VirtualDeviceType.TrackingInterface:
+				LogManager.Instance.Log(LogMessage.CreateError(this, "Configuration not implemented"));
 				return false;
 			default:
 				throw new ArgumentException("deviceType: Unknown type: " + deviceType);

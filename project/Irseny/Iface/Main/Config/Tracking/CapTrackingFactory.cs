@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Irseny.Content;
 
-namespace Irseny.Iface.Main.Control.Tracking {
+namespace Irseny.Iface.Main.Config.Tracking {
 	public class CapTrackingFactory : InterfaceFactory {
 		readonly int index;
 		VideoTrackerConnection connection = null;
@@ -10,7 +10,7 @@ namespace Irseny.Iface.Main.Control.Tracking {
 			this.index = index;
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingControl");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}

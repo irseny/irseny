@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
-  <requires lib="gtk+" version="3.12"/>
+  <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="img_Add">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -54,6 +54,24 @@
             <property name="position">1</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkComboBoxText" id="cbb_Type">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active">0</property>
+            <items>
+              <item id="0" translatable="yes">Keyboard</item>
+              <item id="1" translatable="yes">Joystick</item>
+              <item id="2" translatable="yes">TrackIR</item>
+            </items>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -62,7 +80,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkNotebook" id="ntb_Root">
+      <object class="GtkNotebook" id="ntb_Device">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="tab_pos">right</property>

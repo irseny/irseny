@@ -1,12 +1,12 @@
 ﻿using System;
 using Irseny.Content;
 
-namespace Irseny.Iface.Main.Control.Camera {
+namespace Irseny.Iface.Main.Config.Camera {
 	public class CameraFactory : InterfaceFactory {
 		public CameraFactory() : base() {
 		}
 		protected override bool CreateInternal() {
-			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraControl");
+			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CameraConfig");
 			Container = factory.CreateWidget("box_Root");
 			return true;
 		}
