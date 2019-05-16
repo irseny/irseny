@@ -20,6 +20,7 @@ namespace Irseny.Content.Resources {
 				"TrackingView",
 				"CapTrackingView",
 				"CapBindingsView",
+				"BindingTab",
 				"DeviceConfig",
 				"KeyboardConfig"
 			};

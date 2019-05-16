@@ -55,6 +55,8 @@ namespace Irseny.Iface.Main.View.Bindings {
 			int page = ntbTracker.NPages;
 			var factory = new CapBindingsFactory(page);
 			ConstructFloor("Track" + page, factory);
+			var bindingFactory = new BindingTabFactory();
+			factory.ConstructFloor("Binding", bindingFactory);
 			var boxTracker = factory.Container.GetWidget("box_Root");
 			var label = new Gtk.Label("Track" + page);
 			Container.AddWidget(label);

@@ -196,6 +196,7 @@
     <Compile Include="Inco\Device\VirtualDeviceAccess.cs" />
     <Compile Include="Iface\Main\View\Bindings\BindingsFactory.cs" />
     <Compile Include="Iface\Main\View\Bindings\CapBindingsFactory.cs" />
+    <Compile Include="Iface\Main\View\Bindings\BindingTabFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

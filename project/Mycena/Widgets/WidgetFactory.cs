@@ -28,8 +28,9 @@ namespace Mycena {
 			widgets.Add("GtkFrame", new FrameFactory());
 			widgets.Add("GtkExpander", new ExpanderFactory());
 
-			widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
-			widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
+			//widgets.Add("GtkHSeparator", new HorizontalSeparatorFactory());
+			//widgets.Add("GtkVSeparator", new VerticalSeparatorFactory());
+			widgets.Add("GtkSeparator", new SeparatorFactory());
 
 			widgets.Add("GtkScale", new ScaleFactory());
 
