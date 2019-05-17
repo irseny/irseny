@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using Irseny.Content;
 using Irseny.Listing;
+using Irseny.Tracap;
+
 namespace Irseny.Iface.Main.View.Bindings {
 	public class BindingsFactory : InterfaceFactory {
 		public BindingsFactory() : base() {
@@ -55,7 +57,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			int page = ntbTracker.NPages;
 			var factory = new CapBindingsFactory(page);
 			ConstructFloor("Track" + page, factory);
-			var bindingFactory = new BindingTabFactory();
+			var bindingFactory = new BindingTabFactory(page);
 			factory.ConstructFloor("Binding", bindingFactory);
 			var boxTracker = factory.Container.GetWidget("box_Root");
 			var label = new Gtk.Label("Track" + page);

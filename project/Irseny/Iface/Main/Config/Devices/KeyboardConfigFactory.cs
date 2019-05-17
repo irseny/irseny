@@ -26,7 +26,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to mount keyboard: " + keyboardIndex));
 				}
 				// TODO: translate from keyboard to device index
-				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
+				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
 			});
 
 
@@ -49,12 +49,12 @@ namespace Irseny.Iface.Main.Config.Devices {
 
 		protected override bool DestroyInternal() {
 			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
+				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount unregistered keyboard: " + keyboardIndex));
 					return;
 				}
-				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Missing, -1);
+				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
 				if (VirtualDeviceManager.Instance.UnmountDevice(deviceId) == null) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount keyboard: " + keyboardIndex));
 					return;

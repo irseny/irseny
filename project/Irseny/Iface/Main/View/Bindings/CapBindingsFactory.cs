@@ -2,10 +2,12 @@
 using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Util;
+using Irseny.Tracap;
 
 namespace Irseny.Iface.Main.View.Bindings {
 	public class CapBindingsFactory : InterfaceFactory {
 		int trackerIndex;
+		bool lockBinding = false;
 		Gdk.Color backgroundColor = new Gdk.Color(0xFF, 0xFF, 0xFF) { Pixel = 0xFF };
 		/*string videoOutStock = "gtk-missing-image";
 		Gtk.IconSize videoOutSize = Gtk.IconSize.Button;*/
@@ -35,6 +37,32 @@ namespace Irseny.Iface.Main.View.Bindings {
 			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
+			{
+				Gtk.ToggleButton[] buttons = GetBindingButtons();
+				for (int i = 0; i + 1 < buttons.Length; i += 2) {
+					if (buttons[i] != null) {
+						buttons[i].Clicked += CreateToggleAxisCallback(buttons[i + 1], buttons);
+					}
+					if (buttons[i + 1] != null) {
+						buttons[i + 1].Clicked += CreateToggleAxisCallback(buttons[i], buttons);
+					}
+				}
+				CapAxis[] axes = new CapAxis[] {
+					CapAxis.X, CapAxis.X,
+					CapAxis.Y, CapAxis.Y,
+					CapAxis.Z, CapAxis.Z,
+					CapAxis.Yaw, CapAxis.Yaw,
+					CapAxis.Pitch, CapAxis.Pitch,
+					CapAxis.Roll, CapAxis.Roll
+					};
+
+				for (int i = 0; i < buttons.Length; i++) {
+					if (buttons[i] != null) {
+						buttons[i].Toggled += CreateOpenTabCallback(axes[i]);
+					}
+				}
+			}
+
 			return true;
 		}
 
@@ -48,6 +76,69 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// TODO: fix bug: removing a started tracker will make subsequently added trackers not receive images
 			Container.Dispose();
 			return true;
+		}
+		private Gtk.ToggleButton[] GetBindingButtons() {
+			Gtk.ToggleButton[] buttons = new Gtk.ToggleButton[(3 + 3)*2];
+			string[] names = new string[] {
+					"btn_AxisX1",
+					"btn_AxisX2",
+					"btn_AxisY1",
+					"btn_AxisY2",
+					"btn_AxisZ1",
+					"btn_AxisZ2",
+					"btn_Yaw1",
+					"btn_Yaw2",
+					"btn_Pitch1",
+					"btn_Pitch2",
+					"btn_Roll1",
+					"btn_Roll2",
+				};
+			for (int i = 0; i < buttons.Length; i++) {
+				buttons[i] = Container.GetWidget<Gtk.ToggleButton>(names[i], null);
+			}
+
+			return buttons;
+		}
+		private EventHandler CreateToggleAxisCallback(Gtk.ToggleButton alternative, Gtk.ToggleButton[] all) {
+			return (object sender, EventArgs e) => {
+				if (lockBinding) {
+					return; // do not react to modified buttons
+				}
+				lockBinding = true;
+				var master = (Gtk.ToggleButton)sender;
+				bool target = master.Active;
+				// make the alternative button have the same state as the master
+				if (alternative != null) {
+					if (alternative.Active != target) {
+						alternative.Click();
+					}
+				}
+				// disable all other buttons
+				if (target) {
+					foreach (Gtk.ToggleButton button in all) {
+						if (button != master && button != alternative && button != null) {
+							if (button.Active) {
+								button.Click();
+							}
+						}
+					}
+				}
+				lockBinding = false;
+			};
+		}
+		private EventHandler CreateOpenTabCallback(CapAxis axis) {
+			return (object sender, EventArgs e) => {
+				if (lockBinding) {
+					return; // do not open multiple times
+				}
+				var floor = GetFloor<BindingTabFactory>("Binding");
+				Gtk.ToggleButton button = (Gtk.ToggleButton)sender;
+				if (button.Active) {
+					floor.RestoreBinding(axis);
+				} else {
+					floor.Hide();
+				}
+			};
 		}
 		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
 			if (args.Index == trackerIndex) {

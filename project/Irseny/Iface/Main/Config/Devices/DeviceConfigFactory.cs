@@ -55,7 +55,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				AddDevice(VirtualDeviceType.Mouse);
 			} else if (typeName.Equals("Joystick")) {
 				AddDevice(VirtualDeviceType.Joystick);
-			} else if (typeName.Equals("TrackIR")) {
+			} else if (typeName.Equals("Freetrack")) {
 				AddDevice(VirtualDeviceType.TrackingInterface);
 			}
 

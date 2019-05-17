@@ -146,7 +146,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToggleButton" id="btn_AxisY1">
+                  <object class="GtkToggleButton" id="btn_Roll1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -172,7 +172,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToggleButton" id="btn_Roll1">
+                  <object class="GtkToggleButton" id="btn_AxisY1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
