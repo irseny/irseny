@@ -21,7 +21,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			Container = factory.CreateWidget("box_Root");
 
 			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = VirtualDeviceManager.Instance.MountDevice(new VirtualKeyboard());
+				int deviceId = VirtualDeviceManager.Instance.MountDevice(new VirtualKeyboard(keyboardIndex));
 				if (deviceId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to mount keyboard: " + keyboardIndex));
 				}

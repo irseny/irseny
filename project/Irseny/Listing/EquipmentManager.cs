@@ -26,10 +26,9 @@ namespace Irseny.Listing {
 			}
 		}
 		private void ShareUpdates() {
-			// updates can arrive out of order if multiple threads can share them at the same time
-			// need to stay in lock here
 			lock (updateSync) {
 				while (updateQueue.Count > 0) {
+					// to avoid order conflicts we need to stay in the locked region
 					OnUpdated(updateQueue.Dequeue());
 				}
 			}
@@ -78,6 +77,13 @@ namespace Irseny.Listing {
 			result = default(TE);
 			return false;
 		}
+		/// <summary>
+		/// Updates the equipment view and sends updated information to all subscribers on the calling thread.
+		/// To avoid conflicts of order this method should only be called by a single thread.
+		/// </summary>
+		/// <param name="index">Index.</param>
+		/// <param name="state">State.</param>
+		/// <param name="equipment">Equipment.</param>
 		public void Update(int index, EquipmentState state, T equipment) {
 			if (index < 0) throw new ArgumentOutOfRangeException("index");
 			lock (equipmentSync) {
@@ -99,11 +105,42 @@ namespace Irseny.Listing {
 					}
 				}
 				this.equipment[index] = Tuple.Create(state, equipment);
+				// update queue lock
 				lock (updateSync) {
+					// to avoid order conflicts we can not leave the outer lock
 					updateQueue.Enqueue(new EquipmentUpdateArgs<T>(index, state, lastState, equipment));
 				}
 			}
+			// we can now leave the locked regions because updates have been enqueued
+			// and can therefore no longer change order
+			// keep in mind that this only works reliably if updates com from only one thread
 			ShareUpdates();
+		}
+		/// <summary>
+		/// Sends the current equipment view through the given event handler on the calling thread.
+		/// To receive all updates objects should subscribe to equipment updates before calling this method.
+		/// Subscribing methods may have an inconsistent view on equipment before this method terminates.
+		/// After termination objects should have an equipment view that is consistent with the current view.
+		/// Note that updates can still be sent through other threads which may result in double updates.
+		/// </summary>
+		/// <param name="handler">Event handler that the subscribing object receives updates through.</param>
+		public void SendEquipment(EventHandler<EquipmentUpdateArgs<T>> handler) {
+			if (handler == null) throw new ArgumentNullException("handler");
+			var argsQueue = new Queue<EquipmentUpdateArgs<T>>(equipment.Count);
+			lock (equipmentSync) {
+				// collect the current view of the equipment
+				for (int i = 0; i < equipment.Count; i++) {
+					if (equipment[i] != null) {
+						argsQueue.Enqueue(new EquipmentUpdateArgs<T>(i, equipment[i].Item1, equipment[i].Item1, equipment[i].Item2));
+					}
+				}
+				// share the information before its state changes
+				// there is no benefit from locking the update sync object
+				// to avoid order conflicts we can not leave the lock
+				while (argsQueue.Count > 0) {
+					handler(this, argsQueue.Dequeue());
+				}
+			}
 		}
 	}
 }

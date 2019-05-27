@@ -3,10 +3,16 @@
 namespace Irseny.Inco.Device {
 	public class VirtualKeyboard : IVirtualDevice {
 		IntPtr deviceHandle = IntPtr.Zero;
-		public VirtualKeyboard() {
+		int deviceIndex;
+
+		public VirtualKeyboard(int index) {
+			this.deviceIndex = index;
 		}
 		public VirtualDeviceType DeviceType {
 			get { return VirtualDeviceType.Keyboard; }
+		}
+		public int DeviceIndex {
+			get { return deviceIndex; }
 		}
 		public bool SupportsAccess(VirtualDeviceAccess access) {
 			switch (access) {
@@ -27,7 +33,7 @@ namespace Irseny.Inco.Device {
 		public int GetKeyNo(VirtualDeviceCapability capability) {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				return 255;
+				return 6;
 			default:
 				return 0;
 			}
@@ -36,7 +42,7 @@ namespace Irseny.Inco.Device {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
 				return new string[] {
-				"Q", "W", "E", "R", "Z"
+				"Q", "W", "E", "R", "T", "Z"
 			};
 			default:
 				return new string[0];
@@ -46,7 +52,7 @@ namespace Irseny.Inco.Device {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
 				return new object[] {
-					new object(), new object(), new object(), new object(), new object()
+					"Q", "W", "E", "R", "T", "Z"
 				};
 			default:
 				return new object[0];
