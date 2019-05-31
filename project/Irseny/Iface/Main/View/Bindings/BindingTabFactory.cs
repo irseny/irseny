@@ -27,6 +27,9 @@ namespace Irseny.Iface.Main.View.Bindings {
 		Dictionary<CapAxis, int> setupDeviceKeyIndex = new Dictionary<CapAxis, int>();
 		Dictionary<CapAxis, object> setupAxisTranslation = new Dictionary<CapAxis, object>();
 
+		// locking
+		bool lockSelection = false;
+
 
 
 		public BindingTabFactory(int trackerIndex) : base() {
@@ -83,9 +86,26 @@ namespace Irseny.Iface.Main.View.Bindings {
 			return true;
 		}
 		public void RestoreBinding(CapAxis axis) {
+			// activate UI
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = true;
 			expRoot.Sensitive = true;
+			// restore active and selection fields
+			activeTrackerAxis = axis;
+			if (!setupDeviceIndex.TryGetValue(axis, out activeDeviceIndex)) {
+				activeDeviceIndex = -1;
+			}
+			// TODO: work with key instead of index
+			if (!setupDeviceKeyIndex.TryGetValue(axis, out activeDeviceKeyIndex)) {
+				activeDeviceKeyIndex = -1;
+			}
+			// rebuild UI elements
+			BuildDeviceSelection();
+			BuildCapabilitySelection();
+			// restore active selection in UI
+			SetActiveDeviceIndex(activeDeviceIndex);
+			SetActiveDeviceCapability(activeDeviceKeyIndex);
+			// TODO: reset state
 		}
 		public void Hide() {
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
@@ -95,9 +115,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		public void ApplyBinding() {
 
 		}
-		private void FindTargets() {
 
-		}
 		/// <summary>
 		/// Updates the displayed and selectable device information.
 		/// Queries new device information first.
@@ -120,20 +138,6 @@ namespace Irseny.Iface.Main.View.Bindings {
 					int deviceKey = device.DeviceIndex;
 					VirtualDeviceType deviceType = device.DeviceType;
 
-					var capabilities = new List<VirtualDeviceCapability>();
-					var descriptions = new List<string>();
-					var handles = new List<object>();
-					VirtualDeviceCapability[] tmpCaps = device.GetSupportedCapabilities();
-					foreach (VirtualDeviceCapability cap in tmpCaps) {
-						string[] tmpDescriptions = device.GetKeyDescriptions(cap);
-						object[] tmpHandles = device.GetKeyHandles(cap);
-						for (int i = 0; i < tmpHandles.Length; i++) {
-							capabilities.Add(cap);
-							descriptions.Add(tmpDescriptions[i]);
-							handles.Add(tmpHandles[i]);
-						}
-					}
-
 					// add entry
 					Invoke(delegate {
 						if (!Initialized) {
@@ -146,12 +150,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 						string reference = deviceType.ToString() + deviceKey.ToString();
 						selectionDevices.Add(deviceIndex, reference);
 						BuildDeviceSelection();
-						if (activeDeviceIndex == deviceIndex) {
-							selectionDeviceCapabilities = capabilities;
-							selectionDeviceKeyDescriptions = descriptions;
-							selectionDeviceKeyHandles = handles;
-							BuildCapabilitySelection();
-						}
+						DeviceSelected(sender, args);
 					});
 				});
 			} else {
@@ -166,15 +165,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 					}
 					selectionDevices.Remove(deviceIndex);
 					BuildDeviceSelection();
-					if (activeDeviceIndex == deviceIndex) {
-						activeDeviceIndex = -1;
-
-						selectionDeviceCapabilities.Clear();
-						selectionDeviceKeyHandles.Clear();
-						selectionDeviceKeyDescriptions.Clear();
-						BuildCapabilitySelection();
-					}
-
+					DeviceSelected(sender, args);
 				});
 			}
 		}
@@ -189,11 +180,15 @@ namespace Irseny.Iface.Main.View.Bindings {
 			if (!Initialized) {
 				return;
 			}
+			if (lockSelection) {
+				return;
+			}
 			activeDeviceIndex = GetActiveDeviceIndex();
 			if (activeDeviceIndex < 0) {
 				ClearCapabilitySelection();
 				return;
 			}
+			// TODO: update saved config
 			int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(activeDeviceIndex, -1);
 			if (deviceId < 0) {
 				LogManager.Instance.Log(LogMessage.CreateWarning(this, "Cannot query capabilities of an unregistered device: " + activeDeviceIndex));
@@ -223,6 +218,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 					selectionDeviceCapabilities = capabilities;
 					selectionDeviceKeyDescriptions = descriptions;
 					selectionDeviceKeyHandles = handles;
+					setupDeviceIndex[activeTrackerAxis] = activeDeviceIndex;
 					BuildCapabilitySelection();
 				});
 			});
@@ -230,12 +226,26 @@ namespace Irseny.Iface.Main.View.Bindings {
 		}
 		private void CapabilitySelected(object sender, EventArgs args) {
 			// TODO: apply binding
+			if (!Initialized) {
+				return;
+			}
+			if (lockSelection) {
+				return;
+			}
+			activeDeviceKeyIndex = GetActiveDeviceCapability();
+			if (activeDeviceKeyIndex < 0) {
+				ClearCapabilitySelection();
+			}
+			setupDeviceKeyIndex[activeTrackerAxis] = activeDeviceKeyIndex;
+			// TODO: update saved config
 		}
 		/// <summary>
 		/// Rebuilds the selectable devices UI element.
 		/// Uses the information currently available.
 		/// </summary>
 		private void BuildDeviceSelection() {
+			// disable change events
+			lockSelection = true;
 			var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
 			var store = (Gtk.ListStore)cbbDevice.Model;
 			string activeEntry = cbbDevice.ActiveText;
@@ -257,34 +267,48 @@ namespace Irseny.Iface.Main.View.Bindings {
 				ClearCapabilitySelection();
 			}
 			cbbDevice.QueueDraw();
+			// enable change events
+			lockSelection = false;
 		}
 		/// <summary>
 		/// Clears the device selection so that no valid values can be selected.
 		/// </summary>
 		private void ClearDeviceSelection() {
+			// disable events
+			lockSelection = true;
+			// clear list
 			var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
 			var store = (Gtk.ListStore)cbbDevice.Model;
 			store.Clear();
 			store.AppendValues("None");
 			cbbDevice.Active = 0;
 			cbbDevice.QueueDraw();
+			// enable events
+			lockSelection = false;
 		}
 		/// <summary>
 		/// Clears the capability selection so that no valid values can be selected.
 		/// </summary>
 		private void ClearCapabilitySelection() {
+			// disable events
+			lockSelection = true;
+			// clear list
 			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
 			var store = (Gtk.ListStore)cbbCap.Model;
 			store.Clear();
 			store.AppendValues("None");
 			cbbCap.Active = 0;
 			cbbCap.QueueDraw();
+			// enable events
+			lockSelection = false;
 		}
 		/// <summary>
 		/// Rebuilds the selectable capability UI element.
 		/// Uses the capability information currently available.
 		/// </summary>
 		private void BuildCapabilitySelection() {
+			// disable events
+			lockSelection = true;
 			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
 			var store = (Gtk.ListStore)cbbCap.Model;
 			string activeEntry = cbbCap.ActiveText;
@@ -304,6 +328,8 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// restore previous selection
 			cbbCap.Active = iActiveEntry;
 			cbbCap.QueueDraw();
+			// enable events
+			lockSelection = false;
 		}
 		/// <summary>
 		/// Gets the index of the currently selected device.
@@ -323,11 +349,33 @@ namespace Irseny.Iface.Main.View.Bindings {
 			}
 			return -1;
 		}
-		private VirtualDeviceCapability GetActiveDeviceCapability() {
-			return VirtualDeviceCapability.Axis;
+		private bool SetActiveDeviceIndex(int deviceIndex) {
+			var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
+			cbbDevice.Active = deviceIndex + 1; // skip None
+			return true;
 		}
-		private Tuple<VirtualDeviceCapability, object> GetActiveDeviceKey() {
-			return Tuple.Create<VirtualDeviceCapability, object>(VirtualDeviceCapability.Axis, null);
+		/// <summary>
+		/// Gets the currently selected device capability.
+		/// The information is read from UI elements.
+		/// </summary>
+		/// <returns>The active device capability information. null if none is selected of if the selection is illegal.</returns>
+		private int GetActiveDeviceCapability() {
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			string sActive = cbbCap.ActiveText;
+			if (sActive == null || sActive.Length == 0) {
+				return -1;
+			}
+			for (int i = 0; i < selectionDeviceKeyHandles.Count; i++) {
+				if (sActive.Equals(selectionDeviceKeyDescriptions[i])) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		private bool SetActiveDeviceCapability(int keyIndex) {
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			cbbCap.Active = keyIndex + 1; // skip None
+			return true;
 		}
 	}
 }
