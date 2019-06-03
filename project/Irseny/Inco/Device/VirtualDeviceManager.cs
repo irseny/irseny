@@ -90,6 +90,12 @@ namespace Irseny.Inco.Device {
 				return result;
 			}
 		}
+		public void BeginUpdate() {
+			// nothing to do
+		}
+		public void EndUpdate() {
+			// TODO: send 
+		}
 		public static void MakeInstance(VirtualDeviceManager manager) {
 			lock (instanceSync) {
 				if (VirtualDeviceManager.instance != null) {

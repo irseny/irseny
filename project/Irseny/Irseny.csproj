@@ -186,7 +186,6 @@
     <Compile Include="Iface\Main\Config\Devices\KeyboardConfigFactory.cs" />
     <Compile Include="Inco\Device\VirtualDeviceManager.cs" />
     <Compile Include="Inco\Device\ITrackingInterface.cs" />
-    <Compile Include="Inco\Device\IVirtualKeyboard.cs" />
     <Compile Include="Inco\Device\VirtualKeyboard.cs" />
     <Compile Include="Inco\Device\VirtualDeviceContext.cs" />
     <Compile Include="Extrack\Ivj.cs" />
@@ -198,6 +197,9 @@
     <Compile Include="Iface\Main\View\Bindings\CapBindingsFactory.cs" />
     <Compile Include="Iface\Main\View\Bindings\BindingTabFactory.cs" />
     <Compile Include="Tracap\CapAxis.cs" />
+    <Compile Include="Inco\Device\CapInputTranslation.cs" />
+    <Compile Include="Inco\Device\VirtualDeviceSendPolicy.cs" />
+    <Compile Include="Inco\Device\VirtualDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

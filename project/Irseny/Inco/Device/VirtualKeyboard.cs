@@ -1,61 +1,68 @@
 ﻿using System;
-
+using System.Collections.Generic;
 namespace Irseny.Inco.Device {
-	public class VirtualKeyboard : IVirtualDevice {
-		IntPtr deviceHandle = IntPtr.Zero;
-		int deviceIndex;
+	public class VirtualKeyboard : VirtualDevice {
+		static readonly object[] keyHandles = new object[] {
+			"Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P"
 
-		public VirtualKeyboard(int index) {
-			this.deviceIndex = index;
+		};
+		static readonly string[] keyDescriptions = new string[] {
+			"Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P"
+
+		};
+		IntPtr deviceHandle = IntPtr.Zero;
+		Dictionary<object, bool> keyState;
+		public VirtualKeyboard(int index) : base(index) {
+			SendPolicy = VirtualDeviceSendPolicy.FixedRate;
+			keyState = new Dictionary<object, bool>();
+			foreach (object handle in keyHandles) {
+				keyState.Add(handle, false);
+			}
 		}
-		public VirtualDeviceType DeviceType {
+		public override VirtualDeviceType DeviceType {
 			get { return VirtualDeviceType.Keyboard; }
 		}
-		public int DeviceIndex {
-			get { return deviceIndex; }
-		}
-		public bool SupportsAccess(VirtualDeviceAccess access) {
-			switch (access) {
-			case VirtualDeviceAccess.None:
-				return true;
-			case VirtualDeviceAccess.Read:
-				return true;
-			case VirtualDeviceAccess.Write:
-				return false;
-			default:
-				return false;
-			}
 
-		}
-		public VirtualDeviceCapability[] GetSupportedCapabilities() {
+		public bool UpdateRequired { get; private set; }
+
+		public override VirtualDeviceCapability[] GetSupportedCapabilities() {
 			return new VirtualDeviceCapability[] { VirtualDeviceCapability.Key };
 		}
-		public int GetKeyNo(VirtualDeviceCapability capability) {
+		public override int GetKeyNo(VirtualDeviceCapability capability) {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				return 6;
+				return keyHandles.Length;
 			default:
 				return 0;
 			}
 		}
-		public string[] GetKeyDescriptions(VirtualDeviceCapability capability) {
+		public override string[] GetKeyDescriptions(VirtualDeviceCapability capability) {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				return new string[] {
-				"Q", "W", "E", "R", "T", "Z"
-			};
+				return (string[])keyDescriptions.Clone();
 			default:
 				return new string[0];
 			}
 		}
-		public object[] GetKeyHandles(VirtualDeviceCapability capability) {
+		public override object[] GetKeyHandles(VirtualDeviceCapability capability) {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				return new object[] {
-					"Q", "W", "E", "R", "T", "Z"
-				};
+				return (object[])keyHandles.Clone();
 			default:
 				return new object[0];
+			}
+		}
+		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state) {
+			// TODO: implement
+			switch (capability) {
+			case VirtualDeviceCapability.Key:
+				if (!keyState.ContainsKey(keyHandle)) {
+					return false;
+				}
+				keyState[keyHandle] = (state > 0f);
+				return true;
+			default:
+				return false;
 			}
 		}
 	}
