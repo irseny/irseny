@@ -5,7 +5,7 @@ using Irseny.Listing;
 using Irseny.Log;
 
 namespace Irseny.Inco.Device {
-	public class CapInputTranslation {
+	public class CapInputRelay {
 		private struct Binding {
 			CapAxis sourceAxis;
 			VirtualDeviceCapability targetCapability;
@@ -38,7 +38,10 @@ namespace Irseny.Inco.Device {
 		}
 
 		Dictionary<int, List<Binding>> config = new Dictionary<int, List<Binding>>();
-		public CapInputTranslation() {
+		public CapInputRelay() {
+		}
+		public bool Empty {
+			get { return config.Count == 0; }
 		}
 		public void AddBinding(CapAxis axis, int deviceIndex, VirtualDeviceCapability capability, object posKey, object negKey, object mapping) {
 			List<Binding> deviceBindings;
@@ -94,8 +97,6 @@ namespace Irseny.Inco.Device {
 							string message = string.Format("Cannot set device {0} key state {1}|{2}", deviceIndex, bind.PosKey, bind.NegKey);
 							LogManager.Instance.Log(LogMessage.CreateWarning(this, message));
 						}
-						// TODO: set device axis
-
 					}
 					device.EndUpdate();
 				}

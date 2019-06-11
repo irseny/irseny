@@ -197,7 +197,7 @@
     <Compile Include="Iface\Main\View\Bindings\CapBindingsFactory.cs" />
     <Compile Include="Iface\Main\View\Bindings\BindingTabFactory.cs" />
     <Compile Include="Tracap\CapAxis.cs" />
-    <Compile Include="Inco\Device\CapInputTranslation.cs" />
+    <Compile Include="Inco\Device\CapInputRelay.cs" />
     <Compile Include="Inco\Device\VirtualDeviceSendPolicy.cs" />
     <Compile Include="Inco\Device\VirtualDevice.cs" />
   </ItemGroup>
