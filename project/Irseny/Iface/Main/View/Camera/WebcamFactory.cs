@@ -2,9 +2,11 @@
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Irseny.Log;
 using Irseny.Util;
 using Irseny.Content;
 using Irseny.Listing;
+using Irseny.Capture.Video;
 
 namespace Irseny.Iface.Main.View.Camera {
 	public class WebcamFactory : InterfaceFactory {
@@ -12,9 +14,9 @@ namespace Irseny.Iface.Main.View.Camera {
 		Gdk.Pixbuf activeImage = null;
 		//string videoOutStock = "gtk-missing-image";
 		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
-		private readonly int index;
+		private readonly int streamIndex;
 		public WebcamFactory(int index) : base() {
-			this.index = index;
+			this.streamIndex = index;
 		}
 
 
@@ -24,32 +26,33 @@ namespace Irseny.Iface.Main.View.Camera {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			EquipmentMaster.Instance.VideoCaptureStream.Updated += StreamStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
+			CaptureSystem.Instance.Invoke(delegate {
+				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
+				if (streamId < 0) {
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot find capture {0}", streamIndex));
+					return;
+				}
+				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
+				if (stream == null) {
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot find capture {0}", streamIndex));
+					return;
+				}
+				stream.ImageAvailable += RetrieveImage;
+			});
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			StopCapture();
-			EquipmentMaster.Instance.VideoCaptureStream.Updated -= StreamStateChanged;
+			// nothing to do, the capture stream does not exist any more
 			return true;
 		}
 		protected override bool DestroyInternal() {
 			Container.Dispose();
 			return true;
 		}
-		private void StreamStateChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
-			if (args.Index == index) {
-				bool start = args.Active;
-				Invoke(delegate {
-					if (start) {
-						StartCapture();
-					} else {
-						StopCapture();
-					}
-				});
-			}
-		}
+
+
 		private void RetrieveImage(object sender, Capture.Video.ImageCapturedEventArgs args) {
 			/*int width = 0;
 			int height = 0;
@@ -113,47 +116,12 @@ namespace Irseny.Iface.Main.View.Camera {
 						updatePixBuf = true;
 					}
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-					videoOut.Pixbuf = activeImage;
+					if (updatePixBuf) {
+						videoOut.Pixbuf = activeImage;
+					}
 					videoOut.QueueDraw();
 				});
 			}
-		}
-
-		public void StartCapture() {
-			if (!Initialized) {
-				return;
-			}
-			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
-				if (streamId > -1) { // listing will change again when the stream is available
-					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
-					if (stream != null) {
-						stream.ImageAvailable += RetrieveImage;
-					}
-				}
-			});
-		}
-		public void StopCapture() {
-			Capture.Video.CaptureSystem.Instance.Invoke(delegate {
-				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(index, -1);
-				if (streamId > -1) { // already removed if the stream is no longer available
-					Capture.Video.CaptureStream stream = Capture.Video.CaptureSystem.Instance.GetStream(streamId);
-					if (stream != null) {
-						stream.ImageAvailable -= RetrieveImage;
-					}
-				}
-			});
-			if (!Initialized) {
-				return; // occurs when the page is removed, although the listing update event should be unsubscribed
-			}
-			// reset default image
-			/*if (activeImage != null) {
-				activeImage.Dispose();
-				activeImage = null;
-			}
-			Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			// TODO: fix attempted read/write protected memory when page is added and immediately removed
-			videoOut.SetFromStock(videoOutStock, videoOutSize);*/
 		}
 	}
 }

@@ -12,6 +12,9 @@ namespace Irseny.Inco.Device {
 		int GetKeyNo(VirtualDeviceCapability capability);
 		void BeginUpdate();
 		bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state);
+		float GetKeyState(VirtualDeviceCapability capability, object keyHandle);
+		object[] GetModifiedKeys(VirtualDeviceCapability capability);
 		void EndUpdate();
+		void Send();
 	}
 }

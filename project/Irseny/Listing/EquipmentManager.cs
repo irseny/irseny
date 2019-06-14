@@ -94,11 +94,13 @@ namespace Irseny.Listing {
 						this.equipment.Capacity = index + 1;
 					}
 					for (int i = this.equipment.Count; i <= index; i++) {
+						// TODO: add null instead
 						this.equipment.Add(Tuple.Create(EquipmentState.Missing, default(T)));
 					}
 
 				} else {
 					if (this.equipment[index] != null) {
+						// TODO: remove state saves, only allow active or not available
 						lastState = this.equipment[index].Item1;
 					} else {
 						lastState = EquipmentState.Missing;
@@ -107,6 +109,7 @@ namespace Irseny.Listing {
 				this.equipment[index] = Tuple.Create(state, equipment);
 				// update queue lock
 				lock (updateSync) {
+					// TODO: replace laststate with statechanged flag
 					// to avoid order conflicts we can not leave the outer lock
 					updateQueue.Enqueue(new EquipmentUpdateArgs<T>(index, state, lastState, equipment));
 				}

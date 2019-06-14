@@ -213,32 +213,32 @@ namespace Irseny.Iface.Main.View.Bindings {
 				}
 				{
 					string sYaw = string.Format("{0:N2}", position.Yaw);
-					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw");
-					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_YawYaw");
+					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw1");
+					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_Yaw2");
 					txtYaw1.Text = sYaw;
 					txtYaw2.Text = sYaw;
 				}
 				{
-					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch");
+					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch1");
 					txtPitch.Text = string.Format("{0:N2}", position.Pitch);
 				}
 				{
-					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
+					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll1");
 					txtRoll.Text = string.Format("{0:N2}", position.Roll);
 
 				}
 				{
-					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX");
+					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX1");
 					txtPosX.Text = string.Format("{0:N2}", position.PosX);
 				}
 				{
-					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY");
+					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY1");
 					txtPosY.Text = string.Format("{0:N2}", position.PosY);
 				}
 				{
 					string sPosZ = string.Format("{0:N2}", position.PosZ);
-					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ");
-					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZZ");
+					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ1");
+					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZ2");
 					txtPosZ.Text = sPosZ;
 					txtPosZZ.Text = sPosZ;
 				}

@@ -39,11 +39,13 @@ namespace Irseny.Inco.Device {
 		public abstract string[] GetKeyDescriptions(VirtualDeviceCapability capability);
 		public abstract object[] GetKeyHandles(VirtualDeviceCapability capability);
 		public abstract int GetKeyNo(VirtualDeviceCapability capability);
-		public void BeginUpdate() {
+		public virtual void BeginUpdate() {
 			// nothing to do
 		}
 		public abstract bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state);
-		public void EndUpdate() {
+		public abstract float GetKeyState(VirtualDeviceCapability capability, object keyHandle);
+		public abstract object[] GetModifiedKeys(VirtualDeviceCapability capability);
+		public virtual void EndUpdate() {
 			// mark the new data as sendable
 			stateChanged = true;
 		}

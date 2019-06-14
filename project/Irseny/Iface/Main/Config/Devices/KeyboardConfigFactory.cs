@@ -9,7 +9,6 @@ namespace Irseny.Iface.Main.Config.Devices {
 		readonly int keyboardIndex;
 		readonly int deviceIndex;
 
-
 		public KeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
 			this.keyboardIndex = keyboardIndex;
 			this.deviceIndex = deviceIndex;
@@ -19,16 +18,6 @@ namespace Irseny.Iface.Main.Config.Devices {
 			// TODO: create device and add to equipment
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("KeyboardConfig");
 			Container = factory.CreateWidget("box_Root");
-
-			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = VirtualDeviceManager.Instance.MountDevice(new VirtualKeyboard(keyboardIndex));
-				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to mount keyboard: " + keyboardIndex));
-				}
-				// TODO: translate from keyboard to device index
-				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
-			});
-
 
 
 			return true;
@@ -41,25 +30,35 @@ namespace Irseny.Iface.Main.Config.Devices {
 				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_UpdateRate");
 				rdbTimed.Clicked += PolicyUpdated;*/
 			}
+			VirtualDeviceManager.Instance.Invoke(delegate {
+
+				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(new VirtualKeyboard(keyboardIndex));
+				if (deviceId < 0) {
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to connect keyboard {0}", keyboardIndex));
+					return;
+				}
+				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
+			});
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+			VirtualDeviceManager.Instance.Invoke(delegate {
+				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
+				if (deviceId < 0) {
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard {0}", keyboardIndex));
+					return;
+				}
+				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
+				if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard {0}", keyboardIndex));
+					return;
+				}
+			});
 			return true;
 		}
 
 		protected override bool DestroyInternal() {
-			VirtualDeviceManager.Instance.Invoke(delegate {
-				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
-				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount unregistered keyboard: " + keyboardIndex));
-					return;
-				}
-				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
-				if (VirtualDeviceManager.Instance.UnmountDevice(deviceId) == null) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to unmount keyboard: " + keyboardIndex));
-					return;
-				}
-			});
+
 
 			Container.Dispose();
 			return true;

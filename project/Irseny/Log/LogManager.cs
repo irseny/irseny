@@ -65,23 +65,7 @@ namespace Irseny.Log {
 			}
 		}
 
-		public static void MakeInstance(LogManager instance) {
-			lock (instanceSync) {
-				if (LogManager.instance != null) {
-					LogManager.instance.SignalStop();
-					if (instanceThread.IsAlive) {
-						instanceThread.Join();
-					}
-					instanceThread = null;
-				}
-				LogManager.instance = instance;
-				if (instance != null) {
-					instanceThread = new Thread(instance.Run);
-					instanceThread.Start();
-				}
-			}
 
-		}
 		private void ProcessPending() {
 			Queue<LogMessage> toProcess;
 			lock (pendingSync) {
@@ -132,7 +116,36 @@ namespace Irseny.Log {
 			}
 			pendingSignal.Set();
 		}
+		public void LogMsg(object source, string text) {
+			if (text == null) throw new ArgumentNullException("text");
+			Log(LogMessage.CreateMessage(source, text));
+		}
+		public void LogWarning(object source, string text) {
+			if (text == null) throw new ArgumentNullException("text");
+			Log(LogMessage.CreateWarning(source, text));
+		}
+		public void LogError(object source, string text) {
+			if (text == null) throw new ArgumentNullException("text");
+			Log(LogMessage.CreateError(source, text));
+		}
+		public static void MakeInstance(LogManager instance) {
+			lock (instanceSync) {
+				if (LogManager.instance != null) {
+					LogManager.instance.SignalStop();
+					if (instanceThread.IsAlive) {
+						instanceThread.Join();
+					}
+					instanceThread = null;
+				}
+				LogManager.instance = instance;
+				if (instance != null) {
+					instanceThread = new Thread(instance.Run);
+					instanceThread.Start();
+				}
+			}
 
+		}
 	}
+
 
 }

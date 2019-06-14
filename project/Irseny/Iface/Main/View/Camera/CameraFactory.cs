@@ -16,11 +16,11 @@ namespace Irseny.Iface.Main.View.Camera {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.PackStart(ntbMain, true, true, 0);
-			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated += CameraChanged;
+			EquipmentMaster.Instance.VideoCaptureStream.Updated += CameraChanged;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			Listing.EquipmentMaster.Instance.VideoCaptureStream.Updated -= CameraChanged;
+			EquipmentMaster.Instance.VideoCaptureStream.Updated -= CameraChanged;
 			while (RemoveCamera()) {
 			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");

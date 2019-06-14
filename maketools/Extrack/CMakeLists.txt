@@ -36,8 +36,11 @@ set(PROJECT_BUILD_DIR "${ROOT_DIR}/obj/${CONFIGURATION}")
 include_directories("${PROJECT_SOURCE_DIR}")
 
 # project sources
-list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/Track.c")
-list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/Inject.c")
+if (WIN32)
+	list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/InjectWin.c")
+elseif (UNIX)
+	list(APPEND PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIR}/InjectLin.c")
+endif()
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_FILES})
 
 # compiler flags
@@ -57,8 +60,12 @@ if (WITH_VJOY)
 	#target_link_libraries(${PROJECT_NAME} PUBLIC "${ROOT_DIR}/lib/VJoy")
 endif()
 # enable freetrack
-if (WITH_TIFC)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_TIFC")
+if (WITH_FREETRACK)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_FREETRACK")
+endif()
+# enable winapi
+if (WITH_WINAPI)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_WINAPI")
 endif()
 # enable uinput
 if (WITH_UINPUT)

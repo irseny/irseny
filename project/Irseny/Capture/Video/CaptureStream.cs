@@ -19,8 +19,7 @@ namespace Irseny.Capture.Video {
 		event EventHandler<StreamEventArgs> captureStopped;
 
 		public CaptureStream(int id) {
-			if (id < 0)
-				throw new ArgumentOutOfRangeException("id");
+			if (id < 0) throw new ArgumentOutOfRangeException("id");
 			this.id = id;
 		}
 

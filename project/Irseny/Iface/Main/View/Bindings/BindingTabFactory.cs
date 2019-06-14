@@ -62,24 +62,27 @@ namespace Irseny.Iface.Main.View.Bindings {
 			}
 			// receive device updates
 			EquipmentMaster.Instance.VirtualDevice.Updated += DeviceUpdated;
+			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
 			Invoke(delegate {
 				// delayed update after initialization finished
 				EquipmentMaster.Instance.VirtualDevice.SendEquipment(DeviceUpdated);
+				EquipmentMaster.Instance.HeadTracker.SendEquipment(TrackerStateChanged);
 			});
 			// bind input handler to tracker
-			DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Could not bind input relay to missing tracker: " + trackerIndex));
-					return;
-				}
-				ICapTracker detector = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
-				if (detector == null) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Cloud not bind input relay to missing tracker with id: " + trackerId));
-					return;
-				}
-				detector.PositionDetected += inputHandler.PositionChanged;
-			});
+
+			//DetectionSystem.Instance.Invoke(delegate {
+			//	int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+			//	if (trackerId < 0) {
+			//		LogManager.Instance.Log(LogMessage.CreateError(this, "Could not bind input relay to missing tracker: " + trackerIndex));
+			//		return;
+			//	}
+			//	ICapTracker detector = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+			//	if (detector == null) {
+			//		LogManager.Instance.Log(LogMessage.CreateError(this, "Cloud not bind input relay to missing tracker with id: " + trackerId));
+			//		return;
+			//	}
+			//	detector.PositionDetected += inputHandler.PositionChanged;
+			//});
 
 			return true;
 		}
@@ -102,6 +105,32 @@ namespace Irseny.Iface.Main.View.Bindings {
 		protected override bool DestroyInternal() {
 			Container.Dispose();
 			return true;
+		}
+		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
+			if (args.Index != trackerIndex) {
+				return;
+			}
+			bool start = args.Active;
+			int trackerId = args.Equipment;
+			/*int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+			if (trackerId < 0) {
+				string message = string.Format("Head tracker {0} not available", trackerIndex);
+				LogManager.Instance.Log(LogMessage.CreateError(this, message));
+				return;
+			}*/
+			DetectionSystem.Instance.Invoke(delegate {
+				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				if (tracker == null) {
+					string message = string.Format("Head tracker {0} not available", trackerIndex);
+					LogManager.Instance.Log(LogMessage.CreateError(this, message));
+					return;
+				}
+				if (start) {
+					tracker.PositionDetected += inputHandler.PositionChanged;
+				} else {
+					tracker.PositionDetected -= inputHandler.PositionChanged;
+				}
+			});
 		}
 		public void RestoreBinding(CapAxis axis) {
 			// activate UI

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Collections.Generic;
+using Irseny.Log;
 
 namespace Irseny.Inco.Device {
 	public class VirtualDeviceManager {
@@ -9,10 +10,14 @@ namespace Irseny.Inco.Device {
 		static Thread instanceThread;
 
 		volatile int stopSignal = 0;
+		volatile int invokeSignal = 0;
+		volatile int sendSignal = 0;
+
 		readonly VirtualDeviceContext context = new VirtualDeviceContext();
-		readonly AutoResetEvent invokeSignal = new AutoResetEvent(false);
+		readonly object contextSync = new object();
 		readonly object invokeSync = new object();
 		readonly object deviceSync = new object();
+
 		List<IVirtualDevice> devices = new List<IVirtualDevice>(16);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 
@@ -21,16 +26,29 @@ namespace Irseny.Inco.Device {
 		public static VirtualDeviceManager Instance {
 			get { return instance; }
 		}
-		public void Start() {
-			while (stopSignal < 1) {
-				invokeSignal.WaitOne();
-				InvokePending();
+		private void Start() {
+			lock (contextSync) {
+				if (!context.Create()) {
+					// TODO: make this visible in UI
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot inject events to OS"));
+				}
 			}
-			stopSignal -= 1;
+			while (stopSignal < 1) {
+				if (Interlocked.CompareExchange(ref invokeSignal, 0, 1) == 1) {
+					InvokePending();
+				}
+				if (Interlocked.CompareExchange(ref sendSignal, 0, 1) == 1) {
+					SendState();
+				}
+				Thread.Sleep(1);
+			}
+			InvokePending();
+			SendState();
+			context.Destroy();
+			Interlocked.Decrement(ref stopSignal);
 		}
 		public void Stop() {
-			stopSignal += 1;
-			invokeSignal.Set();
+			Interlocked.Increment(ref stopSignal);
 		}
 		public void InvokePending() {
 			Queue<EventHandler> pending;
@@ -42,16 +60,25 @@ namespace Irseny.Inco.Device {
 			foreach (EventHandler handler in pending) {
 				handler(this, args);
 			}
+			if (sendSignal > 0) {
+				sendSignal -= 1;
+				SendState();
+			}
 		}
 		public void Invoke(EventHandler handler) {
 			if (handler == null) throw new ArgumentNullException("handler");
 			lock (invokeSync) {
 				toInvoke.Enqueue(handler);
 			}
-			invokeSignal.Set();
+			invokeSignal = 1;
 		}
-		public int MountDevice(IVirtualDevice device) {
+		public int ConnectDevice(IVirtualDevice device) {
 			if (device == null) throw new ArgumentNullException("device");
+			lock (contextSync) {
+				if (!context.ConnectDevice(device)) {
+					return -1;
+				}
+			}
 			lock (deviceSync) {
 				// find empty device index
 				int mountIndex = -1;
@@ -68,7 +95,6 @@ namespace Irseny.Inco.Device {
 				} else {
 					devices[mountIndex] = device;
 				}
-				// TODO: initialize device
 				return mountIndex;
 			}
 		}
@@ -80,22 +106,53 @@ namespace Irseny.Inco.Device {
 				return devices[deviceId];
 			}
 		}
-		public IVirtualDevice UnmountDevice(int deviceId) {
+		public bool DisconnectDevice(int deviceId) {
+			IVirtualDevice device = null;
+
 			lock (deviceSync) {
 				if (deviceId < 0 || deviceId >= devices.Count) {
-					return null;
+					return false;
 				}
-				IVirtualDevice result = devices[deviceId];
-				// TODO: uninitialize device
-				return result;
+				device = devices[deviceId];
 			}
+			lock (contextSync) {
+				if (!context.DisconnectDevice(device)) {
+					return false;
+				}
+			}
+			lock (deviceSync) {
+				if (deviceId == devices.Count - 1) {
+					devices.RemoveAt(deviceId);
+				} else {
+					devices[deviceId] = null;
+				}
+			}
+			return true;
 		}
+
 		public void BeginUpdate() {
 			// nothing to do
 		}
 		public void EndUpdate() {
-			// TODO: send 
+			sendSignal = 1;
 		}
+		private void SendState() {
+			var toSend = new Queue<IVirtualDevice>();
+			lock (deviceSync) {
+				for (int i = 0; i < devices.Count; i++) {
+					if (devices[i] != null && devices[i].SendRequired) {
+						toSend.Enqueue(devices[i]);
+					}
+				}
+			}
+			lock (contextSync) {
+				while (toSend.Count > 0) {
+					IVirtualDevice device = toSend.Dequeue();
+					context.SendDevice(device);
+				}
+			}
+		}
+
 		public static void MakeInstance(VirtualDeviceManager manager) {
 			lock (instanceSync) {
 				if (VirtualDeviceManager.instance != null) {
