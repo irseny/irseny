@@ -116,9 +116,9 @@ namespace Irseny.Iface.Main.View.Camera {
 						updatePixBuf = true;
 					}
 					Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-					if (updatePixBuf) {
-						videoOut.Pixbuf = activeImage;
-					}
+					//if (updatePixBuf) {
+					videoOut.Pixbuf = activeImage; // explicitly set to make updates visible
+												   //}
 					videoOut.QueueDraw();
 				});
 			}

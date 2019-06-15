@@ -3,6 +3,8 @@ using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ServiceModel.Dispatcher;
+using Irseny.Log;
+using Irseny.Util;
 
 namespace Irseny.Capture.Video {
 	public class CaptureStream {
@@ -12,7 +14,7 @@ namespace Irseny.Capture.Video {
 		Emgu.CV.VideoCapture capture = null;
 		CaptureSettings settings = new CaptureSettings();
 		readonly int id;
-		Util.SharedRefCleaner imageCleaner = new Util.SharedRefCleaner(32);
+		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
 		event EventHandler<ImageCapturedEventArgs> imageAvailable;
 		event EventHandler<StreamEventArgs> captureStarted;
@@ -87,14 +89,15 @@ namespace Irseny.Capture.Video {
 				if (capture == null) {
 					return; // null if capture is stopped but internal capture thread still running
 				}
-				var colorImage = Util.SharedRef.Create(new Emgu.CV.Mat());
-				var grayImage = Util.SharedRef.Create(new Emgu.CV.Mat());
+				var colorImage = SharedRef.Create(new Emgu.CV.Mat());
+				var grayImage = SharedRef.Create(new Emgu.CV.Mat());
 				capture.Retrieve(colorImage.Reference);
 				Emgu.CV.CvInvoke.CvtColor(colorImage.Reference, grayImage.Reference, Emgu.CV.CvEnum.ColorConversion.Rgb2Gray);
 				OnImageAvailable(new ImageCapturedEventArgs(this, id, colorImage, grayImage));
+				imageCleaner.CleanUpStep(4); // 2 images added on every receive, try to free more than those added
 				imageCleaner.AddReference(colorImage);
 				imageCleaner.AddReference(grayImage);
-				imageCleaner.CleanUpStep(4); // 2 images potentially added on every receive, try to free more than those added
+
 			}
 		}
 
@@ -127,82 +130,93 @@ namespace Irseny.Capture.Video {
 				handler(this, args);
 			}
 		}
-
-		public bool Start(CaptureSettings settings) {
-			if (settings == null)
-				throw new ArgumentNullException("settings");
-			bool result;
+		public bool ApplySettings(CaptureSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
 			lock (captureSync) {
 				if (capture == null) {
+					return false;
+				}
+			}
+			// we might be able to set these during capture by stopping, applying settings and starting again
+
+			return true;
+		}
+		private bool ApplySettings() {
+			// assumes the lock is set
+			if (capture == null) {
+				return false;
+			}
+			if (settings == null) {
+				return false;
+			}
+			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
+				LogManager.Instance.Log(LogMessage.CreateWarning(this, "unable to apply framerate"));
+			} else {
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
+			}
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
+			capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
+																	// TODO: apply more settings
+			return true;
+		}
+		public bool Start(CaptureSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			bool started = false;
+			bool running = false;
+			lock (captureSync) {
+				if (capture != null) {
+					// TODO: apply settings
+					running = true;
+				} else {
 					capture = new Emgu.CV.VideoCapture(0);
-
 					if (capture.IsOpened) {
-
-						if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
-							Log.LogManager.Instance.Log(Log.LogMessage.CreateWarning(this, "unable to apply framerate"));
-						} else {
-							Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
-						}
-						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
-						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
-						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
-						//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
-						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20);
-						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
-						capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
-						Log.LogManager.Instance.Log(Log.LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
-						capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
-																				// TODO: apply settings
 						this.settings = new CaptureSettings(settings);
-
-						OnCaptureStarted(new StreamEventArgs(this, Id));
+						ApplySettings();
 						capture.ImageGrabbed += ReceiveImage;
-						result = true;
+						// all settings have to be set before the capture may start
+						capture.Start(new CaptureThreadExceptionHandler(this));
+						started = true;
+
 					} else {
 						capture.Dispose();
 						capture = null;
-						result = false;
 					}
-				} else {
-					result = false;
 				}
 			}
-			return result;
+			if (started) {
+				OnCaptureStarted(new StreamEventArgs(this, Id));
+			}
+			return started || running;
 		}
 
-		public bool Pause() {
-			bool result;
-			lock (captureSync) {
-				if (capture != null) {
-					capture.Pause();
-					result = true;
-				} else {
-					result = false;
-				}
-			}
-			return result;
-		}
+
 
 		public bool Stop() {
-			bool result;
+			bool stopped = false;
 			lock (captureSync) {
 				imageCleaner.CleanUpAll(); // this is a non forced cleanup which can leave some images undisposed
 				if (capture != null) {
+					capture.ImageGrabbed -= ReceiveImage;
 					capture.Stop();
 					capture.Dispose();
 					capture = null;
-					result = true;
-				} else {
-					result = false;
+					stopped = true;
 				}
 			}
-			if (result) {
+			if (stopped) {
 				OnCaptureStopped(new StreamEventArgs(this, Id));
 			}
-			return result;
+			return true;
 		}
 
 		private class CaptureThreadExceptionHandler : ExceptionHandler {
@@ -216,7 +230,7 @@ namespace Irseny.Capture.Video {
 
 			public override bool HandleException(Exception exception) {
 				target.Stop(); // not capturing any longer
-				Log.LogManager.Instance.Log(Log.LogMessage.CreateError(this, "Video capture failed with exception: " + exception.Message));
+				LogManager.Instance.Log(LogMessage.CreateError(this, "Video capture failed with exception: " + exception.Message));
 				Debug.WriteLine(exception.StackTrace);
 				return true; // do not abort
 			}

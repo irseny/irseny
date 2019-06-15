@@ -43,12 +43,12 @@ namespace Irseny.Iface.Main.Config.Camera {
 		protected override bool DisconnectInternal() {
 			// stop and destroy stream
 			CaptureSystem.Instance.Invoke(delegate {
-				EquipmentMaster.Instance.VideoCaptureStream.Update(streamIndex, EquipmentState.Missing, -1);
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
 				if (streamId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy capture {0}", streamIndex));
 					return;
 				}
+				EquipmentMaster.Instance.VideoCaptureStream.Update(streamIndex, EquipmentState.Missing, -1);
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream == null) {
 					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
