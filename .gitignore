@@ -7,6 +7,7 @@ lib/Gtk/*
 lib/Mycena/*
 build
 project/.vs
+project/.vscode
 project/Extrack/bin
 project/Extrack/obj
 project/Mycena/bin

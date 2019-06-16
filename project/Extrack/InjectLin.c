@@ -12,6 +12,8 @@ const int32_t ivjKeyCodes[IVJ_KEYBOARD_KEY_NO] = {
 	KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Z, KEY_U, KEY_I, KEY_O, KEY_P
 };
 
+void ivjLogError(const char* message);
+
 IvjContext* EXTRACK_EXPORT ivjCreateContext() {
 	for (int i = 0; i < IVJ_CONTEXT_CANDIDATE_NUM; i++) {
 		int32_t file = open(ivjContextCandidates[i], O_WRONLY | O_NDELAY);
@@ -138,7 +140,7 @@ bool EXTRACK_EXPORT ivjSendKeyboard(IvjKeyboard* keyboard) {
 	}
 	return result;
 }
-void ivjLogError(char* message) {
+void ivjLogError(const char* message) {
 	printf("Ivj Error: %s\n", message);
 }
 #endif // WITH_UINPUT

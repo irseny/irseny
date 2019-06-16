@@ -50,7 +50,7 @@ namespace Irseny.Extrack {
 			return result;
 		}
 #if WINDOWS
-		const string lib = "libExtrack.dll";
+		const string lib = "Extrack.dll";
 		const CallingConvention ccon = CallingConvention.StdCall;
 #elif LINUX
 		const string lib = "libExtrack.dll";

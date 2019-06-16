@@ -6,18 +6,26 @@
 #include <windows.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-typedef struct {
-} IvjContext;
+#define IVJ_KEYBOARD_KEY_NO 10
+#define IVJ_MAX_BUFFERED_EVENT_NO 32
 
-#define IVJ_MAX_BUFFERED_EVENTS 32
+typedef int32_t IvjContext;
+//typedef struct {
+//	int dummy;
+//} IvjContext;
+
 typedef struct {
 	int32_t BufferedEventNo;
-	INPUT BufferedEvents[IVJ_MAX_BUFFERED_EVENTS];
+	INPUT BufferedEvents[IVJ_MAX_BUFFERED_EVENT_NO];
 } IvjKeyboard;
 
-typedef struct {
-} IvjKeyboardConstructionInfo;
+typedef int32_t IvjKeyboardConstructionInfo;
+//typedef struct {
+//	int dummy;
+//} IvjKeyboardConstructionInfo;
 #endif // WITH_WINAPI
 #endif // EXTRACK_INJECT_TYPES_H
 #endif // WINDOWS

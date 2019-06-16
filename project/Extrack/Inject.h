@@ -4,7 +4,7 @@
 #if LINUX
 #ifndef EXTRACK_EXPORT
 //#define EXTRACK_EXPORT __attribute__((cdecl))
-#define EXTRACK_EXPORT
+#define EXTRACK_EXPORT __declspec(dllexport)
 #endif
 
 #include "InjectLin.h"
@@ -12,19 +12,19 @@
 
 #if WINDOWS
 #ifndef EXTRACK_EXPORT
-#define EXTRACK_EXPORT __attribute__(stdcall)
+//#define EXTRACK_EXPORT __attribute__(stdcall)
+#define EXTRACK_EXPORT __declspec(dllexport)
 #endif
 
 #include "InjectWin.h"
 #endif // WINDOWS
 
-EXTRACK_EXPORT IvjContext*  ivjCreateContext();
-bool EXTRACK_EXPORT ivjDestroyContext(IvjContext* context);
-IvjKeyboardConstructionInfo* EXTRACK_EXPORT ivjAllocKeyboardConstructionInfo();
-bool EXTRACK_EXPORT ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info);
-IvjKeyboard* EXTRACK_EXPORT ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info);
-bool EXTRACK_EXPORT ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard);
-bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, float state);
-bool EXTRACK_EXPORT ivjSendKeyboard(IvjKeyboard* keyboard);
-void ivjLogError(char* message);
+EXTRACK_EXPORT IvjContext* ivjCreateContext();
+EXTRACK_EXPORT bool ivjDestroyContext(IvjContext* context);
+EXTRACK_EXPORT IvjKeyboardConstructionInfo* ivjAllocKeyboardConstructionInfo();
+EXTRACK_EXPORT bool ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info);
+EXTRACK_EXPORT IvjKeyboard* ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info);
+EXTRACK_EXPORT bool ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard);
+EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, float state);
+EXTRACK_EXPORT bool ivjSendKeyboard(IvjKeyboard* keyboard);
 #endif // EXTRACK_INJECT_H

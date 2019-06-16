@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">LinuxDebug</Configuration>
@@ -40,7 +40,7 @@
     <DefineConstants>DEBUG;WINDOWS;</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)\</IntermediateOutputPath>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -80,7 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
-	<Reference Include="netstandard" />
+    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Drawing" />
@@ -111,7 +111,7 @@
       <HintPath>..\..\lib\Gtk\CairoSharp.dll</HintPath>
       <Package>CairoSharp</Package>
     </Reference>
-     <Reference Include="PangoSharp">
+    <Reference Include="PangoSharp">
       <HintPath>..\..\lib\Gtk\PangoSharp.dll</HintPath>
       <Package>PangoSharp</Package>
     </Reference>
@@ -202,30 +202,7 @@
     <Compile Include="Inco\Device\VirtualDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Iface\" />
-    <Folder Include="Capture\" />
-    <Folder Include="Capture\Video\" />
-    <Folder Include="Iface\Main\" />
-    <Folder Include="Iface\Main\Config\" />
-    <Folder Include="Iface\Main\Log\" />
-    <Folder Include="Content\" />
-    <Folder Include="Content\Resources\" />
-    <Folder Include="Iface\Main\Config\Camera\" />
-    <Folder Include="Log\" />
-    <Folder Include="Listing\" />
-    <Folder Include="Tracap\" />
-    <Folder Include="Util\" />
-    <Folder Include="Iface\Main\Config\Tracking\" />
-    <Folder Include="Extrack\" />
-    <Folder Include="Iface\Main\View\" />
-    <Folder Include="Iface\Main\View\Camera\" />
-    <Folder Include="Iface\Main\View\Tracking\" />
-    <Folder Include="Iface\Main\Config\Devices\" />
-    <Folder Include="Inco\" />
-    <Folder Include="Inco\Device\" />
-    <Folder Include="Iface\Main\View\Bindings\" />
-  </ItemGroup>
+  <ItemGroup />
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
