@@ -1,56 +1,63 @@
 ﻿using System;
 using System.Text;
+using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace Irseny.Log {
 	public class LogMessage {
+		string sourceFile;
+		int sourceLine;
+		string sourceSystem;
+		string description;
+		MessageType messageType;
 
-		private LogMessage(MessageType messageType, object source, string text) {
-			if (text == null) throw new ArgumentNullException("text");
-			MessageType = messageType;
-			Source = source;
-			InnerText = text;
-			Timestamp = DateTime.UtcNow;
+
+		private LogMessage(MessageType messageType, object source, string description,string sourceFile, int sourceLine) {
+			this.messageType = messageType;
+			if (source == null) {
+				this.sourceSystem = string.Empty;
+			} else {
+				if (source is string) {
+					this.sourceSystem = source.ToString();
+				} else {
+					this.sourceSystem = source.GetType().FullName;
+				}
+			}
+			this.description = description;
+			this.sourceFile = Path.GetFileNameWithoutExtension(sourceFile);
+			this.sourceLine = sourceLine;
 		}
 
-		public string InnerText { get; private set; }
-		public object Source { get; private set; }
-		public DateTime Timestamp { get; private set; }
-		public MessageType MessageType { get; private set; }
+		public MessageType MessageType {
+			get {  return messageType; }
+		}
 
-		public static LogMessage CreateMessage(object source, string text) {
-			return new LogMessage(MessageType.Signal, source, text);
+
+		public static LogMessage CreateMessage(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogMessage(MessageType.Signal, source, description, sourceFile, sourceLine);
 		}
-		public static LogMessage CreateMessage(object source, string format, params object[] args) {
-			return new LogMessage(MessageType.Signal, source, string.Format(format, args));
+		public static LogMessage CreateWarning(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogMessage(MessageType.Warning, source, description, sourceFile, sourceLine);
 		}
-		public static LogMessage CreateWarning(object source, string text) {
-			return new LogMessage(MessageType.Warning, source, text);
-		}
-		public static LogMessage CreateWarning(object source, string format, params object[] args) {
-			return new LogMessage(MessageType.Warning, source, string.Format(format, args));
-		}
-		public static LogMessage CreateError(object source, string text) {
-			return new LogMessage(MessageType.Error, source, text);
-		}
-		public static LogMessage CreateError(object source, string format, params object[] args) {
-			return new LogMessage(MessageType.Error, source, string.Format(format, args));
+		public static LogMessage CreateError(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogMessage(MessageType.Error, source, description, sourceFile, sourceLine);
 		}
 
 		public override string ToString() {
 			return ToLongString();
 		}
+		public string ToDebugString() {
+			var result = new StringBuilder(120);
+			result.Append(sourceFile);
+			result.Append(" (");
+			result.Append(sourceLine);
+			result.Append(") ");
+			AppendMessage(result);
+			return result.ToString();
+		}
 		public string ToLongString() {
 			var result = new StringBuilder(120);
-			result.Append('|');
-			result.Append(Timestamp.ToString());
-			result.Append('|');
-			if (Source == null) {
-
-			} else if (Source is string) {
-				result.Append(Source);
-			} else {
-				result.Append(Source.GetType().FullName);
-			}
+			result.Append(sourceSystem);
 			result.Append(": ");
 			AppendMessage(result);
 			return result.ToString();
@@ -72,7 +79,7 @@ namespace Irseny.Log {
 				result.Append("Error: ");
 				break;
 			}
-			result.Append(InnerText);
+			result.Append(description);
 		}
 	}
 }

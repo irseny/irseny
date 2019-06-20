@@ -3,6 +3,7 @@ using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Util;
 using Irseny.Tracap;
+using Irseny.Log;
 
 namespace Irseny.Iface.Main.View.Bindings {
 	public class CapBindingsFactory : InterfaceFactory {
@@ -34,7 +35,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
+			//EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			{
@@ -63,12 +64,36 @@ namespace Irseny.Iface.Main.View.Bindings {
 				}
 			}
 
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + 0 + " not available");
+					return;
+				}
+				var tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerIndex, null);
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + 0 + " not available");
+					return;
+				}
+				tracker.PositionDetected += RetrievePosition;
+			});
 			return true;
 		}
 
 		protected override bool DisconnectInternal() {
-			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerStateChanged;
-			StopCapture();
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					return;
+				}
+				var tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerIndex, null);
+				if (tracker == null) {
+					return;
+				}
+				tracker.PositionDetected -= RetrievePosition;
+			});
+			//EquipmentMaster.Instance.HeadTracker.Updated -= TrackerStateChanged;
+
 			return true;
 		}
 
@@ -140,48 +165,9 @@ namespace Irseny.Iface.Main.View.Bindings {
 				}
 			};
 		}
-		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
-			if (args.Index == trackerIndex) {
-				bool start = args.Active;
-				Invoke(delegate {
-					if (start) {
-						StartCapture();
-					} else {
-						StopCapture();
-					}
-				});
-			}
-		}
-		private void StartCapture() {
-			if (!Initialized) {
-				return;
-			}
-			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId > -1) {
-					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
-					if (tracker != null) {
-						tracker.PositionDetected += RetrievePosition;
-					}
-				}
-			});
-		}
-		private void StopCapture() {
-			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId > -1) {
-					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
-					if (tracker != null) {
-						tracker.PositionDetected -= RetrievePosition;
-					}
-				}
-			});
-			if (!Initialized) {
-				return;
-			}
-		}
-		private void RetrievePosition(object sender, Tracap.PositionDetectedEventArgs args) {
-			Tracap.CapPosition position = args.Position;
+
+		private void RetrievePosition(object sender, PositionDetectedEventArgs args) {
+			CapPosition position = args.Position;
 			Invoke(delegate {
 				if (!Initialized) {
 					return;
@@ -205,10 +191,10 @@ namespace Irseny.Iface.Main.View.Bindings {
 					Gdk.Pixbuf rotated = ImageTools.Rotate(imgSideSource.Pixbuf, position.Pitch,
 											 ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
 											 backgroundColor, imgSideTarget.Pixbuf);
-					if (imgSideTarget.Pixbuf != rotated) {
+					if (imgSideTarget.Pixbuf != rotated) { // never happens
 						imgSideTarget.Pixbuf.Dispose();
 					}
-					imgSideTarget.Pixbuf = rotated;
+					imgSideTarget.Pixbuf = rotated; // TODO: try to avoid assignment
 					imgSideTarget.QueueDraw();
 				}
 				{
@@ -242,12 +228,6 @@ namespace Irseny.Iface.Main.View.Bindings {
 					txtPosZ.Text = sPosZ;
 					txtPosZZ.Text = sPosZ;
 				}
-				/*{
-					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
-					Gdk.Pixbuf nRotatedImage = ImageTools.Rotate(
-						imgSideSource.Pixbuf, angle, ImageTools.RotatedImageSize.Maximized,
-						ImageTools.RotatedImageAlpha.Enabled, new Gdk.Color(), rotatedImage);
-				}*/
 			});
 		}
 	}

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace Irseny.Log {
 	public class LogManager {
@@ -77,7 +79,9 @@ namespace Irseny.Log {
 				handler = messageAvailable;
 			}
 			while (toProcess.Count > 0) {
-				var args = new MessageEventArgs(toProcess.Dequeue());
+				LogMessage msg = toProcess.Dequeue();
+				Debug.WriteLine(msg.ToDebugString());
+				var args = new MessageEventArgs(msg);
 				if (handler != null) {
 					handler(this, args);
 				}
@@ -116,17 +120,14 @@ namespace Irseny.Log {
 			}
 			pendingSignal.Set();
 		}
-		public void LogMsg(object source, string text) {
-			if (text == null) throw new ArgumentNullException("text");
-			Log(LogMessage.CreateMessage(source, text));
+		public void LogSignal(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			Log(LogMessage.CreateMessage(source, description, sourceFile, sourceLine));
 		}
-		public void LogWarning(object source, string text) {
-			if (text == null) throw new ArgumentNullException("text");
-			Log(LogMessage.CreateWarning(source, text));
+		public void LogWarning(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			Log(LogMessage.CreateWarning(source, description, sourceFile, sourceLine));
 		}
-		public void LogError(object source, string text) {
-			if (text == null) throw new ArgumentNullException("text");
-			Log(LogMessage.CreateError(source, text));
+		public void LogError(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			Log(LogMessage.CreateError(source, description, sourceFile, sourceLine));
 		}
 		public static void MakeInstance(LogManager instance) {
 			lock (instanceSync) {

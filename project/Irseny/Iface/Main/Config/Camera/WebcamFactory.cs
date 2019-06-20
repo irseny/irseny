@@ -32,7 +32,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 			CaptureSystem.Instance.Invoke(delegate {
 				int streamId = CaptureSystem.Instance.CreateStream();
 				if (streamId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create capture " + streamIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VideoCaptureStream.Update(streamIndex, Listing.EquipmentState.Active, streamId);
@@ -45,18 +45,18 @@ namespace Irseny.Iface.Main.Config.Camera {
 			CaptureSystem.Instance.Invoke(delegate {
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
 				if (streamId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy capture " + streamIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VideoCaptureStream.Update(streamIndex, EquipmentState.Missing, -1);
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture " + streamIndex));
 				} else if (!stream.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture " + streamIndex));
 				}
 				if (!CaptureSystem.Instance.DestroyStream(streamId)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy capture " + streamIndex));
 					return;
 				}
 			});
@@ -72,40 +72,40 @@ namespace Irseny.Iface.Main.Config.Camera {
 			CaptureSystem.Instance.Invoke(delegate {
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
 				if (streamId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture " + streamIndex));
 					return;
 				}
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture " + streamIndex));
 					return;
 				}
 				if (!stream.Start(settings)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture " + streamIndex));
 					return;
 				}
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started capture {0}", streamIndex));
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started capture " + streamIndex));
 			});
 		}
 		private void StopCapture() {
 			CaptureSystem.Instance.Invoke(delegate {
-				// keep in mind that the capture could be missing here 
+				// keep in mind that the capture could be missing here
 				// this is currently prohibited by implicitly enforcing an order: all updates are performed on the capture thread
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
 				if (streamId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture " + streamIndex));
 					return;
 				}
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture " + streamIndex));
 					return;
 				}
 				if (!stream.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture {0}", streamIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop capture " + streamIndex));
 					return;
 				}
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped capture {0}", streamIndex));
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped capture " + streamIndex));
 			});
 		}
 	}

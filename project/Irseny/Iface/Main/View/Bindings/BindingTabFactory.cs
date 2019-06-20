@@ -13,7 +13,8 @@ namespace Irseny.Iface.Main.View.Bindings {
 		// current selection
 		CapAxis activeTrackerAxis = CapAxis.Yaw;
 		int activeDeviceIndex = -1;
-		object activeKeyHandle = -1;
+		VirtualDeviceCapability activeDeviceCapability = VirtualDeviceCapability.Key;
+		object activeKeyHandle = null;
 		string activeKeyDescription = string.Empty;
 		object activeAxisMapping = null;
 
@@ -91,7 +92,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				EquipmentMaster.Instance.VirtualDevice.Updated -= DeviceUpdated;
 				var boxParent = Hall.Container.GetWidget<Gtk.Box>("box_Binding");
 				var boxRoot = Container.GetWidget("box_Root");
-				boxParent.Remove(boxRoot);
+				boxParent.Remove(boxRoot);// TODO: fix access violation exception
 			}
 			{ // target selection
 				var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
@@ -112,12 +113,6 @@ namespace Irseny.Iface.Main.View.Bindings {
 			}
 			bool start = args.Active;
 			int trackerId = args.Equipment;
-			/*int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-			if (trackerId < 0) {
-				string message = string.Format("Head tracker {0} not available", trackerIndex);
-				LogManager.Instance.Log(LogMessage.CreateError(this, message));
-				return;
-			}*/
 			DetectionSystem.Instance.Invoke(delegate {
 				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
 				if (tracker == null) {
@@ -285,14 +280,16 @@ namespace Irseny.Iface.Main.View.Bindings {
 			if (lockSelection) {
 				return;
 			}
-			Tuple<object, string> activeKey = GetActiveDeviceCapability();
-			activeKeyHandle = activeKey.Item1;
-			activeKeyDescription = activeKey.Item2;
-			if (activeKey.Item1 == null || activeKey.Item2.Length == 0) {
+			Tuple<VirtualDeviceCapability, object, string> activeKey = GetActiveDeviceCapability();
+			activeDeviceCapability = activeKey.Item1;
+			activeKeyHandle = activeKey.Item2;
+			activeKeyDescription = activeKey.Item3;
+			if (activeKey.Item2 == null || activeKey.Item3.Length == 0) {
 				ClearCapabilitySelection();
 			}
-			setupKeyHandles[activeTrackerAxis] = activeKey.Item1;
-			setupKeyDescriptions[activeTrackerAxis] = activeKey.Item2;
+			setupDeviceCapabilities[activeTrackerAxis] = activeKey.Item1;
+			setupKeyHandles[activeTrackerAxis] = activeKey.Item2;
+			setupKeyDescriptions[activeTrackerAxis] = activeKey.Item3;
 			SyncTranslation(activeTrackerAxis);
 			// TODO: update saved config
 		}
@@ -416,18 +413,18 @@ namespace Irseny.Iface.Main.View.Bindings {
 		/// The information is read from UI elements.
 		/// </summary>
 		/// <returns>The active device capability information. null if none is selected of if the selection is illegal.</returns>
-		private Tuple<object, string> GetActiveDeviceCapability() {
+		private Tuple<VirtualDeviceCapability, object, string> GetActiveDeviceCapability() {
 			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
 			string sActive = cbbCap.ActiveText;
 			if (sActive == null || sActive.Length == 0) {
-				return Tuple.Create<object, string>(null, string.Empty);
+				return Tuple.Create<VirtualDeviceCapability, object, string>(VirtualDeviceCapability.Key, null, string.Empty);
 			}
 			for (int i = 0; i < selectionKeyHandles.Count; i++) {
 				if (sActive.Equals(selectionKeyDescriptions[i])) {
-					return Tuple.Create(selectionKeyHandles[i], selectionKeyDescriptions[i]);
+					return Tuple.Create(selectionDeviceCapabilities[i], selectionKeyHandles[i], selectionKeyDescriptions[i]);
 				}
 			}
-			return Tuple.Create<object, string>(null, string.Empty);
+			return Tuple.Create<VirtualDeviceCapability, object, string>(VirtualDeviceCapability.Key, null, string.Empty);
 		}
 		/// <summary>
 		/// Sets the currently selected device capability visualization.

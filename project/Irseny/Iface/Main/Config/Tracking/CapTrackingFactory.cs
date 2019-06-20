@@ -20,7 +20,6 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			Listing.EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Passive, -1);
 			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Start");
 			btnTrack.Clicked += delegate {
 				if (btnTrack.Active) {
@@ -35,7 +34,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				//DetectionSystem.Instance.
 				int trackerId = DetectionSystem.Instance.ConnectDetector(tracker);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create tracker " + trackerIndex));
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
@@ -46,18 +45,18 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker " + trackerIndex));
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, EquipmentState.Missing, -1);
 				IPoseDetector tracker = DetectionSystem.Instance.GetDetector(trackerId);
 				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				} else if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				}
 				if (!DetectionSystem.Instance.DisconnectDetector(trackerId)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker " + trackerIndex));
 					return;
 				}
 				connection.StopConnection();
@@ -75,12 +74,12 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
 					return;
 				}
 				ISingleImageCapTracker tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerId, null);
 				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
 					return;
 				}
 				// TODO: apply tracker settings
@@ -88,12 +87,12 @@ namespace Irseny.Iface.Main.Config.Tracking {
 					return;
 				}
 				if (!tracker.Start()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
 					return;
 				}
 				// TODO: read source index from UI
 				connection.StartConnection(tracker, 0);
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started tracker {0}", trackerIndex));
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started tracker " + trackerIndex));
 			});
 		}
 		// TODO: implement option application
@@ -104,20 +103,20 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 					return;
 				}
 				IPoseDetector tracker = DetectionSystem.Instance.GetDetector(trackerId);
 				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				} else if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				}
 				if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker {0}", trackerIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				}
 				connection.StopConnection();
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped tracker {0}", trackerIndex));
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped tracker " + trackerIndex));
 			});
 		}
 
