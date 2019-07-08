@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Util;
+using Irseny.Log;
+using Irseny.Tracap;
 
 namespace Irseny.Iface.Main.View.Tracking {
 	public class CapTrackingFactory : InterfaceFactory {
@@ -23,15 +25,42 @@ namespace Irseny.Iface.Main.View.Tracking {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
 			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
 			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
+					return;
+				}
+
+				var tracker = DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + "not available");
+					return;
+
+				}
+				tracker.InputProcessed += RetrieveImage;
+				// TODO: connect start and stop signals
+			});
 			return true;
 		}
 
 		protected override bool DisconnectInternal() {
-			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerStateChanged;
-			StopCapture();
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					return;
+				}
+				var tracker = DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+
+				if (tracker == null) {
+					return;
+
+				}
+				tracker.InputProcessed -= RetrieveImage;
+			});
 			return true;
 		}
 
@@ -40,56 +69,25 @@ namespace Irseny.Iface.Main.View.Tracking {
 			Container.Dispose();
 			return true;
 		}
-		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
-			if (args.Index == trackerIndex) {
-				bool start = args.Active;
-				Invoke(delegate {
-					if (start) {
-						StartCapture();
-					} else {
-						StopCapture();
-					}
-				});
-			}
-		}
-		private void StartCapture() {
-			if (!Initialized) {
-				return;
-			}
-			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId > -1) {
-					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
-					if (tracker != null) {
-						tracker.InputProcessed += RetrieveImage;
-					}
-				}
-			});
-		}
-		private void StopCapture() {
-			Tracap.DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId > -1) {
-					var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
-					if (tracker != null) {
-						tracker.InputProcessed -= RetrieveImage;
-					}
-				}
-			});
-			if (!Initialized) {
-				return;
-			}
-			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			var imgMissingVideo = Container.GetGadget<Gtk.Image>("img_MissingVideo");
-			imgVideoOut.Pixbuf = imgMissingVideo.Pixbuf;
-			imgVideoOut.QueueDraw();
-			/*if (activeImage != null) {
-				activeImage.Dispose();
-				activeImage = null;
-			}
-			var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			imgVideoOut.SetFromStock(videoOutStock, videoOutSize);*/
-		}
+
+		//private void StopCapture() {
+		//	Tracap.DetectionSystem.Instance.Invoke(delegate {
+		//		int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+		//		if (trackerId > -1) {
+		//			var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+		//			if (tracker != null) {
+		//				tracker.InputProcessed -= RetrieveImage;
+		//			}
+		//		}
+		//	});
+		//	if (!Initialized) {
+		//		return;
+		//	}
+		//	var imgVideoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
+		//	var imgMissingVideo = Container.GetGadget<Gtk.Image>("img_MissingVideo");
+		//	imgVideoOut.Pixbuf = imgMissingVideo.Pixbuf;
+		//	imgVideoOut.QueueDraw();
+		//}
 		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
 			int width = 0;
 			int height = 0;

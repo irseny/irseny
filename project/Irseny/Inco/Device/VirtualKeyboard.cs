@@ -62,6 +62,9 @@ namespace Irseny.Inco.Device {
 				if (!keyState.ContainsKey(keyHandle)) {
 					return false;
 				}
+				if (keyState[keyHandle] != (state > 0f)) {
+					Console.WriteLine("new key state for " + keyHandle + ": " + (state > 0f));
+				}
 				keyState[keyHandle] = (state > 0f);
 				modifiedKeys.Add(keyHandle);
 				return true;

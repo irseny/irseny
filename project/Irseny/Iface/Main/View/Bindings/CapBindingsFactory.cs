@@ -168,6 +168,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 
 		private void RetrievePosition(object sender, PositionDetectedEventArgs args) {
 			CapPosition position = args.Position;
+			Console.WriteLine("Yaw" + position.GetAxis(CapAxis.Yaw));
 			Invoke(delegate {
 				if (!Initialized) {
 					return;

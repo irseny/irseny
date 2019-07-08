@@ -61,38 +61,37 @@ namespace Irseny.Iface.Main.View.Bindings {
 				BuildDeviceSelection();
 				BuildCapabilitySelection();
 			}
-			// receive device updates
-			EquipmentMaster.Instance.VirtualDevice.Updated += DeviceUpdated;
-			EquipmentMaster.Instance.HeadTracker.Updated += TrackerStateChanged;
+			{ // receive device updates
+				EquipmentMaster.Instance.VirtualDevice.Updated += DeviceUpdated;
+			}
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
+					return;
+				}
+				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
+					return;
+				}
+				tracker.PositionDetected += inputHandler.PositionChanged;
+			});
 			Invoke(delegate {
 				// delayed update after initialization finished
 				EquipmentMaster.Instance.VirtualDevice.SendEquipment(DeviceUpdated);
-				EquipmentMaster.Instance.HeadTracker.SendEquipment(TrackerStateChanged);
 			});
-			// bind input handler to tracker
-
-			//DetectionSystem.Instance.Invoke(delegate {
-			//	int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-			//	if (trackerId < 0) {
-			//		LogManager.Instance.Log(LogMessage.CreateError(this, "Could not bind input relay to missing tracker: " + trackerIndex));
-			//		return;
-			//	}
-			//	ICapTracker detector = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
-			//	if (detector == null) {
-			//		LogManager.Instance.Log(LogMessage.CreateError(this, "Cloud not bind input relay to missing tracker with id: " + trackerId));
-			//		return;
-			//	}
-			//	detector.PositionDetected += inputHandler.PositionChanged;
-			//});
-
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-			{  // disconnect from hall
+			{ // stop updates
 				EquipmentMaster.Instance.VirtualDevice.Updated -= DeviceUpdated;
+			}
+			{  // disconnect from hall
+
 				var boxParent = Hall.Container.GetWidget<Gtk.Box>("box_Binding");
 				var boxRoot = Container.GetWidget("box_Root");
-				boxParent.Remove(boxRoot);// TODO: fix access violation exception
+				boxParent.Remove(boxRoot);// TODO: fix program termination due to access violation
 			}
 			{ // target selection
 				var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
@@ -100,32 +99,22 @@ namespace Irseny.Iface.Main.View.Bindings {
 				cbbDevice.Changed -= DeviceSelected;
 				cbbCap.Changed -= CapabilitySelected;
 			}
-			// TODO: remove input handler from tracker if it does still exist
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					return;
+				}
+				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				if (tracker == null) {
+					return;
+				}
+				tracker.PositionDetected -= inputHandler.PositionChanged;
+			});
 			return true;
 		}
 		protected override bool DestroyInternal() {
 			Container.Dispose();
 			return true;
-		}
-		private void TrackerStateChanged(object sender, EquipmentUpdateArgs<int> args) {
-			if (args.Index != trackerIndex) {
-				return;
-			}
-			bool start = args.Active;
-			int trackerId = args.Equipment;
-			DetectionSystem.Instance.Invoke(delegate {
-				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
-				if (tracker == null) {
-					string message = string.Format("Head tracker {0} not available", trackerIndex);
-					LogManager.Instance.Log(LogMessage.CreateError(this, message));
-					return;
-				}
-				if (start) {
-					tracker.PositionDetected += inputHandler.PositionChanged;
-				} else {
-					tracker.PositionDetected -= inputHandler.PositionChanged;
-				}
-			});
 		}
 		public void RestoreBinding(CapAxis axis) {
 			// activate UI
