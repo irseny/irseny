@@ -39,6 +39,9 @@ namespace Irseny.Iface.Main.View.Bindings {
 		public BindingTabFactory(int trackerIndex) : base() {
 			this.trackerIndex = trackerIndex;
 		}
+		public int TrackerIndex {
+			get { return trackerIndex; }
+		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("BindingTab");
 			Container = factory.CreateWidget("box_Root");
@@ -120,7 +123,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// activate UI
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = true;
-			expRoot.Sensitive = true;
+			//expRoot.Sensitive = true;
 			// restore active and selection fields
 			activeTrackerAxis = axis;
 			if (!setupDeviceIndexes.TryGetValue(axis, out activeDeviceIndex)) {
@@ -143,10 +146,58 @@ namespace Irseny.Iface.Main.View.Bindings {
 		public void Hide() {
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = false;
-			expRoot.Sensitive = false;
+			//expRoot.Sensitive = false;
 		}
 		public void ApplyBinding() {
 
+		}
+		public bool ApplyConfig(CapInputRelay config) {
+			if (config == null) throw new ArgumentNullException("config");
+			if (!Initialized) {
+				return false;
+			}
+			// TODO: ditch setup in favor of relay
+			foreach (var axis in (CapAxis[])Enum.GetValues(typeof(CapAxis))) {
+				int deviceIndex = config.GetDeviceIndex(axis);
+				if (deviceIndex < 0) {
+					setupDeviceIndexes[axis] = -1;
+					setupDeviceCapabilities[axis] = VirtualDeviceCapability.Key;
+					setupKeyHandles[axis] = null;
+					setupKeyDescriptions[axis] = string.Empty;
+					setupAxisMappings[axis] = null;
+				} else {
+					setupDeviceIndexes[axis] = deviceIndex;
+					setupDeviceCapabilities[axis] = config.GetDeviceCapability(axis);
+					var keys = config.GetDeviceKeys(axis);
+					setupKeyHandles[axis] = keys.Item1;
+					setupKeyDescriptions[axis] = keys.Item1.ToString();
+					setupAxisMappings[axis] = config.GetMapping(axis);
+				}
+				activeDeviceIndex = -1;
+			}
+			// copy the given configuration and connect it to the tracker
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
+					return;
+				}
+				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
+					return;
+				}
+				// the tracker could have changed 
+				// but in case it has not we remove the event handler anyway
+				// and exchange it with the new instance
+				tracker.PositionDetected -= inputHandler.PositionChanged;
+				inputHandler = CapInputRelay.CreateCopy(config);
+				tracker.PositionDetected += inputHandler.PositionChanged;
+			});
+			return true;
+		}
+		public CapInputRelay GetConfig() {
+			return CapInputRelay.CreateCopy(inputHandler);
 		}
 
 		/// <summary>

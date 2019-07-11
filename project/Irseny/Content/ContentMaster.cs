@@ -1,25 +1,30 @@
 ﻿using System;
 using System.IO;
-
+using Irseny.Content.Resources;
+using Irseny.Content.Profile;
 namespace Irseny.Content {
 	public class ContentMaster : ContentManager {
 		public ContentMaster() : base() {
-			Resources = new Resources.ResourceManager();
+			Resources = new ResourceManager();
+			Profiles = new ProfileManager();
 		}
 		public static ContentMaster Instance { get; private set; }
 
-		public Resources.ResourceManager Resources { get; protected set; }
+		public ResourceManager Resources { get; protected set; }
+		public ProfileManager Profiles { get; protected set; }
 
 		public override void Load(ContentManagerSettings settings) {
 			Settings = settings;
 			Resources.Load(new ContentManagerSettings(settings));
-
+			Profiles.Load(new ContentManagerSettings(settings));
 		}
 		public override void Reload() {
 			Resources.Reload();
+			Profiles.Reload();
 		}
 		public override void Unload() {
 			Resources.Unload();
+			Profiles.Unload();
 		}
 
 

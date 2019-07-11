@@ -76,11 +76,9 @@ namespace Irseny.Capture.Video {
 			}
 		}
 
-		public CaptureSettings Settings {
-			get {
-				lock (captureSync) {
-					return new CaptureSettings(settings);
-				}
+		public CaptureSettings GetSettings() {
+			lock (captureSync) {
+				return new CaptureSettings(settings);
 			}
 		}
 

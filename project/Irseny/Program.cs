@@ -32,6 +32,7 @@ namespace Irseny {
 			}
 			bool stopped = false;
 			{
+				var factoryRegister = new Iface.InterfaceRegister();
 				var mainFactory = new Iface.MainFactory();
 				var logFactory = new Iface.Main.Log.MainFactory();
 				var controlFactory = new Iface.Main.Config.ConfigFactory();
@@ -40,12 +41,18 @@ namespace Irseny {
 				mainFactory.ConstructFloor("Control", controlFactory);
 				mainFactory.ConstructFloor("Display", displayFactory);
 				{ // control
-					var cameraControlFactory = new Iface.Main.Config.Camera.CameraFactory();
-					controlFactory.ConstructFloor("Camera", cameraControlFactory);
-					var trackingControlFactory = new Iface.Main.Config.Tracking.TrackingFactory();
-					controlFactory.ConstructFloor("Tracking", trackingControlFactory);
-					var outputControlFactory = new Iface.Main.Config.Devices.DeviceConfigFactory();
-					controlFactory.ConstructFloor("Output", outputControlFactory);
+					var camera = new Iface.Main.Config.Camera.CameraFactory();
+					factoryRegister.Register("CameraConfig", camera);
+					controlFactory.ConstructFloor("Camera", camera);
+					var tracking = new Iface.Main.Config.Tracking.TrackingFactory();
+					factoryRegister.Register("TrackingConfig", tracking);
+					controlFactory.ConstructFloor("Tracking", tracking);
+					var device = new Iface.Main.Config.Devices.DeviceConfigFactory();
+					factoryRegister.Register("DeviceConfig", device);
+					controlFactory.ConstructFloor("Device", device);
+					var profile = new Iface.Main.Config.Profile.ProfileFactory(factoryRegister);
+					factoryRegister.Register("ProfileConfig", profile);
+					controlFactory.ConstructFloor("Profile", profile);
 					/*{
 						var deviceControlFactory = new Iface.Main.Control.Output.OutputDeviceConfigFactory();
 						outputControlFactory.ConstructFloor("Device", deviceControlFactory);

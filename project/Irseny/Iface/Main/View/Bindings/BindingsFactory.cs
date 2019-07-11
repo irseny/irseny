@@ -1,12 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Tracap;
+using Irseny.Inco.Device;
 
 namespace Irseny.Iface.Main.View.Bindings {
 	public class BindingsFactory : InterfaceFactory {
 		public BindingsFactory() : base() {
+		}
+		public IReadOnlyDictionary<int, CapInputRelay> GetConfig() {
+			var result = new Dictionary<int, CapInputRelay>();
+			foreach (var floor in Floors) {
+				var factory = floor.GetFloor<BindingTabFactory>("Binding");
+				result.Add(factory.TrackerIndex, factory.GetConfig());
+			}
+			return result;
+		}
+		public bool ApplyConfig(IReadOnlyDictionary<int, CapInputRelay> config) {
+			if (config == null) throw new ArgumentNullException("config");
+			bool result = true;
+			foreach (var floor in Floors) {
+				var viewFactory = (CapBindingsFactory)floor;
+				viewFactory.HideBindings();
+				var bindFactory = floor.GetFloor<BindingTabFactory>("Binding");
+				CapInputRelay conf;
+				if (config.TryGetValue(bindFactory.TrackerIndex, out conf)) {
+					bindFactory.ApplyConfig(conf);
+				} else {
+					result = false;
+				}
+			}
+			return result;
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingView");

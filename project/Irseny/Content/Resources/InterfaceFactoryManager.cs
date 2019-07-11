@@ -22,7 +22,8 @@ namespace Irseny.Content.Resources {
 				"CapBindingsView",
 				"BindingTab",
 				"DeviceConfig",
-				"KeyboardConfig"
+				"KeyboardConfig",
+				"ProfileConfig"
 			};
 			for (int i = 0; i < entryNames.Length; i++) {
 				var stock = ContentMaster.Instance.Resources.InterfaceStock.GetEntry("Main"); // load this first

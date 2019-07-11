@@ -148,7 +148,9 @@ namespace Irseny.Capture.Video {
 		public bool DestroyStream(int id) {
 			lock (streamSync) {
 				if (id >= 0 && id < streams.Count) {
-					streams[id].Stop();
+					if (streams[id] != null) {
+						streams[id].Stop();
+					}
 					if (id == streams.Count - 1) {
 						streams.RemoveAt(id);
 					} else {

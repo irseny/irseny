@@ -25,6 +25,11 @@ namespace Irseny.Iface {
 		/// <value>The widget container.</value>
 		Mycena.IInterfaceNode Container { get; }
 		/// <summary>
+		/// Gets the floor names of this instance.
+		/// </summary>
+		/// <value>The floor names.</value>
+		ICollection<string> FloorNames { get; }
+		/// <summary>
 		/// Gets the floors of this instance.
 		/// </summary>
 		/// <value>The floors.</value>

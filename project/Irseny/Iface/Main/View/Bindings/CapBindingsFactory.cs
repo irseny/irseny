@@ -16,6 +16,20 @@ namespace Irseny.Iface.Main.View.Bindings {
 		public CapBindingsFactory(int trackerIndex) : base() {
 			this.trackerIndex = trackerIndex;
 		}
+		public int TrackerIndex {
+			get { return trackerIndex; }
+		}
+		public void HideBindings() {
+			if (!Initialized) {
+				return;
+			}
+			Gtk.ToggleButton[] buttons = GetBindingButtons();
+			for (int i = 0; i < buttons.Length; i++) {
+				if (buttons[i].Active) {
+					buttons[i].Click();
+				}
+			}
+		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapBindingsView");
 			Container = factory.CreateWidget("box_Root");

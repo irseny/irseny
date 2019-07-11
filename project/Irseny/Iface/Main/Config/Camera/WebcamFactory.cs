@@ -12,7 +12,21 @@ namespace Irseny.Iface.Main.Config.Camera {
 		public WebcamFactory(int index) : base() {
 			this.streamIndex = index;
 		}
-
+		public int StreamIndex {
+			get { return streamIndex; }
+		}
+		public bool ApplySettings(CaptureSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			if (!Initialized) {
+				return false;
+			}
+			// TODO: apply settings to UI
+			// TODO: indicate that new settings will become active if stream is restarted
+			return true;
+		}
+		public CaptureSettings GetSettings() {
+			return new CaptureSettings();
+		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamConfig");
 			Container = factory.CreateWidget("box_Root");

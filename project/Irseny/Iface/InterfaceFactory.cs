@@ -14,6 +14,9 @@ namespace Irseny.Iface {
 		public InterfaceFactoryState State { get; private set; }
 		public IInterfaceFactory Hall { get; set; }
 		public Mycena.IInterfaceNode Container { get; protected set; }
+		public ICollection<string> FloorNames {
+			get { return innerFactories.Keys; }
+		}
 		public ICollection<IInterfaceFactory> Floors {
 			get { return innerFactories.Values; }
 		}

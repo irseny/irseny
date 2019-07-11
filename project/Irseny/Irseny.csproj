@@ -78,6 +78,7 @@
     <Reference Include="Emgu.CV.World">
       <HintPath>..\..\lib\Emgu.CV\Emgu.CV.World.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
     <Reference Include="netstandard" />
@@ -200,9 +201,21 @@
     <Compile Include="Inco\Device\CapInputRelay.cs" />
     <Compile Include="Inco\Device\VirtualDeviceSendPolicy.cs" />
     <Compile Include="Inco\Device\VirtualDevice.cs" />
+    <Compile Include="Iface\Main\Config\Profile\ProfileFactory.cs" />
+    <Compile Include="Iface\InterfaceRegister.cs" />
+    <Compile Include="Iface\IInterfaceRegister.cs" />
+    <Compile Include="Content\Profile\ProfileManager.cs" />
+    <Compile Include="Content\Profile\SetupProfile.cs" />
+    <Compile Include="Content\Profile\CaptureProfileWriter.cs" />
+    <Compile Include="Content\Profile\CaptureProfileReader.cs" />
+    <Compile Include="Util\TextParseTools.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Iface\Main\Config\Profile\" />
+    <Folder Include="Content\Profile\" />
+  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

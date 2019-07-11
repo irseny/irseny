@@ -39,13 +39,13 @@ namespace Irseny.Content {
 				throw new KeyNotFoundException(name);
 			}
 		}
-		public T GetEntry(string name, T defaultValue) {
+		public T GetEntry(string name, T fallback) {
 			if (name == null) throw new ArgumentNullException("name");
 			T result;
 			if (entries.TryGetValue(name, out result)) {
 				return result;
 			} else {
-				return defaultValue;
+				return fallback;
 			}
 		}
 		public bool TryGetEntry(string name, out T result) {
