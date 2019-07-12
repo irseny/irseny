@@ -8,18 +8,18 @@ using Irseny.Util;
 
 namespace Irseny.Tracap {
 	public class Cap3PointTracker : SingleImageCapTracker {
-		Cap3PointOptions options;
+		TrackerSettings settings;
 		KeypointDetector pointDetector;
 		PointLabeler pointLabeler;
 		BasicPoseEstimator poseEstimator;
 		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
-		public Cap3PointTracker(Cap3PointOptions options) : base(options) {
-			this.options = new Cap3PointOptions(options);
-			this.pointDetector = new KeypointDetector(this.options);
-			this.pointLabeler = new PointLabeler(this.options);
-			this.poseEstimator = new BasicPoseEstimator(this.options);
+		public Cap3PointTracker(TrackerSettings settings) : base(settings) {
+			this.settings = new TrackerSettings(settings);
+			this.pointDetector = new KeypointDetector(this.settings);
+			this.pointLabeler = new PointLabeler(this.settings);
+			this.poseEstimator = new BasicPoseEstimator(this.settings);
 		}
 		public override bool Centered {
 			get {
@@ -31,9 +31,9 @@ namespace Irseny.Tracap {
 		}
 		public override bool Start() {
 			Running = true;
-			pointDetector = new KeypointDetector(options);
-			pointLabeler = new PointLabeler(options);
-			poseEstimator = new BasicPoseEstimator(options);
+			pointDetector = new KeypointDetector(settings);
+			pointLabeler = new PointLabeler(settings);
+			poseEstimator = new BasicPoseEstimator(settings);
 			return true;
 		}
 

@@ -12,7 +12,7 @@ namespace Irseny.Tracap {
 		const int LeftPointIndex = 2;
 		const int AcceptedPointNo = 3;
 
-		IBasicPoseEstimatorOptions options;
+		TrackerSettings settings;
 		Point2i[] inPoints;
 		int[] inLabels;
 		Point2i[] centerPoints;
@@ -23,8 +23,9 @@ namespace Irseny.Tracap {
 
 		LinkedList<CapPosition> positionHistory = new LinkedList<CapPosition>();
 
-		public BasicPoseEstimator(IBasicPoseEstimatorOptions options) {
-			this.options = options;
+		public BasicPoseEstimator(TrackerSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			this.settings = settings;
 			this.inPoints = new Point2i[0];
 			this.inLabels = new int[0];
 			this.centerPoints = new Point2i[0];

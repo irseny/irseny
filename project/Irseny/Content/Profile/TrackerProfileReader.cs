@@ -19,17 +19,17 @@ namespace Irseny.Content.Profile {
 						return false;
 					}
 
-					ICapTrackerOptions options = ReadCap3Point(root);
-					if (options == null) {
+					TrackerSettings settings = ReadCap3Point(root);
+					if (settings == null) {
 						return false;
 					}
-					profile.AddTracker(index, options);
+					profile.AddTracker(index, settings);
 				}
 			}
 			return true;
 		}
-		private ICapTrackerOptions ReadCap3Point(XmlNode root) {
-			var result = new Cap3PointOptions();
+		private TrackerSettings ReadCap3Point(XmlNode root) {
+			var result = new TrackerSettings();
 
 			return result;
 		}

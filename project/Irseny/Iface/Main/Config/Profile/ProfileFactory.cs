@@ -77,12 +77,12 @@ namespace Irseny.Iface.Main.Config.Profile {
 			}
 			// virtual device config
 
-			// tracker options
+			// tracker settings
 			var trackerFactory = register.GetFactory<Iface.Main.Config.Tracking.TrackingFactory>("TrackingConfig");
 			for (int i = 0; i < 16; i++) {
-				ICapTrackerOptions options = trackerFactory.GetTrackerOptions(i);
-				if (options != null) {
-					profile.AddTracker(i, options);
+				TrackerSettings settings = trackerFactory.GetTrackerSettings(i);
+				if (settings != null) {
+					profile.AddTracker(i, settings);
 				}
 			}
 			ContentMaster.Instance.Profiles.SafeActiveProfile(profile);

@@ -6,7 +6,7 @@ using Size2i = System.Drawing.Size;
 
 namespace Irseny.Tracap {
 	public partial class PointLabeler {
-		IPointLabelerOptions options;
+		TrackerSettings settings;
 		Point2i[] inPoints;
 		Point2i[] lastPoints;
 		int[] lastLabels;
@@ -22,9 +22,9 @@ namespace Irseny.Tracap {
 
 
 
-		public PointLabeler(IPointLabelerOptions options) {
-			if (options == null) throw new ArgumentNullException("options");
-			this.options = options;
+		public PointLabeler(TrackerSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			this.settings = settings;
 			this.lastLabels = new int[0];
 			this.lastPoints = new Point2i[0];
 			this.inPoints = new Point2i[0];
@@ -33,7 +33,14 @@ namespace Irseny.Tracap {
 			this.permutations = new int[0][];
 			this.permutationPointNo = 0;
 		}
-
+		/// <summary>
+		/// Executes one labelling iteration.
+		/// </summary>
+		/// <returns>The label.</returns>
+		/// <param name="points">Detected points.</param>
+		/// <param name="pointNo">Number of points detected.</param>
+		/// <param name="imageOut">Image out.</param>
+		/// <param name="labels">Point labels.</param>
 		public int Label(Point2i[] points, int pointNo, Emgu.CV.Mat imageOut, out int[] labels) {
 			if (!Setup(points, pointNo)) {
 				labels = lastLabels;
@@ -44,43 +51,51 @@ namespace Irseny.Tracap {
 			} else {
 				MinmizeDistance();
 			}
-			if (options.ShowLabels) {
-				ShowLabels(imageOut);
-			}
+
+			ShowLabels(imageOut);
+
 			labels = outLabels;
 			return outPointNo;
 		}
+		/// <summary>
+		/// Performs setup operations for the next iteration.
+		/// </summary>
+		/// <returns>The setup.</returns>
+		/// <param name="points">Detected points.</param>
+		/// <param name="pointNo">Number of points detected.</param>
 		public bool Setup(Point2i[] points, int pointNo) {
 			if (pointNo < 1) {
 				return false; // nothing to detect in that case
 			}
-			if (pointNo != options.LabelNo) {
+			int targetLabelNo = settings.GetInteger(TrackerProperty.LabelNo, 3);
+			if (pointNo != targetLabelNo) {
 				return false; // in-out point number equality assured
-			} 
-			if (options.LabelNo != inPoints.Length) {
-				inPoints = new Point2i[options.LabelNo];
 			}
-			if (options.LabelNo != lastPoints.Length) {
-				lastPoints = new Point2i[options.LabelNo];
-				lastLabels = new int[options.LabelNo];
+			if (targetLabelNo != inPoints.Length) {
+				inPoints = new Point2i[targetLabelNo];
 			}
-			if (options.LabelNo != outPoints.Length) {
-				outPoints = new Point2i[options.LabelNo];
-				outLabels = new int[options.LabelNo];
+			if (targetLabelNo != lastPoints.Length) {
+				lastPoints = new Point2i[targetLabelNo];
+				lastLabels = new int[targetLabelNo];
+			}
+			if (targetLabelNo != outPoints.Length) {
+				outPoints = new Point2i[targetLabelNo];
+				outLabels = new int[targetLabelNo];
 				outPointNo = 0; // relabel triggered below
 			}
-			if (options.LabelNo != permutationPointNo) {
-				permutations = BuildPermutations(options.LabelNo);
-				permutationPointNo = options.LabelNo;
+			if (targetLabelNo != permutationPointNo) {
+				permutations = BuildPermutations(targetLabelNo);
+				permutationPointNo = targetLabelNo;
 			}
 
-			Array.Copy(points, inPoints, options.LabelNo);
+			Array.Copy(points, inPoints, targetLabelNo);
 			Array.Copy(outPoints, lastPoints, outPointNo);
 			Array.Copy(outLabels, lastLabels, outPointNo);
 
 
 			if (outPointNo != pointNo) {
-				relabel = true; // relabel on algorithm start and label numbner modifications
+				// relabel on algorithm start and label numbner modifications
+				relabel = true;
 			} else {
 				relabel = false;
 			}
@@ -90,6 +105,9 @@ namespace Irseny.Tracap {
 			return true;
 
 		}
+		/// <summary>
+		/// Assigns standard labels to out-points in ascending order.
+		/// </summary>
 		private void AssignLabels() {
 			for (int p = 0; p < inPointNo; p++) {
 				outPoints[p] = inPoints[p];
@@ -97,6 +115,10 @@ namespace Irseny.Tracap {
 			}
 			outPointNo = inPointNo;
 		}
+		/// <summary>
+		/// Assigns labels to out-points according to the given labelling.
+		/// </summary>
+		/// <param name="permutation">Labelling.</param>
 		private void AssignLabels(int[] permutation) {
 			for (int p = 0; p < inPointNo; p++) {
 				outPoints[p] = inPoints[p];
@@ -104,18 +126,26 @@ namespace Irseny.Tracap {
 			}
 			outPointNo = inPointNo;
 		}
+		/// <summary>
+		/// Finds the best match of new in-points to last-points.
+		/// First tries a fast approximation and applies a full search if not sufficient.
+		/// Assigns labels to points.
+		/// </summary>
 		private void MinmizeDistance() {
-			// in-out point number equality assumed
-			// at least one in point assumed
-			{
+			// in-out-point number equality assumed
+			// requires at least one in point
+			int approxThreshold = settings.GetInteger(TrackerProperty.FastApproxThreshold, 0);
+			if (approxThreshold > 0) { // test with last result
 				bool[] indexOccupation = new bool[inPointNo];
-				int[] permutation = new int[inPointNo]; // from in to last point
+				int[] permutation = new int[inPointNo];
+				bool fastApproxValid = true;
+				// from in-points to last-point
 				// first try the fast approximation
 				// for every point search for the nearest correspondence
 				int totalDistance = 0;
-
 				for (int pIn = 0; pIn < inPointNo; pIn++) {
 					Point2i inPoint = inPoints[pIn];
+					// find the last point with the lowest distance
 					int minIndex = -1;
 					int minDistance = -1;
 					for (int pOut = 0; pOut < inPointNo; pOut++) {
@@ -128,24 +158,31 @@ namespace Irseny.Tracap {
 							minDistance = distance;
 						}
 					}
+
 					if (indexOccupation[minIndex]) {
-						break; // every last point must be assigned exactly one in point
+						// avoid multiple assignments to the same index
+						// every last-point must be assigned to exactly one in-point
+						// continue with a test against all permutations
+						fastApproxValid = false;
+						break;
 					} else {
+						// build the fast approximation permutation
 						indexOccupation[minIndex] = true;
 						permutation[pIn] = minIndex;
 						totalDistance += minDistance;
 					}
 
 				}
-				if (totalDistance <= options.FastApproximationThreshold) {
+				if (fastApproxValid && totalDistance <= approxThreshold) {
+					// if the fast approximation error is small enough use the permutation build above
 					AssignLabels(permutation);
 					return;
 				}
 			}
-			{
-				// find best match of all permutations
+			{ // find best match of all permutations
 				int minIndex = -1;
 				int minDistance = -1;
+				// test against all permutations and choose the one with lowest error
 				for (int i = 0; i < permutations.Length; i++) {
 					int[] permutation = permutations[i]; // from in to last point
 					int totalDistance = 0;
@@ -167,37 +204,51 @@ namespace Irseny.Tracap {
 			}
 		}
 
-
-		private static int[][] BuildPermutations(int indexNo) {
-			var result = new List<int[]>(indexNo*indexNo); // all permutations, we omit indexNo! calculation here
-			// nothing occupied at start
-			BuildPermutations(0, indexNo, new bool[indexNo], new int[indexNo], result); // recursive permutation generation
+		/// <summary>
+		/// Builds all permutations with the given number of elements.
+		/// Permutated values start at 0.
+		/// </summary>
+		/// <returns>The permutations.</returns>
+		/// <param name="elementNo">Index no.</param>
+		private static int[][] BuildPermutations(int elementNo) {
+			var result = new List<int[]>(elementNo*elementNo);
+			BuildPermutations(0, elementNo, new bool[elementNo], new int[elementNo], result); // recursive permutation generation
 			return result.ToArray();
 		}
-		private static void BuildPermutations(int index, int indexNo, bool[] indexOccupation, int[] permutation, List<int[]> result) {
-			if (index == indexNo - 1) {
-				// fill list
-				for (int i = 0; i < indexNo; i++) {
-					if (!indexOccupation[i]) {
+		/// <summary>
+		/// Builds all permutations with the given number of elements starting from the given index.
+		/// </summary>
+		/// <param name="index">Index.</param>
+		/// <param name="elementNo">Element no.</param>
+		/// <param name="iOccupation">Elements already occupied.</param>
+		/// <param name="permutation">Current permutation.</param>
+		/// <param name="result">Result.</param>
+		private static void BuildPermutations(int index, int elementNo, bool[] iOccupation, int[] permutation, List<int[]> result) {
+			if (index == elementNo - 1) {
+				// fill the last element and save the permutation
+				for (int i = 0; i < elementNo; i++) {
+					if (!iOccupation[i]) {
 						permutation[index] = i;
 						result.Add((int[])permutation.Clone());
 					}
 				}
 			} else {
 				// recursive calls with all configurations, respecting array boundaries
-				for (int i = 0; i < indexNo; i++) {
-					if (!indexOccupation[i]) { 
-						indexOccupation[i] = true; 
+				for (int i = 0; i < elementNo; i++) {
+					if (!iOccupation[i]) {
+						iOccupation[i] = true;
 						permutation[index] = i;
-						BuildPermutations(index + 1, indexNo, indexOccupation, permutation, result);
-						indexOccupation[i] = false;
+						BuildPermutations(index + 1, elementNo, iOccupation, permutation, result);
+						iOccupation[i] = false; // clean after build
 					}
 				}
 			}
 		}
 
 	}
-
+	/// <summary>
+	/// Draws visual representations of labels.
+	/// </summary>
 	public partial class PointLabeler {
 		static Size2i[] visualSize;
 		static Point2i[] visualOffset;
@@ -239,7 +290,7 @@ namespace Irseny.Tracap {
 				visualSize[0] = new Size2i(4, 8);
 				visualOffset[0] = new Point2i(-8, -12);
 				visualPixels[0] = new Point2i[] {
-					
+
 					new Point2i(1, 0), // top
 					new Point2i(2, 0),
 					new Point2i(0, 1), // left

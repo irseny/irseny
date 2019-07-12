@@ -7,7 +7,7 @@ using Irseny.Inco.Device;
 namespace Irseny.Content.Profile {
 	public class SetupProfile {
 		Dictionary<int, CaptureSettings> captures = new Dictionary<int, CaptureSettings>(16);
-		Dictionary<int, ICapTrackerOptions> trackers = new Dictionary<int, ICapTrackerOptions>(16);
+		Dictionary<int, TrackerSettings> trackers = new Dictionary<int, TrackerSettings>(16);
 		Dictionary<int, CapInputRelay> bindings = new Dictionary<int, CapInputRelay>(16);
 		Dictionary<int, VirtualDeviceType> devices = new Dictionary<int, VirtualDeviceType>(16);
 
@@ -34,12 +34,12 @@ namespace Irseny.Content.Profile {
 		public ICollection<int> TrackerIndexes {
 			get { return trackers.Keys; }
 		}
-		public void AddTracker(int index, ICapTrackerOptions profile) {
+		public void AddTracker(int index, TrackerSettings profile) {
 			if (profile == null) throw new ArgumentNullException("profile");
 			trackers[index] = profile;
 		}
-		public ICapTrackerOptions GetTracker(int index) {
-			ICapTrackerOptions result;
+		public TrackerSettings GetTracker(int index) {
+			TrackerSettings result;
 			if (!trackers.TryGetValue(index, out result)) {
 				return null;
 			}

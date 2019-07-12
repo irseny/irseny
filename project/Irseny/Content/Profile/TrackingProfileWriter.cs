@@ -12,69 +12,128 @@ namespace Irseny.Content.Profile {
 			if (target == null) throw new ArgumentNullException("target");
 			var result = target.CreateElement("Tracking");
 			foreach (int i in profile.TrackerIndexes) {
-				ICapTrackerOptions options = profile.GetTracker(i);
-				XmlNode node = null;
-				if (options is Cap3PointOptions) {
-					node = WriteCap3Point(i, (Cap3PointOptions)options, target);
-				} else {
-					return null;
-				}
+				TrackerSettings settings = profile.GetTracker(i);
+				XmlNode node = WriteCap3Point(i, settings, target);
 				result.AppendChild(node);
 
 			}
 			return result;
 		}
-		private XmlNode WriteCap3Point(int index, Cap3PointOptions options, XmlDocument target) {
+		private XmlNode WriteCap3Point(int index, TrackerSettings settings, XmlDocument target) {
 			XmlElement result = target.CreateElement("Cap3Point");
 			result.SetAttribute("Index", index.ToString());
-			for (int i = 0; i < options.StreamNo; i++) {
-				XmlElement node = target.CreateElement("Stream");
-				result.AppendChild(node);
-				node.InnerText = options.GetStreamId(i).ToString();
+			// stream
+			for (int i = 0; i < 2; i++) { // stream
+				int stream = settings.GetInteger(TrackerProperty.Stream0 + i, -1);
+				if (stream > -1) {
+					XmlElement node = target.CreateElement("Stream");
+					result.AppendChild(node);
+					node.InnerText = stream.ToString();
+				}
 			}
-			{ // smoothing
-				XmlElement node = target.CreateElement("Smoothing");
-				result.AppendChild(node);
-				node.InnerText = options.Smoothing.ToString();
+			{ // model
+				int model = settings.GetInteger(TrackerProperty.Model, -1);
+				if (model > -1) {
+					XmlElement node = target.CreateElement("Model");
+					result.AppendChild(node);
+					node.InnerText = model.ToString();
+				}
 			}
-			{ // brightness
-				XmlElement node = target.CreateElement("BrightnessThreshold");
-				result.AppendChild(node);
-				node.InnerText = options.BrightnessThreshold.ToString();
+			{ // mixing
+				int mixing = settings.GetInteger(TrackerProperty.Mixing, -1);
+				if (mixing > -1) {
+					XmlElement node = target.CreateElement("Mixing");
+					result.AppendChild(node);
+					node.InnerText = mixing.ToString();
+				}
+			}
+			{
+				double mixingDecline = settings.GetDecimal(TrackerProperty.MixingDecline, -1.0);
+				if (mixingDecline > -1.0) {
+					XmlElement node = target.CreateElement("MixingDecline");
+					result.AppendChild(node);
+					node.InnerText = mixingDecline.ToString();
+				}
+			}
+			{
+				int bright = settings.GetInteger(TrackerProperty.MinBrightness, -1);
+				if (bright > -1) {
+					XmlElement node = target.CreateElement("MinBrightness");
+					result.AppendChild(node);
+					node.InnerText = bright.ToString();
+				}
 			}
 			{ // cluster radius
-				XmlElement node = target.CreateElement("MinClusterRadius");
-				result.AppendChild(node);
-				node.InnerText = options.MinClusterRadius.ToString();
-				node = target.CreateElement("MaxClusterRadius");
-				result.AppendChild(node);
-				node.InnerText = options.MaxClusterRadius.ToString();
+				int radius = settings.GetInteger(TrackerProperty.MinClusterRadius, -1);
+				if (radius > -1) {
+					XmlElement node = target.CreateElement("MinClusterRadius");
+					result.AppendChild(node);
+					node.InnerText = radius.ToString();
+				}
+			}
+			{
+				int radius = settings.GetInteger(TrackerProperty.MaxClusterRadius, -1);
+				if (radius > -1) {
+					XmlElement node = target.CreateElement("MaxClusterRadius");
+					result.AppendChild(node);
+					node.InnerText = radius.ToString();
+				}
 			}
 			{ // cluster members
-				XmlElement node = target.CreateElement("MaxClusterMembers");
-				result.AppendChild(node);
-				node.InnerText = options.MaxClusterMembers.ToString();
+				int members = settings.GetInteger(TrackerProperty.MaxClusterMembers, -1);
+				if (members > -1) {
+					XmlElement node = target.CreateElement("MaxClusterMembers");
+					result.AppendChild(node);
+					node.InnerText = members.ToString();
+				}
 			}
-
 			{ // cluster no
-				XmlElement node = target.CreateElement("MaxClusterNo");
-				result.AppendChild(node);
-				node.InnerText = options.MaxClusterNo.ToString();
+				int clusterNo = settings.GetInteger(TrackerProperty.MaxClusterNo, -1);
+				if (clusterNo > -1) {
+					XmlElement node = target.CreateElement("MaxClusterNo");
+					result.AppendChild(node);
+					node.InnerText = clusterNo.ToString();
+				}
 			}
 			{ // point no
-				XmlElement node = target.CreateElement("MaxPointNo");
-				result.AppendChild(node);
-				node.InnerText = options.MaxPointNo.ToString();
+				int pointNo = settings.GetInteger(TrackerProperty.MaxPointNo, -1);
+				if (pointNo > -1) {
+					XmlElement node = target.CreateElement("MaxPointNo");
+					result.AppendChild(node);
+					node.InnerText = pointNo.ToString();
+				}
 			}
 			{ // layer energy
-				XmlElement node = target.CreateElement("MinLayerEnergy");
-				result.AppendChild(node);
-				node.InnerText = options.MinLayerEnergy.ToString();
+				int energy = settings.GetInteger(TrackerProperty.MinLayerEnergy, -1);
+				if (energy > -1) {
+					XmlElement node = target.CreateElement("MinLayerEnergy");
+					result.AppendChild(node);
+					node.InnerText = energy.ToString();
+				}
+			}
+			{ // label no
+				int labelNo = settings.GetInteger(TrackerProperty.LabelNo, -1);
+				if (labelNo > -1) {
+					XmlElement node = target.CreateElement("LabelNo");
+					result.AppendChild(node);
+					node.InnerText = labelNo.ToString();
+				}
 			}
 			{ // fast approx threshold
-				XmlElement node = target.CreateElement("FastApproximationThreshold");
-				result.AppendChild(node);
-				node.InnerText = options.FastApproximationThreshold.ToString();
+				int threshold = settings.GetInteger(TrackerProperty.FastApproxThreshold, -1);
+				if (threshold > -1) {
+					XmlElement node = target.CreateElement("FastApproxThreshold");
+					result.AppendChild(node);
+					node.InnerText = threshold.ToString();
+				}
+			}
+			{ // max queued images
+				int imageNo = settings.GetInteger(TrackerProperty.MaxQueuedImages, -1);
+				if (imageNo > -1) {
+					XmlElement node = target.CreateElement("MaxQueuedImages");
+					result.AppendChild(node);
+					node.InnerText = imageNo.ToString();
+				}
 			}
 			return result;
 		}

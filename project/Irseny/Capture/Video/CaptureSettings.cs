@@ -7,12 +7,17 @@ namespace Irseny.Capture.Video {
 		Dictionary<CaptureProperty, int> iProps = new Dictionary<CaptureProperty, int>(16);
 
 		public CaptureSettings() {
+			// leave everything at auto
 		}
 
 		public CaptureSettings(CaptureSettings source) {
 			if (source == null) throw new ArgumentNullException("source");
-			// leave everything at auto detect
-			// iProps.Add(CaptureProperty.CameraId, 0);
+			foreach (var pair in source.fProps) {
+				this.fProps.Add(pair.Key, pair.Value);
+			}
+			foreach (var pair in source.iProps) {
+				this.iProps.Add(pair.Key, pair.Value);
+			}
 		}
 		public int GetInteger(CaptureProperty prop, int fallback) {
 			int result;

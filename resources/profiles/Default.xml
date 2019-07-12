@@ -30,16 +30,7 @@
     </Stream>
   </VideoCapture>
   <Tracking>
-    <Basic3Point Index="0">
-      <Smoothing>0</Smoothing>
-      <BrightnessThreshold>32</BrightnessThreshold>
-      <MinClusterRadius>2</MinClusterRadius>
-      <MaxClusterRadius>32</MaxClusterRadius>
-      <MaxClusterMembers>512</MaxClusterMembers>
-      <MaxClusterNo>8</MaxClusterNo>
-      <MaxPointNo>1024</MaxPointNo>
-      <MinLayerEnergy>6</MinLayerEnergy>
-      <FastApproximationThreshold>200</FastApproximationThreshold>
-    </Basic3Point>
+    <Cap3Point Index="1" />
+    <Cap3Point Index="2" />
   </Tracking>
 </Profile>
