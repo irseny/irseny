@@ -21,7 +21,7 @@ namespace Irseny.Tracap {
 		/// Gets the maximum number of points a cluster may have.
 		/// </summary>
 		/// <value>The maximum cluster point number.</value>
-		int MaxClusterPointNo { get; }
+		int MaxClusterMembers { get; }
 		/// <summary>
 		/// Gets the minimum energy a cluster must have.
 		/// </summary>

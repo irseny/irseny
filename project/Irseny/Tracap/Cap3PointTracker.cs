@@ -7,16 +7,16 @@ using Point2f = System.Drawing.PointF;
 using Irseny.Util;
 
 namespace Irseny.Tracap {
-	public class Basic3PointCapTracker : SingleImageCapTracker {
-		Basic3PointOptions options;
+	public class Cap3PointTracker : SingleImageCapTracker {
+		Cap3PointOptions options;
 		KeypointDetector pointDetector;
 		PointLabeler pointLabeler;
 		BasicPoseEstimator poseEstimator;
 		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
-		public Basic3PointCapTracker(Basic3PointOptions options) : base(options) {
-			this.options = new Basic3PointOptions(options);
+		public Cap3PointTracker(Cap3PointOptions options) : base(options) {
+			this.options = new Cap3PointOptions(options);
 			this.pointDetector = new KeypointDetector(this.options);
 			this.pointLabeler = new PointLabeler(this.options);
 			this.poseEstimator = new BasicPoseEstimator(this.options);

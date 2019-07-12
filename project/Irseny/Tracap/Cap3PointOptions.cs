@@ -1,15 +1,15 @@
 ﻿using System;
 
 namespace Irseny.Tracap {
-	public class Basic3PointOptions : CapTrackerOptions, IKeypointDetectorOptions, IPointLabelerOptions, IBasicPoseEstimatorOptions {
+	public class Cap3PointOptions : CapTrackerOptions, IKeypointDetectorOptions, IPointLabelerOptions, IBasicPoseEstimatorOptions {
 		/// <summary>
 		/// Creates a new instance of this class with default values.
 		/// </summary>
-		public Basic3PointOptions() : base() {
+		public Cap3PointOptions() : base() {
 			this.BrightnessThreshold = 32;
 			this.MaxPointNo = 1024;
 			this.MaxClusterNo = 8;
-			this.MaxClusterPointNo = 512;
+			this.MaxClusterMembers = 512;
 			this.MinLayerEnergy = 6;
 			this.MinClusterRadius = 2;
 			this.MaxClusterRadius = 32;
@@ -26,11 +26,11 @@ namespace Irseny.Tracap {
 		/// Creates a copy of the given instance.
 		/// </summary>
 		/// <param name="source">Source.</param>
-		public Basic3PointOptions(Basic3PointOptions source) : base(source) {
+		public Cap3PointOptions(Cap3PointOptions source) : base(source) {
 			this.BrightnessThreshold = source.BrightnessThreshold;
 			this.MaxPointNo = source.MaxPointNo;
 			this.MaxClusterNo = source.MaxClusterNo;
-			this.MaxClusterPointNo = source.MaxClusterPointNo;
+			this.MaxClusterMembers = source.MaxClusterMembers;
 			this.MinLayerEnergy = source.MinLayerEnergy;
 			this.MinClusterRadius = source.MinClusterRadius;
 			this.MaxClusterRadius = source.MaxClusterRadius;
@@ -47,7 +47,7 @@ namespace Irseny.Tracap {
 		public int MinClusterRadius { get; set; }
 		public int MaxClusterRadius { get; set; }
 		public int MinLayerEnergy { get; set; }
-		public int MaxClusterPointNo { get; set; }
+		public int MaxClusterMembers { get; set; }
 		public int MaxPointNo { get; set; }
 		public int MaxClusterNo { get; set; }
 		public bool MarkClusters { get; set; }

@@ -77,6 +77,14 @@ namespace Irseny.Iface.Main.Config.Profile {
 			}
 			// virtual device config
 
+			// tracker options
+			var trackerFactory = register.GetFactory<Iface.Main.Config.Tracking.TrackingFactory>("TrackingConfig");
+			for (int i = 0; i < 16; i++) {
+				ICapTrackerOptions options = trackerFactory.GetTrackerOptions(i);
+				if (options != null) {
+					profile.AddTracker(i, options);
+				}
+			}
 			ContentMaster.Instance.Profiles.SafeActiveProfile(profile);
 			LogManager.Instance.LogSignal(this, "Default profile saved");
 		}
@@ -87,12 +95,20 @@ namespace Irseny.Iface.Main.Config.Profile {
 			}
 			// clear existing configuration
 			var cameraFactory = register.GetFactory<Iface.Main.Config.Camera.CameraFactory>("CameraConfig");
-			cameraFactory.Clear();
+			cameraFactory.RemoveWebcams();
+			var trackerFactory = register.GetFactory<Iface.Main.Config.Tracking.TrackingFactory>("TrackingConfig");
+			trackerFactory.RemoveTrackers();
 
 			// apply the new config
 			foreach (int iCapture in profile.VideoCaptureIndexes) {
 				if (!cameraFactory.AddWebcam(iCapture, profile.GetVideoCapture(iCapture))) {
 					LogManager.Instance.LogError(this, "Failed to restore camera config");
+					return;
+				}
+			}
+			foreach (int iTracker in profile.TrackerIndexes) {
+				if (!trackerFactory.AddTracker(iTracker, profile.GetTracker(iTracker))) { // TODO: pass arguments
+					LogManager.Instance.LogError(this, "Failed to restore tracker config");
 					return;
 				}
 			}

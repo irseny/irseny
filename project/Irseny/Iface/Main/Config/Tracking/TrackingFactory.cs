@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Irseny.Content;
+using Irseny.Tracap;
 
 namespace Irseny.Iface.Main.Config.Tracking {
 	public class TrackingFactory : InterfaceFactory {
@@ -20,7 +22,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			};
 			var btnRemove = Container.GetWidget<Gtk.Button>("btn_Remove");
 			btnRemove.Clicked += delegate {
-				RemoveTracker();
+				RemoveSelectedTracker();
 			};
 			return true;
 		}
@@ -35,12 +37,19 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			Container.Dispose();
 			return true;
 		}
-		public bool AddTracker() {
+		public bool AddTracker(int index, ICapTrackerOptions options) {
+			if (index < 0) throw new ArgumentOutOfRangeException("index");
+			if (options == null) throw new ArgumentNullException("options");
+			//if (!(options is Cap3PointOptions)) throw new ArgumentException("options");
+			// TODO: add the tracker
+			return true;
+		}
+		private bool AddTracker() {
 			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages;
 			// create and append
 			if (page < 10) {
-				var factory = new CapTrackingFactory(page);
+				var factory = new CapTrackingFactory(page, new CapTrackerOptions());
 				ConstructFloor(string.Format("Track{0}", page), factory);
 				var boxInner = factory.Container.GetWidget("box_Root");
 				var label = new Gtk.Label(string.Format("Track{0}", page));
@@ -53,7 +62,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				return false;
 			}
 		}
-		public bool RemoveTracker() {
+		private bool RemoveSelectedTracker() {
 			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int page = ntbTracker.NPages - 1;
 			// remove last
@@ -65,6 +74,35 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			} else {
 				return false;
 			}
+		}
+		public void RemoveTrackers() {
+			// remove all tracker pages
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			while (ntbTracker.NPages > 0) {
+				Gtk.Widget page = ntbTracker.GetNthPage(0);
+				Gtk.Widget label = ntbTracker.GetTabLabel(page);
+				ntbTracker.RemovePage(0);
+				label.Dispose();
+			}
+			// deconstruct all trackers
+			var names = new List<string>(FloorNames);
+			foreach (string name in names) {
+				IInterfaceFactory floor = DestructFloor(name);
+				floor.Dispose();
+			}
+
+		}
+		public ICapTrackerOptions GetTrackerOptions(int index) {
+			if (!Initialized) {
+				return null;
+			}
+			foreach (IInterfaceFactory floor in Floors) {
+				var factory = (CapTrackingFactory)floor;
+				if (factory.TrackerIndex == index) {
+					return factory.GetOptions();
+				}
+			}
+			return null;
 		}
 	}
 }

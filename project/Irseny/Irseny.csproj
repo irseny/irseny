@@ -149,7 +149,7 @@
     <Compile Include="Tracap\DetectionSystem.cs" />
     <Compile Include="Tracap\ImageProcessedEventArgs.cs" />
     <Compile Include="Util\SharedRef.cs" />
-    <Compile Include="Tracap\Basic3PointCapTracker.cs" />
+    <Compile Include="Tracap\Cap3PointTracker.cs" />
     <Compile Include="Extrack\Artf.cs" />
     <Compile Include="Tracap\IPoseDetector.cs" />
     <Compile Include="Tracap\ISingleImageCapTracker.cs" />
@@ -163,7 +163,7 @@
     <Compile Include="Capture\Video\StreamEventArgs.cs" />
     <Compile Include="Capture\Video\ImageCapturedEventArgs.cs" />
     <Compile Include="Tracap\PositionDetectedEventArgs.cs" />
-    <Compile Include="Tracap\Basic3PointOptions.cs" />
+    <Compile Include="Tracap\Cap3PointOptions.cs" />
     <Compile Include="Tracap\KeypointDetector.cs" />
     <Compile Include="Tracap\IKeypointDetectorOptions.cs" />
     <Compile Include="Tracap\ICapTrackerOptions.cs" />
@@ -209,6 +209,9 @@
     <Compile Include="Content\Profile\CaptureProfileWriter.cs" />
     <Compile Include="Content\Profile\CaptureProfileReader.cs" />
     <Compile Include="Util\TextParseTools.cs" />
+    <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
+    <Compile Include="Content\Profile\TrackerProfileReader.cs" />
+    <Compile Include="Tracap\TrackerProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

@@ -176,7 +176,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 				return false;
 			}*/
 		}
-		public void Clear() {
+		public void RemoveWebcams() {
 			if (!Initialized) {
 				return;
 			}

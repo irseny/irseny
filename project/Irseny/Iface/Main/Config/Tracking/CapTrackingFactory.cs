@@ -11,8 +11,15 @@ namespace Irseny.Iface.Main.Config.Tracking {
 	public class CapTrackingFactory : InterfaceFactory {
 		readonly int trackerIndex;
 		VideoTrackerConnection connection = new VideoTrackerConnection();
-		public CapTrackingFactory(int index) : base() {
+		public CapTrackingFactory(int index, ICapTrackerOptions options) : base() {
+			if (options == null) throw new ArgumentNullException("options");
 			this.trackerIndex = index;
+		}
+		public int TrackerIndex {
+			get { return trackerIndex; }
+		}
+		public ICapTrackerOptions GetOptions() {
+			return new Cap3PointOptions();
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("CapTrackingConfig");
@@ -29,8 +36,8 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				}
 			};
 			DetectionSystem.Instance.Invoke(delegate {
-				var options = new Basic3PointOptions();
-				var tracker = new Basic3PointCapTracker(options);
+				var options = new Cap3PointOptions();
+				var tracker = new Cap3PointTracker(options);
 				//DetectionSystem.Instance.
 				int trackerId = DetectionSystem.Instance.ConnectDetector(tracker);
 				if (trackerId < 0) {

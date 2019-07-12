@@ -43,8 +43,8 @@ namespace Irseny.Tracap {
 			if (imagePoints.Length < options.MaxPointNo) {
 				imagePoints = new Point2i[options.MaxPointNo];
 			}
-			if (clusterPoints.Length < options.MaxClusterPointNo) {
-				clusterPoints = new Point2i[options.MaxClusterPointNo];
+			if (clusterPoints.Length < options.MaxClusterMembers) {
+				clusterPoints = new Point2i[options.MaxClusterMembers];
 			}
 			if (clusterCenters.Length < options.MaxClusterNo) {
 				clusterCenters = new Point2i[options.MaxClusterNo];

@@ -1,6 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Profile>
   <VideoCapture>
+    <Stream Index="0">
+      <Camera Auto="True">0</Camera>
+      <Width Auto="True">640</Width>
+      <Height Auto="True">480</Height>
+      <FPS Auto="True">30</FPS>
+      <Exposure Auto="True">0</Exposure>
+      <Brightness Auto="True">0</Brightness>
+      <Contrast Auto="True">0</Contrast>
+    </Stream>
     <Stream Index="1">
       <Camera Auto="True">0</Camera>
       <Width Auto="True">640</Width>
@@ -19,14 +28,18 @@
       <Brightness Auto="True">0</Brightness>
       <Contrast Auto="True">0</Contrast>
     </Stream>
-    <Stream Index="3">
-      <Camera Auto="True">0</Camera>
-      <Width Auto="True">640</Width>
-      <Height Auto="True">480</Height>
-      <FPS Auto="True">30</FPS>
-      <Exposure Auto="True">0</Exposure>
-      <Brightness Auto="True">0</Brightness>
-      <Contrast Auto="True">0</Contrast>
-    </Stream>
   </VideoCapture>
+  <Tracking>
+    <Basic3Point Index="0">
+      <Smoothing>0</Smoothing>
+      <BrightnessThreshold>32</BrightnessThreshold>
+      <MinClusterRadius>2</MinClusterRadius>
+      <MaxClusterRadius>32</MaxClusterRadius>
+      <MaxClusterMembers>512</MaxClusterMembers>
+      <MaxClusterNo>8</MaxClusterNo>
+      <MaxPointNo>1024</MaxPointNo>
+      <MinLayerEnergy>6</MinLayerEnergy>
+      <FastApproximationThreshold>200</FastApproximationThreshold>
+    </Basic3Point>
+  </Tracking>
 </Profile>
