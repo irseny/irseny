@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml;
 using System.Collections.Generic;
-using Irseny.Tracap;
+using Irseny.Tracking;
 
 namespace Irseny.Content.Profile {
 	public class TrackingProfileWriter {

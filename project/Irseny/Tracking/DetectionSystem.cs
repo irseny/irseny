@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class DetectionSystem {
 		static object instanceSync = new object();
 		static DetectionSystem instance = null;

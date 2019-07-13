@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public interface ICapTracker : IPoseDetector {
 		/// <summary>
 		/// Occurs when the head position has been detected.

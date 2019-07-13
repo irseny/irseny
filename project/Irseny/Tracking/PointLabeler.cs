@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Point2i = System.Drawing.Point;
 using Size2i = System.Drawing.Size;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public partial class PointLabeler {
 		TrackerSettings settings;
 		Point2i[] inPoints;

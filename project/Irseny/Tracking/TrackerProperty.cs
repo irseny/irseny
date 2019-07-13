@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public enum TrackerProperty {
 		Stream0,
 		Stream1,

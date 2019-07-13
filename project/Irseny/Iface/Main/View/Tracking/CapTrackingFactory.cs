@@ -5,7 +5,7 @@ using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Util;
 using Irseny.Log;
-using Irseny.Tracap;
+using Irseny.Tracking;
 
 namespace Irseny.Iface.Main.View.Tracking {
 	public class CapTrackingFactory : InterfaceFactory {
@@ -34,7 +34,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 					return;
 				}
 
-				var tracker = DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetDetector<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
 
 				if (tracker == null) {
 					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + "not available");
@@ -53,7 +53,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 				if (trackerId < 0) {
 					return;
 				}
-				var tracker = DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetDetector<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
 
 				if (tracker == null) {
 					return;
@@ -88,7 +88,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 		//	imgVideoOut.Pixbuf = imgMissingVideo.Pixbuf;
 		//	imgVideoOut.QueueDraw();
 		//}
-		private void RetrieveImage(object sender, Tracap.ImageProcessedEventArgs args) {
+		private void RetrieveImage(object sender, Irseny.Tracking.ImageProcessedEventArgs args) {
 			int width = 0;
 			int height = 0;
 			int totalBytes = 0;

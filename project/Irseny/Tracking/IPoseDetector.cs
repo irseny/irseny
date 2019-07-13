@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public interface IPoseDetector : IDisposable {
 		/// <summary>
 		/// Occurs when the algorithm has data to process.

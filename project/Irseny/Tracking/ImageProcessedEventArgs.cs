@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class ImageProcessedEventArgs : EventArgs {
 		Util.SharedRef<Emgu.CV.Mat> image;
 		/// <summary>

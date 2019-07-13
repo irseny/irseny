@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Irseny.Content;
-using Irseny.Tracap;
+using Irseny.Tracking;
 using Irseny.Util;
 
 namespace Irseny.Iface.Main.Config.Tracking {

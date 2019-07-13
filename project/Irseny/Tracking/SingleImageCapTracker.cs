@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Irseny.Util;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();

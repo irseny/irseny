@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class PositionDetectedEventArgs : EventArgs {
 
 		public PositionDetectedEventArgs(CapPosition position) : base() {

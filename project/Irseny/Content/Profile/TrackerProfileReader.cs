@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Collections.Generic;
 using Irseny.Util;
-using Irseny.Tracap;
+using Irseny.Tracking;
 
 namespace Irseny.Content.Profile {
 	public class TrackerProfileReader {

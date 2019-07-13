@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public struct CapPosition {
 
 

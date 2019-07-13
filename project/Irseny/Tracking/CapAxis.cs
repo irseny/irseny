@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public enum CapAxis : int {
 		X = 0,
 		Y,

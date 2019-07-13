@@ -18,7 +18,7 @@ namespace Irseny {
 				EquipmentMaster.MakeInstance(new EquipmentMaster());
 				LogManager.MakeInstance(new LogManager());
 				Capture.Video.CaptureSystem.MakeInstance(new Capture.Video.CaptureSystem());
-				Tracap.DetectionSystem.MakeInstance(new Tracap.DetectionSystem());
+				Tracking.DetectionSystem.MakeInstance(new Tracking.DetectionSystem());
 				Inco.Device.VirtualDeviceManager.MakeInstance(new Inco.Device.VirtualDeviceManager());
 			}
 			{
@@ -118,7 +118,7 @@ namespace Irseny {
 			//Gtk.Application.Run();
 			{
 				Inco.Device.VirtualDeviceManager.MakeInstance(null);
-				Tracap.DetectionSystem.MakeInstance(null);
+				Tracking.DetectionSystem.MakeInstance(null);
 				Capture.Video.CaptureSystem.MakeInstance(null);
 				LogManager.MakeInstance(null);
 				EquipmentMaster.MakeInstance(null);

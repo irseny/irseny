@@ -5,7 +5,7 @@ using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
 using Size2i = System.Drawing.Size;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class BasicPoseEstimator {
 		const int TopPointIndex = 0;
 		const int RightPointIndex = 1;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Size = System.Drawing.Size;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class TrackerSettings {
 		Dictionary<TrackerProperty, double> fProps = new Dictionary<TrackerProperty, double>(16);
 		Dictionary<TrackerProperty, int> iProps = new Dictionary<TrackerProperty, int>(16);

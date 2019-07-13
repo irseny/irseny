@@ -6,7 +6,7 @@ using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
 using Irseny.Util;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class Cap3PointTracker : SingleImageCapTracker {
 		KeypointDetector pointDetector = null;
 		PointLabeler pointLabeler = null;

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Size2i = System.Drawing.Size;
 using Point2i = System.Drawing.Point;
 
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public class KeypointDetector {
 		TrackerSettings settings;
 		Point2i[] imagePoints = new Point2i[0];

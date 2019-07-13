@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Irseny.Tracap {
+namespace Irseny.Tracking {
 	public abstract class CapTracker : ICapTracker {
 		readonly object inputEventSync = new object();
 		readonly object detectedEventSync = new object();
