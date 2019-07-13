@@ -22,7 +22,7 @@ namespace Irseny.Tracap {
 		/// Starts the detection process.
 		/// </summary>
 		/// <returns>Whether the operation was successful.</returns>
-		bool Start();
+		bool Start(TrackerSettings settings);
 		/// <summary>
 		/// Executes one detection iteration.
 		/// </summary>

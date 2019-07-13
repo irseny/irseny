@@ -6,14 +6,10 @@ namespace Irseny.Tracap {
 	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
-		TrackerSettings settings;
 		Queue<SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<SharedRef<Emgu.CV.Mat>>();
 		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
-		public SingleImageCapTracker(TrackerSettings settings) : base() {
-			if (settings == null) throw new ArgumentNullException("settings");
-			// TODO: move settings passing to Start()
-			this.settings = settings;
+		public SingleImageCapTracker() : base() {
 		}
 		public event EventHandler<ImageProcessedEventArgs> InputProcessed {
 			add {
@@ -80,14 +76,16 @@ namespace Irseny.Tracap {
 		}
 		public void QueueInput(SharedRef<Emgu.CV.Mat> image) {
 			if (image == null) throw new ArgumentNullException("image");
+			if (!Running) {
+				return;
+			}
 			lock (inputSync) {
 				pendingImages.Enqueue(SharedRef.Copy(image));
-				int imageLimit = settings.GetInteger(TrackerProperty.MaxQueuedImages, 4);
+				int imageLimit = Settings.GetInteger(TrackerProperty.MaxQueuedImages, 4);
 				while (pendingImages.Count > imageLimit && pendingImages.Count >= 0) {
 					pendingImages.Dequeue().Dispose();
 				}
 			}
-
 			OnInputAvailable(new EventArgs());
 		}
 		public override void Dispose() {

@@ -40,17 +40,17 @@ namespace Irseny.Content.Profile {
 				}
 			}
 			{ // mixing
-				int mixing = settings.GetInteger(TrackerProperty.Mixing, -1);
+				int mixing = settings.GetInteger(TrackerProperty.Smoothing, -1);
 				if (mixing > -1) {
-					XmlElement node = target.CreateElement("Mixing");
+					XmlElement node = target.CreateElement("Smoothing");
 					result.AppendChild(node);
 					node.InnerText = mixing.ToString();
 				}
 			}
 			{
-				double mixingDecline = settings.GetDecimal(TrackerProperty.MixingDecline, -1.0);
+				double mixingDecline = settings.GetDecimal(TrackerProperty.SmoothingDropoff, -1.0);
 				if (mixingDecline > -1.0) {
-					XmlElement node = target.CreateElement("MixingDecline");
+					XmlElement node = target.CreateElement("SmoothingDropoff");
 					result.AppendChild(node);
 					node.InnerText = mixingDecline.ToString();
 				}
@@ -90,7 +90,7 @@ namespace Irseny.Content.Profile {
 			{ // cluster no
 				int clusterNo = settings.GetInteger(TrackerProperty.MaxClusterNo, -1);
 				if (clusterNo > -1) {
-					XmlElement node = target.CreateElement("MaxClusterNo");
+					XmlElement node = target.CreateElement("MaxClusters");
 					result.AppendChild(node);
 					node.InnerText = clusterNo.ToString();
 				}
@@ -98,7 +98,7 @@ namespace Irseny.Content.Profile {
 			{ // point no
 				int pointNo = settings.GetInteger(TrackerProperty.MaxPointNo, -1);
 				if (pointNo > -1) {
-					XmlElement node = target.CreateElement("MaxPointNo");
+					XmlElement node = target.CreateElement("MaxPoints");
 					result.AppendChild(node);
 					node.InnerText = pointNo.ToString();
 				}
@@ -114,7 +114,7 @@ namespace Irseny.Content.Profile {
 			{ // label no
 				int labelNo = settings.GetInteger(TrackerProperty.LabelNo, -1);
 				if (labelNo > -1) {
-					XmlElement node = target.CreateElement("LabelNo");
+					XmlElement node = target.CreateElement("Labels");
 					result.AppendChild(node);
 					node.InnerText = labelNo.ToString();
 				}

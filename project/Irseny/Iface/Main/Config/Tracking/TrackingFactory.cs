@@ -10,6 +10,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 		readonly string TitlePrefix = "Track";
 
 		public TrackingFactory() : base() {
+
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingConfig");
@@ -86,6 +87,15 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			}
 			// TODO: initialize settings
 			var settings = new TrackerSettings();
+			settings.SetInteger(TrackerProperty.MinBrightness, 32);
+			settings.SetInteger(TrackerProperty.Stream0, 0);
+			settings.SetInteger(TrackerProperty.Smoothing, 4);
+			settings.SetDecimal(TrackerProperty.SmoothingDropoff, 0.8);
+			settings.SetInteger(TrackerProperty.MinClusterRadius, 2);
+			settings.SetInteger(TrackerProperty.MaxClusterRadius, 32);
+			settings.SetInteger(TrackerProperty.MinLayerEnergy, 6);
+			settings.SetInteger(TrackerProperty.LabelNo, 3);
+			settings.SetInteger(TrackerProperty.FastApproxThreshold, 200);
 			return AddTracker(iFree, settings);
 		}
 		private bool RemoveSelectedTracker() {

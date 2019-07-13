@@ -38,8 +38,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				}
 			};
 			DetectionSystem.Instance.Invoke((EventHandler)delegate {
-				var settings = new TrackerSettings();
-				var tracker = new Cap3PointTracker(settings);
+				var tracker = new Cap3PointTracker();
 				//DetectionSystem.Instance.
 				int trackerId = DetectionSystem.Instance.ConnectDetector(tracker);
 				if (trackerId < 0) {
@@ -80,6 +79,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			if (!Initialized) {
 				return;
 			}
+			var trackerSettings = new TrackerSettings(settings);
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId < 0) {
@@ -95,7 +95,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				if (tracker.Running) {
 					return;
 				}
-				if (!tracker.Start()) {
+				if (!tracker.Start(trackerSettings)) {
 					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
 					return;
 				}

@@ -51,6 +51,8 @@ namespace Irseny.Content.Profile {
 				}
 			} catch (FileNotFoundException) {
 				return null;
+			} catch (System.Reflection.TargetInvocationException) {
+				return null;
 			}
 			var result = new SetupProfile("Default");
 			foreach (XmlNode root in document.DocumentElement.ChildNodes) {

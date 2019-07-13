@@ -8,29 +8,33 @@ using Irseny.Util;
 
 namespace Irseny.Tracap {
 	public class Cap3PointTracker : SingleImageCapTracker {
-		TrackerSettings settings;
-		KeypointDetector pointDetector;
-		PointLabeler pointLabeler;
-		BasicPoseEstimator poseEstimator;
+		KeypointDetector pointDetector = null;
+		PointLabeler pointLabeler = null;
+		BasicPoseEstimator poseEstimator = null;
 		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
-		public Cap3PointTracker(TrackerSettings settings) : base(settings) {
-			this.settings = new TrackerSettings(settings);
-			this.pointDetector = new KeypointDetector(this.settings);
-			this.pointLabeler = new PointLabeler(this.settings);
-			this.poseEstimator = new BasicPoseEstimator(this.settings);
+		public Cap3PointTracker() : base() {
+
 		}
 		public override bool Centered {
 			get {
+				if (poseEstimator == null) {
+					return false;
+				}
 				return poseEstimator.Centered;
 			}
 		}
 		public override bool Center() {
+			if (poseEstimator == null) {
+				return false;
+			}
 			return poseEstimator.Center();
 		}
-		public override bool Start() {
-			Running = true;
+		public override bool Start(TrackerSettings settings) {
+			if (!base.Start(settings)) {
+				return false;
+			}
 			pointDetector = new KeypointDetector(settings);
 			pointLabeler = new PointLabeler(settings);
 			poseEstimator = new BasicPoseEstimator(settings);
@@ -38,7 +42,9 @@ namespace Irseny.Tracap {
 		}
 
 		public override bool Stop() {
-			Running = false;
+			if (!base.Stop()) {
+				return false;
+			}
 			imageCleaner.CleanUpAll(); // might leave some images left
 			return true;
 		}
@@ -47,6 +53,9 @@ namespace Irseny.Tracap {
 			base.Dispose();
 		}
 		protected override bool Step(SharedRef<Emgu.CV.Mat> imageIn) {
+			if (!Running) {
+				return false;
+			}
 			SetupStep(imageIn);
 			// keypoint detection
 			Point2i[] keypoints;

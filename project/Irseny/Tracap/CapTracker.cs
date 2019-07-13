@@ -10,12 +10,14 @@ namespace Irseny.Tracap {
 		event EventHandler stopped;
 		public CapTracker() {
 			Running = false;
+			Settings = null;
 		}
 		~CapTracker() {
 			Dispose();
 		}
 		public abstract bool Centered { get; }
-		public virtual bool Running { get; protected set; }
+		public bool Running { get; private set; }
+		protected TrackerSettings Settings { get; private set; }
 		public event EventHandler<PositionDetectedEventArgs> PositionDetected {
 			add {
 				lock (detectedEventSync) {
@@ -117,9 +119,23 @@ namespace Irseny.Tracap {
 			}
 		}
 		public abstract bool Center();
-		public abstract bool Start();
+		public virtual bool Start(TrackerSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			if (Running) {
+				return false;
+			}
+			Settings = settings;
+			Running = true;
+			return true;
+		}
 		public abstract bool Step();
-		public abstract bool Stop();
+		public virtual bool Stop() {
+			if (!Running) {
+				return false;
+			}
+			Running = false;
+			return true;
+		}
 
 	}
 }

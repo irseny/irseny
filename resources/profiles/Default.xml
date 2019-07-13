@@ -10,27 +10,18 @@
       <Brightness Auto="True">0</Brightness>
       <Contrast Auto="True">0</Contrast>
     </Stream>
-    <Stream Index="1">
-      <Camera Auto="True">0</Camera>
-      <Width Auto="True">640</Width>
-      <Height Auto="True">480</Height>
-      <FPS Auto="True">30</FPS>
-      <Exposure Auto="True">0</Exposure>
-      <Brightness Auto="True">0</Brightness>
-      <Contrast Auto="True">0</Contrast>
-    </Stream>
-    <Stream Index="2">
-      <Camera Auto="True">0</Camera>
-      <Width Auto="True">640</Width>
-      <Height Auto="True">480</Height>
-      <FPS Auto="True">30</FPS>
-      <Exposure Auto="True">0</Exposure>
-      <Brightness Auto="True">0</Brightness>
-      <Contrast Auto="True">0</Contrast>
-    </Stream>
   </VideoCapture>
   <Tracking>
-    <Cap3Point Index="1" />
-    <Cap3Point Index="2" />
+    <Cap3Point Index="0">
+      <Stream>0</Stream>
+      <Smoothing>4</Smoothing>
+      <SmoothingDropoff>0.8</SmoothingDropoff>
+      <MinBrightness>32</MinBrightness>
+      <MinClusterRadius>2</MinClusterRadius>
+      <MaxClusterRadius>32</MaxClusterRadius>
+      <MinLayerEnergy>6</MinLayerEnergy>
+      <Labels>3</Labels>
+      <FastApproxThreshold>200</FastApproxThreshold>
+    </Cap3Point>
   </Tracking>
 </Profile>
