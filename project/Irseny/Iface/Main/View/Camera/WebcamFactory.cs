@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using Size2i = System.Drawing.Size;
 using Irseny.Log;
 using Irseny.Util;
 using Irseny.Content;
@@ -11,15 +12,12 @@ using Irseny.Capture.Video;
 
 namespace Irseny.Iface.Main.View.Camera {
 	public class WebcamFactory : InterfaceFactory {
-		byte[] pixelBuffer = new byte[0];
-		//Gdk.Pixbuf activeImage = null;
-		int imageWidth = 0;
-		int imageHeight = 0;
-
 		Queue<Emgu.CV.Mat> captureBuffer = new Queue<Emgu.CV.Mat>();
-		//string videoOutStock = "gtk-missing-image";
-		//Gtk.IconSize videoOutSize = Gtk.IconSize.Button;
-		private readonly int streamIndex;
+		readonly object captureSync = new object();
+		Size2i captureSize = new Size2i(0, 0);
+		bool captureRunning = false;
+
+		readonly int streamIndex;
 		public WebcamFactory(int index) : base() {
 			this.streamIndex = index;
 		}
@@ -31,8 +29,6 @@ namespace Irseny.Iface.Main.View.Camera {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			/*var videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-			videoOut.GetStock(out videoOutStock, out videoOutSize);*/
 			var drawVideoOut = Container.GetWidget<Gtk.DrawingArea>("draw_VideoOut");
 			drawVideoOut.Drawn += DrawImage;
 
@@ -48,6 +44,11 @@ namespace Irseny.Iface.Main.View.Camera {
 					return;
 				}
 				stream.ImageAvailable += RetrieveImage;
+				stream.CaptureStarted += CaptureStarted;
+				if (stream.Capturing) {
+					CaptureStarted(stream, new StreamEventArgs(stream, -1));
+				}
+				stream.CaptureStopped += CaptureStopped;
 			});
 			return true;
 		}
@@ -57,68 +58,76 @@ namespace Irseny.Iface.Main.View.Camera {
 		}
 		protected override bool DestroyInternal() {
 			Container.Dispose();
+			lock (captureSync) {
+				while (captureBuffer.Count > 0) {
+					captureBuffer.Dequeue().Dispose();
+				}
+			}
+			captureRunning = false;
 			return true;
 		}
-
-
+		private void CaptureStarted(object sender, StreamEventArgs args) {
+			lock (captureSync) {
+				captureRunning = true;
+			}
+		}
+		private void CaptureStopped(object sender, StreamEventArgs args) {
+			lock (captureSync) {
+				captureRunning = false;
+			}
+		}
 		private void RetrieveImage(object sender, Capture.Video.ImageCapturedEventArgs args) {
-			/*int width = 0;
-			int height = 0;
-			MemoryStream imgStream;
-			using (var imgRef = args.Image) {
-				var imgSource = imgRef.Reference;
-				width = imgSource.Width;
-				height = imgSource.Height;
-				imgStream = new MemoryStream(imgSource.Width*imgSource.Height*imgSource.ElementSize);
-				using (var bmp = imgSource.Bitmap) {
-					bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.MemoryBmp);
-				}
-				imgStream.Position = 0;
+			Size2i windowSize;
+			lock (captureSync) {
+				windowSize = captureSize;
 			}
-			Invoke(delegate {
-				Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-				videoOut.Pixbuf = new Gdk.Pixbuf(imgStream, width, height);
-				videoOut.QueueDraw();
-				imgStream.Dispose();
-			});*/
-			//byte[] buffer = null;
-			imageWidth = 0;
-			imageHeight = 0;
-			int totalBytes = 0;
-			bool pixelsAvailable = false;
-			using (var imgRef = args.GrayImage) {
-				var imgSource = imgRef.Reference;
-				//if (imgSource.NumberOfChannels == 3 && imgSource.ElementSize == sizeof(byte)*3 && imgSource.DataPointer != IntPtr.Zero) {
-				//	imageWidth = imgSource.Width;
-				//	imageHeight = imgSource.Height;
-				//	totalBytes = imageWidth*imageHeight*imgSource.ElementSize*sizeof(byte);
-				//	if (pixelBuffer.Length < totalBytes) {
-				//		pixelBuffer = new byte[totalBytes];
-				//	}
-				//	// we could write data that is currently read below, though this should only result in visual artifacts sometimes
-				//	Marshal.Copy(imgSource.DataPointer, pixelBuffer, 0, totalBytes);
-				//	pixelsAvailable = true;
-				//} else {
-				//	Debug.WriteLine(this.GetType().Name + ": Retrieved image has wrong format.");
-				//}
-				if (imgSource.NumberOfChannels == 1 && imgSource.ElementSize == sizeof(byte) && imgSource.DataPointer != IntPtr.Zero) {
-					imageWidth = imgSource.Width;
-					imageHeight = imgSource.Height;
-					totalBytes = imageWidth*imageHeight*sizeof(byte);
-					if (pixelBuffer.Length < totalBytes) {
-						pixelBuffer = new byte[totalBytes];
-					}
-					// we could write data that is currently read below, though this should only result in visual artifacts sometimes
-					Marshal.Copy(imgSource.DataPointer, pixelBuffer, 0, totalBytes);
-					pixelsAvailable = true;
-				} else {
-					Debug.WriteLine(this.GetType().Name + ": Retrieved image has wrong format.");
-				}
-			}
-
-
-			if (!pixelsAvailable) {
+			// discard if the target size is unknown
+			if (windowSize.Width < 1 || windowSize.Height < 1) {
 				return;
+			}
+			// discard if many captures are already pending for display
+			int captureNo;
+			lock (captureSync) {
+				captureNo = captureBuffer.Count;
+			}
+			if (captureNo >= 4) {
+				return;
+			}
+
+			using (var imgRef = args.ColorImage) {
+				var imgSource = imgRef.Reference;
+				if (imgSource.NumberOfChannels != 3 || imgSource.ElementSize != sizeof(byte)*3) {
+					LogManager.Instance.LogError(this, "Captured image has wrong format");
+					return;
+				}
+				// choose target size and preserve aspect ratio
+				Size2i targetSize = new Size2i(0, 0);
+				float aspectRatio = (float)imgSource.Width/(float)imgSource.Height;
+				{
+					int width = Math.Min(windowSize.Width, imgSource.Width);
+					int height = (int)Math.Round(width/aspectRatio);
+					if (height <= windowSize.Height && height > targetSize.Height) {
+						targetSize.Width = width;
+						targetSize.Height = height;
+					}
+				}
+				{
+					int height = Math.Min(windowSize.Height, imgSource.Height);
+					int width = (int)Math.Round(height*aspectRatio);
+					if (width <= windowSize.Width && width > targetSize.Width) {
+						targetSize.Width = width;
+						targetSize.Height = height;
+					}
+				}
+				if (targetSize.Width < 1 || targetSize.Height < 1) {
+					return;
+				}
+				// resize and buffer capture
+				Emgu.CV.Mat capture = new Emgu.CV.Mat(targetSize, imgSource.Depth, imgSource.NumberOfChannels);
+				Emgu.CV.CvInvoke.Resize(imgSource, capture, targetSize);
+				lock (captureSync) {
+					captureBuffer.Enqueue(capture);
+				}
 			}
 			Invoke(delegate {
 				if (!Initialized) {
@@ -127,46 +136,6 @@ namespace Irseny.Iface.Main.View.Camera {
 				Gtk.Widget drawImageOut = Container.GetWidget("draw_VideoOut");
 				drawImageOut.QueueDraw();
 			});
-
-			Invoke(delegate {
-				if (!Initialized) { // can be called after the capture is stopped
-					return;
-				}
-				//Gtk.Image videoOut = Container.GetWidget<Gtk.Image>("img_VideoOut");
-				//bool updatePixBuf = false;
-				//if (activeImage == null || activeImage.Width != width || activeImage.Height != height) {
-				//	activeImage = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, width, height);
-				//	updatePixBuf = true;
-				//}
-				//Marshal.Copy(pixelBuffer, 0, activeImage.Pixels, totalBytes);
-
-				//videoOut.Pixbuf = activeImage; // explicitly set to make updates visible
-
-				//videoOut.QueueDraw();
-
-				// other attempts
-				//var pixels = new Gdk.Pixbuf(buffer, Gdk.Colorspace.Rgb, false, 8, width, height, stride, (byte[] buf) => {
-				//	Console.WriteLine("pixbuf destroy"); // not called
-				//});
-				//var pixels = new Gdk.Pixbuf(buffer); // unable to determine format
-				//var pixels = new Gdk.Pixbuf(buffer, false); // header corrupt
-				//
-				//var data = new Gdk.Pixdata();
-				//data.Deserialize((uint)buffer.Length, buffer); // unable to determine format
-				//var pixels = Gdk.Pixbuf.FromPixdata(data, true);
-				//var pixels = new Gdk.Pixbuf(buffer, false, 8, width, height, stride); // out of memory
-
-				//Gtk.Widget drawImageOut = Container.GetWidget("draw_VideoOut");
-				//drawImageOut.QueueDraw();
-				//});
-				//Invoke(delegate {
-				//	if (!Initialized) {
-				//		return;
-				//	}
-				//	Gtk.Widget drawImageOut = Container.GetWidget("draw_VideoOut");
-				//	drawImageOut.QueueDraw();
-			});
-
 		}
 		private void DrawImage(object sender, Gtk.DrawnArgs args) {
 			if (!Initialized) {
@@ -175,42 +144,75 @@ namespace Irseny.Iface.Main.View.Camera {
 			// TODO: drawing operations increase memory usage, there must be a memory leak located in here
 			Gtk.DrawingArea target = (Gtk.DrawingArea)sender;
 			Gdk.Window window = target.Window;
-			int targetWidth = window.Width;
-			int targetHeight = window.Height;
-
-			// memory leaks seem to originate from the context creation call
-			using (Cairo.Context context = Gdk.CairoHelper.Create(window)) {
-				if (captureBuffer.Count > 0) {
-					// display capture
-					for (int i = 0; i < imageWidth*imageHeight; i++) {
-						pixelBuffer[i] = (byte)(pixelBuffer[i]*4);
+			// get the latest capture
+			// the capture will remain in the queue
+			// so that it can be displayed again
+			Emgu.CV.Mat capture = null;
+			if (captureRunning) {
+				lock (captureSync) {
+					captureSize = new Size2i(window.Width, window.Height);
+					int captureNo = captureBuffer.Count;
+					if (captureNo > 0) {
+						// delete old captures
+						while (captureBuffer.Count > 1) {
+							captureBuffer.Dequeue().Dispose();
+						}
+						// keep the capture in the queue
+						capture = captureBuffer.Peek();
 					}
-					using (var surface = new Cairo.ImageSurface(pixelBuffer, Cairo.Format.A8, imageWidth, imageHeight, imageWidth)) {
-						context.Rectangle(0, 0, window.Width, window.Height);
-						context.SetSource(surface);
+				}
+			}
+			// test the latest capture for satisfactory size
+			if (capture != null) {
+				// skip drawing oversized captures
+				if (capture.Width > window.Width || capture.Height > window.Height) {
+					return;
+				}
 
+			}
+			// continue displaying the same image if no new image is available
+			if (captureRunning && capture == null) {
+				return;
+			}
+			// draw on widget
+			// with gtk-sharp memory leaks seem to originate from this context creation call
+			using (Cairo.Context context = Gdk.CairoHelper.Create(window)) {
+				if (capture != null) {
+					int totalBytes = capture.ElementSize*capture.Width*capture.Height;
+					byte[] pixels = new byte[totalBytes];
+					Marshal.Copy(capture.DataPointer, pixels, 0, totalBytes);
+					int startX = (window.Width - capture.Width)/2;
+					int startY = (window.Height - capture.Height)/2;
+					/*using (var pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, false, 8, capture.Width, capture.Height)) {
+						Marshal.Copy(pixels, 0, pixbuf.Pixels, totalBytes);
+						Gdk.CairoHelper.SetSourcePixbuf(context, pixbuf, startX, startY);
+						context.Rectangle(startX, startY, pixbuf.Width, pixbuf.Height);
+						context.Fill();
+					}*/
+					using (var pixbuf = new Gdk.Pixbuf(pixels, Gdk.Colorspace.Rgb, false, 8, capture.Width, capture.Height, capture.Width*3)) {
+						Gdk.CairoHelper.SetSourcePixbuf(context, pixbuf, startX, startY);
+						context.Rectangle(startX, startY, pixbuf.Width, pixbuf.Height);
 						context.Fill();
 					}
-					context.Translate(window.Width/2, window.Height/2);
-					context.Arc(0, 0, (window.Width < window.Height ? window.Width : window.Height) / 2 - 10, 0, 2*Math.PI);
-					context.StrokePreserve();
-
-					context.SetSourceRGB(0.3, 0.4, 0.6);
-					context.Fill();
+					// this does not work as expected as the surface uses a custom stride value
+					/*using (var surface = new Cairo.ImageSurface(Cairo.Format.RGB24, capture.Width, capture.Height)) {
+						Marshal.Copy(capture.DataPointer, surface.Data, 0, totalBytes); // writing to data copy here
+						context.SetSourceSurface(surface, startX, startY);
+						context.Rectangle(startX, startY, capture.Width, capture.Height);
+						context.Fill();
+					}*/
 				} else {
 					// display fallback
 					var imgFallback = Container.GetGadget<Gtk.Image>("img_MissingVideo");
-					int imgWidth = imgFallback.Pixbuf.Width;
-					int imgHeight = imgFallback.Pixbuf.Height;
-					int startX = (targetWidth - imgWidth)/2;
-					int startY = (targetHeight - imgHeight)/2;
-
+					Gdk.Pixbuf pixbuf = imgFallback.Pixbuf;
+					int startX = (window.Width - pixbuf.Width)/2;
+					int startY = (window.Height - pixbuf.Height)/2;
 					Gdk.CairoHelper.SetSourcePixbuf(context, imgFallback.Pixbuf, startX, startY);
-					context.Rectangle(startX, startY, imgWidth, imgHeight);
+					context.Rectangle(startX, startY, pixbuf.Width, pixbuf.Height);
 					context.Fill();
 				}
 			}
-			//Console.WriteLine("displaying image " + imageWidth + " " + imageHeight);
+			//Console.WriteLine("displaying image " + window.Width + " " + window.Height);
 		}
 	}
 }
