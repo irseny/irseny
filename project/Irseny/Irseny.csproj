@@ -79,6 +79,9 @@
       <HintPath>..\..\lib\Emgu.CV\Emgu.CV.World.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="cairo-sharp, Version=1.10.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Package>gtk-sharp-3.0</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">
     <Reference Include="netstandard" />
@@ -207,6 +210,7 @@
     <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
     <Compile Include="Content\Profile\TrackerProfileReader.cs" />
     <Compile Include="Tracking\TrackerProperty.cs" />
+    <Compile Include="Iface\InvokeHack.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

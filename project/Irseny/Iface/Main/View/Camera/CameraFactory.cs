@@ -34,6 +34,9 @@ namespace Irseny.Iface.Main.View.Camera {
 		}
 		private void CameraChanged(object sender, Listing.EquipmentUpdateArgs<int> args) {
 			Invoke(delegate {
+				if (!Initialized) {
+					return;
+				}
 				var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 				int pages = ntbCamera.NPages;
 				if (args.Missing) {

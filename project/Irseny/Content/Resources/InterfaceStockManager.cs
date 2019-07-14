@@ -18,6 +18,7 @@ namespace Irseny.Content.Resources {
 					"ArrowRotationTop.png",
 					"CapSide.png",
 					"CapTop.png",
+					"VideoStop.png",
 					"Icon.png"
 				};
 				for (int i = 0; i < fileNames.Length; i++) {

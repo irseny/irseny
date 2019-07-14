@@ -178,7 +178,9 @@ namespace Irseny.Iface {
 		}
 		public void Invoke(EventHandler handler) {
 			if (handler == null) throw new ArgumentNullException("handler");
-			Gtk.Application.Invoke(handler);
+			//Gtk.Application.Invoke(handler);
+			// TODO: find a robust solution
+			InvokeHack.Invoke(handler);
 		}
 		public void Dispose() {
 			Init(InterfaceFactoryState.Initial); // inner factories uninitialized

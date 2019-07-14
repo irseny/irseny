@@ -1,5 +1,4 @@
 ﻿using System;
-
 using System.IO;
 using System.Threading;
 using System.Diagnostics;
@@ -92,7 +91,10 @@ namespace Irseny {
 			Extrack.Artf.SetPacketCameraSize(packet, 320, 240);
 			Stopwatch watch = new Stopwatch();
 			watch.Start();*/
-			Gtk.Application.RunIteration();
+			//Gtk.Application.RunIteration();
+
+			var watch = new Stopwatch();
+			watch.Start();
 			while (!stopped) {
 				/*Extrack.Artf.IncreasePacketId(packet);
 				float yaw = (float)Math.Sin(watch.ElapsedMilliseconds * 0.0002f);
@@ -104,12 +106,26 @@ namespace Irseny {
 					Debug.WriteLine("packet not submitted successfully");
 				}*/
 				// TODO: fix attempted to read or write protected memory through GLib.ToggleRef.Free();
-				Gtk.Application.RunIteration();
+				// iterate but do not block if there is no UI activity
+				// so that hacked event processing does work
 
+				long timeStart = watch.ElapsedMilliseconds;
+				Gtk.Application.RunIteration(false);
+
+				Iface.InvokeHack.Process();
 				long memory = GC.GetTotalMemory(true);
+				long timeEnd = watch.ElapsedMilliseconds;
+				long elapsed = timeEnd - timeStart;
+				if (elapsed > 10) {
+					Console.WriteLine("Long frame: " + elapsed);
+				}
+				//Console.WriteLine("elapsed: " + (time2 - time).ToString());
+				//Console.WriteLine("iter");
 				//Console.WriteLine("total memory used {0:#,##0}k", memory / 1000);
 				// occuring exceptions:
 				// invalid access to memory when removing a camera page
+				// TODO: implement frame timing
+				//Thread.Sleep(12);
 			}
 			/*watch.Stop();
 			Extrack.Artf.FreePacket(packet);

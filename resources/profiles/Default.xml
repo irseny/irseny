@@ -11,17 +11,5 @@
       <Contrast Auto="True">0</Contrast>
     </Stream>
   </VideoCapture>
-  <Tracking>
-    <Cap3Point Index="0">
-      <Stream>0</Stream>
-      <Smoothing>4</Smoothing>
-      <SmoothingDropoff>0.8</SmoothingDropoff>
-      <MinBrightness>32</MinBrightness>
-      <MinClusterRadius>2</MinClusterRadius>
-      <MaxClusterRadius>32</MaxClusterRadius>
-      <MinLayerEnergy>6</MinLayerEnergy>
-      <Labels>3</Labels>
-      <FastApproxThreshold>200</FastApproxThreshold>
-    </Cap3Point>
-  </Tracking>
+  <Tracking />
 </Profile>
