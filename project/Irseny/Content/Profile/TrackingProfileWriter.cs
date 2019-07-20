@@ -7,17 +7,19 @@ namespace Irseny.Content.Profile {
 	public class TrackingProfileWriter {
 		public TrackingProfileWriter() {
 		}
-		public XmlNode Write(SetupProfile profile, XmlDocument target) {
+		public bool Write(SetupProfile profile, XmlNode root, XmlDocument target) {
 			if (profile == null) throw new ArgumentNullException("profile");
 			if (target == null) throw new ArgumentNullException("target");
-			var result = target.CreateElement("Tracking");
+			if (root == null) throw new ArgumentNullException("root");
 			foreach (int i in profile.TrackerIndexes) {
 				TrackerSettings settings = profile.GetTracker(i);
 				XmlNode node = WriteCap3Point(i, settings, target);
-				result.AppendChild(node);
+				if (node != null) {
+					root.AppendChild(node);
+				}
 
 			}
-			return result;
+			return true;
 		}
 		private XmlNode WriteCap3Point(int index, TrackerSettings settings, XmlDocument target) {
 			XmlElement result = target.CreateElement("Cap3Point");

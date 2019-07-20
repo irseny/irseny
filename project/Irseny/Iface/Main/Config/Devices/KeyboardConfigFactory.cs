@@ -8,10 +8,15 @@ namespace Irseny.Iface.Main.Config.Devices {
 	public class KeyboardConfigFactory : InterfaceFactory {
 		readonly int keyboardIndex;
 		readonly int deviceIndex;
+		VirtualDeviceSettings settings;
 
-		public KeyboardConfigFactory(int keyboardIndex, int deviceIndex) : base() {
-			this.keyboardIndex = keyboardIndex;
+		public KeyboardConfigFactory(VirtualDeviceSettings settings, int deviceIndex) : base() {
+			if (settings == null) throw new ArgumentNullException("settings");
+			if (deviceIndex < 0) throw new ArgumentOutOfRangeException("deviceIndex");
+			if (keyboardIndex < 0) throw new ArgumentOutOfRangeException("keyboardIndex");
+			this.keyboardIndex = settings.SubdeviceIndex;
 			this.deviceIndex = deviceIndex;
+			this.settings = settings;
 		}
 		protected override bool CreateInternal() {
 
@@ -31,8 +36,8 @@ namespace Irseny.Iface.Main.Config.Devices {
 				rdbTimed.Clicked += PolicyUpdated;*/
 			}
 			VirtualDeviceManager.Instance.Invoke(delegate {
-
-				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(new VirtualKeyboard(keyboardIndex));
+				var device = VirtualDevice.CreateFromSettings(settings);
+				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
 				if (deviceId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to connect keyboard " + keyboardIndex));
 					return;
@@ -56,11 +61,67 @@ namespace Irseny.Iface.Main.Config.Devices {
 			});
 			return true;
 		}
-
 		protected override bool DestroyInternal() {
 
 
 			Container.Dispose();
+			return true;
+		}
+		public int GetDeviceIndex() {
+			return deviceIndex;
+		}
+		public int GetKeyboardIndex() {
+			return keyboardIndex;
+		}
+		public VirtualDeviceSettings GetSettings() {
+			return new VirtualDeviceSettings(settings);
+		}
+		public bool ApplySettings(VirtualDeviceSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			if (settings.DeviceType != VirtualDeviceType.Keyboard) throw new ArgumentException("settings.DeviceType");
+			if (settings.SubdeviceIndex != keyboardIndex) throw new ArgumentException("settings.SubdeviceIndex");
+			this.settings = new VirtualDeviceSettings(settings);
+			// TODO: apply to user interface elements
+			VirtualDeviceManager.Instance.Invoke(delegate {
+				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
+				if (deviceId < 0) {
+					LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+					return;
+				}
+				IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
+				if (device == null) {
+					LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+					return;
+				}
+				bool reconnect = false;
+				if (device.DeviceIndex != settings.DeviceId) {
+					reconnect = true;
+				}
+				if (reconnect) {
+					if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
+						LogManager.Instance.LogError(this, "Failed to disconnnect keyboard " + keyboardIndex);
+						return;
+					}
+					device = VirtualDevice.CreateFromSettings(settings);
+					deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
+					if (deviceId < 0) {
+						LogManager.Instance.LogError(this, "Failed to connect keyboard " + keyboardIndex);
+						// TODO: try to avoid equipment updates, apply in device manager
+						EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
+						return;
+					}
+					EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
+				} else {
+					if (device.SendRate != settings.SendRate) {
+						device.SendRate = settings.SendRate;
+					}
+					if (device.SendPolicy != settings.SendPolicy) {
+						device.SendPolicy = settings.SendPolicy;
+					}
+				}
+
+
+			});
 			return true;
 		}
 		private void PolicyUpdated(object sender, EventArgs args) {

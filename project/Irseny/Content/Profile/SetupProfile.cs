@@ -9,7 +9,7 @@ namespace Irseny.Content.Profile {
 		Dictionary<int, CaptureSettings> captures = new Dictionary<int, CaptureSettings>(16);
 		Dictionary<int, TrackerSettings> trackers = new Dictionary<int, TrackerSettings>(16);
 		Dictionary<int, CapInputRelay> bindings = new Dictionary<int, CapInputRelay>(16);
-		Dictionary<int, VirtualDeviceType> devices = new Dictionary<int, VirtualDeviceType>(16);
+		Dictionary<int, VirtualDeviceSettings> devices = new Dictionary<int, VirtualDeviceSettings>(16);
 
 		public SetupProfile(string name) {
 			if (name == null) throw new ArgumentNullException("name");
@@ -20,9 +20,9 @@ namespace Irseny.Content.Profile {
 		public ICollection<int> VideoCaptureIndexes {
 			get { return captures.Keys; }
 		}
-		public void AddVideoCapture(int index, CaptureSettings profile) {
-			if (profile == null) throw new ArgumentNullException("profile");
-			captures[index] = profile;
+		public void AddVideoCapture(int index, CaptureSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			captures[index] = settings;
 		}
 		public CaptureSettings GetVideoCapture(int index) {
 			CaptureSettings result;
@@ -34,9 +34,9 @@ namespace Irseny.Content.Profile {
 		public ICollection<int> TrackerIndexes {
 			get { return trackers.Keys; }
 		}
-		public void AddTracker(int index, TrackerSettings profile) {
-			if (profile == null) throw new ArgumentNullException("profile");
-			trackers[index] = profile;
+		public void AddTracker(int index, TrackerSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			trackers[index] = settings;
 		}
 		public TrackerSettings GetTracker(int index) {
 			TrackerSettings result;
@@ -48,23 +48,23 @@ namespace Irseny.Content.Profile {
 		public ICollection<int> DeviceIndexes {
 			get { return devices.Keys; }
 		}
-		public void AddDevice(int index, VirtualDeviceType profile) {
-			if (profile == null) throw new ArgumentNullException("profile");
-			devices[index] = profile;
+		public void AddDevice(int index, VirtualDeviceSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			devices[index] = settings;
 		}
-		public VirtualDeviceType GetDevice(int index) {
-			VirtualDeviceType result;
+		public VirtualDeviceSettings GetDevice(int index) {
+			VirtualDeviceSettings result;
 			if (!devices.TryGetValue(index, out result)) {
-				return default(VirtualDeviceType);
+				return null;
 			}
 			return result;
 		}
 		public ICollection<int> BindingIndexes {
 			get { return bindings.Keys; }
 		}
-		public void AddBindings(int index, CapInputRelay profile) {
-			if (profile == null) throw new ArgumentNullException("profile");
-			bindings[index] = profile;
+		public void AddBindings(int index, CapInputRelay settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			bindings[index] = settings;
 		}
 		public CapInputRelay GetBindings(int index) {
 			CapInputRelay result;

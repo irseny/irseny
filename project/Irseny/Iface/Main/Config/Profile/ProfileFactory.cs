@@ -76,7 +76,13 @@ namespace Irseny.Iface.Main.Config.Profile {
 				}
 			}
 			// virtual device config
-
+			var deviceFactory = register.GetFactory<Iface.Main.Config.Devices.DeviceConfigFactory>("DeviceConfig");
+			for (int i = 0; i < 16; i++) {
+				VirtualDeviceSettings settings = deviceFactory.GetDeviceSettings(i);
+				if (settings != null) {
+					profile.AddDevice(i, settings);
+				}
+			}
 			// tracker settings
 			var trackerFactory = register.GetFactory<Iface.Main.Config.Tracking.TrackingFactory>("TrackingConfig");
 			for (int i = 0; i < 16; i++) {
@@ -85,6 +91,7 @@ namespace Irseny.Iface.Main.Config.Profile {
 					profile.AddTracker(i, settings);
 				}
 			}
+			// tracker bindings
 			ContentMaster.Instance.Profiles.SafeActiveProfile(profile);
 			LogManager.Instance.LogSignal(this, "Default profile saved");
 		}
@@ -92,17 +99,27 @@ namespace Irseny.Iface.Main.Config.Profile {
 			var profile = ContentMaster.Instance.Profiles.LoadDefaultProfile();
 			if (profile == null) {
 				LogManager.Instance.LogError(this, "Failed to read profile");
+				return;
 			}
 			// clear existing configuration
 			var cameraFactory = register.GetFactory<Iface.Main.Config.Camera.CameraFactory>("CameraConfig");
 			cameraFactory.RemoveWebcams();
 			var trackerFactory = register.GetFactory<Iface.Main.Config.Tracking.TrackingFactory>("TrackingConfig");
 			trackerFactory.RemoveTrackers();
+			var deviceFactory = register.GetFactory<Iface.Main.Config.Devices.DeviceConfigFactory>("DeviceConfig");
+			deviceFactory.RemoveDevices();
+			var bindingsFactory = register.GetFactory<Iface.Main.View.Bindings.BindingsFactory>("BindingsView");
 
 			// apply the new config
 			foreach (int iCapture in profile.VideoCaptureIndexes) {
 				if (!cameraFactory.AddWebcam(iCapture, profile.GetVideoCapture(iCapture))) {
 					LogManager.Instance.LogError(this, "Failed to restore camera config");
+					return;
+				}
+			}
+			foreach (int iDevice in profile.DeviceIndexes) {
+				if (!deviceFactory.AddDevice(iDevice, profile.GetDevice(iDevice))) {
+					LogManager.Instance.LogError(this, "Failed to restore device config");
 					return;
 				}
 			}
@@ -112,6 +129,7 @@ namespace Irseny.Iface.Main.Config.Profile {
 					return;
 				}
 			}
+
 			LogManager.Instance.LogSignal(this, "Default profile loaded");
 		}
 	}

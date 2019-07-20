@@ -7,17 +7,18 @@ namespace Irseny.Content.Profile {
 	public class CaptureProfileWriter {
 		public CaptureProfileWriter() {
 		}
-		public XmlNode Write(SetupProfile profile, XmlDocument target) {
+		public XmlNode Write(SetupProfile profile, XmlNode root, XmlDocument target) {
 			if (profile == null) throw new ArgumentNullException("profile");
 			if (target == null) throw new ArgumentNullException("target");
-			var result = target.CreateElement("VideoCapture");
-			var indexes = new List<int>(profile.VideoCaptureIndexes);
-			foreach (int i in indexes) {
+			if (root == null) throw new ArgumentNullException("root");
+			foreach (int i in profile.VideoCaptureIndexes) {
 				CaptureSettings settings = profile.GetVideoCapture(i);
 				XmlNode node = WriteStream(i, settings, target);
-				result.AppendChild(node);
+				if (node != null) {
+					root.AppendChild(node);
+				}
 			}
-			return result;
+			return root;
 		}
 		private XmlNode WriteStream(int index, CaptureSettings settings, XmlDocument target) {
 			var result = target.CreateElement("Stream");

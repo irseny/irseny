@@ -8,8 +8,8 @@
     <RootNamespace>Mycena</RootNamespace>
     <AssemblyName>Mycena</AssemblyName>
     <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,17 +37,33 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
-    <Reference Include="gio-sharp">
-      <Package>gio-sharp-3.0</Package>
+    <Reference Include="GioSharp">
+      <HintPath>..\..\lib\Gtk\GioSharp.dll</HintPath>
+      <Package>GioSharp</Package>
     </Reference>
-    <Reference Include="gdk-sharp">
-      <Package>gdk-sharp-3.0</Package>
+    <Reference Include="GLibSharp">
+      <HintPath>..\..\lib\Gtk\GLibSharp.dll</HintPath>
+      <Package>GLibSharp</Package>
     </Reference>
-    <Reference Include="gtk-sharp">
-      <Package>gtk-sharp-3.0</Package>
+    <Reference Include="GdkSharp">
+      <HintPath>..\..\lib\Gtk\GdkSharp.dll</HintPath>
+      <Package>GdkSharp</Package>
     </Reference>
-    <Reference Include="glib-sharp">
-      <Package>glib-sharp-3.0</Package>
+    <Reference Include="AtkSharp">
+      <HintPath>..\..\lib\Gtk\AtkSharp.dll</HintPath>
+      <Package>AtkSharp</Package>
+    </Reference>
+    <Reference Include="GtkSharp">
+      <HintPath>..\..\lib\Gtk\GtkSharp.dll</HintPath>
+      <Package>GtkSharp</Package>
+    </Reference>
+    <Reference Include="CairoSharp">
+      <HintPath>..\..\lib\Gtk\CairoSharp.dll</HintPath>
+      <Package>CairoSharp</Package>
+    </Reference>
+    <Reference Include="PangoSharp">
+      <HintPath>..\..\lib\Gtk\PangoSharp.dll</HintPath>
+      <Package>PangoSharp</Package>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'WindowsDebug|AnyCPU' ">

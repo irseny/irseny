@@ -31,11 +31,15 @@ namespace Irseny.Content.Profile {
 			XmlElement root = document.CreateElement("Profile");
 			document.AppendChild(root);
 
-
-			XmlNode capture = new CaptureProfileWriter().Write(profile, document);
+			XmlElement capture = document.CreateElement("VideoCapture");
 			root.AppendChild(capture);
-			XmlNode tracking = new TrackingProfileWriter().Write(profile, document);
+			new CaptureProfileWriter().Write(profile, capture, document);
+			XmlElement tracking = document.CreateElement("Tracking");
 			root.AppendChild(tracking);
+			new TrackingProfileWriter().Write(profile, tracking, document);
+			XmlElement devices = document.CreateElement("VirtualDevices");
+			root.AppendChild(devices);
+			new DeviceProfileWriter().Write(profile, devices, document);
 			using (FileStream stream = File.Open(filePath, FileMode.Create, FileAccess.Write)) {
 				document.Save(stream);
 			}
@@ -60,8 +64,10 @@ namespace Irseny.Content.Profile {
 					if (!new CaptureProfileReader().Read(result, root)) {
 						return null;
 					}
-				} else if (root.Name.Equals("VirtualDevice")) {
-					// TODO: complete
+				} else if (root.Name.Equals("VirtualDevices")) {
+					if (!new DeviceProfileReader().Read(result, root)) {
+						return null;
+					}
 				} else if (root.Name.Equals("Tracking")) {
 					if (!new TrackerProfileReader().Read(result, root)) {
 						return null;

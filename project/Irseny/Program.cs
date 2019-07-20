@@ -60,12 +60,13 @@ namespace Irseny {
 					}*/
 				}
 				{ // display
-					var cameraDisplayFactory = new Irseny.Iface.Main.View.Camera.CameraFactory();
-					displayFactory.ConstructFloor("Camera", cameraDisplayFactory);
-					var trackingDisplayFactory = new Irseny.Iface.Main.View.Tracking.TrackingFactory();
-					displayFactory.ConstructFloor("Tracking", trackingDisplayFactory);
-					var bindingsDisplayFactory = new Irseny.Iface.Main.View.Bindings.BindingsFactory();
-					displayFactory.ConstructFloor("Bindings", bindingsDisplayFactory);
+					var camera = new Irseny.Iface.Main.View.Camera.CameraFactory();
+					displayFactory.ConstructFloor("Camera", camera);
+					var tracking = new Irseny.Iface.Main.View.Tracking.TrackingFactory();
+					displayFactory.ConstructFloor("Tracking", tracking);
+					var bindings = new Irseny.Iface.Main.View.Bindings.BindingsFactory();
+					displayFactory.ConstructFloor("Bindings", bindings);
+					factoryRegister.Register("BindingsView", bindings);
 				}
 
 				if (!mainFactory.Init(Iface.InterfaceFactoryState.Connected)) {

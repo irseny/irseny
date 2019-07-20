@@ -3,7 +3,7 @@ namespace Irseny.Inco.Device {
 	public interface IVirtualDevice {
 		VirtualDeviceType DeviceType { get; }
 		VirtualDeviceSendPolicy SendPolicy { get; set; }
-		int SendInterval { get; set; }
+		int SendRate { get; set; }
 		bool SendRequired { get; }
 		int DeviceIndex { get; }
 		VirtualDeviceCapability[] GetSupportedCapabilities();

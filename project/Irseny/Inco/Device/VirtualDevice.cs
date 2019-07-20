@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Irseny.Inco.Device {
 	public abstract class VirtualDevice : IVirtualDevice {
-		int sendInterval = 16;
+		int sendRate = 16;
 		bool stateChanged = true;
 		long lastSend = 0;
 
@@ -11,11 +11,11 @@ namespace Irseny.Inco.Device {
 		public int DeviceIndex { get; private set; }
 		public abstract VirtualDeviceType DeviceType { get; }
 		public VirtualDeviceSendPolicy SendPolicy { get; set; }
-		public int SendInterval {
-			get { return sendInterval; }
+		public int SendRate {
+			get { return sendRate; }
 			set {
 				if (value < 0) throw new ArgumentException();
-				sendInterval = value;
+				sendRate = value;
 			}
 		}
 		public bool SendRequired {
@@ -23,7 +23,7 @@ namespace Irseny.Inco.Device {
 				switch (SendPolicy) {
 				case VirtualDeviceSendPolicy.FixedRate:
 					return true; // TODO: implement
-				case VirtualDeviceSendPolicy.AfterModication:
+				case VirtualDeviceSendPolicy.AfterModification:
 					return stateChanged;
 				case VirtualDeviceSendPolicy.Adaptive:
 					if (stateChanged) {
@@ -54,7 +54,20 @@ namespace Irseny.Inco.Device {
 			// TODO: set last update time
 			stateChanged = false;
 		}
-
+		public static VirtualDevice CreateFromSettings(VirtualDeviceSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			VirtualDevice result;
+			switch (settings.DeviceType) {
+			case VirtualDeviceType.Keyboard:
+				result = new VirtualKeyboard(settings.DeviceId);
+				break;
+			default:
+				throw new ArgumentException("settings.DeviceType");
+			}
+			result.SendPolicy = settings.SendPolicy;
+			result.SendRate = settings.SendRate;
+			return result;
+		}
 
 	}
 }
