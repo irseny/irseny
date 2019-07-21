@@ -5,34 +5,38 @@ using Irseny.Content;
 using Irseny.Listing;
 using Irseny.Tracking;
 using Irseny.Inco.Device;
+using Irseny.Util;
 
 namespace Irseny.Iface.Main.View.Bindings {
 	public class BindingsFactory : InterfaceFactory {
+		const string TitlePrefix = "Track";
+		const string FloorPrefix = "Track";
+		const string SubfloorName = "Binding";
+
 		public BindingsFactory() : base() {
 		}
-		public IReadOnlyDictionary<int, CapInputRelay> GetConfig() {
-			var result = new Dictionary<int, CapInputRelay>();
-			foreach (var floor in Floors) {
-				var factory = floor.GetFloor<BindingTabFactory>("Binding");
-				result.Add(factory.TrackerIndex, factory.GetConfig());
+		public CapInputRelay GetBindings(int index) {
+			string name = FloorPrefix + index;
+			try {
+				var floor = GetFloor(name);
+				var factory = floor.GetFloor<BindingTabFactory>(SubfloorName);
+				return factory.GetSettings();
+			} catch (KeyNotFoundException) {
+			} catch (ArgumentException) {
 			}
-			return result;
+			return null;
 		}
-		public bool ApplyConfig(IReadOnlyDictionary<int, CapInputRelay> config) {
-			if (config == null) throw new ArgumentNullException("config");
-			bool result = true;
-			foreach (var floor in Floors) {
-				var viewFactory = (CapBindingsFactory)floor;
-				viewFactory.HideBindings();
-				var bindFactory = floor.GetFloor<BindingTabFactory>("Binding");
-				CapInputRelay conf;
-				if (config.TryGetValue(bindFactory.TrackerIndex, out conf)) {
-					bindFactory.ApplyConfig(conf);
-				} else {
-					result = false;
-				}
+		public bool ApplyBindings(int index, CapInputRelay settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			string name = FloorPrefix + index;
+			try {
+				var floor = GetFloor(name);
+				var factory = floor.GetFloor<BindingTabFactory>(SubfloorName);
+				return factory.ApplySettings(settings);
+			} catch (KeyNotFoundException) {
+			} catch (ArgumentException) {
 			}
-			return result;
+			return false;
 		}
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("TrackingView");
@@ -48,8 +52,6 @@ namespace Irseny.Iface.Main.View.Bindings {
 		}
 		protected override bool DisconnectInternal() {
 			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerChanged;
-			while (RemoveTracker()) {
-			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Bindings");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.Remove(ntbMain);
@@ -66,42 +68,59 @@ namespace Irseny.Iface.Main.View.Bindings {
 			var ntbTrackers = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			if (args.Missing) {
 				if (args.Index == ntbTrackers.NPages - 1) {
-					RemoveTracker();
+					RemoveTracker(args.Index);
 				} else {
 					Debug.WriteLine(this.GetType().Name + ": Trackers modified out of order");
 				}
 			} else {
 				if (args.Index == ntbTrackers.NPages) {
-					AddTracker();
+					AddTracker(args.Index);
 				} else {
 					Debug.WriteLine(this.GetType().Name + ": Trackers modified out of order");
 				}
 			}
 		}
-		private bool AddTracker() {
+		private bool AddTracker(int index) {
+			if (!Initialized) {
+				return false;
+			}
 			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
-			int page = ntbTracker.NPages;
-			var factory = new CapBindingsFactory(page);
-			ConstructFloor("Track" + page, factory);
-			var bindingFactory = new BindingTabFactory(page);
-			factory.ConstructFloor("Binding", bindingFactory);
-			var boxTracker = factory.Container.GetWidget("box_Root");
-			var label = new Gtk.Label("Track" + page);
+			var factory = new CapBindingsFactory(index);
+			ConstructFloor(FloorPrefix + index, factory);
+			var bindingFactory = new BindingTabFactory(index);
+			factory.ConstructFloor(SubfloorName, bindingFactory);
+			var boxRoot = factory.Container.GetWidget("box_Root");
+			var label = new Gtk.Label(TitlePrefix + index);
 			Container.AddWidget(label);
-			ntbTracker.AppendPage(boxTracker, label);
+			ntbTracker.AppendPage(boxRoot, label);
 			ntbTracker.ShowAll();
 			return true;
 		}
-		private bool RemoveTracker() {
-			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
-			int page = ntbTracker.NPages - 1;
-			if (page > -1) {
-				ntbTracker.RemovePage(page);
-				var floor = DestructFloor("Track" + page);
-				floor.Dispose();
-				return true;
+		private bool RemoveTracker(int index) {
+			if (!Initialized) {
+				return false;
 			}
-			return false;
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			// remove the tracker page
+			int pageNo = ntbTracker.NPages;
+			for (int iPage = 0; iPage < pageNo; iPage++) {
+				Gtk.Widget page = ntbTracker.GetNthPage(iPage);
+				string title = ntbTracker.GetTabLabelText(page);
+				int iTracker = TextParseTools.ParseInt(title.Substring(TitlePrefix.Length), -1);
+				if (iTracker == index) {
+					Gtk.Widget label = ntbTracker.GetTabLabel(page);
+					ntbTracker.RemovePage(iPage);
+					label.Dispose();
+					break;
+				}
+			}
+			// destruct the floor
+			IInterfaceFactory floor = DestructFloor(FloorPrefix + index);
+			if (floor == null) {
+				return false;
+			}
+			floor.Dispose();
+			return true;
 		}
 	}
 }

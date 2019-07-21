@@ -225,12 +225,14 @@
     <Compile Include="Content\Profile\CaptureProfileReader.cs" />
     <Compile Include="Util\TextParseTools.cs" />
     <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
-    <Compile Include="Content\Profile\TrackerProfileReader.cs" />
+    <Compile Include="Content\Profile\TrackingProfileReader.cs" />
     <Compile Include="Tracking\TrackerProperty.cs" />
     <Compile Include="Iface\InvokeHack.cs" />
     <Compile Include="Inco\Device\VirtualDeviceSettings.cs" />
     <Compile Include="Content\Profile\DeviceProfileWriter.cs" />
     <Compile Include="Content\Profile\DeviceProfileReader.cs" />
+    <Compile Include="Content\Profile\BindingsProfileWriter.cs" />
+    <Compile Include="Content\Profile\BindingsProfileReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

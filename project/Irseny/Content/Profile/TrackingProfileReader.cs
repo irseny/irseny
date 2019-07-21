@@ -5,8 +5,8 @@ using Irseny.Util;
 using Irseny.Tracking;
 
 namespace Irseny.Content.Profile {
-	public class TrackerProfileReader {
-		public TrackerProfileReader() {
+	public class TrackingProfileReader {
+		public TrackingProfileReader() {
 		}
 		public bool Read(SetupProfile profile, XmlNode root) {
 			foreach (XmlNode node in root) {

@@ -40,6 +40,14 @@ namespace Irseny.Inco.Device {
 		Dictionary<int, List<Binding>> config = new Dictionary<int, List<Binding>>();
 		public CapInputRelay() {
 		}
+		public CapInputRelay(CapInputRelay source) {
+			if (source == null) throw new ArgumentNullException("source");
+			foreach (var pair in source.config) {
+				foreach (var binding in pair.Value) {
+					AddBinding(binding.Axis, pair.Key, binding.Capability, binding.PosKey, binding.NegKey, binding.Mapping);
+				}
+			}
+		}
 		public bool Empty {
 			get { return config.Count == 0; }
 		}
@@ -145,16 +153,7 @@ namespace Irseny.Inco.Device {
 				VirtualDeviceManager.Instance.EndUpdate();
 			});
 		}
-		public static CapInputRelay CreateCopy(CapInputRelay source) {
-			if (source == null) throw new ArgumentNullException("source");
-			var result = new CapInputRelay();
-			foreach (var pair in source.config) {
-				foreach (var binding in pair.Value) {
-					result.AddBinding(binding.Axis, pair.Key, binding.Capability, binding.PosKey, binding.NegKey, binding.Mapping);
-				}
-			}
-			return result;
-		}
+
 	}
 
 }

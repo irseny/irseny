@@ -92,6 +92,14 @@ namespace Irseny.Iface.Main.Config.Profile {
 				}
 			}
 			// tracker bindings
+			var bindingsFactory = register.GetFactory<Iface.Main.View.Bindings.BindingsFactory>("BindingsView");
+			for (int i = 0; i < 16; i++) {
+				CapInputRelay settings = bindingsFactory.GetBindings(i);
+				if (settings != null) {
+					profile.AddBindings(i, settings);
+				}
+			}
+			// tracker bindings
 			ContentMaster.Instance.Profiles.SafeActiveProfile(profile);
 			LogManager.Instance.LogSignal(this, "Default profile saved");
 		}
@@ -129,7 +137,17 @@ namespace Irseny.Iface.Main.Config.Profile {
 					return;
 				}
 			}
-
+			// we need to wait for the detection system to update tracker equipment
+			DetectionSystem.Instance.Invoke(delegate {
+				Invoke(delegate {
+					foreach (int iTracker in profile.BindingIndexes) {
+						if (!bindingsFactory.ApplyBindings(iTracker, profile.GetBindings(iTracker))) {
+							LogManager.Instance.LogError(this, "Failed to restore tracker bindings");
+							return;
+						}
+					}
+				});
+			});
 			LogManager.Instance.LogSignal(this, "Default profile loaded");
 		}
 	}

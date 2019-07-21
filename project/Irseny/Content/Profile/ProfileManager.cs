@@ -40,6 +40,9 @@ namespace Irseny.Content.Profile {
 			XmlElement devices = document.CreateElement("VirtualDevices");
 			root.AppendChild(devices);
 			new DeviceProfileWriter().Write(profile, devices, document);
+			XmlElement bindings = document.CreateElement("TrackerBindings");
+			root.AppendChild(bindings);
+			new BindingsProfileWriter().Write(profile, bindings, document);
 			using (FileStream stream = File.Open(filePath, FileMode.Create, FileAccess.Write)) {
 				document.Save(stream);
 			}
@@ -69,7 +72,11 @@ namespace Irseny.Content.Profile {
 						return null;
 					}
 				} else if (root.Name.Equals("Tracking")) {
-					if (!new TrackerProfileReader().Read(result, root)) {
+					if (!new TrackingProfileReader().Read(result, root)) {
+						return null;
+					}
+				} else if (root.Name.Equals("TrackerBindings")) {
+					if (!new BindingsProfileReader().Read(result, root)) {
 						return null;
 					}
 				}

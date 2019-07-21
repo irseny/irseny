@@ -123,7 +123,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// activate UI
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = true;
-			//expRoot.Sensitive = true;
+			expRoot.Sensitive = true;
 			// restore active and selection fields
 			activeTrackerAxis = axis;
 			if (!setupDeviceIndexes.TryGetValue(axis, out activeDeviceIndex)) {
@@ -146,19 +146,19 @@ namespace Irseny.Iface.Main.View.Bindings {
 		public void Hide() {
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = false;
-			//expRoot.Sensitive = false;
+			expRoot.Sensitive = false;
 		}
 		public void ApplyBinding() {
 
 		}
-		public bool ApplyConfig(CapInputRelay config) {
-			if (config == null) throw new ArgumentNullException("config");
+		public bool ApplySettings(CapInputRelay settings) {
+			if (settings == null) throw new ArgumentNullException("config");
 			if (!Initialized) {
 				return false;
 			}
 			// TODO: ditch setup in favor of relay
 			foreach (var axis in (CapAxis[])Enum.GetValues(typeof(CapAxis))) {
-				int deviceIndex = config.GetDeviceIndex(axis);
+				int deviceIndex = settings.GetDeviceIndex(axis);
 				if (deviceIndex < 0) {
 					setupDeviceIndexes[axis] = -1;
 					setupDeviceCapabilities[axis] = VirtualDeviceCapability.Key;
@@ -167,11 +167,11 @@ namespace Irseny.Iface.Main.View.Bindings {
 					setupAxisMappings[axis] = null;
 				} else {
 					setupDeviceIndexes[axis] = deviceIndex;
-					setupDeviceCapabilities[axis] = config.GetDeviceCapability(axis);
-					var keys = config.GetDeviceKeys(axis);
+					setupDeviceCapabilities[axis] = settings.GetDeviceCapability(axis);
+					var keys = settings.GetDeviceKeys(axis);
 					setupKeyHandles[axis] = keys.Item1;
 					setupKeyDescriptions[axis] = keys.Item1.ToString();
-					setupAxisMappings[axis] = config.GetMapping(axis);
+					setupAxisMappings[axis] = settings.GetMapping(axis);
 				}
 				activeDeviceIndex = -1;
 			}
@@ -191,13 +191,13 @@ namespace Irseny.Iface.Main.View.Bindings {
 				// but in case it has not we remove the event handler anyway
 				// and exchange it with the new instance
 				tracker.PositionDetected -= inputHandler.PositionChanged;
-				inputHandler = CapInputRelay.CreateCopy(config);
+				inputHandler = new CapInputRelay(settings);
 				tracker.PositionDetected += inputHandler.PositionChanged;
 			});
 			return true;
 		}
-		public CapInputRelay GetConfig() {
-			return CapInputRelay.CreateCopy(inputHandler);
+		public CapInputRelay GetSettings() {
+			return new CapInputRelay(inputHandler);
 		}
 
 		/// <summary>

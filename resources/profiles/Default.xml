@@ -30,4 +30,9 @@
       <SendPolicy>AfterModification</SendPolicy>
     </Keyboard>
   </VirtualDevices>
+  <TrackerBindings>
+    <Bindings Index="0">
+      <Bind Axis="Yaw" Index="0" Capability="Key" Key1="E" Key2="E" />
+    </Bindings>
+  </TrackerBindings>
 </Profile>
