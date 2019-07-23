@@ -11,25 +11,25 @@ namespace Irseny.Iface.Main.View.Bindings {
 		int trackerIndex;
 		CapInputRelay inputHandler = new CapInputRelay();
 		// current selection
+		bool axisSelected = false;
 		CapAxis activeTrackerAxis = CapAxis.Yaw;
 		int activeDeviceIndex = -1;
 		VirtualDeviceCapability activeDeviceCapability = VirtualDeviceCapability.Key;
 		object activeKeyHandle = null;
-		string activeKeyDescription = string.Empty;
 		object activeAxisMapping = null;
 
 		// available for selection
 		List<VirtualDeviceCapability> selectionDeviceCapabilities = new List<VirtualDeviceCapability>();
-		List<string> selectionKeyDescriptions = new List<string>();
+		//List<string> selectionKeyDescriptions = new List<string>();
 		List<object> selectionKeyHandles = new List<object>();
 		Dictionary<int, string> selectionDeviceNames = new Dictionary<int, string>();
 
 		// current settings for all axes
-		Dictionary<CapAxis, int> setupDeviceIndexes = new Dictionary<CapAxis, int>();
+		/*Dictionary<CapAxis, int> setupDeviceIndexes = new Dictionary<CapAxis, int>();
 		Dictionary<CapAxis, VirtualDeviceCapability> setupDeviceCapabilities = new Dictionary<CapAxis, VirtualDeviceCapability>();
 		Dictionary<CapAxis, object> setupKeyHandles = new Dictionary<CapAxis, object>();
 		Dictionary<CapAxis, string> setupKeyDescriptions = new Dictionary<CapAxis, string>();
-		Dictionary<CapAxis, object> setupAxisMappings = new Dictionary<CapAxis, object>();
+		Dictionary<CapAxis, object> setupAxisMappings = new Dictionary<CapAxis, object>();*/
 
 		// locking
 		bool lockSelection = false;
@@ -48,6 +48,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			return true;
 		}
 		protected override bool ConnectInternal() {
+			axisSelected = false;
 			{ // connect to hall
 				var boxParent = Hall.Container.GetWidget<Gtk.Box>("box_Binding");
 				var boxRoot = Container.GetWidget("box_Root");
@@ -84,9 +85,11 @@ namespace Irseny.Iface.Main.View.Bindings {
 				// delayed update after initialization finished
 				EquipmentMaster.Instance.VirtualDevice.SendEquipment(DeviceUpdated);
 			});
+
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+			axisSelected = false;
 			{ // stop updates
 				EquipmentMaster.Instance.VirtualDevice.Updated -= DeviceUpdated;
 			}
@@ -120,33 +123,42 @@ namespace Irseny.Iface.Main.View.Bindings {
 			return true;
 		}
 		public void RestoreBinding(CapAxis axis) {
+			if (!Initialized) {
+				return;
+			}
 			// activate UI
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = true;
 			expRoot.Sensitive = true;
 			// restore active and selection fields
+			axisSelected = true;
 			activeTrackerAxis = axis;
-			if (!setupDeviceIndexes.TryGetValue(axis, out activeDeviceIndex)) {
-				activeDeviceIndex = -1;
-			}
-			if (!setupKeyHandles.TryGetValue(axis, out activeKeyHandle)) {
+			activeDeviceIndex = inputHandler.GetDeviceIndex(axis);
+			if (activeDeviceIndex < 0) {
 				activeKeyHandle = null;
-			}
-			if (!setupKeyDescriptions.TryGetValue(axis, out activeKeyDescription)) {
-				activeKeyDescription = string.Empty;
+			} else {
+				Tuple<object, object> keys = inputHandler.GetDeviceKeys(axis);
+				activeKeyHandle = keys.Item1;
 			}
 			// rebuild UI elements
 			BuildDeviceSelection();
 			BuildCapabilitySelection();
 			// restore active selection in UI
 			SetActiveDeviceIndex(activeDeviceIndex);
-			SetActiveDeviceCapability(activeKeyDescription);
-			// TODO: reset state
+			SetActiveDeviceCapability(activeKeyHandle);
+			// TODO: find out why the capability is not restored correctly on the first restoration
 		}
 		public void Hide() {
+			if (!Initialized) {
+				return;
+			}
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = false;
 			expRoot.Sensitive = false;
+			axisSelected = false;
+			activeDeviceIndex = -1;
+			activeKeyHandle = null;
+			activeAxisMapping = null;
 		}
 		public void ApplyBinding() {
 
@@ -156,44 +168,19 @@ namespace Irseny.Iface.Main.View.Bindings {
 			if (!Initialized) {
 				return false;
 			}
-			// TODO: ditch setup in favor of relay
+			// reset the view
+			Hide();
+			// for all axes remove existing bindings and apply the given ones
 			foreach (var axis in (CapAxis[])Enum.GetValues(typeof(CapAxis))) {
+				inputHandler.RemoveBinding(axis);
 				int deviceIndex = settings.GetDeviceIndex(axis);
-				if (deviceIndex < 0) {
-					setupDeviceIndexes[axis] = -1;
-					setupDeviceCapabilities[axis] = VirtualDeviceCapability.Key;
-					setupKeyHandles[axis] = null;
-					setupKeyDescriptions[axis] = string.Empty;
-					setupAxisMappings[axis] = null;
-				} else {
-					setupDeviceIndexes[axis] = deviceIndex;
-					setupDeviceCapabilities[axis] = settings.GetDeviceCapability(axis);
-					var keys = settings.GetDeviceKeys(axis);
-					setupKeyHandles[axis] = keys.Item1;
-					setupKeyDescriptions[axis] = keys.Item1.ToString();
-					setupAxisMappings[axis] = settings.GetMapping(axis);
+				if (deviceIndex >= 0) {
+					object mapping = settings.GetMapping(axis);
+					VirtualDeviceCapability capability = settings.GetDeviceCapability(axis);
+					Tuple<object, object> keys = settings.GetDeviceKeys(axis);
+					inputHandler.AddBinding(axis, deviceIndex, capability, keys.Item1, keys.Item2, mapping);
 				}
-				activeDeviceIndex = -1;
 			}
-			// copy the given configuration and connect it to the tracker
-			DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId < 0) {
-					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
-					return;
-				}
-				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
-				if (tracker == null) {
-					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
-					return;
-				}
-				// the tracker could have changed 
-				// but in case it has not we remove the event handler anyway
-				// and exchange it with the new instance
-				tracker.PositionDetected -= inputHandler.PositionChanged;
-				inputHandler = new CapInputRelay(settings);
-				tracker.PositionDetected += inputHandler.PositionChanged;
-			});
 			return true;
 		}
 		public CapInputRelay GetSettings() {
@@ -267,13 +254,15 @@ namespace Irseny.Iface.Main.View.Bindings {
 			if (lockSelection) {
 				return;
 			}
+			if (!axisSelected) {
+				return;
+			}
 			activeDeviceIndex = GetActiveDeviceIndex();
+			// TODO: remove the current binding if the device index changed
 			if (activeDeviceIndex < 0) {
 				ClearCapabilitySelection();
-				setupDeviceIndexes[activeTrackerAxis] = -1;
-				setupKeyHandles[activeTrackerAxis] = null;
-				setupKeyDescriptions[activeTrackerAxis] = string.Empty;
-				SyncTranslation(activeTrackerAxis);
+				inputHandler.RemoveBinding(activeTrackerAxis);
+				// otherwise the bindings are updated further down the line
 				return;
 			}
 			// TODO: update saved config
@@ -290,24 +279,20 @@ namespace Irseny.Iface.Main.View.Bindings {
 					return;
 				}
 				var capabilities = new List<VirtualDeviceCapability>();
-				var descriptions = new List<string>();
 				var handles = new List<object>();
 				VirtualDeviceCapability[] tmpCaps = device.GetSupportedCapabilities();
 				foreach (VirtualDeviceCapability cap in tmpCaps) {
-					string[] tmpDescriptions = device.GetKeyDescriptions(cap);
 					object[] tmpHandles = device.GetKeyHandles(cap);
 					for (int i = 0; i < tmpHandles.Length; i++) {
 						capabilities.Add(cap);
-						descriptions.Add(tmpDescriptions[i]);
 						handles.Add(tmpHandles[i]);
 					}
 				}
 				this.Invoke(delegate {
 					selectionDeviceCapabilities = capabilities;
-					selectionKeyDescriptions = descriptions;
 					selectionKeyHandles = handles;
-					setupDeviceIndexes[activeTrackerAxis] = activeDeviceIndex;
 					BuildCapabilitySelection();
+					// TODO: trigger capability selection here if it does not work already to update the input handler
 				});
 			});
 			// TODO: apply binding
@@ -320,18 +305,20 @@ namespace Irseny.Iface.Main.View.Bindings {
 			if (lockSelection) {
 				return;
 			}
-			Tuple<VirtualDeviceCapability, object, string> activeKey = GetActiveDeviceCapability();
-			activeDeviceCapability = activeKey.Item1;
-			activeKeyHandle = activeKey.Item2;
-			activeKeyDescription = activeKey.Item3;
-			if (activeKey.Item2 == null || activeKey.Item3.Length == 0) {
-				ClearCapabilitySelection();
+			if (!axisSelected) {
+				return;
 			}
-			setupDeviceCapabilities[activeTrackerAxis] = activeKey.Item1;
-			setupKeyHandles[activeTrackerAxis] = activeKey.Item2;
-			setupKeyDescriptions[activeTrackerAxis] = activeKey.Item3;
-			SyncTranslation(activeTrackerAxis);
-			// TODO: update saved config
+			Tuple<VirtualDeviceCapability, object> key = GetActiveDeviceCapability();
+			activeDeviceCapability = key.Item1;
+			activeKeyHandle = key.Item2;
+			inputHandler.RemoveBinding(activeTrackerAxis);
+			if (activeKeyHandle == null) {
+				ClearCapabilitySelection();
+			} else if (activeDeviceIndex >= 0) {
+				inputHandler.AddBinding(
+					activeTrackerAxis, activeDeviceIndex, activeDeviceCapability,
+					activeKeyHandle, activeKeyHandle, activeAxisMapping);
+			}
 		}
 		/// <summary>
 		/// Rebuilds the selectable devices UI element.
@@ -410,8 +397,8 @@ namespace Irseny.Iface.Main.View.Bindings {
 			store.Clear();
 			store.AppendValues("None");
 			int iActiveEntry = 0;
-			for (int i = 0; i < selectionKeyDescriptions.Count; i++) {
-				string entry = selectionKeyDescriptions[i];
+			for (int i = 0; i < selectionKeyHandles.Count; i++) {
+				object entry = selectionKeyHandles[i].ToString();
 				if (entry.Equals(activeEntry)) {
 					// select the currently created entry
 					// entry 0 is None
@@ -446,6 +433,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		private bool SetActiveDeviceIndex(int deviceIndex) {
 			var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
 			cbbDevice.Active = deviceIndex + 1; // skip None
+			cbbDevice.QueueDraw();
 			return true;
 		}
 		/// <summary>
@@ -453,65 +441,43 @@ namespace Irseny.Iface.Main.View.Bindings {
 		/// The information is read from UI elements.
 		/// </summary>
 		/// <returns>The active device capability information. null if none is selected of if the selection is illegal.</returns>
-		private Tuple<VirtualDeviceCapability, object, string> GetActiveDeviceCapability() {
+		private Tuple<VirtualDeviceCapability, object> GetActiveDeviceCapability() {
 			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
 			string sActive = cbbCap.ActiveText;
 			if (sActive == null || sActive.Length == 0) {
-				return Tuple.Create<VirtualDeviceCapability, object, string>(VirtualDeviceCapability.Key, null, string.Empty);
+				return Tuple.Create<VirtualDeviceCapability, object>(VirtualDeviceCapability.Key, null);
 			}
 			for (int i = 0; i < selectionKeyHandles.Count; i++) {
-				if (sActive.Equals(selectionKeyDescriptions[i])) {
-					return Tuple.Create(selectionDeviceCapabilities[i], selectionKeyHandles[i], selectionKeyDescriptions[i]);
+				string entry = selectionKeyHandles[i].ToString();
+				if (sActive.Equals(entry)) {
+					return Tuple.Create(selectionDeviceCapabilities[i], selectionKeyHandles[i]);
 				}
 			}
-			return Tuple.Create<VirtualDeviceCapability, object, string>(VirtualDeviceCapability.Key, null, string.Empty);
+			return Tuple.Create<VirtualDeviceCapability, object>(VirtualDeviceCapability.Key, null);
 		}
 		/// <summary>
 		/// Sets the currently selected device capability visualization.
 		/// </summary>
 		/// <returns><c>true</c>, if active device capability was set, <c>false</c> otherwise.</returns>
-		/// <param name="keyDescription">Key name.</param>
-		private bool SetActiveDeviceCapability(string keyDescription) {
+		/// <param name="keyHandle">Key.</param>
+		private bool SetActiveDeviceCapability(object keyHandle) {
 			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
-			int keyIndex;
-			for (keyIndex = 0; keyIndex < selectionKeyDescriptions.Count; keyIndex++) {
-				if (selectionKeyDescriptions[keyIndex].Equals(keyDescription)) {
+			string keyDescription = keyHandle != null ? keyHandle.ToString() : string.Empty;
+			int iKey;
+			for (iKey = 0; iKey < selectionKeyHandles.Count; iKey++) {
+				string entry = selectionKeyHandles[iKey].ToString();
+				if (keyDescription.Equals(entry)) {
 					break;
 				}
 			}
-			if (keyIndex < selectionKeyDescriptions.Count) {
-				cbbCap.Active = keyIndex + 1; // skip None
+			if (iKey < selectionKeyHandles.Count) {
+				cbbCap.Active = iKey + 1; // skip None
 			} else {
 				// TODO: report
 				cbbCap.Active = 0; // None
 			}
+			cbbCap.QueueDraw();
 			return true;
-		}
-		/// <summary>
-		/// Updates the translation to the currently selected values.
-		/// Updates are only applied to the given axis.
-		/// </summary>
-		/// <param name="axis">Axis to update.</param>
-		private void SyncTranslation(CapAxis axis) {
-			int deviceIndex;
-			bool clear = false;
-			if (!setupDeviceIndexes.TryGetValue(axis, out deviceIndex)) {
-				clear = true;
-			}
-			object keyHandle;
-			if (!setupKeyHandles.TryGetValue(axis, out keyHandle)) {
-				clear = true;
-			}
-			VirtualDeviceCapability capability;
-			if (!setupDeviceCapabilities.TryGetValue(axis, out capability)) {
-				clear = true;
-			}
-			object mapping = null;
-			if (clear) {
-				inputHandler.RemoveBinding(axis);
-			} else {
-				inputHandler.AddBinding(axis, deviceIndex, capability, keyHandle, keyHandle, mapping);
-			}
 		}
 	}
 }

@@ -32,7 +32,10 @@
   </VirtualDevices>
   <TrackerBindings>
     <Bindings Index="0">
-      <Bind Axis="Yaw" Index="0" Capability="Key" Key1="E" Key2="E" />
+      <Bind Axis="Y" Index="0" Capability="Key" Key1="Q" Key2="Q" />
+      <Bind Axis="Z" Index="0" Capability="Key" Key1="W" Key2="W" />
+      <Bind Axis="Yaw" Index="0" Capability="Key" Key1="R" Key2="R" />
+      <Bind Axis="Roll" Index="0" Capability="Key" Key1="E" Key2="E" />
     </Bindings>
   </TrackerBindings>
 </Profile>

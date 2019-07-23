@@ -101,24 +101,28 @@ namespace Irseny.Inco.Device {
 			deviceBindings.Add(binding);
 		}
 		public bool RemoveBinding(CapAxis axis) {
+			// remove the axis from all devices
 			bool result = false;
-			Queue<int> toRemove = new Queue<int>();
-			foreach (var pair in config) {
-				// remove binding from all devices
-				for (int i = 0; i < pair.Value.Count; i++) {
-					if (pair.Value[i].Axis == axis) {
-						pair.Value.RemoveAt(i);
-						i -= 1;
+			var removeFrom = new Queue<List<Binding>>(config.Values);
+			while (removeFrom.Count > 0) {
+				List<Binding> bindings = removeFrom.Dequeue();
+				for (int iBind = 0; iBind < bindings.Count; iBind++) {
+					if (bindings[iBind].Axis == axis) {
+						bindings.RemoveAt(iBind);
+						iBind -= 1;
 						result = true;
 					}
 				}
-				// remove empty device entries
+			}
+			// cleanup, remove empty device config
+			var toRemove = new Queue<int>();
+			foreach (var pair in config) {
 				if (pair.Value.Count == 0) {
 					toRemove.Enqueue(pair.Key);
 				}
-				foreach (int deviceIndex in toRemove) {
-					config.Remove(deviceIndex);
-				}
+			}
+			while (toRemove.Count > 0) {
+				config.Remove(toRemove.Dequeue());
 			}
 			return result;
 		}
@@ -127,7 +131,9 @@ namespace Irseny.Inco.Device {
 			var configCopy = config;
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				VirtualDeviceManager.Instance.BeginUpdate();
+				var toRemove = new Queue<int>();
 				foreach (var pair in configCopy) {
+					List<Binding> bindings = pair.Value;
 					int deviceIndex = pair.Key;
 					int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 					if (deviceId < 0) {
