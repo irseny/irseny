@@ -3,7 +3,7 @@ using Irseny.Log;
 using Irseny.Content;
 using Irseny.Inco.Device;
 using Irseny.Listing;
-
+using Irseny.Util;
 namespace Irseny.Iface.Main.Config.Devices {
 	public class KeyboardConfigFactory : InterfaceFactory {
 		readonly int keyboardIndex;
@@ -29,12 +29,15 @@ namespace Irseny.Iface.Main.Config.Devices {
 		}
 		protected override bool ConnectInternal() {
 			{
-				/*var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
-				var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
-				var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
-				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_UpdateRate");
-				rdbTimed.Clicked += PolicyUpdated;*/
+				var btnApply = Container.GetWidget<Gtk.Button>("btn_Apply");
+				btnApply.Clicked += delegate {
+					settings = GetSettings();
+					ApplySettingsToModel();
+				};
 			}
+			Invoke(delegate {
+				ApplySettingsToView();
+			});
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				var device = VirtualDevice.CreateFromSettings(settings);
 				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
@@ -74,66 +77,107 @@ namespace Irseny.Iface.Main.Config.Devices {
 			return keyboardIndex;
 		}
 		public VirtualDeviceSettings GetSettings() {
-			return new VirtualDeviceSettings(settings);
+			var result = new VirtualDeviceSettings() {
+				DeviceType = VirtualDeviceType.Keyboard,
+				DeviceId = deviceIndex,
+				SubdeviceIndex = keyboardIndex
+			};
+
+			if (!Initialized) {
+				return result;
+			}
+			{ // send rate
+				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_SendRate");
+				settings.SendRate = (int)txtRate.Adjustment.Value;
+			}
+			{ // send policy 
+				var cbbPolicy = Container.GetWidget<Gtk.ComboBoxText>("cbb_SendPolicy");
+				int policyId = TextParseTools.ParseInt(cbbPolicy.ActiveId, 0);
+				settings.SendPolicy = (VirtualDeviceSendPolicy)policyId;
+			}
+
+			return result;
 		}
-		public bool ApplySettings(VirtualDeviceSettings settings) {
-			if (settings == null) throw new ArgumentNullException("settings");
-			if (settings.DeviceType != VirtualDeviceType.Keyboard) throw new ArgumentException("settings.DeviceType");
-			if (settings.SubdeviceIndex != keyboardIndex) throw new ArgumentException("settings.SubdeviceIndex");
-			this.settings = new VirtualDeviceSettings(settings);
-			// TODO: apply to user interface elements
+		/// <summary>
+		/// Applies the given settings to this instance.
+		/// </summary>
+		/// <returns><c>true</c>, if application was successful, <c>false</c> otherwise.</returns>
+		/// <param name="settings">Settings.</param>
+		//private bool ApplySettings(VirtualDeviceSettings settings) {
+		//	if (settings == null) throw new ArgumentNullException("settings");
+		//	if (settings.DeviceType != VirtualDeviceType.Keyboard) throw new ArgumentException("settings.DeviceType");
+		//	if (settings.SubdeviceIndex != keyboardIndex) throw new ArgumentException("settings.SubdeviceIndex");
+		//	this.settings = new VirtualDeviceSettings(settings);
+		//	// TODO: apply to user interface elements
+		//	VirtualDeviceManager.Instance.Invoke(delegate {
+		//		int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
+		//		if (deviceId < 0) {
+		//			LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+		//			return;
+		//		}
+		//		IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
+		//		if (device == null) {
+		//			LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+		//			return;
+		//		}
+		//		bool reconnect = false;
+		//		if (device.DeviceIndex != settings.DeviceId) {
+		//			reconnect = true;
+		//		}
+		//		if (reconnect) {
+		//			if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
+		//				LogManager.Instance.LogError(this, "Failed to disconnnect keyboard " + keyboardIndex);
+		//				return;
+		//			}
+		//			device = VirtualDevice.CreateFromSettings(settings);
+		//			deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
+		//			if (deviceId < 0) {
+		//				LogManager.Instance.LogError(this, "Failed to connect keyboard " + keyboardIndex);
+		//				// TODO: try to avoid equipment updates, apply in device manager
+		//				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
+		//				return;
+		//			}
+		//			EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
+		//		} else {
+		//			if (device.SendRate != settings.SendRate) {
+		//				device.SendRate = settings.SendRate;
+		//			}
+		//			if (device.SendPolicy != settings.SendPolicy) {
+		//				device.SendPolicy = settings.SendPolicy;
+		//			}
+		//		}
+
+
+		//	});
+		//	return true;
+		//}
+		private void ApplySettingsToView() {
+			if (!Initialized) {
+				return;
+			}
+			{ // send rate
+				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_SendRate");
+				txtRate.Adjustment.Value = settings.SendRate;
+			}
+			{ // send policy
+				var cbbPolicy = Container.GetWidget<Gtk.ComboBoxText>("cbb_SendPolicy");
+				cbbPolicy.ActiveId = ((int)settings.SendPolicy).ToString();
+			}
+		}
+		private void ApplySettingsToModel() {
+			IVirtualDevice device = VirtualDevice.CreateFromSettings(settings);
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
 					LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
 					return;
 				}
-				IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
-				if (device == null) {
-					LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+				if (!VirtualDeviceManager.Instance.ReconnectDevice(deviceId, device)) {
+					LogManager.Instance.LogError(this, "Failed to apply settings to keyboard " + keyboardIndex);
 					return;
 				}
-				bool reconnect = false;
-				if (device.DeviceIndex != settings.DeviceId) {
-					reconnect = true;
-				}
-				if (reconnect) {
-					if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
-						LogManager.Instance.LogError(this, "Failed to disconnnect keyboard " + keyboardIndex);
-						return;
-					}
-					device = VirtualDevice.CreateFromSettings(settings);
-					deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
-					if (deviceId < 0) {
-						LogManager.Instance.LogError(this, "Failed to connect keyboard " + keyboardIndex);
-						// TODO: try to avoid equipment updates, apply in device manager
-						EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
-						return;
-					}
-					EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
-				} else {
-					if (device.SendRate != settings.SendRate) {
-						device.SendRate = settings.SendRate;
-					}
-					if (device.SendPolicy != settings.SendPolicy) {
-						device.SendPolicy = settings.SendPolicy;
-					}
-				}
-
-
 			});
-			return true;
 		}
-		private void PolicyUpdated(object sender, EventArgs args) {
-			/*var rdbTimed = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyTimed");
-			var rdbChange = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyChange");
-			var rgbComplete = Container.GetWidget<Gtk.RadioButton>("rdb_PolicyComplete");
-			int deviceId = EquipmentMaster.Instance.OutputDevice.GetEquipment(deviceIndex, -1);
-			if (deviceId > -1) {
-				EquipmentMaster.Instance.OutputDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
-			}*/
-		}
-
 	}
 }
 

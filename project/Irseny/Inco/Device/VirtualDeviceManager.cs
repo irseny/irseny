@@ -26,6 +26,10 @@ namespace Irseny.Inco.Device {
 		public static VirtualDeviceManager Instance {
 			get { return instance; }
 		}
+		/// <summary>
+		/// Executes the operation loop.
+		/// Returns when stopped.
+		/// </summary>
 		private void Start() {
 			lock (contextSync) {
 				if (!context.Create()) {
@@ -47,10 +51,16 @@ namespace Irseny.Inco.Device {
 			context.Destroy();
 			Interlocked.Decrement(ref stopSignal);
 		}
+		/// <summary>
+		/// Signals this instance to stop the operation loop.
+		/// </summary>
 		public void Stop() {
 			Interlocked.Increment(ref stopSignal);
 		}
-		public void InvokePending() {
+		/// <summary>
+		/// Invokes all pending event handlers.
+		/// </summary>
+		private void InvokePending() {
 			Queue<EventHandler> pending;
 			lock (invokeSync) {
 				pending = toInvoke;
@@ -65,6 +75,11 @@ namespace Irseny.Inco.Device {
 				SendState();
 			}
 		}
+		/// <summary>
+		/// Adds the given event handler to the pending list.
+		/// Signals pending event handler invocation.
+		/// </summary>
+		/// <param name="handler">Handler to invoke.</param>
 		public void Invoke(EventHandler handler) {
 			if (handler == null) throw new ArgumentNullException("handler");
 			lock (invokeSync) {
@@ -72,6 +87,11 @@ namespace Irseny.Inco.Device {
 			}
 			invokeSignal = 1;
 		}
+		/// <summary>
+		/// Connects the given device.
+		/// </summary>
+		/// <returns>Id to reference the device.</returns>
+		/// <param name="device">Device specification.</param>
 		public int ConnectDevice(IVirtualDevice device) {
 			if (device == null) throw new ArgumentNullException("device");
 			lock (contextSync) {
@@ -98,6 +118,48 @@ namespace Irseny.Inco.Device {
 				return mountIndex;
 			}
 		}
+		/// <summary>
+		/// Reconnects the device with the given ID.
+		/// This method can be used to disconnect and connect a device without changing its ID.
+		/// </summary>
+		/// <returns><c>true</c>, if the operation was successful, <c>false</c> otherwise.</returns>
+		/// <param name="deviceId">Device identifier.</param>
+		/// <param name="device">New device specification.</param>
+		public bool ReconnectDevice(int deviceId, IVirtualDevice device) {
+			if (deviceId < 0) throw new ArgumentOutOfRangeException("deviceId");
+			if (device == null) throw new ArgumentOutOfRangeException("device");
+			// find the old device
+			IVirtualDevice oldDevice;
+			lock (deviceSync) {
+				if (deviceId < 0 || deviceId >= devices.Count) {
+					return false;
+				}
+				if (devices[deviceId] == null) {
+					return false;
+				}
+				oldDevice = devices[deviceId];
+			}
+			// internal reconnect
+			lock (contextSync) {
+				if (!context.DisconnectDevice(oldDevice)) {
+					return false;
+				}
+				if (!context.ConnectDevice(device)) {
+					return false;
+				}
+			}
+			// exchange the devices
+			// since the old device is still officially connected the device id has not been reassigned
+			lock (deviceSync) {
+				devices[deviceId] = device;
+			}
+			return true;
+		}
+		/// <summary>
+		/// Gets the device with the given ID.
+		/// </summary>
+		/// <returns>The device or null if it is not available.</returns>
+		/// <param name="deviceId">Device identifier.</param>
 		public IVirtualDevice GetDevice(int deviceId) {
 			lock (deviceSync) {
 				if (deviceId < 0 || deviceId >= devices.Count) {
@@ -106,6 +168,11 @@ namespace Irseny.Inco.Device {
 				return devices[deviceId];
 			}
 		}
+		/// <summary>
+		/// Disconnects the device with the given ID from this instance.
+		/// </summary>
+		/// <returns><c>true</c>, if the operation wass successful, <c>false</c> otherwise.</returns>
+		/// <param name="deviceId">Device identifier.</param>
 		public bool DisconnectDevice(int deviceId) {
 			IVirtualDevice device = null;
 
@@ -129,13 +196,21 @@ namespace Irseny.Inco.Device {
 			}
 			return true;
 		}
-
+		/// <summary>
+		/// Signals that devices state is updated.
+		/// </summary>
 		public void BeginUpdate() {
 			// nothing to do
 		}
+		/// <summary>
+		/// Signals that device state updates have finished.
+		/// </summary>
 		public void EndUpdate() {
 			sendSignal = 1;
 		}
+		/// <summary>
+		/// Sends device state updates to the OS or HID backend.
+		/// </summary>
 		private void SendState() {
 			var toSend = new Queue<IVirtualDevice>();
 			lock (deviceSync) {
@@ -152,7 +227,11 @@ namespace Irseny.Inco.Device {
 				}
 			}
 		}
-
+		/// <summary>
+		/// Starts the operation loop of the given manager in a new thread.
+		/// Stops the previously active manager.
+		/// </summary>
+		/// <param name="manager">Manager.</param>
 		public static void MakeInstance(VirtualDeviceManager manager) {
 			lock (instanceSync) {
 				if (VirtualDeviceManager.instance != null) {

@@ -2,11 +2,11 @@
 <Profile>
   <VideoCapture>
     <Stream Index="0">
-      <Camera Auto="True">0</Camera>
-      <Width Auto="True">640</Width>
-      <Height Auto="True">480</Height>
-      <FPS Auto="True">30</FPS>
-      <Exposure Auto="True">0</Exposure>
+      <Camera Auto="False">0</Camera>
+      <Width Auto="False">640</Width>
+      <Height Auto="False">240</Height>
+      <FPS Auto="False">60</FPS>
+      <Exposure Auto="False">0</Exposure>
       <Brightness Auto="True">0</Brightness>
       <Contrast Auto="True">0</Contrast>
     </Stream>

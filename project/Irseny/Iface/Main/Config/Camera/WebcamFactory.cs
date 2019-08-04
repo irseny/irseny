@@ -2,8 +2,10 @@
 using System.IO;
 using Irseny.Content;
 using Irseny.Log;
+using Irseny.Util;
 using Irseny.Listing;
 using Irseny.Capture.Video;
+
 
 namespace Irseny.Iface.Main.Config.Camera {
 	public class WebcamFactory : InterfaceFactory {
@@ -15,18 +17,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 		public int StreamIndex {
 			get { return streamIndex; }
 		}
-		public bool ApplySettings(CaptureSettings settings) {
-			if (settings == null) throw new ArgumentNullException("settings");
-			if (!Initialized) {
-				return false;
-			}
-			// TODO: apply settings to UI
-			// TODO: indicate that new settings will become active if stream is restarted
-			return true;
-		}
-		public CaptureSettings GetSettings() {
-			return new CaptureSettings();
-		}
+
 		protected override bool CreateInternal() {
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("WebcamConfig");
 			Container = factory.CreateWidget("box_Root");
@@ -40,6 +31,10 @@ namespace Irseny.Iface.Main.Config.Camera {
 				} else {
 					StopCapture();
 				}
+			};
+			var btnApply = Container.GetWidget<Gtk.Button>("btn_Apply");
+			btnApply.Clicked += delegate {
+				ApplySettings();
 			};
 			// TODO: connect value setting widgets with value visualizers
 			// create the stream to use
@@ -81,7 +76,10 @@ namespace Irseny.Iface.Main.Config.Camera {
 			return true;
 		}
 		private void StartCapture() {
-			var settings = new CaptureSettings();
+			if (!Initialized) {
+				return;
+			}
+			CaptureSettings settings = GetSettings();
 			// TODO: start existing stream
 			CaptureSystem.Instance.Invoke(delegate {
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
@@ -98,7 +96,15 @@ namespace Irseny.Iface.Main.Config.Camera {
 					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start capture " + streamIndex));
 					return;
 				}
+
 				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started capture " + streamIndex));
+				// the stream may alternate the settings used internally
+				// communicate these changes back to the user
+				settings = stream.GetSettings();
+				Invoke(delegate {
+					ApplySettings(settings);
+				});
+
 			});
 		}
 		private void StopCapture() {
@@ -120,6 +126,111 @@ namespace Irseny.Iface.Main.Config.Camera {
 					return;
 				}
 				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped capture " + streamIndex));
+			});
+		}
+		public CaptureSettings GetSettings() {
+			var result = new CaptureSettings();
+			if (!Initialized) {
+				return result;
+			}
+			// the settings start with everything on auto
+			// so we set the manual entries
+			// this way they are set non auto in the returned object
+			var cbxCamera = Container.GetWidget<Gtk.CheckButton>("cbx_AutoDeviceId");
+			if (!cbxCamera.Active) {
+				var txtCamera = Container.GetWidget<Gtk.SpinButton>("txt_DeviceId");
+				result.SetInteger(CaptureProperty.CameraId, (int)txtCamera.Adjustment.Value);
+			}
+			var cbxWidth = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameWidth");
+			if (!cbxWidth.Active) {
+				var txtWidth = Container.GetWidget<Gtk.SpinButton>("txt_FrameWidth");
+				result.SetInteger(CaptureProperty.FrameWidth, (int)txtWidth.Adjustment.Value);
+			}
+			var cbxHeight = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameHeight");
+			if (!cbxHeight.Active) {
+				var txtHeight = Container.GetWidget<Gtk.SpinButton>("txt_FrameHeight");
+				int height = TextParseTools.ParseInt(txtHeight.Text, 480);
+				result.SetInteger(CaptureProperty.FrameHeight, (int)txtHeight.Adjustment.Value);
+			}
+			var cbxRate = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameRate");
+			if (!cbxRate.Active) {
+				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_FrameRate");
+				int rate = TextParseTools.ParseInt(txtRate.Text, 30);
+				result.SetInteger(CaptureProperty.FrameRate, (int)txtRate.Adjustment.Value);
+			}
+			var cbxExposure = Container.GetWidget<Gtk.CheckButton>("cbx_AutoExposure");
+			if (!cbxExposure.Active) {
+				var txtExposure = Container.GetWidget<Gtk.SpinButton>("txt_Exposure");
+				result.SetDecimal(CaptureProperty.Exposure, txtExposure.Adjustment.Value);
+			}
+			var cbxBrightness = Container.GetWidget<Gtk.CheckButton>("cbx_AutoBrightness");
+			if (!cbxBrightness.Active) {
+				var txtBrightness = Container.GetWidget<Gtk.SpinButton>("txt_Brightness");
+				result.SetDecimal(CaptureProperty.Brightness, txtBrightness.Adjustment.Value);
+			}
+			//var cbxContrast = Container.GetWidget<Gtk.CheckButton>("cbx_AutoContrast");
+			//if (!cbxContrast.Active) {
+			//	var txtContrast = Container.GetWidget<Gtk.SpinButton>("txt_Contrast");
+			//	result.SetDecimal(CaptureProperty.Contrast, txtContrast.Adjustment.Value);
+			//}
+			//var cbxGain = Container.GetWidget<Gtk.CheckButton>("cbx_AutoGain");
+			//if (!cbxGain.Active) {
+			//	var txtGain = Container.GetWidget<Gtk.SpinButton>("txt_Gain");
+			//	result.SetDecimal(CaptureProperty.Gain, txtGain.Adjustment.Value);
+			//}
+			return result;
+		}
+		public bool ApplySettings(CaptureSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			if (!Initialized) {
+				return false;
+			}
+			var cbxCamera = Container.GetWidget<Gtk.CheckButton>("cbx_AutoDeviceId");
+			//cbxCamera.Active = settings.IsAuto(CaptureProperty.CameraId);
+			var txtCamera = Container.GetWidget<Gtk.SpinButton>("txt_DeviceId");
+			txtCamera.Adjustment.Value = settings.GetInteger(CaptureProperty.CameraId, 0);
+			var cbxWidth = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameWidth");
+			//cbxWidth.Active = settings.IsAuto(CaptureProperty.FrameWidth);
+			var txtWidth = Container.GetWidget<Gtk.SpinButton>("txt_FrameWidth");
+			txtWidth.Adjustment.Value = settings.GetInteger(CaptureProperty.FrameWidth, 640);
+			var cbxHeight = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameHeight");
+			var txtHeight = Container.GetWidget<Gtk.SpinButton>("txt_FrameHeight");
+			txtHeight.Adjustment.Value = settings.GetInteger(CaptureProperty.FrameHeight, 320);
+			var cbxRate = Container.GetWidget<Gtk.CheckButton>("cbx_AutoFrameRate");
+			var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_FrameRate");
+			txtRate.Adjustment.Value = settings.GetInteger(CaptureProperty.FrameRate, 30);
+			var cbxExposure = Container.GetWidget<Gtk.CheckButton>("cbx_AutoExposure");
+			var txtExposure = Container.GetWidget<Gtk.SpinButton>("txt_Exposure");
+			txtExposure.Adjustment.Value = settings.GetDecimal(CaptureProperty.Exposure, 0.0);
+			var cbxBrightness = Container.GetWidget<Gtk.CheckButton>("cbx_AutoBrightness");
+			var txtBrightness = Container.GetWidget<Gtk.SpinButton>("txt_Brightness");
+			txtBrightness.Adjustment.Value = settings.GetDecimal(CaptureProperty.Brightness, 0.0);
+			//var cbxContrast = Container.GetWidget<Gtk.CheckButton>("cbx_AutoContrast");
+			//var txtContrast = Container.GetWidget<Gtk.SpinButton>("txt_Contrast");
+			//txtContrast.Adjustment.Value = settings.GetDecimal(CaptureProperty.Contrast, 0.0);
+			//var cbxGain = Container.GetWidget<Gtk.CheckButton>("cbx_AutoGain");
+			//var txtGain = Container.GetWidget<Gtk.SpinButton>("txt_Gain");
+			//txtGain.Adjustment.Value = settings.GetDecimal(CaptureProperty.Gain, 0.0);
+			// TODO: apply auto settings where applicable
+			return true;
+		}
+		public void ApplySettings() {
+			if (!Initialized) {
+				return;
+			}
+			CaptureSettings settings = GetSettings();
+			CaptureSystem.Instance.Invoke(delegate {
+				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
+				if (streamId < 0) {
+					LogManager.Instance.LogError(this, "Video capture " + streamIndex + " is missing");
+					return;
+				}
+				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
+				if (stream == null) {
+					LogManager.Instance.LogError(this, "Video capture" + streamIndex + " is missing");
+					return;
+				}
+				stream.ApplySettings(settings);
 			});
 		}
 	}

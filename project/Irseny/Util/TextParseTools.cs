@@ -6,16 +6,11 @@ namespace Irseny.Util {
 	public static class TextParseTools {
 		readonly static NumberStyles numberStyle = NumberStyles.Float;
 		readonly static CultureInfo formatProvider = CultureInfo.InvariantCulture;
-		public static string ParsePath(string text, string fallback) {
-#if LINUX
-			return text.Replace('\\', Path.DirectorySeparatorChar);
-#elif WINDOWS
-			return text.Replace('/', Path.DirectorySeparatorChar);
-#else
-			return text;
-#endif
-		}
+
 		public static char ParseChar(string text, char fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			if (text.Length > 0) {
 				return text[0];
 			} else {
@@ -23,6 +18,9 @@ namespace Irseny.Util {
 			}
 		}
 		public static float ParseFloat(string text, float fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			if (text.Length > 0) {
 				float result;
 				if (float.TryParse(text, numberStyle, formatProvider, out result)) {
@@ -32,6 +30,9 @@ namespace Irseny.Util {
 			return fallback;
 		}
 		public static double ParseDouble(string text, double fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			if (text.Length > 0) {
 				double result;
 				if (double.TryParse(text, numberStyle, formatProvider, out result)) {
@@ -46,6 +47,9 @@ namespace Irseny.Util {
 		/// <returns><c>true</c>, if given value evaluates to "True", <c>false</c> otherwise.</returns>
 		/// <param name="text">String to read from.</param>
 		public static bool ParseBool(string text, bool fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			text = text.Trim();
 			if (text.Length > 0) {
 				int intValue;
@@ -75,6 +79,9 @@ namespace Irseny.Util {
 		/// <returns>The integer read.</returns>
 		/// <param name="text">String to read from.</param>
 		public static int ParseInt(string text, int fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			if (text.Length > 0) {
 				int result;
 				if (int.TryParse(text, out result)) {
@@ -85,6 +92,9 @@ namespace Irseny.Util {
 		}
 
 		public static uint ParseUInt(string text, uint fallback) {
+			if (text == null) {
+				return fallback;
+			}
 			if (text.Length > 0) {
 				uint result;
 				if (uint.TryParse(text, out result)) {

@@ -15,9 +15,10 @@
 
 #define IVJ_KEYBOARD_KEY_NO 10
 #define IVJ_KEYBOARD_MAX_BUFFERED_EVENT_NO 32
+#define IVJ_CONTEXT_MAX_PATH_LENGTH 128
 
 typedef struct {
-	int32_t FileHandle;
+	char FilePath[IVJ_CONTEXT_MAX_PATH_LENGTH];
 } IvjContext;
 
 typedef struct {

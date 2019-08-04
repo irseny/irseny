@@ -13,22 +13,24 @@ const int32_t ivjKeyCodes[IVJ_KEYBOARD_KEY_NO] = {
 };
 
 void ivjLogError(const char* message);
+void ivjLogWarning(const char* message);
 
 IvjContext* EXTRACK_EXPORT ivjCreateContext() {
 	for (int i = 0; i < IVJ_CONTEXT_CANDIDATE_NUM; i++) {
-		int32_t file = open(ivjContextCandidates[i], O_WRONLY | O_NDELAY);
-		if (file >= 0) {
+		int32_t fileHandle = open(ivjContextCandidates[i], O_WRONLY | O_NDELAY);
+		if (fileHandle >= 0) {
+			close(fileHandle);
 			IvjContext* context = (IvjContext*)malloc(sizeof(IvjContext));
-			context->FileHandle = file;
+			memset(context, 0, sizeof(IvjContext));
+			strncpy(context->FilePath, ivjContextCandidates[i], IVJ_CONTEXT_MAX_PATH_LENGTH);
 			return context;
 		}
 	}
-	ivjLogError("uinput file not found");
+	ivjLogError("uinput file not found or unsufficient permission");
 	return NULL;
 }
 
 bool EXTRACK_EXPORT ivjDestroyContext(IvjContext* context) {
-	close(context->FileHandle);
 	free(context);
 	return true;
 }
@@ -47,16 +49,31 @@ bool EXTRACK_EXPORT ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo*
 }
 
 IvjKeyboard* EXTRACK_EXPORT ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
-	ivjLogError("activating events");
 	// activate all keys
-	ioctl(context->FileHandle, UI_SET_EVBIT, EV_KEY);
-	ioctl(context->FileHandle, UI_SET_EVBIT, EV_SYN); // TODO: are the last two needed?
-	ioctl(context->FileHandle, UI_SET_EVBIT, EV_REP);
-	for (int i = 0; i < IVJ_KEYBOARD_KEY_NO; i++) {
-		ivjLogError("activating key " + ivjKeyCodes[i]);
-		ioctl(context->FileHandle, UI_SET_KEYBIT, ivjKeyCodes[i]);
+	int32_t fileHandle = open(context->FilePath, O_WRONLY | O_NDELAY);
+	if (fileHandle < 0) {
+		ivjLogError("failed to open uinput file");
+		return NULL;
 	}
-	ivjLogError("transmitting description");
+	char number[16];
+	if (ioctl(fileHandle, UI_SET_EVBIT, EV_KEY) < 0) {
+		ivjLogWarning("failed to activate key events");
+	}
+	if (ioctl(fileHandle, UI_SET_EVBIT, EV_SYN) < 0) {
+		ivjLogWarning("failed to activate syn events");
+	}
+	if (ioctl(fileHandle, UI_SET_EVBIT, EV_REP) < 0) {
+		ivjLogWarning("failed to activate report events");
+	}
+	bool keyBitError = false;
+	for (int i = 0; i < IVJ_KEYBOARD_KEY_NO; i++) {
+		if (ioctl(fileHandle, UI_SET_KEYBIT, ivjKeyCodes[i]) < 0) {
+			keyBitError = true;
+		}
+	}
+	if (keyBitError) {
+		ivjLogWarning("failed to active key codes");
+	}
 	// transmit description
 	struct uinput_user_dev deviceDescription;
 	memset(&deviceDescription, 0, sizeof(struct uinput_user_dev));
@@ -65,28 +82,30 @@ IvjKeyboard* EXTRACK_EXPORT ivjConnectKeyboard(IvjContext* context, IvjKeyboardC
 	deviceDescription.id.version = 0x1;
 	deviceDescription.id.vendor = info->Vendor;
 	deviceDescription.id.product = info->Product;
-	int32_t deviceHandle = context->FileHandle;
-	ivjLogError("attempting setup");
-	if (ioctl(deviceHandle, UI_DEV_SETUP, &deviceDescription) < 0) {
+	if (ioctl(fileHandle, UI_DEV_SETUP, &deviceDescription) < 0) {
 		ivjLogError("Keyboard setup failed");
+		close(fileHandle);
 		return NULL;
 	}
-	ivjLogError("attempting keyboard creation");
 	// create device
-	if (ioctl(deviceHandle, UI_DEV_CREATE, NULL) < 0) {
+	if (ioctl(fileHandle, UI_DEV_CREATE, NULL) < 0) {
 		ivjLogError("Keyboard creation failed");
+		close(fileHandle);
 		return NULL;
 	}
-	ivjLogError("allocating result");
 	// allocate result
 	IvjKeyboard* keyboard = (IvjKeyboard*)malloc(sizeof(IvjKeyboard));
 	keyboard->Context = context;
-	keyboard->FileHandle = deviceHandle;
+	keyboard->FileHandle = fileHandle;
 	//iotcl(deviceHandle, UI_GET_SYSNAME(sizeof(char)*IVJ_MAX_FILE_PATH_SIZE), keyboard->FilePath);
 	keyboard->BufferedEventNo = 0;
 	return keyboard;
 }
 bool EXTRACK_EXPORT	ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
+	if (ioctl(keyboard->FileHandle, UI_DEV_DESTROY) < 0) {
+		ivjLogWarning("Keyboard destruction failed");
+	}
+	close(keyboard->FileHandle);
 	free(keyboard);
 	return true;
 }
@@ -142,6 +161,9 @@ bool EXTRACK_EXPORT ivjSendKeyboard(IvjKeyboard* keyboard) {
 }
 void ivjLogError(const char* message) {
 	printf("Ivj Error: %s\n", message);
+}
+void ivjLogWarning(const char* message) {
+	printf("Ivj Warning: %s\n", message);
 }
 #endif // WITH_UINPUT
 #endif // LINUX
