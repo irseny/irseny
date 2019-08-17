@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Irseny.Log;
 
 namespace Irseny.Capture.Video {
 	public class CaptureSystem {
@@ -11,7 +12,7 @@ namespace Irseny.Capture.Video {
 		object invokeSync = new object();
 		volatile bool running = false;
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
-		ManualResetEvent invokeSignal = new ManualResetEvent(false);
+		AutoResetEvent invokeSignal = new AutoResetEvent(false);
 		object streamEventSync = new object();
 		event EventHandler<StreamEventArgs> streamCreated;
 		event EventHandler<StreamEventArgs> streamDestroyed;
@@ -55,8 +56,10 @@ namespace Irseny.Capture.Video {
 			lock (instanceSync) {
 				if (CaptureSystem.instance != null) {
 					CaptureSystem.instance.SignalStop();
+					instanceThread.Join(2048);
 					if (instanceThread.IsAlive) {
-						instanceThread.Join();
+						LogManager.Instance.LogWarning(instance, "Capture thread does not terminate. Aborting.");
+						instanceThread.Abort();
 					}
 					instanceThread = null;
 				}
@@ -86,9 +89,8 @@ namespace Irseny.Capture.Video {
 		private void Run() {
 			running = true;
 			while (running) {
-				invokeSignal.WaitOne(); // TODO: evaluate whether a timeout is required
-				invokeSignal.Reset(); // may reset even if there are operations pending
-				InvokePending(); // these are processed here, the signal can be set again in the meantime
+				invokeSignal.WaitOne();
+				InvokePending();
 			}
 			// clean up
 			lock (streamSync) {

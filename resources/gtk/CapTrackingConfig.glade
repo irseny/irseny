@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
 <interface>
-  <requires lib="gtk+" version="3.12"/>
+  <!-- interface-requires gtk+ 3.12 -->
   <object class="GtkAdjustment" id="adj_Smooth">
     <property name="upper">6</property>
     <property name="step_increment">1</property>
@@ -18,11 +17,6 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-apply</property>
   </object>
-  <object class="GtkImage" id="img_Start">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-play</property>
-  </object>
   <object class="GtkBox" id="box_Root">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -36,40 +30,50 @@
           <object class="GtkLabel" id="lbl_Source">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Source</property>
             <property name="xalign">1</property>
+            <property name="label" translatable="yes">Source</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">0</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkComboBoxText" id="cbb_Source">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <items>
+              <item translatable="yes">None</item>
+            </items>
           </object>
           <packing>
             <property name="left_attach">2</property>
             <property name="top_attach">0</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="lbl_Threshold">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Threshold</property>
             <property name="xalign">1</property>
+            <property name="label" translatable="yes">Threshold</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkScale" id="scl_Threshold">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="hexpand">True</property>
             <property name="adjustment">adj_Threshold</property>
             <property name="fill_level">1000</property>
             <property name="round_digits">2</property>
@@ -78,6 +82,8 @@
           <packing>
             <property name="left_attach">1</property>
             <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
@@ -86,29 +92,33 @@
             <property name="can_focus">True</property>
             <property name="max_length">4</property>
             <property name="width_chars">4</property>
-            <property name="max_width_chars">4</property>
           </object>
           <packing>
             <property name="left_attach">2</property>
             <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="lbl_Smooth">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Smoothing</property>
             <property name="xalign">1</property>
+            <property name="label" translatable="yes">Smoothing</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkScale" id="scl_Smooth">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="hexpand">True</property>
             <property name="adjustment">adj_Smooth</property>
             <property name="fill_level">1000</property>
             <property name="draw_value">False</property>
@@ -116,6 +126,8 @@
           <packing>
             <property name="left_attach">1</property>
             <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
         </child>
         <child>
@@ -124,57 +136,13 @@
             <property name="can_focus">True</property>
             <property name="max_length">4</property>
             <property name="width_chars">4</property>
-            <property name="max_width_chars">4</property>
           </object>
           <packing>
             <property name="left_attach">2</property>
             <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
         <child>
           <placeholder/>
@@ -191,24 +159,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkToggleButton" id="btn_Start">
-            <property name="label" translatable="yes">Start</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">img_Start</property>
-            <property name="image_position">right</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="padding">2</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkToggleButton" id="btn_Apply">
+          <object class="GtkButton" id="btn_Apply">
             <property name="label" translatable="yes">Apply</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -219,9 +170,8 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="padding">2</property>
             <property name="pack_type">end</property>
-            <property name="position">1</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </object>
@@ -231,10 +181,5 @@
         <property name="position">1</property>
       </packing>
     </child>
-  </object>
-  <object class="GtkImage" id="img_Stop">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-stop</property>
   </object>
 </interface>

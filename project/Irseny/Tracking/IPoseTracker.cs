@@ -1,6 +1,10 @@
 ﻿using System;
 namespace Irseny.Tracking {
-	public interface IPoseDetector : IDisposable {
+	public interface IPoseTracker : IDisposable {
+		/// <summary>
+		/// Occurs when a pose has been detected.
+		/// </summary>
+		event EventHandler<PositionDetectedEventArgs> PositionDetected;
 		/// <summary>
 		/// Occurs when the algorithm has data to process.
 		/// </summary>
@@ -14,10 +18,20 @@ namespace Irseny.Tracking {
 		/// </summary>
 		event EventHandler Stopped;
 		/// <summary>
-		/// Indicates whether this instance has been started.
+		/// Indicates whether the detector is currently active.
 		/// </summary>
-		/// <value><c>true</c> if running; otherwise, <c>false</c>.</value>
-		bool Running { get; }
+		bool Running {  get; }
+		/// <summary>
+		/// Uses the current pose as tracking origin.
+		/// </summary>
+		/// <returns></returns>
+		bool Center();
+		/// <summary>
+		/// Applies tracker settings.
+		/// </summary>
+		/// <param name="settings">Settings.</param>
+		/// <returns>Whether the application was successful.</returns>
+		bool ApplySettings(TrackerSettings settings);
 		/// <summary>
 		/// Starts the detection process.
 		/// </summary>

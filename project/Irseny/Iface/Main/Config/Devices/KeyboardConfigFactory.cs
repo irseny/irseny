@@ -88,12 +88,12 @@ namespace Irseny.Iface.Main.Config.Devices {
 			}
 			{ // send rate
 				var txtRate = Container.GetWidget<Gtk.SpinButton>("txt_SendRate");
-				settings.SendRate = (int)txtRate.Adjustment.Value;
+				result.SendRate = (int)txtRate.Adjustment.Value;
 			}
-			{ // send policy 
+			{ // send policy
 				var cbbPolicy = Container.GetWidget<Gtk.ComboBoxText>("cbb_SendPolicy");
 				int policyId = TextParseTools.ParseInt(cbbPolicy.ActiveId, 0);
-				settings.SendPolicy = (VirtualDeviceSendPolicy)policyId;
+				result.SendPolicy = (VirtualDeviceSendPolicy)policyId;
 			}
 
 			return result;

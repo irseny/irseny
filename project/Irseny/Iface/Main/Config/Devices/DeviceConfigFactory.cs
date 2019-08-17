@@ -42,6 +42,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Devices");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
+			RemoveDevices();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -197,9 +198,6 @@ namespace Irseny.Iface.Main.Config.Devices {
 			var floorNames = new List<string>(FloorNames);
 			foreach (string name in floorNames) {
 				IInterfaceFactory floor = DestructFloor(name);
-				if (floor == null) {
-					return false;
-				}
 				floor.Dispose();
 			}
 			return true;

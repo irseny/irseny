@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Irseny.Content;
 using Irseny.Listing;
 
@@ -21,11 +22,10 @@ namespace Irseny.Iface.Main.View.Camera {
 		}
 		protected override bool DisconnectInternal() {
 			EquipmentMaster.Instance.VideoCaptureStream.Updated -= CameraChanged;
-			while (RemoveCamera()) {
-			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.Remove(ntbMain);
+			RemoveCameras();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -77,6 +77,20 @@ namespace Irseny.Iface.Main.View.Camera {
 				return true;
 			}
 			return false;
+		}
+		public void RemoveCameras() {
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			while (ntbCamera.NPages > 0) {
+				Gtk.Widget page = ntbCamera.GetNthPage(0);
+				Gtk.Widget label = ntbCamera.GetTabLabel(page);
+				ntbCamera.RemovePage(0);
+				label.Dispose();
+			}
+			var floorNames = new List<string>(FloorNames);
+			foreach (string name in floorNames) {
+				IInterfaceFactory floor = DestructFloor(name);
+				floor.Dispose();
+			}
 		}
 	}
 }

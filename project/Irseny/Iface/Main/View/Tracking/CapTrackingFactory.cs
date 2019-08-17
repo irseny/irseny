@@ -34,7 +34,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 					return;
 				}
 
-				var tracker = DetectionSystem.Instance.GetDetector<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetTracker<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
 
 				if (tracker == null) {
 					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + "not available");
@@ -53,7 +53,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 				if (trackerId < 0) {
 					return;
 				}
-				var tracker = DetectionSystem.Instance.GetDetector<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetTracker<Irseny.Tracking.ISingleImageCapTracker>(trackerIndex, null);
 
 				if (tracker == null) {
 					return;
@@ -74,7 +74,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 		//	Tracap.DetectionSystem.Instance.Invoke(delegate {
 		//		int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 		//		if (trackerId > -1) {
-		//			var tracker = Tracap.DetectionSystem.Instance.GetDetector<Tracap.ISingleImageCapTracker>(trackerIndex, null);
+		//			var tracker = Tracap.DetectionSystem.Instance.GetTracker<Tracap.ISingleImageCapTracker>(trackerIndex, null);
 		//			if (tracker != null) {
 		//				tracker.InputProcessed -= RetrieveImage;
 		//			}

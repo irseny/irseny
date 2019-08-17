@@ -1,6 +1,6 @@
 ﻿using System;
 namespace Irseny.Tracking {
-	public interface ISingleImageCapTracker : ICapTracker {
+	public interface ISingleImageCapTracker : IPoseTracker {
 		/// <summary>
 		/// Occurs when an input image has been processed.
 		/// </summary>

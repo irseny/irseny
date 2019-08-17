@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Collections.Generic;
+using Irseny.Log;
 
 namespace Irseny.Tracking {
 	public class DetectionSystem {
@@ -11,11 +12,11 @@ namespace Irseny.Tracking {
 		volatile bool running = false;
 		readonly object invokeSync = new object();
 		readonly object stepSync = new object();
-		readonly object detectorSync = new object();
+		readonly object trackerSync = new object();
 		AutoResetEvent invokeSignal = new AutoResetEvent(false);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
-		Queue<IPoseDetector> toStep = new Queue<IPoseDetector>();
-		List<IPoseDetector> detectors = new List<IPoseDetector>(4);
+		Queue<IPoseTracker> toStep = new Queue<IPoseTracker>();
+		List<IPoseTracker> trackers = new List<IPoseTracker>(4);
 
 
 		public DetectionSystem() {
@@ -34,84 +35,89 @@ namespace Irseny.Tracking {
 		}
 
 		/// <summary>
-		/// Connects the given detector.
+		/// Connects the given tracker.
 		/// </summary>
-		/// <returns>Identifier for the detector. Less than 0 if starting was not successful.</returns>
-		/// <param name="detector">Detector.</param>
-		public int ConnectDetector(IPoseDetector detector) {
-			if (detector == null) throw new ArgumentNullException("detector");
-			lock (detectorSync) {
+		/// <returns>Identifier for the tracker. Less than 0 if starting was not successful.</returns>
+		/// <param name="tracker">Tracker.</param>
+		/// <param name="settings">Settings.</param>
+		public int StartTracker(IPoseTracker tracker, TrackerSettings settings) {
+			if (tracker == null) throw new ArgumentNullException("tracker");
+			if (settings == null) throw new ArgumentNullException("settings");
+			lock (trackerSync) {
 				int id;
 				// find unused index
-				for (id = 0; id < detectors.Count; id++) {
-					if (detectors[id] == null) {
+				for (id = 0; id < trackers.Count; id++) {
+					if (trackers[id] == null) {
 						break;
 					}
 				}
-				// add or insert detector
-				if (id < detectors.Count) {
-					detectors[id] = detector;
+				// add or insert tracker
+				if (id < trackers.Count) {
+					trackers[id] = tracker;
 				} else {
-					detectors.Add(detector);
+					trackers.Add(tracker);
 				}
-				// the detector signals when it has data to process
+				// the tracker signals when it has data to process
 				// to let it process we pick up the signal
-				detector.InputAvailable += SignalStep;
+				tracker.InputAvailable += SignalStep;
+				if (!tracker.Start(settings)) {
+					return -1;
+				}
 				return id;
 			}
 		}
 
 		/// <summary>
-		/// Gets the detector specified by the given identifier.
+		/// Gets the tracker specified by the given identifier.
 		/// </summary>
-		/// <returns>The detector. Null if it does not exist.</returns>
-		/// <param name="id">Detector identifier previously returned by <see cref="ConnectDetector"/>.</param>
-		public IPoseDetector GetDetector(int id) {
-			lock (detectorSync) {
-				if (id < 0 || id >= detectors.Count) {
+		/// <returns>The tracker. Null if it does not exist.</returns>
+		/// <param name="id">Tracker identifier previously returned by <see cref="StartTracker"/>.</param>
+		public IPoseTracker GetTracker(int id) {
+			lock (trackerSync) {
+				if (id < 0 || id >= trackers.Count) {
 					return null;
 				}
-				return detectors[id];
+				return trackers[id];
 			}
 		}
 
 		/// <summary>
-		/// Gets the detector specified by the given identifier and type.
+		/// Gets the tracker specified by the given identifier and type.
 		/// </summary>
-		/// <returns>The detector. Null if it does not exist or there is a type mismatch.</returns>
-		/// <param name="id">Detector identifier previously returned by <see cref="ConnectDetector"/>.</param>
+		/// <returns>The tracker. Null if it does not exist or there is a type mismatch.</returns>
+		/// <param name="id">Tracker identifier previously returned by <see cref="StartTracker"/>.</param>
 		/// <param name="fallback">Default value.</param>
-		/// <typeparam name="Tdetect">The detector type.</typeparam>
-		public Tdetect GetDetector<Tdetect>(int id, Tdetect fallback) where Tdetect : IPoseDetector {
-			lock (detectorSync) {
-				if (id < 0 || id >= detectors.Count) {
+		/// <typeparam name="Ttrack">The tracker type.</typeparam>
+		public Ttrack GetTracker<Ttrack>(int id, Ttrack fallback) where Ttrack : IPoseTracker {
+			lock (trackerSync) {
+				if (id < 0 || id >= trackers.Count) {
 					return fallback;
 				}
-				if (detectors[id] is Tdetect) {
-					return (Tdetect)detectors[id];
+				if (trackers[id] is Ttrack) {
+					return (Ttrack)trackers[id];
 				}
 				return fallback;
 			}
 		}
 
 		/// <summary>
-		/// Stops, disposes and removes the detector specified by the given identifier.
+		/// Stops, disposes and removes the tracker specified by the given identifier.
 		/// </summary>
-		/// <returns><c>true</c>, if the detector existed, <c>false</c> otherwise.</returns>
-		/// <param name="id">Detector identifier previously returned by <see cref="ConnectDetector"></see>.</param>
-		public bool DisconnectDetector(int id) {
-			lock (detectorSync) {
-				if (id < 0 || id >= detectors.Count) {
-					return false;
+		/// <returns><c>true</c>, if the tracker existed, <c>false</c> otherwise.</returns>
+		/// <param name="id">Tracker identifier previously returned by <see cref="StartTracker"></see>.</param>
+		public IPoseTracker StopTracker(int id) {
+			lock (trackerSync) {
+				if (id < 0 || id >= trackers.Count) {
+					return null;
 				}
-				if (detectors[id] == null) {
-					return false;
+				if (trackers[id] == null) {
+					return null;
 				}
-				detectors[id].InputAvailable -= SignalStep;
-				detectors[id].Stop();
-				detectors[id].Dispose();
-				detectors[id] = null;
-				return true;
+				IPoseTracker result = trackers[id];
+				trackers[id] = null;
+				result.InputAvailable -= SignalStep;
+				result.Stop();
+				return result;
 			}
 		}
 
@@ -120,8 +126,7 @@ namespace Irseny.Tracking {
 		/// </summary>
 		/// <param name="handler">Handler to invoke.</param>
 		public void Invoke(EventHandler handler) {
-			if (handler == null)
-				throw new ArgumentNullException("handler");
+			if (handler == null) throw new ArgumentNullException("handler");
 			lock (invokeSync) {
 				toInvoke.Enqueue(handler);
 				invokeSignal.Set();
@@ -145,13 +150,13 @@ namespace Irseny.Tracking {
 		}
 
 		/// <summary>
-		/// Executes a single iteration of all started detectors.
+		/// Executes a single iteration of all started trackers.
 		/// </summary>
-		private void StepDetectors() {
+		private void StopTrackers() {
 			lock (stepSync) {
 				while (toStep.Count > 0) {
-					IPoseDetector detector = toStep.Dequeue();
-					detector.Step();
+					IPoseTracker tracker = toStep.Dequeue();
+					tracker.Step();
 				}
 			}
 		}
@@ -165,15 +170,15 @@ namespace Irseny.Tracking {
 		}
 
 		/// <summary>
-		/// Signals this instance to step the detectors due to available data to process.
+		/// Signals this instance to step the trackers due to available data to process.
 		/// </summary>
 		/// <param name="sender">Ignnored.</param>
 		/// <param name="args">Ignored.</param>
 		private void SignalStep(object sender, EventArgs args) {
-			IPoseDetector detector = sender as IPoseDetector;
-			if (detector != null) {
+			IPoseTracker tracker = sender as IPoseTracker;
+			if (tracker != null) {
 				lock (stepSync) {
-					toStep.Enqueue(detector);
+					toStep.Enqueue(tracker);
 				}
 			}
 			invokeSignal.Set();
@@ -187,12 +192,12 @@ namespace Irseny.Tracking {
 			while (running) {
 				invokeSignal.WaitOne();
 				InvokePending();
-				StepDetectors();
+				StopTrackers();
 			}
 			// cleanup
-			lock (detectorSync) {
-				for (int id = 0; id < detectors.Count; id++) {
-					DisconnectDetector(id);
+			lock (trackerSync) {
+				for (int id = 0; id < trackers.Count; id++) {
+					StopTracker(id);
 				}
 			}
 		}
@@ -208,7 +213,11 @@ namespace Irseny.Tracking {
 			lock (instanceSync) {
 				if (DetectionSystem.instance != null) {
 					DetectionSystem.instance.SignalStop();
-					DetectionSystem.instanceThread.Join();
+					DetectionSystem.instanceThread.Join(2048);
+					if (DetectionSystem.instanceThread.IsAlive) {
+						LogManager.Instance.LogWarning(instance, "Detection system thread does not terminate. Aborting.");
+						DetectionSystem.instanceThread.Abort();
+					}
 					DetectionSystem.instanceThread = null;
 					DetectionSystem.instance = null;
 				}

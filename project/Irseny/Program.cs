@@ -81,8 +81,8 @@ namespace Irseny {
 					// TODO: remove all new display elements to prevent invinite marshaling
 				};
 				GLib.ExceptionManager.UnhandledException += (GLib.UnhandledExceptionArgs e) => {
-					LogManager.Instance.Log(LogMessage.CreateError(e.ExceptionObject, e.ExceptionObject.ToString()));
-					e.ExitApplication = false;
+					LogManager.Instance.LogError(e.ExceptionObject, e.ExceptionObject.ToString());
+					e.ExitApplication = true;
 				};
 
 			}
@@ -112,7 +112,6 @@ namespace Irseny {
 
 				long timeStart = watch.ElapsedMilliseconds;
 				Gtk.Application.RunIteration(false);
-
 				Iface.InvokeHack.Process();
 				long memory = GC.GetTotalMemory(true);
 				long timeEnd = watch.ElapsedMilliseconds;
@@ -128,6 +127,7 @@ namespace Irseny {
 				// TODO: implement frame timing
 				//Thread.Sleep(12);
 			}
+			Gtk.Application.Quit();
 			/*watch.Stop();
 			Extrack.Artf.FreePacket(packet);
 			Extrack.Artf.CloseDevice(context, device);

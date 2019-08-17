@@ -8,7 +8,7 @@ namespace Irseny.Tracking {
 		TrackerSettings settings;
 		Point2i[] imagePoints = new Point2i[0];
 		int imagePointNo;
-		Point2i[] clusterPoints = new Point2i[0];
+		Point2i[] clusterMembers = new Point2i[0];
 		Point2i[] clusterCenters = new Point2i[0];
 		int clusterCenterNo;
 		bool[] suppressionMap = new bool[0];
@@ -31,7 +31,7 @@ namespace Irseny.Tracking {
 		public int Detect(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut, out Point2i[] keypoints) {
 			Setup(imageIn, imageOut);
 			Threshold(imageIn, imageOut);
-			FindClusters(imageIn);
+			FindClusters(imageIn, imageOut);
 
 			MarkClusters(imageOut);
 
@@ -56,8 +56,8 @@ namespace Irseny.Tracking {
 				imagePoints = new Point2i[maxPointNo];
 			}
 			int maxClusterMembers = settings.GetInteger(TrackerProperty.MaxClusterMembers, 512);
-			if (clusterPoints.Length < maxClusterMembers) {
-				clusterPoints = new Point2i[maxClusterMembers];
+			if (clusterMembers.Length < maxClusterMembers) {
+				clusterMembers = new Point2i[maxClusterMembers];
 			}
 			int maxClusterNo = settings.GetInteger(TrackerProperty.MaxClusterNo, 16);
 			if (clusterCenters.Length < maxClusterNo) {
@@ -94,7 +94,7 @@ namespace Irseny.Tracking {
 							imagePoints[imagePointNo] = new Point2i(c, r);
 							imagePointNo += 1;
 						}
-						Marshal.WriteByte(bufferOut, r*imageStride + c, bright);
+						Marshal.WriteByte(bufferOut, r*imageStride + c, 64);
 					} else {
 						visibilityMap[r*imageStride + c] = false;
 						Marshal.WriteByte(bufferOut, r*imageStride + c, 0);
@@ -106,16 +106,22 @@ namespace Irseny.Tracking {
 		/// Finds clusters within the given image.
 		/// </summary>
 		/// <param name="imageIn">Input image.</param>
-		private void FindClusters(Emgu.CV.Mat imageIn) {
-			int stride = imageIn.Width;
+		private void FindClusters(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
 			// try with cluster origins at all bright points in the image
 			for (int p = 0; p < imagePointNo; p++) {
 				Point2i point = imagePoints[p];
-				if (!suppressionMap[point.Y*stride + point.X]) {
+				if (!suppressionMap[point.Y*imageStride + point.X]) {
 					int clusterRadius;
 					Point2i clusterCenter;
-					bool isCluster = DetectCluster(point, out clusterCenter, out clusterRadius);
-					if (isCluster) {
+					bool terminate;
+					bool found = DetectCluster(point, out clusterCenter, out clusterRadius, out terminate, imageOut);
+					// terminate if not successful
+					if (terminate) {
+						clusterCenterNo = 0;
+						return;
+					}
+					// add cluster if satisfactory
+					if (found) {
 						if (clusterCenterNo < clusterCenters.Length) {
 							clusterCenters[clusterCenterNo] = clusterCenter;
 							clusterCenterNo += 1;
@@ -131,95 +137,86 @@ namespace Irseny.Tracking {
 		/// <param name="start">Potential cluster start.</param>
 		/// <param name="center">Cluster center.</param>
 		/// <param name="radius">Cluster radius.</param>
-		private bool DetectCluster(Point2i start, out Point2i center, out int radius) {
+		/// <prama name="critical">Critical error.</prama>
+		private bool DetectCluster(Point2i start, out Point2i center, out int radius, out bool critical, Emgu.CV.Mat imageOut) {
 			// initialization to be able to return at any point
 			int minClusterRadius = settings.GetInteger(TrackerProperty.MinClusterRadius, 2);
-			int maxClusterRadius = settings.GetInteger(TrackerProperty.MinClusterRadius, 32);
-			int minLayerEnergy = settings.GetInteger(TrackerProperty.MinLayerEnergy, 6);
-			radius = 0;
+			int maxClusterRadius = settings.GetInteger(TrackerProperty.MaxClusterRadius, 32);
+			int minLayerEnergy = settings.GetInteger(TrackerProperty.MinLayerEnergy, 32);
+			IntPtr bufferOut = imageOut.DataPointer;
 			center = new Point2i(-1, -1);
-			// determine points that are members of the cluster
-			// and find the center within the members
-			Point2i averageClusterPoint = new Point2i(0, 0);
-			int clusterPointNo = 0;
-			// iteratively find cluster bounds and points within the bounds
-			// starting from the smalles try all radiuses
-			// stop when the point population on a layer becomes too thin
-			// visually one layer is the edge of a quadratic region
-			int layerNo;
-			for (layerNo = 1; layerNo < maxClusterRadius; layerNo += 1) {
-				if (start.X - layerNo < 0 || start.X + layerNo >= imageWidth || start.Y - layerNo < 0 || start.Y + layerNo >= imageHeight) {
-					// skip if we trip an image border
-
-					// we get multiple clusters at edges if not omitted
-					// eventually end loop as an image border is encountered
-					// TODO: do evaluation on a pixel level to allow for better edge cluster detection
+			radius = -1;
+			critical = false;
+			clusterMembers[0] = start;
+			int clusterMemberNo = 1;
+			suppressionMap[start.Y*imageStride + start.X] = true;
+			// process all cluster members
+			for (int clusterProgress = 0; clusterProgress < clusterMemberNo; clusterProgress += 1) {
+				Point2i point = clusterMembers[clusterProgress];
+				// ignore edge points
+				// do not read outside image bounds
+				if (point.X <= 0 || point.X + 1 >= imageWidth) {
+					continue;
+				}
+				if (point.Y <= 0 || point.Y + 1 >= imageHeight) {
+					continue;
+				}
+				// terminate if the cluster grows too big
+				if (clusterMemberNo + 4 >= clusterMembers.Length) {
+					critical = true;
 					return false;
 				}
-				// calculate the layer energy and additional cluster points
-				// perform the search with a rectangular shape
-				int layerEnergy = 0;
-				// determine the points on the edges that connect the end points of the left and right edges
-				// and calculate the layer energy
-				for (int dr = -layerNo; dr <= layerNo; dr += layerNo*2) { // -radius and +radius
-					int r = start.Y + dr;
-					// search through all columns within the radius range
-					for (int dc = -layerNo; dc <= layerNo; dc++) {
-						int c = start.X + dc;
-						if (visibilityMap[r*imageStride + c] && !suppressionMap[r*imageStride + c]) {
-							layerEnergy += 1;
-							if (clusterPointNo < clusterPoints.Length) {
-								clusterPoints[clusterPointNo] = new Point2i(c, r);
-								clusterPointNo += 1;
-								averageClusterPoint.X += c;
-								averageClusterPoint.Y += r;
-							}
-						}
+				// queue bright neighbors
+				for (int d = -1; d <= 1; d += 2) {
+					// evaluate horizontal and vertical neighbors separately
+					int c = point.X + d;
+					if (visibilityMap[point.Y*imageStride + c] && !suppressionMap[point.Y*imageStride + c]) {
+						// mark as cluster member
+						clusterMembers[clusterMemberNo] = new Point2i(c, point.Y);
+						clusterMemberNo += 1;
+						suppressionMap[point.Y*imageStride + c] = true;
+						Marshal.WriteByte(bufferOut, point.Y*imageStride + c, 146);
 					}
-				}
-				// determine the points on the edges that connect the end points of the top and bottom edges
-				// and calculate the layer energy
-				for (int dc = -layerNo; dc <= layerNo; dc += layerNo*2) {
-					int c = start.X + dc;
-					// search through all rows within radius range
-					for (int dr = -layerNo + 1; dr < layerNo; dr++) {
-						int r = start.Y + dr;
-						if (visibilityMap[r*imageStride + c] && !suppressionMap[r*imageStride + c]) {
-							layerEnergy += 1;
-							if (clusterPointNo < clusterPoints.Length) {
-								clusterPoints[clusterPointNo] = new Point2i(c, r);
-								clusterPointNo += 1;
-								averageClusterPoint.X += c;
-								averageClusterPoint.Y += r;
-							}
-						}
+					int r = point.Y + d;
+					if (visibilityMap[r*imageStride + point.X] && !suppressionMap[r*imageStride + point.X]) {
+						// mark as cluster member
+						clusterMembers[clusterMemberNo] = new Point2i(point.X, r);
+						clusterMemberNo += 1;
+						suppressionMap[r*imageStride + point.X] = true;
+						Marshal.WriteByte(bufferOut, r*imageStride + point.X, 146);
 					}
-				}
-				if (layerEnergy < minLayerEnergy) {
-					// finished if no more layers can be applied
-					break;
 				}
 
-				// TODO: break on layer boundary pass
 			}
-			radius = layerNo;
-			if (clusterPointNo > 0) {
-				center = new Point2i(averageClusterPoint.X/clusterPointNo, averageClusterPoint.Y/clusterPointNo);
-			} else {
+			if (clusterMemberNo < minLayerEnergy) {
+				critical = false;
 				return false;
 			}
-			// check for size constraints
-			if (layerNo < minClusterRadius) {
+			// find cluster center
+			// weighted sum of members
+			var clusterSum = new Point2i(0, 0);
+			for (int i = 0; i < clusterMemberNo; i++) {
+				clusterSum.X += clusterMembers[i].X;
+				clusterSum.Y += clusterMembers[i].Y;
+			}
+			center = new Point2i(clusterSum.X/clusterMemberNo, clusterSum.Y/clusterMemberNo);
+			// find cluster radius
+			// average deviation from center
+			var clusterDeviation = new Point2i(0, 0);
+			for (int i = 0; i < clusterMemberNo; i++) {
+				clusterDeviation.X += Math.Abs(clusterMembers[i].X - center.X);
+				clusterDeviation.Y += Math.Abs(clusterMembers[i].Y - center.Y);
+			}
+			// with increasing size we get a tendency to high deviation
+			// as there are can exist more points further away from the center
+			// TODO: evaluate how to get a good radius estimate (at which radius are the most points located)
+			var clusterRadius = new Point2i((int)(clusterDeviation.X/clusterMemberNo*1.4f), (int)(clusterDeviation.Y/clusterMemberNo*1.4f));
+			radius = Math.Max(clusterRadius.X, clusterRadius.Y);
+			if (clusterRadius.X < minClusterRadius || clusterRadius.X > maxClusterRadius) {
 				return false;
 			}
-			if (layerNo > maxClusterRadius) {
-				// TODO: let the layer number grow beyond the cluster radius ?
+			if (clusterRadius.Y < minClusterRadius || clusterRadius.Y > maxClusterRadius) {
 				return false;
-			}
-			// suppress further point usage for succeeding clusters
-			for (int p = 0; p < clusterPointNo; p++) {
-				Point2i point = clusterPoints[p];
-				suppressionMap[point.Y*imageStride + point.X] = true;
 			}
 			return true;
 		}

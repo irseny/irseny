@@ -10,19 +10,20 @@ namespace Irseny.Tracking {
 	public class Cap3PointTracker : SingleImageCapTracker {
 		KeypointDetector pointDetector = null;
 		PointLabeler pointLabeler = null;
-		BasicPoseEstimator poseEstimator = null;
+		P3PoseEstimator poseEstimator = null;
+		TrackerSettings settings = null;
 		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
-		public Cap3PointTracker() : base() {
 
+		public override bool Running {
+			get { return pointDetector != null && poseEstimator != null && pointLabeler != null; }
 		}
-		public override bool Centered {
-			get {
-				if (poseEstimator == null) {
-					return false;
-				}
-				return poseEstimator.Centered;
+		protected override TrackerSettings GetSettings() {
+			if (settings == null) {
+				return new TrackerSettings();
+			} else {
+				return new TrackerSettings(settings);
 			}
 		}
 		public override bool Center() {
@@ -31,24 +32,31 @@ namespace Irseny.Tracking {
 			}
 			return poseEstimator.Center();
 		}
-		public override bool Start(TrackerSettings settings) {
-			if (!base.Start(settings)) {
+		public override bool ApplySettings(TrackerSettings settings) {
+			if (!Running) {
 				return false;
 			}
 			pointDetector = new KeypointDetector(settings);
 			pointLabeler = new PointLabeler(settings);
-			poseEstimator = new BasicPoseEstimator(settings);
+			poseEstimator = new P3PoseEstimator(settings);
+			return true;
+		}
+		public override bool Start(TrackerSettings settings) {
+			pointDetector = new KeypointDetector(settings);
+			pointLabeler = new PointLabeler(settings);
+			poseEstimator = new P3PoseEstimator(settings);
 			return true;
 		}
 
 		public override bool Stop() {
-			if (!base.Stop()) {
-				return false;
-			}
 			imageCleaner.CleanUpAll(); // might leave some images left
+			pointDetector = null;
+			pointLabeler = null;
+			poseEstimator = null;
 			return true;
 		}
 		public override void Dispose() {
+			Stop();
 			imageCleaner.DisposeAll(); // should not matter if some images are disposed on non detection threads
 			base.Dispose();
 		}

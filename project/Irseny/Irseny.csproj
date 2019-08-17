@@ -168,12 +168,12 @@
     <Compile Include="Listing\EquipmentState.cs" />
     <Compile Include="Tracking\DetectionSystem.cs" />
     <Compile Include="Tracking\ImageProcessedEventArgs.cs" />
+    <Compile Include="Tracking\IPoseTracker.cs" />
+    <Compile Include="Tracking\P3PoseEstimator.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Tracking\Cap3PointTracker.cs" />
     <Compile Include="Extrack\Artf.cs" />
-    <Compile Include="Tracking\IPoseDetector.cs" />
     <Compile Include="Tracking\ISingleImageCapTracker.cs" />
-    <Compile Include="Tracking\ICapTracker.cs" />
     <Compile Include="Tracking\CapTracker.cs" />
     <Compile Include="Tracking\SingleImageCapTracker.cs" />
     <Compile Include="Tracking\CapPosition.cs" />

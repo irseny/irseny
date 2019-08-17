@@ -84,7 +84,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 					LogManager.Instance.LogError(this, "Tracker " + 0 + " not available");
 					return;
 				}
-				var tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetTracker<ISingleImageCapTracker>(trackerIndex, null);
 				if (tracker == null) {
 					LogManager.Instance.LogError(this, "Tracker " + 0 + " not available");
 					return;
@@ -100,7 +100,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				if (trackerId < 0) {
 					return;
 				}
-				var tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerIndex, null);
+				var tracker = DetectionSystem.Instance.GetTracker<ISingleImageCapTracker>(trackerIndex, null);
 				if (tracker == null) {
 					return;
 				}
@@ -182,7 +182,6 @@ namespace Irseny.Iface.Main.View.Bindings {
 
 		private void RetrievePosition(object sender, PositionDetectedEventArgs args) {
 			CapPosition position = args.Position;
-			Console.WriteLine("Yaw" + position.GetAxis(CapAxis.Yaw));
 			Invoke(delegate {
 				if (!Initialized) {
 					return;

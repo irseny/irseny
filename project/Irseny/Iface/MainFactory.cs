@@ -15,7 +15,6 @@ namespace Irseny.Iface {
 			var window = Container.GetWidget<Gtk.Window>("win_Main");
 			window.DeleteEvent += delegate {
 				Init(InterfaceFactoryState.Initial);
-				Gtk.Application.Quit();
 			};
 			return true;
 		}

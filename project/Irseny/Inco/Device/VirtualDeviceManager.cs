@@ -236,7 +236,11 @@ namespace Irseny.Inco.Device {
 			lock (instanceSync) {
 				if (VirtualDeviceManager.instance != null) {
 					VirtualDeviceManager.instance.Stop();
-					VirtualDeviceManager.instanceThread.Join();
+					VirtualDeviceManager.instanceThread.Join(2048);
+					if (VirtualDeviceManager.instanceThread.IsAlive) {
+						LogManager.Instance.LogWarning(manager, "Virtual device thread does not terminate. Aborting.");
+						VirtualDeviceManager.instanceThread.Abort();
+					}
 					VirtualDeviceManager.instanceThread = null;
 					VirtualDeviceManager.instance = null;
 				}

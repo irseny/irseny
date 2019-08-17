@@ -74,7 +74,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
 					return;
 				}
-				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
 				if (tracker == null) {
 					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not available");
 					return;
@@ -110,7 +110,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				if (trackerId < 0) {
 					return;
 				}
-				ICapTracker tracker = DetectionSystem.Instance.GetDetector<ICapTracker>(trackerId, null);
+				IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
 				if (tracker == null) {
 					return;
 				}

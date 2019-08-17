@@ -32,10 +32,10 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
+			RemoveTrackers();
 			return true;
 		}
 		protected override bool DestroyInternal() {

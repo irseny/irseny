@@ -9,8 +9,7 @@ namespace Irseny.Tracking {
 		Queue<SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<SharedRef<Emgu.CV.Mat>>();
 		event EventHandler<ImageProcessedEventArgs> imageProcessed;
 
-		public SingleImageCapTracker() : base() {
-		}
+
 		public event EventHandler<ImageProcessedEventArgs> InputProcessed {
 			add {
 				lock (processedEventSync) {
@@ -81,7 +80,8 @@ namespace Irseny.Tracking {
 			}
 			lock (inputSync) {
 				pendingImages.Enqueue(SharedRef.Copy(image));
-				int imageLimit = Settings.GetInteger(TrackerProperty.MaxQueuedImages, 4);
+				// TODO: get limit efficiently
+				int imageLimit = 4;//GetSettings().GetInteger(TrackerProperty.MaxQueuedImages, 4);
 				while (pendingImages.Count > imageLimit && pendingImages.Count >= 0) {
 					pendingImages.Dequeue().Dispose();
 				}
@@ -100,5 +100,6 @@ namespace Irseny.Tracking {
 				pendingImages.Clear();
 			}
 		}
+		protected abstract TrackerSettings GetSettings();
 	}
 }

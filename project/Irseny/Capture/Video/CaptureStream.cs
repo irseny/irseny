@@ -157,7 +157,8 @@ namespace Irseny.Capture.Video {
 			if (settings == null) {
 				return false;
 			}
-			bool autoWidth = settings.IsAuto(CaptureProperty.FrameWidth);
+			// TODO: fix so that settings are actually applied like below
+			/*bool autoWidth = settings.IsAuto(CaptureProperty.FrameWidth);
 			if (!autoWidth) {
 				int width = settings.GetInteger(CaptureProperty.FrameWidth, 640);
 				autoWidth = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, width);
@@ -183,6 +184,12 @@ namespace Irseny.Capture.Video {
 			if (autoRate) {
 				int rate = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
 				settings.SetInteger(CaptureProperty.FrameRate, rate);
+			}
+			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0.0)) {
+
+			}
+			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 0.0)) {
+				capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, -1.0);
 			}
 			bool autoExposure = settings.IsAuto(CaptureProperty.Exposure);
 			if (!autoExposure) {
@@ -219,25 +226,25 @@ namespace Irseny.Capture.Video {
 			if (autoGain) {
 				double gain = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Gain);
 				settings.SetDecimal(CaptureProperty.Gain, gain);
-			}
+			}*/
 
-			//if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
-			//	LogManager.Instance.Log(LogMessage.CreateWarning(this, "unable to apply framerate"));
-			//} else {
-			//	LogManager.Instance.Log(LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
-			//}
-			////capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
-			////capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
-			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
-			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
-			////capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
-			////capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
-			//LogManager.Instance.Log(LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
-			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20);
-			//LogManager.Instance.Log(LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
-			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
-			//LogManager.Instance.Log(LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
-			//capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
+			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
+				LogManager.Instance.Log(LogMessage.CreateWarning(this, "unable to apply framerate"));
+			} else {
+				LogManager.Instance.Log(LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
+			}
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 320);
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
+			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
+			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
+			LogManager.Instance.Log(LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
+			capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
 
 			return true;
 		}

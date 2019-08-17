@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Irseny.Content;
 using Irseny.Listing;
 
@@ -26,6 +27,7 @@ namespace Irseny.Iface.Main.View.Tracking {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.Remove(ntbMain);
+			RemoveTrackers();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -73,6 +75,20 @@ namespace Irseny.Iface.Main.View.Tracking {
 				return true;
 			}
 			return false;
+		}
+		private void RemoveTrackers() {
+			var ntbTracker = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			while (ntbTracker.NPages > 0) {
+				Gtk.Widget page = ntbTracker.GetNthPage(0);
+				Gtk.Widget label = ntbTracker.GetTabLabel(page);
+				ntbTracker.RemovePage(0);
+				label.Dispose();
+			}
+			var floorNames = new List<string>(FloorNames);
+			foreach (string name in floorNames) {
+				IInterfaceFactory floor = DestructFloor(name);
+				floor.Dispose();
+			}
 		}
 	}
 }

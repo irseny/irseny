@@ -12,6 +12,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 		readonly int trackerIndex;
 		VideoTrackerConnection connection = new VideoTrackerConnection();
 		TrackerSettings settings;
+
 		public CapTrackingFactory(int index, TrackerSettings settings) : base() {
 			if (settings == null) throw new ArgumentNullException("settings");
 			this.settings = settings;
@@ -21,6 +22,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			get { return trackerIndex; }
 		}
 		public TrackerSettings GetSettings() {
+			UpdateSettings();
 			return new TrackerSettings(settings);
 		}
 		protected override bool CreateInternal() {
@@ -29,23 +31,38 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			return true;
 		}
 		protected override bool ConnectInternal() {
-			var btnTrack = Container.GetWidget<Gtk.ToggleButton>("btn_Start");
-			btnTrack.Clicked += delegate {
-				if (btnTrack.Active) {
-					StartTracking();
-				} else {
-					StopTracking();
-				}
+			var btnApply = Container.GetWidget<Gtk.Button>("btn_Apply");
+			btnApply.Clicked += delegate {
+				var settings = GetSettings();
+				DetectionSystem.Instance.Invoke(delegate {
+					int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+					if (trackerId < 0) {
+						LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+						return;
+					}
+					IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
+					if (tracker == null) {
+						LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+						return;
+					}
+					tracker.ApplySettings(settings);
+				});
 			};
-			DetectionSystem.Instance.Invoke((EventHandler)delegate {
+			// start the tracker
+			// delay so that settings can be queried
+			DetectionSystem.Instance.Invoke(delegate {
 				var tracker = new Cap3PointTracker();
+				var settings = GetSettings();
 				//DetectionSystem.Instance.
-				int trackerId = DetectionSystem.Instance.ConnectDetector(tracker);
+				int trackerId = DetectionSystem.Instance.StartTracker(tracker, settings);
 				if (trackerId < 0) {
 					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create tracker " + trackerIndex));
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
+				int streamId = settings.GetInteger(TrackerProperty.Stream0, 0);
+				connection.StartConnection(tracker, streamId);
+				LogManager.Instance.LogSignal(this, "Started Tracker " + trackerIndex);
 			});
 			return true;
 		}
@@ -57,17 +74,14 @@ namespace Irseny.Iface.Main.Config.Tracking {
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, EquipmentState.Missing, -1);
-				IPoseDetector tracker = DetectionSystem.Instance.GetDetector(trackerId);
+
+				IPoseTracker tracker = DetectionSystem.Instance.StopTracker(trackerId);
 				if (tracker == null) {
 					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
-				} else if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
 				}
-				if (!DetectionSystem.Instance.DisconnectDetector(trackerId)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker " + trackerIndex));
-					return;
-				}
+				tracker.Dispose();
 				connection.StopConnection();
+				LogManager.Instance.LogSignal(this, "Stopped Tracker " + trackerIndex);
 			});
 			return true;
 		}
@@ -75,63 +89,15 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			Container.Dispose();
 			return true;
 		}
-		private void StartTracking() {
-			if (!Initialized) {
-				return;
-			}
-			var trackerSettings = new TrackerSettings(settings);
-			DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
-					return;
-				}
-				ISingleImageCapTracker tracker = DetectionSystem.Instance.GetDetector<ISingleImageCapTracker>(trackerId, null);
-				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
-					return;
-				}
-				// TODO: apply tracker settings
-				if (tracker.Running) {
-					return;
-				}
-				if (!tracker.Start(trackerSettings)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to start tracker " + trackerIndex));
-					return;
-				}
-				// TODO: read source index from UI
-				connection.StartConnection(tracker, 0);
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Started tracker " + trackerIndex));
-			});
-		}
-		// TODO: implement option application
-		private void StopTracking() {
-			if (!Initialized) {
-				return;
-			}
-			DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
-					return;
-				}
-				IPoseDetector tracker = DetectionSystem.Instance.GetDetector(trackerId);
-				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
-				} else if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
-				}
-				if (!tracker.Stop()) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
-				}
-				connection.StopConnection();
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "Stopped tracker " + trackerIndex));
-			});
+		private void UpdateSettings() {
+			settings.SetInteger(TrackerProperty.Stream0, 0);
+			settings.SetInteger(TrackerProperty.MinBrightness, 16);
+			// TODO: read from UI
 		}
 
 		private class VideoTrackerConnection {
 			CaptureStream lockedSource = null;
-			ICapTracker sink = null;
+			IPoseTracker sink = null;
 			EventHandler<ImageCapturedEventArgs> tunnel = null;
 
 			public VideoTrackerConnection() {
@@ -326,7 +292,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			// detect target availability
 			int targetId = Listing.EquipmentMaster.Instance.HeadTracker.GetEquipment(targetIndex, -1);
 			if (targetId > -1) {
-				Tracap.IPoseDetector detector = Tracap.DetectionSystem.Instance.GetDetector(targetId);
+				Tracap.IPoseTracker detector = Tracap.DetectionSystem.Instance.GetTracker(targetId);
 				target = detector as Tracap.ICapTracker;
 			}
 			bool changed = false;

@@ -1,6 +1,6 @@
 ﻿using System;
 namespace Irseny.Tracking {
-	public abstract class CapTracker : ICapTracker {
+	public abstract class CapTracker : IPoseTracker {
 		readonly object inputEventSync = new object();
 		readonly object detectedEventSync = new object();
 		readonly object executionEventSync = new object();
@@ -8,16 +8,7 @@ namespace Irseny.Tracking {
 		event EventHandler inputAvailable;
 		event EventHandler started;
 		event EventHandler stopped;
-		public CapTracker() {
-			Running = false;
-			Settings = null;
-		}
-		~CapTracker() {
-			Dispose();
-		}
-		public abstract bool Centered { get; }
-		public bool Running { get; private set; }
-		protected TrackerSettings Settings { get; private set; }
+		public abstract bool Running { get; }
 		public event EventHandler<PositionDetectedEventArgs> PositionDetected {
 			add {
 				lock (detectedEventSync) {
@@ -119,23 +110,10 @@ namespace Irseny.Tracking {
 			}
 		}
 		public abstract bool Center();
-		public virtual bool Start(TrackerSettings settings) {
-			if (settings == null) throw new ArgumentNullException("settings");
-			if (Running) {
-				return false;
-			}
-			Settings = settings;
-			Running = true;
-			return true;
-		}
+		public abstract bool ApplySettings(TrackerSettings settings);
+		public abstract bool Start(TrackerSettings settings);
 		public abstract bool Step();
-		public virtual bool Stop() {
-			if (!Running) {
-				return false;
-			}
-			Running = false;
-			return true;
-		}
+		public abstract bool Stop();
 
 	}
 }
