@@ -6,6 +6,7 @@ using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
 using Size2i = System.Drawing.Size;
 using Irseny.Log;
+using Irseny.Listing;
 
 namespace Irseny.Tracking {
 	public class P3PoseEstimator {
@@ -15,26 +16,24 @@ namespace Irseny.Tracking {
 		const int AcceptedPointNo = 3;
 
 		TrackerSettings settings;
-		Point2i[] inPoints;
-		int[] inLabels;
-		Point2i[] centerPoints;
+		IObjectModel model;
+		Point2i[] inPoints = new Point2i[0];
+		int[] inLabels = new int[0];
+		Point2i[] centerPoints = new Point2i[0];
 
-		int topPointLabel;
-		int rightPointLabel;
-		int leftPointLabel;
+		int topPointLabel = -1;
+		int rightPointLabel = -1;
+		int leftPointLabel = -1;
+
+
 
 		LinkedList<CapPosition> positionHistory = new LinkedList<CapPosition>();
 
-		public P3PoseEstimator(TrackerSettings settings) {
+		public P3PoseEstimator(TrackerSettings settings, IObjectModel model) {
 			if (settings == null) throw new ArgumentNullException("settings");
+			if (model == null) throw new ArgumentNullException("model");
 			this.settings = settings;
-			this.inPoints = new Point2i[0];
-			this.inLabels = new int[0];
-			this.centerPoints = new Point2i[0];
-			this.topPointLabel = -1;
-			this.rightPointLabel = -1;
-			this.leftPointLabel = -1;
-
+			this.model = model;
 		}
 		private bool Centered {
 			get { return topPointLabel > -1 && rightPointLabel > -1 && leftPointLabel > -1; }
@@ -155,10 +154,13 @@ namespace Irseny.Tracking {
 			// working
 			//var objectPoints = new Emgu.CV.Mat(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
 			//var imagePoints = new Emgu.CV.Mat(3, 2, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
+			Tuple<int, int, int> topPoint = model.GetPoint(0);
+			Tuple<int, int, int> leftPoint = model.GetPoint(1);
+			Tuple<int, int, int> rightPoint = model.GetPoint(2);
 			var objectPoints = new Emgu.CV.Matrix<float>(new float[,] {
-				{  0, 0, 0 },
-				{ 7, -8, 12 },
-				{ -7, -8, 12 }
+				{ topPoint.Item1, topPoint.Item2, topPoint.Item3 },
+				{ rightPoint.Item1, rightPoint.Item2, rightPoint.Item3 },
+				{ leftPoint.Item1, leftPoint.Item2, leftPoint.Item3 }
 			});
 			var imagePoints = new Emgu.CV.Matrix<float>(new float[,] {
 				{ inPoints[TopPointIndex].X, inPoints[TopPointIndex].Y },

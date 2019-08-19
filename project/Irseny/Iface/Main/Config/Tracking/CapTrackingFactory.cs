@@ -33,7 +33,21 @@ namespace Irseny.Iface.Main.Config.Tracking {
 		protected override bool ConnectInternal() {
 			var btnApply = Container.GetWidget<Gtk.Button>("btn_Apply");
 			btnApply.Clicked += delegate {
+				var model = GetModel();
 				var settings = GetSettings();
+				DetectionSystem.Instance.Invoke(delegate {
+					int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
+
+					if (modelId < 0) {
+						LogManager.Instance.LogError(this, "Model " + trackerIndex + " not found");
+						return;
+					}
+					if (!DetectionSystem.Instance.ReplaceModel(modelId, model)) {
+						LogManager.Instance.LogError(this, "Model " + trackerIndex + " could not be updated");
+						return;
+					}
+					LogManager.Instance.LogSignal(this, "Model " + trackerIndex + " updated");
+				});
 				DetectionSystem.Instance.Invoke(delegate {
 					int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 					if (trackerId < 0) {
@@ -45,9 +59,25 @@ namespace Irseny.Iface.Main.Config.Tracking {
 						LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
 						return;
 					}
-					tracker.ApplySettings(settings);
+					if (!tracker.ApplySettings(settings)) {
+						LogManager.Instance.LogError(this, "Failed to apply settings for tracker " + trackerIndex);
+						return;
+					}
+					LogManager.Instance.LogSignal(this, "Applied settings for tracker " + trackerIndex);
+
 				});
 			};
+			// create the model
+			DetectionSystem.Instance.Invoke(delegate {
+				var model = GetModel();
+				int modelId = DetectionSystem.Instance.RegisterModel(model);
+				if (modelId < 0) {
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create model " + trackerIndex));
+					return;
+				}
+				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Active, modelId);
+				LogManager.Instance.LogSignal(this, "Created model " + trackerIndex);
+			});
 			// start the tracker
 			// delay so that settings can be queried
 			DetectionSystem.Instance.Invoke(delegate {
@@ -56,7 +86,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				//DetectionSystem.Instance.
 				int trackerId = DetectionSystem.Instance.StartTracker(tracker, settings);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create tracker " + trackerIndex));
+					LogManager.Instance.LogError(this, "Failed to create tracker " + trackerIndex);
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
@@ -67,21 +97,34 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
 				if (trackerId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to destroy tracker " + trackerIndex));
+					LogManager.Instance.LogWarning(this, "Tracker " + trackerIndex + " not found");
 					return;
 				}
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, EquipmentState.Missing, -1);
 
 				IPoseTracker tracker = DetectionSystem.Instance.StopTracker(trackerId);
 				if (tracker == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to stop tracker " + trackerIndex));
+					LogManager.Instance.LogWarning(this, "Failed to stop tracker " + trackerIndex);
 				}
 				tracker.Dispose();
 				connection.StopConnection();
 				LogManager.Instance.LogSignal(this, "Stopped Tracker " + trackerIndex);
+			});
+			DetectionSystem.Instance.Invoke(delegate {
+				int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
+				if (trackerIndex < 0) {
+					LogManager.Instance.LogWarning(this, "Model " + trackerIndex + " not found");
+					return;
+				}
+				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Missing, -1);
+				if (DetectionSystem.Instance.RemoveModel(modelId)) {
+					LogManager.Instance.LogWarning(this, "Failed to destroy model " + trackerIndex);
+					return;
+				}
 			});
 			return true;
 		}
@@ -90,9 +133,42 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			return true;
 		}
 		private void UpdateSettings() {
+			if (!Initialized) {
+				return;
+			}
 			settings.SetInteger(TrackerProperty.Stream0, 0);
-			settings.SetInteger(TrackerProperty.MinBrightness, 16);
+			{ // brightness
+				var txtBrightness = Container.GetWidget<Gtk.SpinButton>("txt_Brightness");
+				int brightness = (int)txtBrightness.Adjustment.Value;
+				settings.SetInteger(TrackerProperty.MinBrightness, brightness);
+			}
+			{ // smoothing
+				var txtSmooth = Container.GetWidget<Gtk.SpinButton>("txt_Smooth");
+				int smoothing = (int)txtSmooth.Adjustment.Value;
+				settings.SetInteger(TrackerProperty.Smoothing, smoothing);
+			}
+			{ // radius
+				var txtRadius = Container.GetWidget<Gtk.SpinButton>("txt_MinRadius");
+				int minRadius = (int)txtRadius.Adjustment.Value;
+				settings.SetInteger(TrackerProperty.MinClusterRadius, minRadius);
+				txtRadius = Container.GetWidget<Gtk.SpinButton>("txt_MaxRadius");
+				int maxRadius = (int)txtRadius.Adjustment.Value;
+				settings.SetInteger(TrackerProperty.MaxClusterRadius, maxRadius);
+			}
 			// TODO: read from UI
+		}
+		private IObjectModel GetModel() {
+			var result = new CapModel();
+			if (!Initialized) {
+				return result;
+			}
+			var txtWidth = Container.GetWidget<Gtk.SpinButton>("txt_VisorWidth");
+			result.VisorWidth = (int)txtWidth.Adjustment.Value;
+			var txtHeight = Container.GetWidget<Gtk.SpinButton>("txt_VisorHeight");
+			result.VisorHeight = (int)txtHeight.Adjustment.Value;
+			var txtLength = Container.GetWidget<Gtk.SpinButton>("txt_VisorLength");
+			result.VisorLength = (int)txtLength.Adjustment.Value;
+			return result;
 		}
 
 		private class VideoTrackerConnection {

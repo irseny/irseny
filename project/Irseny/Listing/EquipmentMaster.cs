@@ -2,7 +2,6 @@
 
 namespace Irseny.Listing {
 	public class EquipmentMaster {
-		static object instanceSync = new object();
 		static EquipmentMaster instance = null;
 
 		/// <summary>
@@ -16,6 +15,8 @@ namespace Irseny.Listing {
 		/// </summary>
 		/// <value>The head tracker manager.</value>
 		public EquipmentManager<int> HeadTracker { get; private set; }
+
+		public EquipmentManager<int> HeadModel {  get; private set; }
 		/// <summary>
 		/// Gets the output device manager.
 		/// </summary>
@@ -27,18 +28,20 @@ namespace Irseny.Listing {
 		/// <value>The input device manager.</value>
 		public EquipmentManager<int> InputDevice { get; private set; }
 
+
+
 		public EquipmentMaster() {
 			VideoCaptureStream = new EquipmentManager<int>();
 			//VideoSource = new EquipmentManager<int>();
 			HeadTracker = new EquipmentManager<int>();
+			HeadModel = new EquipmentManager<int>();
 			VirtualDevice = new EquipmentManager<int>();
 			InputDevice = new EquipmentManager<int>();
+
 		}
 		public static EquipmentMaster Instance {
 			get {
-				lock (instanceSync) {
-					return instance;
-				}
+				return instance;
 			}
 		}
 		/// <summary>
@@ -46,9 +49,7 @@ namespace Irseny.Listing {
 		/// </summary>
 		/// <param name="instance">Instance to make current.</param>
 		public static void MakeInstance(EquipmentMaster instance) {
-			lock (instanceSync) {
-				EquipmentMaster.instance = instance;
-			}
+			EquipmentMaster.instance = instance;
 		}
 	}
 }

@@ -5,6 +5,7 @@ using Size2i = System.Drawing.Size;
 using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
 using Irseny.Util;
+using Irseny.Listing;
 
 namespace Irseny.Tracking {
 	public class Cap3PointTracker : SingleImageCapTracker {
@@ -14,7 +15,6 @@ namespace Irseny.Tracking {
 		TrackerSettings settings = null;
 		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
-
 
 		public override bool Running {
 			get { return pointDetector != null && poseEstimator != null && pointLabeler != null; }
@@ -36,15 +36,21 @@ namespace Irseny.Tracking {
 			if (!Running) {
 				return false;
 			}
+			int iModel = settings.GetInteger(TrackerProperty.Model, -1);
+			IObjectModel model = GetModel(iModel);
+
+
 			pointDetector = new KeypointDetector(settings);
 			pointLabeler = new PointLabeler(settings);
-			poseEstimator = new P3PoseEstimator(settings);
+			poseEstimator = new P3PoseEstimator(settings, model);
 			return true;
 		}
 		public override bool Start(TrackerSettings settings) {
+			int iModel = settings.GetInteger(TrackerProperty.Model, -1);
+			IObjectModel model = GetModel(iModel);
 			pointDetector = new KeypointDetector(settings);
 			pointLabeler = new PointLabeler(settings);
-			poseEstimator = new P3PoseEstimator(settings);
+			poseEstimator = new P3PoseEstimator(settings, model);
 			return true;
 		}
 
@@ -87,7 +93,19 @@ namespace Irseny.Tracking {
 				imageOut = SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
 			}
 		}
-
+		private static IObjectModel GetModel(int modelIndex) {
+			IObjectModel result = new CapModel();
+			int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(modelIndex, -1);
+			if (modelId < 0) {
+				return result;
+			}
+			var model = DetectionSystem.Instance.GetModel(modelId);
+			if (model == null || model.PointNo < 3) {
+				return result;
+			}
+			result = model;
+			return result;
+		}
 	}
 
 

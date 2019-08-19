@@ -168,8 +168,10 @@
     <Compile Include="Listing\EquipmentState.cs" />
     <Compile Include="Tracking\DetectionSystem.cs" />
     <Compile Include="Tracking\ImageProcessedEventArgs.cs" />
+    <Compile Include="Tracking\IObjectModel.cs" />
     <Compile Include="Tracking\IPoseTracker.cs" />
     <Compile Include="Tracking\P3PoseEstimator.cs" />
+    <Compile Include="Tracking\CapModel.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Tracking\Cap3PointTracker.cs" />
     <Compile Include="Extrack\Artf.cs" />

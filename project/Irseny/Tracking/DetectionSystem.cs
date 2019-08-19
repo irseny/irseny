@@ -13,10 +13,12 @@ namespace Irseny.Tracking {
 		readonly object invokeSync = new object();
 		readonly object stepSync = new object();
 		readonly object trackerSync = new object();
+		readonly object modelSync = new object();
 		AutoResetEvent invokeSignal = new AutoResetEvent(false);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 		Queue<IPoseTracker> toStep = new Queue<IPoseTracker>();
 		List<IPoseTracker> trackers = new List<IPoseTracker>(4);
+		List<IObjectModel> models = new List<IObjectModel>(4);
 
 
 		public DetectionSystem() {
@@ -120,7 +122,52 @@ namespace Irseny.Tracking {
 				return result;
 			}
 		}
-
+		public int RegisterModel(IObjectModel model) {
+			if (model == null) throw new ArgumentNullException("model");
+			lock (modelSync) {
+				for (int i = 0; i < models.Count; i++) {
+					if (models[i] == null) {
+						models[i] = model;
+						return i;
+					}
+				}
+				int index = models.Count;
+				models.Add(model);
+				return index;
+			}
+		}
+		public bool RemoveModel(int id) {
+			lock (modelSync) {
+				if (id < 0 || id >= models.Count) {
+					return false;
+				}
+				if (models[id] == null) {
+					return false;
+				}
+				models[id] = null;
+				return true;
+			}
+		}
+		public bool ReplaceModel(int id, IObjectModel model) {
+			lock (modelSync) {
+				if (id < 0 || id >= models.Count) {
+					return false;
+				}
+				if (models[id] == null) {
+					return false;
+				}
+				models[id] = model;
+				return true;
+			}
+		}
+		public IObjectModel GetModel(int id) {
+			lock (modelSync) {
+				if (id < 0 || id >= models.Count) {
+					return null;
+				}
+				return models[id];
+			}
+		}
 		/// <summary>
 		/// Invoke the specified handler on the detection thread.
 		/// </summary>
