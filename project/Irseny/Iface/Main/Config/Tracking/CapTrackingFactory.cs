@@ -12,6 +12,9 @@ namespace Irseny.Iface.Main.Config.Tracking {
 		readonly int trackerIndex;
 		VideoTrackerConnection connection = new VideoTrackerConnection();
 		TrackerSettings settings;
+		int activeSource = -1;
+		HashSet<string> selectionSources = new HashSet<string>();
+		bool lockSelection = false;
 
 		public CapTrackingFactory(int index, TrackerSettings settings) : base() {
 			if (settings == null) throw new ArgumentNullException("settings");
@@ -32,100 +35,23 @@ namespace Irseny.Iface.Main.Config.Tracking {
 		}
 		protected override bool ConnectInternal() {
 			var btnApply = Container.GetWidget<Gtk.Button>("btn_Apply");
-			btnApply.Clicked += delegate {
-				var model = GetModel();
-				var settings = GetSettings();
-				DetectionSystem.Instance.Invoke(delegate {
-					int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
-
-					if (modelId < 0) {
-						LogManager.Instance.LogError(this, "Model " + trackerIndex + " not found");
-						return;
-					}
-					if (!DetectionSystem.Instance.ReplaceModel(modelId, model)) {
-						LogManager.Instance.LogError(this, "Model " + trackerIndex + " could not be updated");
-						return;
-					}
-					LogManager.Instance.LogSignal(this, "Model " + trackerIndex + " updated");
-				});
-				DetectionSystem.Instance.Invoke(delegate {
-					int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-					if (trackerId < 0) {
-						LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
-						return;
-					}
-					IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
-					if (tracker == null) {
-						LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
-						return;
-					}
-					if (!tracker.ApplySettings(settings)) {
-						LogManager.Instance.LogError(this, "Failed to apply settings for tracker " + trackerIndex);
-						return;
-					}
-					LogManager.Instance.LogSignal(this, "Applied settings for tracker " + trackerIndex);
-
-				});
-			};
-			// create the model
-			DetectionSystem.Instance.Invoke(delegate {
-				var model = GetModel();
-				int modelId = DetectionSystem.Instance.RegisterModel(model);
-				if (modelId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create model " + trackerIndex));
-					return;
-				}
-				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Active, modelId);
-				LogManager.Instance.LogSignal(this, "Created model " + trackerIndex);
-			});
-			// start the tracker
-			// delay so that settings can be queried
-			DetectionSystem.Instance.Invoke(delegate {
-				var tracker = new Cap3PointTracker();
-				var settings = GetSettings();
-				//DetectionSystem.Instance.
-				int trackerId = DetectionSystem.Instance.StartTracker(tracker, settings);
-				if (trackerId < 0) {
-					LogManager.Instance.LogError(this, "Failed to create tracker " + trackerIndex);
-					return;
-				}
-				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
-				int streamId = settings.GetInteger(TrackerProperty.Stream0, 0);
-				connection.StartConnection(tracker, streamId);
-				LogManager.Instance.LogSignal(this, "Started Tracker " + trackerIndex);
+			btnApply.Clicked += SettingsApplied;
+			var btnCenter = Container.GetWidget<Gtk.Button>("btn_Center");
+			btnCenter.Clicked += TrackerCentered;
+			var cbbSource = Container.GetWidget<Gtk.ComboBoxText>("cbb_Source");
+			cbbSource.Changed += ActiveSourceUpdated;
+			ConnectModel();
+			ConnectTracker();
+			EquipmentMaster.Instance.VideoCaptureStream.Updated += AvailableSourceUpdated;
+			Invoke(delegate {
+				EquipmentMaster.Instance.VideoCaptureStream.SendEquipment(AvailableSourceUpdated);
 			});
 			return true;
 		}
 		protected override bool DisconnectInternal() {
-
-			DetectionSystem.Instance.Invoke(delegate {
-				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
-				if (trackerId < 0) {
-					LogManager.Instance.LogWarning(this, "Tracker " + trackerIndex + " not found");
-					return;
-				}
-				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, EquipmentState.Missing, -1);
-
-				IPoseTracker tracker = DetectionSystem.Instance.StopTracker(trackerId);
-				if (tracker == null) {
-					LogManager.Instance.LogWarning(this, "Failed to stop tracker " + trackerIndex);
-				}
-				tracker.Dispose();
-				connection.StopConnection();
-				LogManager.Instance.LogSignal(this, "Stopped Tracker " + trackerIndex);
-			});
-			DetectionSystem.Instance.Invoke(delegate {
-				int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
-				if (trackerIndex < 0) {
-					LogManager.Instance.LogWarning(this, "Model " + trackerIndex + " not found");
-					return;
-				}
-				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Missing, -1);
-				if (DetectionSystem.Instance.RemoveModel(modelId)) {
-					LogManager.Instance.LogWarning(this, "Failed to destroy model " + trackerIndex);
-					return;
-				}
-			});
+			EquipmentMaster.Instance.VideoCaptureStream.Updated -= AvailableSourceUpdated;
+			DisconnectTracker();
+			DisconnectModel();
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -136,7 +62,11 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			if (!Initialized) {
 				return;
 			}
-			settings.SetInteger(TrackerProperty.Stream0, 0);
+			{ // source
+				// connection does not initialize if nothing is selected
+				int activeSource = GetActiveSource();
+				settings.SetInteger(TrackerProperty.Stream0, activeSource);
+			}
 			{ // brightness
 				var txtBrightness = Container.GetWidget<Gtk.SpinButton>("txt_Brightness");
 				int brightness = (int)txtBrightness.Adjustment.Value;
@@ -170,7 +100,181 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			result.VisorLength = (int)txtLength.Adjustment.Value;
 			return result;
 		}
+		private void ConnectTracker() {
+			var tracker = new Cap3PointTracker();
+			var settings = GetSettings();
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = DetectionSystem.Instance.StartTracker(tracker, settings);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Failed to create tracker " + trackerIndex);
+					return;
+				}
+				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
+				int streamId = settings.GetInteger(TrackerProperty.Stream0, 0);
+				connection.StartConnection(tracker, streamId);
+				LogManager.Instance.LogSignal(this, "Started Tracker " + trackerIndex);
+			});
+		}
+		private void ConnectModel() {
+			var model = GetModel();
+			DetectionSystem.Instance.Invoke(delegate {
+				int modelId = DetectionSystem.Instance.RegisterModel(model);
+				if (modelId < 0) {
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create model " + trackerIndex));
+					return;
+				}
+				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Active, modelId);
+				LogManager.Instance.LogSignal(this, "Created model " + trackerIndex);
+			});
+		}
+		private void DisconnectTracker() {
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogWarning(this, "Tracker " + trackerIndex + " not found");
+					return;
+				}
+				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, EquipmentState.Missing, -1);
 
+				IPoseTracker tracker = DetectionSystem.Instance.StopTracker(trackerId);
+				if (tracker == null) {
+					LogManager.Instance.LogWarning(this, "Failed to stop tracker " + trackerIndex);
+				}
+				tracker.Dispose();
+				connection.StopConnection();
+				LogManager.Instance.LogSignal(this, "Stopped Tracker " + trackerIndex);
+			});
+		}
+		private void DisconnectModel() {
+			DetectionSystem.Instance.Invoke(delegate {
+				int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
+				if (trackerIndex < 0) {
+					LogManager.Instance.LogWarning(this, "Model " + trackerIndex + " not found");
+					return;
+				}
+				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Missing, -1);
+				if (DetectionSystem.Instance.RemoveModel(modelId)) {
+					LogManager.Instance.LogWarning(this, "Failed to destroy model " + trackerIndex);
+					return;
+				}
+			});
+		}
+		private void SettingsApplied(object sender, EventArgs args) {
+			var model = GetModel();
+			var settings = GetSettings();
+			DetectionSystem.Instance.Invoke(delegate {
+				int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(trackerIndex, -1);
+
+				if (modelId < 0) {
+					LogManager.Instance.LogError(this, "Model " + trackerIndex + " not found");
+					return;
+				}
+				if (!DetectionSystem.Instance.ReplaceModel(modelId, model)) {
+					LogManager.Instance.LogError(this, "Model " + trackerIndex + " could not be updated");
+					return;
+				}
+				LogManager.Instance.LogSignal(this, "Model " + trackerIndex + " updated");
+			});
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+					return;
+				}
+				IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+					return;
+				}
+				if (!tracker.ApplySettings(settings)) {
+					LogManager.Instance.LogError(this, "Failed to apply settings for tracker " + trackerIndex);
+					return;
+				}
+				LogManager.Instance.LogSignal(this, "Applied settings for tracker " + trackerIndex);
+			});
+		}
+		private void TrackerCentered(object sender, EventArgs args) {
+			DetectionSystem.Instance.Invoke(delegate {
+				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
+				if (trackerId < 0) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+					return;
+				}
+				IPoseTracker tracker = DetectionSystem.Instance.GetTracker(trackerId);
+				if (tracker == null) {
+					LogManager.Instance.LogError(this, "Tracker " + trackerIndex + " not found");
+					return;
+				}
+				if (!tracker.Center()) {
+					LogManager.Instance.LogError(this, "Failed to center tracker " + trackerIndex);
+					return;
+				}
+			});
+		}
+		private void ActiveSourceUpdated(object sender, EventArgs args) {
+			if (!lockSelection) {
+				activeSource = GetActiveSource();
+			}
+		}
+		private void AvailableSourceUpdated(object sender, EquipmentUpdateArgs<int> args) {
+			int sourceIndex = args.Index;
+			bool sourceActive = args.Active;
+			Invoke(delegate {
+				if (sourceActive) {
+					selectionSources.Add("Camera" + sourceIndex);
+				} else {
+					selectionSources.Remove("Camera" + sourceIndex);
+				}
+				BuildSourceSelection();
+			});
+		}
+		private void BuildSourceSelection() {
+			if (!Initialized) {
+				return;
+			}
+			lockSelection = true;
+			var cbbSource = Container.GetWidget<Gtk.ComboBoxText>("cbb_Source");
+			string activeSource = cbbSource.ActiveText;
+			var store = (Gtk.ListStore)cbbSource.Model;
+			store.Clear();
+			store.AppendValues("None");
+			int iActiveEntry = -1;
+			int iEntry = 1;
+			foreach (string sourceName in selectionSources) {
+				store.AppendValues(sourceName);
+				if (sourceName.Equals(activeSource)) {
+					iActiveEntry = iEntry;
+				}
+				iEntry += 1;
+			}
+			cbbSource.Active = iActiveEntry;
+			if (iActiveEntry < 1) {
+				ClearSourceSelection();
+			}
+			lockSelection = false;
+		}
+		private void ClearSourceSelection() {
+			if (!Initialized) {
+				return;
+			}
+			var cbbSource = Container.GetWidget<Gtk.ComboBoxText>("cbb_Source");
+			cbbSource.Active = 0;
+		}
+		private int GetActiveSource() {
+			if (!Initialized) {
+				return -1;
+			}
+			var cbbSource = Container.GetWidget<Gtk.ComboBoxText>("cbb_Source");
+			return cbbSource.Active - 1;
+		}
+		private bool SetActiveSource(int sourceIndex) {
+			if (!Initialized) {
+				return false;
+			}
+			var cbbSource = Container.GetWidget<Gtk.ComboBoxText>("cbb_Source");
+			cbbSource.Active = sourceIndex + 1;
+			return true;
+		}
 		private class VideoTrackerConnection {
 			CaptureStream lockedSource = null;
 			IPoseTracker sink = null;
