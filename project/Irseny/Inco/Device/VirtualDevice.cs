@@ -1,6 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
+
 namespace Irseny.Inco.Device {
 	public abstract class VirtualDevice : IVirtualDevice {
+		static Stopwatch sendWatch;
+
+		static VirtualDevice() {
+			sendWatch = new Stopwatch();
+			sendWatch.Start();
+		}
+
 		int sendRate = 16;
 		bool stateChanged = true;
 		long lastSend = 0;
@@ -22,21 +31,20 @@ namespace Irseny.Inco.Device {
 			get {
 				switch (SendPolicy) {
 				case VirtualDeviceSendPolicy.FixedRate:
-					return true; // TODO: implement
+					return (sendWatch.ElapsedMilliseconds - lastSend >= sendRate);
 				case VirtualDeviceSendPolicy.AfterModification:
 					return stateChanged;
 				case VirtualDeviceSendPolicy.Adaptive:
 					if (stateChanged) {
 						return true;
 					}
-					return true;
+					return (sendWatch.ElapsedMilliseconds - lastSend >= sendRate);
 				default:
 					return false;
 				}
 			}
 		}
 		public abstract VirtualDeviceCapability[] GetSupportedCapabilities();
-		public abstract string[] GetKeyDescriptions(VirtualDeviceCapability capability);
 		public abstract object[] GetKeyHandles(VirtualDeviceCapability capability);
 		public abstract int GetKeyNo(VirtualDeviceCapability capability);
 		public virtual void BeginUpdate() {
@@ -53,6 +61,7 @@ namespace Irseny.Inco.Device {
 			// everything else managed in override
 			// TODO: set last update time
 			stateChanged = false;
+			lastSend = sendWatch.ElapsedMilliseconds;
 		}
 		public static VirtualDevice CreateFromSettings(VirtualDeviceSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
@@ -61,8 +70,11 @@ namespace Irseny.Inco.Device {
 			case VirtualDeviceType.Keyboard:
 				result = new VirtualKeyboard(settings.DeviceId);
 				break;
+			case VirtualDeviceType.TrackingInterface:
+				result = new FreetrackInterface(settings.DeviceId);
+				break;
 			default:
-				throw new ArgumentException("settings.DeviceType");
+				throw new NotImplementedException();
 			}
 			result.SendPolicy = settings.SendPolicy;
 			result.SendRate = settings.SendRate;

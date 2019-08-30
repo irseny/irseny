@@ -23,8 +23,8 @@ namespace Irseny.Content.Profile {
 		}
 		private XmlNode WriteDevice(int index, VirtualDeviceSettings settings, XmlDocument target) {
 			XmlElement result = target.CreateElement(settings.DeviceType.ToString());
-			result.SetAttribute("Index", index.ToString());
-			result.SetAttribute("Subindex", settings.SubdeviceIndex.ToString());
+			result.SetAttribute("CommonIndex", index.ToString());
+			result.SetAttribute("ClassifiedIndex", settings.ClassifiedDeviceIndex.ToString());
 			{ // device id
 				XmlElement deviceId = target.CreateElement("DeviceId");
 				result.AppendChild(deviceId);

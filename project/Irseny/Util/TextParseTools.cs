@@ -4,8 +4,8 @@ using System.Globalization;
 
 namespace Irseny.Util {
 	public static class TextParseTools {
-		readonly static NumberStyles numberStyle = NumberStyles.Float;
-		readonly static CultureInfo formatProvider = CultureInfo.InvariantCulture;
+		public readonly static NumberStyles NumberStyle = NumberStyles.Float;
+		public readonly static CultureInfo FormatProvider = CultureInfo.InvariantCulture;
 
 		public static char ParseChar(string text, char fallback) {
 			if (text == null) {
@@ -23,7 +23,7 @@ namespace Irseny.Util {
 			}
 			if (text.Length > 0) {
 				float result;
-				if (float.TryParse(text, numberStyle, formatProvider, out result)) {
+				if (float.TryParse(text, NumberStyle, FormatProvider, out result)) {
 					return result;
 				}
 			}
@@ -35,7 +35,7 @@ namespace Irseny.Util {
 			}
 			if (text.Length > 0) {
 				double result;
-				if (double.TryParse(text, numberStyle, formatProvider, out result)) {
+				if (double.TryParse(text, NumberStyle, FormatProvider, out result)) {
 					return result;
 				}
 			}

@@ -27,4 +27,22 @@ EXTRACK_EXPORT IvjKeyboard* ivjConnectKeyboard(IvjContext* context, IvjKeyboardC
 EXTRACK_EXPORT bool ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard);
 EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, float state);
 EXTRACK_EXPORT bool ivjSendKeyboard(IvjKeyboard* keyboard);
+
+#if WITH_FREETRACK
+EXTRACK_EXPORT IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo();
+EXTRACK_EXPORT bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info);
+EXTRACK_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info);
+EXTRACK_EXPORT bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack);
+EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height);
+EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y);
+EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float value);
+EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack);
+#endif // WITH_FREETRACK
+
+#if WITH_JOYSTICK
+EXTRACK_EXPORT IvjJoystickConstructionInfo* ivjAllocJoystickConstructionInfo();
+EXTRACK_EXPORT bool ivjSetJoystickIndex(IvjJoystickConstructionInfo* info, int joyIndex);
+EXTRACK_EXPORT bool ivjFreeJoystickConstructionInfo(IvjJoystickConstructionInfo* info);
+#endif // WITH_JOYSTICK
+
 #endif // EXTRACK_INJECT_H

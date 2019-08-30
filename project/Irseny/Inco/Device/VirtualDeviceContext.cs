@@ -27,11 +27,17 @@ namespace Irseny.Inco.Device {
 				return true;
 			}
 			IntPtr handle = IntPtr.Zero;
+			IntPtr constructionInfo;
 			switch (device.DeviceType) {
 			case VirtualDeviceType.Keyboard:
-				IntPtr constructionInfo = Extrack.Ivj.AllocKeyboardConstructionInfo();
+				constructionInfo = Extrack.Ivj.AllocKeyboardConstructionInfo();
 				handle = Extrack.Ivj.ConnectKeyboard(contextHandle, constructionInfo);
 				Extrack.Ivj.FreeKeyboardConstructionInfo(constructionInfo);
+				break;
+			case VirtualDeviceType.TrackingInterface:
+				constructionInfo = Extrack.Ivj.AllocFreetrackConstructionInfo();
+				handle = Extrack.Ivj.ConnectFreetrackInterface(contextHandle, constructionInfo);
+				Extrack.Ivj.FreeFreetrackConstructionInfo(constructionInfo);
 				break;
 			default:
 				throw new NotImplementedException();
@@ -54,6 +60,8 @@ namespace Irseny.Inco.Device {
 			switch (device.DeviceType) {
 			case VirtualDeviceType.Keyboard:
 				return SendKeyboard(device, handle);
+			case VirtualDeviceType.TrackingInterface:
+				return SendFreetrackInterface(device, handle);
 			default:
 				throw new NotImplementedException();
 			}
@@ -72,6 +80,19 @@ namespace Irseny.Inco.Device {
 			return result;
 
 		}
+		private bool SendFreetrackInterface(IVirtualDevice device, IntPtr handle) {
+			object[] modifiedKeys = device.GetModifiedKeys(VirtualDeviceCapability.Axis);
+			foreach (object key in modifiedKeys) {
+				float state = device.GetKeyState(VirtualDeviceCapability.Axis, key);
+				int axisIndex = Extrack.Ivj.GetFreetrackAxisIndex(key);
+				if (axisIndex > -1) {
+					Extrack.Ivj.SetFreetrackAxis(handle, axisIndex, state);
+				}
+			}
+			bool result = Extrack.Ivj.SendFreetrackInterface(handle);
+			device.Send();
+			return result;
+		}
 		public bool DisconnectDevice(IVirtualDevice device) {
 			if (device == null) throw new ArgumentNullException("device");
 			if (!Created) {
@@ -84,6 +105,9 @@ namespace Irseny.Inco.Device {
 			switch (device.DeviceType) {
 			case VirtualDeviceType.Keyboard:
 				Extrack.Ivj.DisconnectKeyboard(contextHandle, handle);
+				break;
+			case VirtualDeviceType.TrackingInterface:
+				Extrack.Ivj.DisconnectFreetrackInterface(contextHandle, handle);
 				break;
 			default:
 				throw new NotImplementedException();
@@ -100,6 +124,9 @@ namespace Irseny.Inco.Device {
 				switch (pair.Key.DeviceType) {
 				case VirtualDeviceType.Keyboard:
 					Extrack.Ivj.DisconnectKeyboard(contextHandle, pair.Value);
+					break;
+				case VirtualDeviceType.TrackingInterface:
+					Extrack.Ivj.DisconnectFreetrackInterface(contextHandle, pair.Value);
 					break;
 				default:
 					throw new NotImplementedException();

@@ -4,18 +4,12 @@ namespace Irseny.Inco.Device {
 	public class VirtualKeyboard : VirtualDevice {
 		static readonly object[] keyHandles = new object[] {
 			"Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P"
-
-		};
-		static readonly string[] keyDescriptions = new string[] {
-			"Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P"
-
 		};
 		Dictionary<object, bool> keyState = new Dictionary<object, bool>(256);
 		List<object> modifiedKeys = new List<object>(32);
 
 		public VirtualKeyboard(int index) : base(index) {
 			SendPolicy = VirtualDeviceSendPolicy.FixedRate;
-			keyState = new Dictionary<object, bool>();
 			foreach (object handle in keyHandles) {
 				keyState.Add(handle, false);
 			}
@@ -35,14 +29,6 @@ namespace Irseny.Inco.Device {
 				return 0;
 			}
 		}
-		public override string[] GetKeyDescriptions(VirtualDeviceCapability capability) {
-			switch (capability) {
-			case VirtualDeviceCapability.Key:
-				return (string[])keyDescriptions.Clone();
-			default:
-				return new string[0];
-			}
-		}
 		public override object[] GetKeyHandles(VirtualDeviceCapability capability) {
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
@@ -53,6 +39,8 @@ namespace Irseny.Inco.Device {
 		}
 		public override void BeginUpdate() {
 			base.BeginUpdate();
+			// TODO: determine whether clearing here produces correct results
+			// TODO: maybe move to Send()
 			modifiedKeys.Clear();
 		}
 		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state) {
@@ -61,9 +49,6 @@ namespace Irseny.Inco.Device {
 			case VirtualDeviceCapability.Key:
 				if (!keyState.ContainsKey(keyHandle)) {
 					return false;
-				}
-				if (keyState[keyHandle] != (state > 0f)) {
-					Console.WriteLine("new key state for " + keyHandle + ": " + (state > 0f));
 				}
 				keyState[keyHandle] = (state > 0f);
 				modifiedKeys.Add(keyHandle);

@@ -4,17 +4,18 @@ using Irseny.Content;
 using Irseny.Inco.Device;
 using Irseny.Listing;
 using Irseny.Util;
+
 namespace Irseny.Iface.Main.Config.Devices {
-	public class KeyboardConfigFactory : InterfaceFactory, IClassifiedDeviceConfigFactory {
-		readonly int keyboardIndex;
+	public class FreetrackConfigFactory : InterfaceFactory, IClassifiedDeviceConfigFactory {
+		readonly int freetrackIndex;
 		readonly int deviceIndex;
 		VirtualDeviceSettings settings;
 
-		public KeyboardConfigFactory(VirtualDeviceSettings settings, int deviceIndex) : base() {
+		public FreetrackConfigFactory(VirtualDeviceSettings settings, int deviceIndex) : base() {
 			if (settings == null) throw new ArgumentNullException("settings");
 			if (deviceIndex < 0) throw new ArgumentOutOfRangeException("deviceIndex");
-			if (keyboardIndex < 0) throw new ArgumentOutOfRangeException("keyboardIndex");
-			this.keyboardIndex = settings.ClassifiedDeviceIndex;
+			if (freetrackIndex < 0) throw new ArgumentOutOfRangeException("keyboardIndex");
+			this.freetrackIndex = settings.ClassifiedDeviceIndex;
 			this.deviceIndex = deviceIndex;
 			this.settings = settings;
 		}
@@ -22,18 +23,16 @@ namespace Irseny.Iface.Main.Config.Devices {
 			get { return deviceIndex; }
 		}
 		public int ClassifiedDeviceIndex {
-			get { return keyboardIndex; }
+			get { return freetrackIndex; }
 		}
 		public VirtualDeviceType DeviceType {
-			get { return VirtualDeviceType.Keyboard; }
+			get { return VirtualDeviceType.TrackingInterface; }
 		}
 		protected override bool CreateInternal() {
 
 			// TODO: create device and add to equipment
 			var factory = ContentMaster.Instance.Resources.InterfaceFactory.GetEntry("KeyboardConfig");
 			Container = factory.CreateWidget("box_Root");
-
-
 			return true;
 		}
 		protected override bool ConnectInternal() {
@@ -51,7 +50,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				var device = VirtualDevice.CreateFromSettings(settings);
 				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to connect keyboard " + keyboardIndex));
+					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to connect keyboard " + freetrackIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
@@ -62,12 +61,12 @@ namespace Irseny.Iface.Main.Config.Devices {
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + keyboardIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
 				if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + keyboardIndex));
+					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
 					return;
 				}
 			});
@@ -81,9 +80,9 @@ namespace Irseny.Iface.Main.Config.Devices {
 		}
 		public VirtualDeviceSettings GetSettings() {
 			var result = new VirtualDeviceSettings() {
-				DeviceType = VirtualDeviceType.Keyboard,
+				DeviceType = VirtualDeviceType.TrackingInterface,
 				DeviceId = deviceIndex,
-				ClassifiedDeviceIndex = keyboardIndex
+				ClassifiedDeviceIndex = freetrackIndex
 			};
 
 			if (!Initialized) {
@@ -101,59 +100,6 @@ namespace Irseny.Iface.Main.Config.Devices {
 
 			return result;
 		}
-		/// <summary>
-		/// Applies the given settings to this instance.
-		/// </summary>
-		/// <returns><c>true</c>, if application was successful, <c>false</c> otherwise.</returns>
-		/// <param name="settings">Settings.</param>
-		//private bool ApplySettings(VirtualDeviceSettings settings) {
-		//	if (settings == null) throw new ArgumentNullException("settings");
-		//	if (settings.DeviceType != VirtualDeviceType.Keyboard) throw new ArgumentException("settings.DeviceType");
-		//	if (settings.SubdeviceIndex != keyboardIndex) throw new ArgumentException("settings.SubdeviceIndex");
-		//	this.settings = new VirtualDeviceSettings(settings);
-		//	// TODO: apply to user interface elements
-		//	VirtualDeviceManager.Instance.Invoke(delegate {
-		//		int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
-		//		if (deviceId < 0) {
-		//			LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
-		//			return;
-		//		}
-		//		IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
-		//		if (device == null) {
-		//			LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
-		//			return;
-		//		}
-		//		bool reconnect = false;
-		//		if (device.DeviceIndex != settings.DeviceId) {
-		//			reconnect = true;
-		//		}
-		//		if (reconnect) {
-		//			if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
-		//				LogManager.Instance.LogError(this, "Failed to disconnnect keyboard " + keyboardIndex);
-		//				return;
-		//			}
-		//			device = VirtualDevice.CreateFromSettings(settings);
-		//			deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
-		//			if (deviceId < 0) {
-		//				LogManager.Instance.LogError(this, "Failed to connect keyboard " + keyboardIndex);
-		//				// TODO: try to avoid equipment updates, apply in device manager
-		//				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
-		//				return;
-		//			}
-		//			EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
-		//		} else {
-		//			if (device.SendRate != settings.SendRate) {
-		//				device.SendRate = settings.SendRate;
-		//			}
-		//			if (device.SendPolicy != settings.SendPolicy) {
-		//				device.SendPolicy = settings.SendPolicy;
-		//			}
-		//		}
-
-
-		//	});
-		//	return true;
-		//}
 		private void ApplySettingsToView() {
 			if (!Initialized) {
 				return;
@@ -172,11 +118,11 @@ namespace Irseny.Iface.Main.Config.Devices {
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
-					LogManager.Instance.LogError(this, "Missing keyboard " + keyboardIndex);
+					LogManager.Instance.LogError(this, "Missing keyboard " + freetrackIndex);
 					return;
 				}
 				if (!VirtualDeviceManager.Instance.ReconnectDevice(deviceId, device)) {
-					LogManager.Instance.LogError(this, "Failed to apply settings to keyboard " + keyboardIndex);
+					LogManager.Instance.LogError(this, "Failed to apply settings to keyboard " + freetrackIndex);
 					return;
 				}
 			});

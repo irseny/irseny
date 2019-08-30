@@ -9,7 +9,8 @@ namespace Irseny.Iface.Main.Config.Devices {
 		const string KeyboardTitlePrefix = "Key";
 		const string MouseTitlePrefix = "Mouse";
 		const string JoystickTitlePrefix = "Joy";
-		const string TrackingTitlePrefix = "Track";
+		const string TrackingInterfaceTitlePrefix = "Track";
+
 
 		public DeviceConfigFactory() : base() {
 
@@ -51,13 +52,11 @@ namespace Irseny.Iface.Main.Config.Devices {
 		}
 		public VirtualDeviceSettings GetDeviceSettings(int index) {
 			foreach (IInterfaceFactory floor in Floors) {
-				if (floor is KeyboardConfigFactory) {
-					var factory = (KeyboardConfigFactory)floor;
-					if (factory.GetDeviceIndex() == index) {
+				if (floor is IClassifiedDeviceConfigFactory) {
+					var factory = (IClassifiedDeviceConfigFactory)floor;
+					if (factory.CommonDeviceIndex == index) {
 						return factory.GetSettings();
 					}
-				} else {
-					throw new NotImplementedException();
 				}
 			}
 			return null;
@@ -82,14 +81,14 @@ namespace Irseny.Iface.Main.Config.Devices {
 				settings.DeviceType = VirtualDeviceType.TrackingInterface;
 			}
 			// build assigned device lists
-			var takenDevices = new List<int>(16);
-			var takenSubdevices = new List<int>(16);
+			var takenCommonDevices = new List<int>(16);
+			var takenClassifiedDevices = new List<int>(16);
 			foreach (IInterfaceFactory floor in Floors) {
-				if (floor is KeyboardConfigFactory) {
-					var factory = (KeyboardConfigFactory)floor;
-					takenDevices.Add(factory.GetDeviceIndex());
-					if (settings.DeviceType == VirtualDeviceType.Keyboard) {
-						takenSubdevices.Add(factory.GetKeyboardIndex());
+				if (floor is IClassifiedDeviceConfigFactory) {
+					var factory = (IClassifiedDeviceConfigFactory)floor;
+					takenCommonDevices.Add(factory.CommonDeviceIndex);
+					if (settings.DeviceType == factory.DeviceType) {
+						takenClassifiedDevices.Add(factory.ClassifiedDeviceIndex);
 					}
 				}
 			}
@@ -97,7 +96,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			int iDevice;
 			for (iDevice = 0; iDevice < 16; iDevice++) {
 				bool deviceTaken = false;
-				foreach (int d in takenDevices) {
+				foreach (int d in takenCommonDevices) {
 					if (d == iDevice) {
 						deviceTaken = true;
 					}
@@ -113,7 +112,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			int iSubdevice;
 			for (iSubdevice = 0; iSubdevice < 16; iSubdevice++) {
 				bool deviceTaken = false;
-				foreach (int d in takenSubdevices) {
+				foreach (int d in takenClassifiedDevices) {
 					if (d == iSubdevice) {
 						deviceTaken = true;
 					}
@@ -125,7 +124,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			if (iSubdevice >= 16) {
 				return false;
 			}
-			settings.SubdeviceIndex = iSubdevice;
+			settings.ClassifiedDeviceIndex = iSubdevice;
 			return AddDevice(iDevice, settings);
 		}
 		public bool AddDevice(int deviceIndex, VirtualDeviceSettings settings) {
@@ -141,7 +140,11 @@ namespace Irseny.Iface.Main.Config.Devices {
 			switch (settings.DeviceType) {
 			case VirtualDeviceType.Keyboard:
 				floor = new KeyboardConfigFactory(settings, deviceIndex);
-				title = KeyboardTitlePrefix + settings.SubdeviceIndex;
+				title = KeyboardTitlePrefix + settings.ClassifiedDeviceIndex;
+				break;
+			case VirtualDeviceType.TrackingInterface:
+				floor = new FreetrackConfigFactory(settings, deviceIndex);
+				title = TrackingInterfaceTitlePrefix + settings.ClassifiedDeviceIndex;
 				break;
 			default:
 				throw new NotImplementedException();

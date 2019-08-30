@@ -142,6 +142,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Iface\Main\Config\Devices\FreetrackConfigFactory.cs" />
+    <Compile Include="Iface\Main\Config\Devices\IClassifiedDeviceConfigFactory.cs" />
+    <Compile Include="Inco\Device\FreetrackInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Iface\InterfaceFactory.cs" />
@@ -203,7 +206,6 @@
     <Compile Include="Iface\Main\Config\Devices\DeviceConfigFactory.cs" />
     <Compile Include="Iface\Main\Config\Devices\KeyboardConfigFactory.cs" />
     <Compile Include="Inco\Device\VirtualDeviceManager.cs" />
-    <Compile Include="Inco\Device\ITrackingInterface.cs" />
     <Compile Include="Inco\Device\VirtualKeyboard.cs" />
     <Compile Include="Inco\Device\VirtualDeviceContext.cs" />
     <Compile Include="Extrack\Ivj.cs" />

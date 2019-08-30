@@ -7,7 +7,6 @@ namespace Irseny.Inco.Device {
 		bool SendRequired { get; }
 		int DeviceIndex { get; }
 		VirtualDeviceCapability[] GetSupportedCapabilities();
-		string[] GetKeyDescriptions(VirtualDeviceCapability capability);
 		object[] GetKeyHandles(VirtualDeviceCapability capability);
 		int GetKeyNo(VirtualDeviceCapability capability);
 		void BeginUpdate();

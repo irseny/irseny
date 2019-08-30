@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 namespace Irseny.Extrack {
 	public static class Ivj {
 		static Dictionary<string, int> keyboardKeys;
+		static Dictionary<string, int> freetrackAxes;
 
 		static Ivj() {
 			keyboardKeys = new Dictionary<string, int>(256);
@@ -18,6 +19,14 @@ namespace Irseny.Extrack {
 			keyboardKeys.Add("I", 8);
 			keyboardKeys.Add("O", 9);
 			keyboardKeys.Add("P", 10);
+			freetrackAxes = new Dictionary<string, int>(16);
+			freetrackAxes.Add("Yaw", 0);
+			freetrackAxes.Add("Pitch", 1);
+			freetrackAxes.Add("Roll", 2);
+			freetrackAxes.Add("PosX", 3);
+			freetrackAxes.Add("PosY", 4);
+			freetrackAxes.Add("PosZ", 5);
+
 		}
 		public enum JoystickCapability {
 			Button1 = 0,
@@ -45,6 +54,14 @@ namespace Irseny.Extrack {
 			string keyName = keyHandle.ToString();
 			int result;
 			if (!keyboardKeys.TryGetValue(keyName, out result)) {
+				return -1;
+			}
+			return result;
+		}
+		public static int GetFreetrackAxisIndex(object axisHandle) {
+			string axisName = axisHandle.ToString();
+			int result;
+			if (!freetrackAxes.TryGetValue(axisName, out result)) {
 				return -1;
 			}
 			return result;
@@ -79,6 +96,30 @@ namespace Irseny.Extrack {
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSendKeyboard")]
 		public static extern bool SendKeyboard(IntPtr keyboard);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjAllocFreetrackConstructionInfo")]
+		public static extern IntPtr AllocFreetrackConstructionInfo();
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjFreeFreetrackConstructionInfo")]
+		public static extern bool FreeFreetrackConstructionInfo(IntPtr constructionInfo);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjConnectFreetrackInterface")]
+		public static extern IntPtr ConnectFreetrackInterface(IntPtr context, IntPtr constructionInfo);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjDisconnectFreetrackInterface")]
+		public static extern bool DisconnectFreetrackInterface(IntPtr context, IntPtr freetrack);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetFreetrackAxis")]
+		public static extern bool SetFreetrackAxis(IntPtr freetrack, int axisIndex, float value);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetFreetrackResolution")]
+		public static extern bool SetFreetrackResolution(IntPtr freetrack, int width, int height);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetFreetrackPoint")]
+		public static extern bool SetFreetrackPoint(IntPtr freetrack, int pointIndex, int x, int y);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSendFreetrackInterface")]
+		public static extern bool SendFreetrackInterface(IntPtr freetrack);
 	}
 }
 

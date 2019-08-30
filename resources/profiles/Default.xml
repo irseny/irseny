@@ -3,18 +3,17 @@
   <VideoCapture>
     <Stream Index="0">
       <Camera Auto="False">0</Camera>
-      <Width Auto="False">640</Width>
+      <Width Auto="False">320</Width>
       <Height Auto="False">240</Height>
       <FPS Auto="False">60</FPS>
       <Exposure Auto="False">0</Exposure>
-      <Brightness Auto="True">0</Brightness>
+      <Brightness Auto="False">0</Brightness>
       <Contrast Auto="True">0</Contrast>
     </Stream>
   </VideoCapture>
   <Tracking>
     <Cap3Point Index="0">
-      <Stream>0</Stream>
-      <Smoothing>4</Smoothing>
+      <Smoothing>0</Smoothing>
       <SmoothingDropoff>0.8</SmoothingDropoff>
       <MinBrightness>32</MinBrightness>
       <MinClusterRadius>2</MinClusterRadius>
@@ -25,17 +24,21 @@
     </Cap3Point>
   </Tracking>
   <VirtualDevices>
-    <Keyboard Index="0" Subindex="0">
+    <Keyboard CommonIndex="0" ClassifiedIndex="0">
       <DeviceId>0</DeviceId>
-      <SendPolicy>AfterModification</SendPolicy>
+      <SendPolicy>FixedRate</SendPolicy>
+      <SendRate>60</SendRate>
     </Keyboard>
+    <TrackingInterface CommonIndex="1" ClassifiedIndex="0">
+      <DeviceId>1</DeviceId>
+      <SendPolicy>FixedRate</SendPolicy>
+      <SendRate>60</SendRate>
+    </TrackingInterface>
   </VirtualDevices>
   <TrackerBindings>
     <Bindings Index="0">
-      <Bind Axis="Y" Index="0" Capability="Key" Key1="Q" Key2="Q" />
-      <Bind Axis="Z" Index="0" Capability="Key" Key1="W" Key2="W" />
-      <Bind Axis="Yaw" Index="0" Capability="Key" Key1="R" Key2="R" />
-      <Bind Axis="Roll" Index="0" Capability="Key" Key1="E" Key2="E" />
+      <Bind Axis="Yaw" Index="1" Capability="Axis" Key1="Yaw" Key2="Yaw" />
+      <Bind Axis="Pitch" Index="1" Capability="Axis" Key1="Pitch" Key2="Pitch" />
     </Bindings>
   </TrackerBindings>
 </Profile>

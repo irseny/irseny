@@ -56,7 +56,7 @@ elseif (UNIX)
 endif()
 # find vjoy
 if (WITH_VJOY)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_VJOY")
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_VJOY" "WITH_JOYSTICK")
 	#target_link_libraries(${PROJECT_NAME} PUBLIC "${ROOT_DIR}/lib/VJoy")
 endif()
 # enable freetrack
@@ -69,7 +69,7 @@ if (WITH_WINAPI)
 endif()
 # enable uinput
 if (WITH_UINPUT)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_UINPUT")
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_UINPUT" "WITH_JOYSTICK")
 endif()
 # move library post build
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND

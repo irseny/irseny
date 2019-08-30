@@ -13,23 +13,23 @@ namespace Irseny.Content.Profile {
 					continue;
 				}
 
-				if (node.Attributes["Index"] == null || node.Attributes["Subindex"] == null) {
+				if (node.Attributes["CommonIndex"] == null || node.Attributes["ClassifiedIndex"] == null) {
 					return false;
 				}
-				int index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
-				int subindex = TextParseTools.ParseInt(node.Attributes["Subindex"].InnerText, -1);
-				if (index < 0 || subindex < 0) {
+				int commonIndex = TextParseTools.ParseInt(node.Attributes["CommonIndex"].InnerText, -1);
+				int classifiedIndex = TextParseTools.ParseInt(node.Attributes["ClassifiedIndex"].InnerText, -1);
+				if (commonIndex < 0 || classifiedIndex < 0) {
 					return false;
 				}
 				var settings = new VirtualDeviceSettings() {
 					DeviceType = deviceType,
-					SubdeviceIndex = subindex
+					ClassifiedDeviceIndex = classifiedIndex
 				};
 				settings = ReadDevice(settings, node);
 				if (settings == null) {
 					return false;
 				}
-				result.AddDevice(index, settings);
+				result.AddDevice(commonIndex, settings);
 			}
 			return true;
 		}

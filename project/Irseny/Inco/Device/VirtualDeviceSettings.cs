@@ -3,7 +3,7 @@ namespace Irseny.Inco.Device {
 	public class VirtualDeviceSettings {
 		public VirtualDeviceType DeviceType { get; set; }
 		public int DeviceId { get; set; }
-		public int SubdeviceIndex { get; set; }
+		public int ClassifiedDeviceIndex { get; set; }
 		public VirtualDeviceSendPolicy SendPolicy { get; set; }
 		public int SendRate { get; set; }
 		public int ButtonNo { get; set; }
@@ -12,21 +12,21 @@ namespace Irseny.Inco.Device {
 			get {
 				switch (DeviceType) {
 				case VirtualDeviceType.Keyboard:
-					return "Key" + SubdeviceIndex;
+					return "Key" + ClassifiedDeviceIndex;
 				case VirtualDeviceType.Mouse:
-					return "Mouse" + SubdeviceIndex;
+					return "Mouse" + ClassifiedDeviceIndex;
 				case VirtualDeviceType.Joystick:
-					return "Joy" + SubdeviceIndex;
+					return "Joy" + ClassifiedDeviceIndex;
 				case VirtualDeviceType.TrackingInterface:
-					return "Track" + SubdeviceIndex;
+					return "Track" + ClassifiedDeviceIndex;
 				default:
-					return "HID" + SubdeviceIndex;
+					return "HID" + ClassifiedDeviceIndex;
 				}
 			}
 		}
 		public VirtualDeviceSettings() {
 			DeviceId = 0;
-			SubdeviceIndex = 0;
+			ClassifiedDeviceIndex = 0;
 			DeviceType = VirtualDeviceType.Keyboard;
 			SendPolicy = VirtualDeviceSendPolicy.AfterModification;
 			SendRate = 60;
@@ -36,7 +36,7 @@ namespace Irseny.Inco.Device {
 		public VirtualDeviceSettings(VirtualDeviceSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			this.DeviceId = settings.DeviceId;
-			this.SubdeviceIndex = settings.SubdeviceIndex;
+			this.ClassifiedDeviceIndex = settings.ClassifiedDeviceIndex;
 			this.DeviceType = settings.DeviceType;
 			this.SendPolicy = settings.SendPolicy;
 			this.SendRate = settings.SendRate;

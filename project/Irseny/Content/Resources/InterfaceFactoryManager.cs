@@ -23,6 +23,7 @@ namespace Irseny.Content.Resources {
 				"BindingTab",
 				"DeviceConfig",
 				"KeyboardConfig",
+				"FreetrackConfig",
 				"ProfileConfig"
 			};
 			for (int i = 0; i < entryNames.Length; i++) {

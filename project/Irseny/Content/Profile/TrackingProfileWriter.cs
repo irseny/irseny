@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Collections.Generic;
 using Irseny.Tracking;
+using Irseny.Util;
 
 namespace Irseny.Content.Profile {
 	public class TrackingProfileWriter {
@@ -54,7 +55,7 @@ namespace Irseny.Content.Profile {
 				if (mixingDecline > -1.0) {
 					XmlElement node = target.CreateElement("SmoothingDropoff");
 					result.AppendChild(node);
-					node.InnerText = mixingDecline.ToString();
+					node.InnerText = mixingDecline.ToString(TextParseTools.FormatProvider);
 				}
 			}
 			{
