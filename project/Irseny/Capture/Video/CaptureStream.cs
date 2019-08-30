@@ -255,8 +255,12 @@ namespace Irseny.Capture.Video {
 					return false;
 				}
 				//new Emgu.CV.VideoCapture(Emgu.CV.CvEnum.CaptureType.);
+#if WINDOWS
 				capture = new Emgu.CV.VideoCapture(settings.GetInteger(CaptureProperty.CameraId, 0));
-				//capture = new Emgu.CV.VideoCapture(Emgu.CV.CvEnum.CaptureType.V4L2);
+#elif LINUX
+				//capture = new Emgu.CV.VideoCapture(Emgu.CV.CvEnum.CaptureType.V4L);
+				capture = new Emgu.CV.VideoCapture(settings.GetInteger(CaptureProperty.CameraId, 0));
+#endif
 				if (!capture.IsOpened) {
 					capture.Dispose();
 					capture = null;

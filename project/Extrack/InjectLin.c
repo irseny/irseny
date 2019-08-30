@@ -166,6 +166,37 @@ void ivjLogWarning(const char* message) {
 	printf("Ivj Warning: %s\n", message);
 }
 #endif // WITH_UINPUT
+
+#if WITH_FREETRACK
+EXTRACK_EXPORT IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo() {
+	return (IvjFreetrackConstructionInfo*)1;
+}
+EXTRACK_EXPORT bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info) {
+	return true;
+}
+EXTRACK_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info) {
+	IvjFreetrackInterface* result = (IvjFreetrackInterface*)malloc(sizeof(IvjFreetrackInterface));
+	memset(result, 0, sizeof(IvjFreetrackInterface));
+	return result;
+}
+EXTRACK_EXPORT bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack) {
+	free(freetrack);
+	return true;
+}
+EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height) {
+	// TODO: implement
+	return true;
+}
+EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
+	return true;
+}
+EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float value) {
+	return true;
+}
+EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
+	return true;
+}
+#endif // WITH_FREETRACK
 #endif // LINUX
 
 

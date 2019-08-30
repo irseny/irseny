@@ -36,6 +36,16 @@ typedef struct {
 } IvjKeyboardConstructionInfo;
 
 #endif // WITH_UINPUT
+
+#if WITH_FREETRACK
+typedef int32_t IvjFreetrackConstructionInfo;
+
+typedef struct {
+	int32_t FileHandle;
+	void* Map;
+} IvjFreetrackInterface;
+#endif // WITH_FREETRACK
+
 #endif // EXTRACK_INJECT_TYPES_H
 #endif // LINUX
 

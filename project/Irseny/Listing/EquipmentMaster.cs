@@ -16,7 +16,7 @@ namespace Irseny.Listing {
 		/// <value>The head tracker manager.</value>
 		public EquipmentManager<int> HeadTracker { get; private set; }
 
-		public EquipmentManager<int> HeadModel {  get; private set; }
+		public EquipmentManager<int> HeadModel { get; private set; }
 		/// <summary>
 		/// Gets the output device manager.
 		/// </summary>
@@ -27,6 +27,11 @@ namespace Irseny.Listing {
 		/// </summary>
 		/// <value>The input device manager.</value>
 		public EquipmentManager<int> InputDevice { get; private set; }
+		/// <summary>
+		/// Gets the surface property manager
+		/// </summary>
+		/// <value>The surface property manager.</value>
+		public EquipmentManager<int> Surface { get; private set; }
 
 
 
@@ -37,6 +42,7 @@ namespace Irseny.Listing {
 			HeadModel = new EquipmentManager<int>();
 			VirtualDevice = new EquipmentManager<int>();
 			InputDevice = new EquipmentManager<int>();
+			Surface = new EquipmentManager<int>();
 
 		}
 		public static EquipmentMaster Instance {

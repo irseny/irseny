@@ -237,6 +237,7 @@
     <Compile Include="Content\Profile\DeviceProfileReader.cs" />
     <Compile Include="Content\Profile\BindingsProfileWriter.cs" />
     <Compile Include="Content\Profile\BindingsProfileReader.cs" />
+    <Compile Include="Iface\SurfaceProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

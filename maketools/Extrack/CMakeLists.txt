@@ -69,7 +69,7 @@ if (WITH_WINAPI)
 endif()
 # enable uinput
 if (WITH_UINPUT)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_UINPUT" "WITH_JOYSTICK")
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "WITH_UINPUT")
 endif()
 # move library post build
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND
