@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
 using Irseny.Log;
@@ -12,12 +13,16 @@ namespace Irseny.Inco.Device {
 		volatile int stopSignal = 0;
 		volatile int invokeSignal = 0;
 		volatile int sendSignal = 0;
+		volatile int ftRequestNo = 0;
+
 
 		readonly VirtualDeviceContext context = new VirtualDeviceContext();
 		readonly object contextSync = new object();
 		readonly object invokeSync = new object();
 		readonly object deviceSync = new object();
+		readonly object ftProcessSync = new object();
 
+		Process ftProcess = null;
 		List<IVirtualDevice> devices = new List<IVirtualDevice>(16);
 		Queue<EventHandler> toInvoke = new Queue<EventHandler>();
 
@@ -44,12 +49,15 @@ namespace Irseny.Inco.Device {
 				if (Interlocked.CompareExchange(ref sendSignal, 0, 1) == 1) {
 					SendState();
 				}
+				HandleFTRequest();
 				Thread.Sleep(1);
 			}
 			InvokePending();
 			SendState();
 			context.Destroy();
 			Interlocked.Decrement(ref stopSignal);
+			ftRequestNo = 0;
+			HandleFTRequest();
 		}
 		/// <summary>
 		/// Signals this instance to stop the operation loop.
@@ -99,24 +107,27 @@ namespace Irseny.Inco.Device {
 					return -1;
 				}
 			}
+			int result = -1;
 			lock (deviceSync) {
 				// find empty device index
-				int mountIndex = -1;
 				for (int i = 0; i < devices.Count; i++) {
 					if (devices[i] == null) {
-						mountIndex = i;
+						result = i;
 						break;
 					}
 				}
 				// add at empty index or append to end
-				if (mountIndex < 0) {
-					mountIndex = devices.Count;
+				if (result < 0) {
+					result = devices.Count;
 					devices.Add(device);
 				} else {
-					devices[mountIndex] = device;
+					devices[result] = device;
 				}
-				return mountIndex;
 			}
+			if (device.DeviceType == VirtualDeviceType.TrackingInterface) {
+				Interlocked.Increment(ref ftRequestNo);
+			}
+			return result;
 		}
 		/// <summary>
 		/// Reconnects the device with the given ID.
@@ -126,6 +137,7 @@ namespace Irseny.Inco.Device {
 		/// <param name="deviceId">Device identifier.</param>
 		/// <param name="device">New device specification.</param>
 		public bool ReconnectDevice(int deviceId, IVirtualDevice device) {
+			Process process = new Process();
 			if (deviceId < 0) throw new ArgumentOutOfRangeException("deviceId");
 			if (device == null) throw new ArgumentOutOfRangeException("device");
 			// find the old device
@@ -144,8 +156,14 @@ namespace Irseny.Inco.Device {
 				if (!context.DisconnectDevice(oldDevice)) {
 					return false;
 				}
+				if (oldDevice.DeviceType == VirtualDeviceType.TrackingInterface) {
+					Interlocked.Decrement(ref ftRequestNo);
+				}
 				if (!context.ConnectDevice(device)) {
 					return false;
+				}
+				if (device.DeviceType == VirtualDeviceType.TrackingInterface) {
+					Interlocked.Increment(ref ftRequestNo);
 				}
 			}
 			// exchange the devices
@@ -194,6 +212,9 @@ namespace Irseny.Inco.Device {
 					devices[deviceId] = null;
 				}
 			}
+			if (device.DeviceType == VirtualDeviceType.TrackingInterface) {
+				Interlocked.Decrement(ref ftRequestNo);
+			}
 			return true;
 		}
 		/// <summary>
@@ -226,6 +247,33 @@ namespace Irseny.Inco.Device {
 					context.SendDevice(device);
 				}
 			}
+		}
+		private void HandleFTRequest() {
+			if (ftRequestNo > 0) {
+				lock (ftProcessSync) {
+					if (ftProcess == null) {
+						try {
+							ftProcess = Process.Start("TrackIR.exe");
+						} catch (System.ComponentModel.Win32Exception) {
+							LogManager.Instance.LogError(this, "Failed to start TrackIR dummy process");
+							ftProcess = new Process();
+						}
+					}
+				}
+			} else {
+				lock (ftProcessSync) {
+					if (ftProcess != null) {
+						try {
+							ftProcess.Kill();
+						} catch (InvalidOperationException) {
+							LogManager.Instance.LogWarning(this, "Failed to stop TrackIR dummy process");
+						}
+						ftProcess.Dispose();
+						ftProcess = null;
+					}
+				}
+			}
+
 		}
 		/// <summary>
 		/// Starts the operation loop of the given manager in a new thread.

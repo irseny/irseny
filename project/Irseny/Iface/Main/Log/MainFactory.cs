@@ -23,7 +23,7 @@ namespace Irseny.Iface.Main.Log {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.PackStart(boxMain, true, true, 0);
-			LogManager.Instance.MessageAvailable += AddMessage;
+			LogManager.Instance.MessageAvailable += MessageAdded;
 			var btnClear = Container.GetWidget<Gtk.Button>("btn_Clear");
 			btnClear.Clicked += delegate {
 				ClearMessages();
@@ -44,7 +44,7 @@ namespace Irseny.Iface.Main.Log {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Log");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
-			LogManager.Instance.MessageAvailable -= AddMessage;
+			LogManager.Instance.MessageAvailable -= MessageAdded;
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -54,12 +54,15 @@ namespace Irseny.Iface.Main.Log {
 		public void ClearMessages() {
 			messages.Clear();
 		}
-		private void AddMessage(object sender, MessageEventArgs args) {
+		private void MessageAdded(object sender, MessageEventArgs args) {
 			Invoke(delegate {
 				AddMessage(args.Message);
 			});
 		}
 		public void AddMessage(LogMessage message) {
+			if (!Initialized) {
+				return;
+			}
 			messages.AddLast(message);
 			LogMessage remaining = Filter(message);
 			if (remaining != null) {
