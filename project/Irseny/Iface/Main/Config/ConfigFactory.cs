@@ -38,10 +38,32 @@ namespace Irseny.Iface.Main.Config {
 			if (!Initialized) {
 				return;
 			}
+			if (Monitor.IsEntered(pageLock)) {
+				return;
+			}
 			var ntbRoot = (Gtk.Notebook)sender;
-			int page = ntbRoot.CurrentPage;
+			Gtk.Widget page = ntbRoot.CurrentPageWidget;
+			string title = ntbRoot.GetTabLabelText(page);
+			int pageId;
+			if (title.StartsWith("Camera")) {
+				pageId = SurfacePage.CameraPage;
+			} else if (title.StartsWith("Tracking")) {
+				pageId =  SurfacePage.TrackingPage;
+			} else if (title.StartsWith("Device")) {
+				pageId =  SurfacePage.DevicePage;
+			} else if (title.StartsWith("Profile")) {
+				pageId =  SurfacePage.ProfilePage;
+			} else if (title.StartsWith("Settings")) {
+				pageId =  SurfacePage.SettingsPage;
+			} else if (title.StartsWith("Model")) {
+				pageId =  SurfacePage.ModelPage;
+			} else if (title.StartsWith("Binding")) {
+				pageId =  SurfacePage.BindingsPage;
+			} else {
+				return;
+			}
 			lock (pageLock) {
-				EquipmentMaster.Instance.Surface.Update(SurfaceProperty.ActivePage, EquipmentState.Active, page);
+				EquipmentMaster.Instance.Surface.Update(SurfacePage.ActivePage, EquipmentState.Active, pageId);
 			}
 		}
 		private void ActivePageUpdated(object sender, EquipmentUpdateArgs<int> args) {
@@ -49,27 +71,50 @@ namespace Irseny.Iface.Main.Config {
 			if (Monitor.IsEntered(pageLock)) {
 				return;
 			}
-			if (args.Index != SurfaceProperty.ActivePage) {
+			if (args.Index != SurfacePage.ActivePage) {
 				return;
 			}
 			if (!args.Active) {
 				return;
 			}
-			int page = args.Equipment;
-			if (page < 0) {
+			// determine a page title
+			int pageId = args.Equipment;
+			string targetTitle;
+			switch (pageId) {
+			case SurfacePage.CameraPage:
+				targetTitle = "Camera";
+				break;
+			case SurfacePage.TrackingPage:
+				targetTitle = "Tracking";
+				break;
+			case SurfacePage.DevicePage:
+			case SurfacePage.BindingsPage:
+				targetTitle = "Device";
+				break;
+			case SurfacePage.ProfilePage:
+				targetTitle = "Profile";
+				break;
+			case SurfacePage.SettingsPage:
+				targetTitle = "Settings";
+				break;
+			default:
 				return;
 			}
+			// activate the page
 			Invoke(delegate {
 				if (!Initialized) {
 					return;
 				}
 				var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
-				if (page >= ntbRoot.NPages) {
-					return;
-				}
-				// only update if different
-				if (ntbRoot.CurrentPage != page) {
-					ntbRoot.CurrentPage = page;
+				int pageNo = ntbRoot.NPages;
+				for (int p = 0; p < pageNo; p++) {
+					Gtk.Widget page = ntbRoot.GetNthPage(p);
+					string title = ntbRoot.GetTabLabelText(page);
+					if (title.StartsWith(targetTitle) && ntbRoot.CurrentPage != p) {
+						lock (pageLock) {
+							ntbRoot.CurrentPage = p;
+						}
+					}
 				}
 			});
 		}

@@ -13,7 +13,7 @@ namespace Irseny.Log {
 		volatile bool running = false;
 		ManualResetEvent pendingSignal = new ManualResetEvent(false);
 		object pendingSync = new object();
-		Queue<LogMessage> pendingMessages = new Queue<LogMessage>();
+		Queue<LogEntry> pendingMessages = new Queue<LogEntry>();
 		object availEventSync = new object();
 		event EventHandler<MessageEventArgs> messageAvailable;
 		object openEventSync = new object();
@@ -69,17 +69,17 @@ namespace Irseny.Log {
 
 
 		private void ProcessPending() {
-			Queue<LogMessage> toProcess;
+			Queue<LogEntry> toProcess;
 			lock (pendingSync) {
 				toProcess = pendingMessages;
-				pendingMessages = new Queue<LogMessage>();
+				pendingMessages = new Queue<LogEntry>();
 			}
 			EventHandler<MessageEventArgs> handler;
 			lock (availEventSync) {
 				handler = messageAvailable;
 			}
 			while (toProcess.Count > 0) {
-				LogMessage msg = toProcess.Dequeue();
+				LogEntry msg = toProcess.Dequeue();
 				Debug.WriteLine(msg.ToDebugString());
 				var args = new MessageEventArgs(msg);
 				if (handler != null) {
@@ -113,21 +113,21 @@ namespace Irseny.Log {
 			running = false;
 			pendingSignal.Set();
 		}
-		public void Log(LogMessage message) {
+		public void Log(LogEntry message) {
 			if (message == null) throw new ArgumentNullException("message");
 			lock (pendingSync) {
 				pendingMessages.Enqueue(message);
 			}
 			pendingSignal.Set();
 		}
-		public void LogSignal(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			Log(LogMessage.CreateMessage(source, description, sourceFile, sourceLine));
+		public void LogMessage(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			Log(LogEntry.CreateMessage(source, description, sourceFile, sourceLine));
 		}
 		public void LogWarning(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			Log(LogMessage.CreateWarning(source, description, sourceFile, sourceLine));
+			Log(LogEntry.CreateWarning(source, description, sourceFile, sourceLine));
 		}
 		public void LogError(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			Log(LogMessage.CreateError(source, description, sourceFile, sourceLine));
+			Log(LogEntry.CreateError(source, description, sourceFile, sourceLine));
 		}
 		public static void MakeInstance(LogManager instance) {
 			lock (instanceSync) {

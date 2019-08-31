@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Irseny.Inco.Device {
 			lock (contextSync) {
 				if (!context.Create()) {
 					// TODO: make this visible in UI
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot inject events to OS"));
+					LogManager.Instance.Log(LogEntry.CreateError(this, "Cannot inject events to OS"));
 				}
 			}
 			while (stopSignal < 1) {
@@ -252,11 +253,26 @@ namespace Irseny.Inco.Device {
 			if (ftRequestNo > 0) {
 				lock (ftProcessSync) {
 					if (ftProcess == null) {
+						ftProcess = new Process();
+#if WINDOWS
+						ftProcess.StartInfo.FileName = "TrackIR.exe";
+#elif LINUX
+						ftProcess.StartInfo.FileName = "TrackIR";
+#endif
+						ftProcess.StartInfo.CreateNoWindow = true;
+						ftProcess.StartInfo.UseShellExecute = false;
+						ftProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 						try {
-							ftProcess = Process.Start("TrackIR.exe");
+							ftProcess.Start();
 						} catch (System.ComponentModel.Win32Exception) {
-							LogManager.Instance.LogError(this, "Failed to start TrackIR dummy process");
-							ftProcess = new Process();
+							LogManager.Instance.LogWarning(this, "Failed to start Freetrack dummy process");
+						} catch (IOException) {
+							LogManager.Instance.LogWarning(this, "Failed to start Freetrack dummy process");
+						}
+						try {
+							ftProcess.PriorityClass = ProcessPriorityClass.Idle;
+						} catch (InvalidOperationException) {
+							LogManager.Instance.LogMessage(this, "Cannot set Freetrack dummy process to low priority");
 						}
 					}
 				}
@@ -266,7 +282,9 @@ namespace Irseny.Inco.Device {
 						try {
 							ftProcess.Kill();
 						} catch (InvalidOperationException) {
-							LogManager.Instance.LogWarning(this, "Failed to stop TrackIR dummy process");
+							LogManager.Instance.LogWarning(this, "Failed to stop Freetrack dummy process");
+						} catch (IOException) {
+							LogManager.Instance.LogWarning(this, "Failed to stop Freetrack dummy process");
 						}
 						ftProcess.Dispose();
 						ftProcess = null;

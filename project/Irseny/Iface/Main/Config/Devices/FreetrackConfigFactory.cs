@@ -50,7 +50,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				var device = VirtualDevice.CreateFromSettings(settings);
 				int deviceId = VirtualDeviceManager.Instance.ConnectDevice(device);
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to connect keyboard " + freetrackIndex));
+					LogManager.Instance.Log(LogEntry.CreateError(this, "Failed to connect keyboard " + freetrackIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Active, deviceId);
@@ -61,12 +61,12 @@ namespace Irseny.Iface.Main.Config.Devices {
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 				if (deviceId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
+					LogManager.Instance.Log(LogEntry.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
 					return;
 				}
 				EquipmentMaster.Instance.VirtualDevice.Update(deviceIndex, EquipmentState.Missing, -1);
 				if (!VirtualDeviceManager.Instance.DisconnectDevice(deviceId)) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
+					LogManager.Instance.Log(LogEntry.CreateWarning(this, "Failed to disconnect keyboard " + freetrackIndex));
 					return;
 				}
 			});

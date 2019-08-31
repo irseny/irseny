@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Threading;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Irseny.Content;
 using Irseny.Listing;
+using Irseny.Util;
 
 namespace Irseny.Iface.Main.View.Tracking {
 	public class TrackingFactory : InterfaceFactory {
+		const string TitlePrefix = "Track";
+		const string FloorPrefix = "Tracker";
+
+		readonly object trackerLock = new object();
 		public TrackingFactory() : base() {
 		}
 		protected override bool CreateInternal() {
@@ -15,19 +21,22 @@ namespace Irseny.Iface.Main.View.Tracking {
 		}
 		protected override bool ConnectInternal() {
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
-			var ntbMain = Container.GetWidget("ntb_Root");
-			boxRoot.PackStart(ntbMain, true, true, 0);
+			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			boxRoot.PackStart(ntbRoot, true, true, 0);
+			ntbRoot.SwitchPage += ActiveTrackerSelected;
 			EquipmentMaster.Instance.HeadTracker.Updated += TrackerChanged;
+			EquipmentMaster.Instance.Surface.Updated += ActiveTrackerUpdated;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+			EquipmentMaster.Instance.Surface.Updated -= ActiveTrackerUpdated;
 			EquipmentMaster.Instance.HeadTracker.Updated -= TrackerChanged;
-			while (RemoveTracker()) {
-			}
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Tracking");
 			var ntbMain = Container.GetWidget("ntb_Root");
 			boxRoot.Remove(ntbMain);
 			RemoveTrackers();
+			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			ntbRoot.SwitchPage -= ActiveTrackerSelected;
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -89,6 +98,58 @@ namespace Irseny.Iface.Main.View.Tracking {
 				IInterfaceFactory floor = DestructFloor(name);
 				floor.Dispose();
 			}
+		}
+		private void ActiveTrackerSelected(object sender, EventArgs args) {
+			if (!Initialized) {
+				return;
+			}
+			if (Monitor.IsEntered(trackerLock)) {
+				return;
+			}
+			var ntbRoot = (Gtk.Notebook)sender;
+			Gtk.Widget page = ntbRoot.CurrentPageWidget;
+			string title = ntbRoot.GetTabLabelText(page);
+			int iTracker = TextParseTools.ParseInt(title.Substring(TitlePrefix.Length), -1);
+			if (iTracker < 0) {
+				return;
+			}
+			lock (trackerLock) {
+				EquipmentMaster.Instance.Surface.Update(SurfacePage.ActiveTracker, EquipmentState.Active, iTracker);
+			}
+		}
+		private void ActiveTrackerUpdated(object sender, EquipmentUpdateArgs<int> args) {
+			if (args.Index != SurfacePage.ActiveTracker) {
+				return;
+			}
+			if (!args.Active) {
+				return;
+			}
+			int iTracker = args.Equipment;
+			if (iTracker < 0) {
+				return;
+			}
+			if (Monitor.IsEntered(trackerLock)) {
+				return;
+			}
+			Invoke(delegate {
+				if (!Initialized) {
+					return;
+				}
+				string targetTitle = TitlePrefix + iTracker;
+				var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+				int pageNo = ntbRoot.NPages;
+				for (int p = 0; p < pageNo; p++) {
+					Gtk.Widget page = ntbRoot.GetNthPage(p);
+					string title = ntbRoot.GetTabLabelText(page);
+					if (title.Equals(targetTitle)) {
+						if (ntbRoot.CurrentPage != p) {
+							lock (trackerLock) {
+								ntbRoot.CurrentPage = p;
+							}
+						}
+					}
+				}
+			});
 		}
 	}
 }

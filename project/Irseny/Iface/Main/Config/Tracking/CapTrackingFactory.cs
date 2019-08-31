@@ -112,7 +112,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				EquipmentMaster.Instance.HeadTracker.Update(trackerIndex, Listing.EquipmentState.Active, trackerId);
 				int streamId = settings.GetInteger(TrackerProperty.Stream0, 0);
 				connection.StartConnection(tracker, streamId);
-				LogManager.Instance.LogSignal(this, "Started Tracker " + trackerIndex);
+				LogManager.Instance.LogMessage(this, "Started Tracker " + trackerIndex);
 			});
 		}
 		private void ConnectModel() {
@@ -120,11 +120,11 @@ namespace Irseny.Iface.Main.Config.Tracking {
 			DetectionSystem.Instance.Invoke(delegate {
 				int modelId = DetectionSystem.Instance.RegisterModel(model);
 				if (modelId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Failed to create model " + trackerIndex));
+					LogManager.Instance.Log(LogEntry.CreateError(this, "Failed to create model " + trackerIndex));
 					return;
 				}
 				EquipmentMaster.Instance.HeadModel.Update(trackerIndex, EquipmentState.Active, modelId);
-				LogManager.Instance.LogSignal(this, "Created model " + trackerIndex);
+				LogManager.Instance.LogMessage(this, "Created model " + trackerIndex);
 			});
 		}
 		private void DisconnectTracker() {
@@ -142,7 +142,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 				}
 				tracker.Dispose();
 				connection.StopConnection();
-				LogManager.Instance.LogSignal(this, "Stopped Tracker " + trackerIndex);
+				LogManager.Instance.LogMessage(this, "Stopped Tracker " + trackerIndex);
 			});
 		}
 		private void DisconnectModel() {
@@ -173,7 +173,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 					LogManager.Instance.LogError(this, "Model " + trackerIndex + " could not be updated");
 					return;
 				}
-				LogManager.Instance.LogSignal(this, "Model " + trackerIndex + " updated");
+				LogManager.Instance.LogMessage(this, "Model " + trackerIndex + " updated");
 			});
 			DetectionSystem.Instance.Invoke(delegate {
 				int trackerId = EquipmentMaster.Instance.HeadTracker.GetEquipment(trackerIndex, -1);
@@ -190,7 +190,7 @@ namespace Irseny.Iface.Main.Config.Tracking {
 					LogManager.Instance.LogError(this, "Failed to apply settings for tracker " + trackerIndex);
 					return;
 				}
-				LogManager.Instance.LogSignal(this, "Applied settings for tracker " + trackerIndex);
+				LogManager.Instance.LogMessage(this, "Applied settings for tracker " + trackerIndex);
 			});
 		}
 		private void TrackerCentered(object sender, EventArgs args) {

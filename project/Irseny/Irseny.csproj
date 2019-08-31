@@ -162,7 +162,7 @@
     <Compile Include="Content\ContentMaster.cs" />
     <Compile Include="Iface\Main\Log\MainFactory.cs" />
     <Compile Include="Log\LogManager.cs" />
-    <Compile Include="Log\LogMessage.cs" />
+    <Compile Include="Log\LogEntry.cs" />
     <Compile Include="Log\MessageType.cs" />
     <Compile Include="Log\MessageEventArgs.cs" />
     <Compile Include="Listing\EquipmentMaster.cs" />
@@ -237,7 +237,7 @@
     <Compile Include="Content\Profile\DeviceProfileReader.cs" />
     <Compile Include="Content\Profile\BindingsProfileWriter.cs" />
     <Compile Include="Content\Profile\BindingsProfileReader.cs" />
-    <Compile Include="Iface\SurfaceProperty.cs" />
+    <Compile Include="Iface\SurfacePage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

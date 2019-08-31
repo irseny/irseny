@@ -80,7 +80,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkNotebook" id="ntb_Device">
+      <object class="GtkNotebook" id="ntb_Root">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="tab_pos">right</property>

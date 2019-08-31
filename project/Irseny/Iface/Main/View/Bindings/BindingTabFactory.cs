@@ -203,7 +203,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				VirtualDeviceManager.Instance.Invoke(delegate {
 					IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
 					if (device == null) {
-						LogManager.Instance.Log(LogMessage.CreateWarning(this, "Failed to query device info: " + deviceId));
+						LogManager.Instance.Log(LogEntry.CreateWarning(this, "Failed to query device info: " + deviceId));
 						return;
 					}
 					int deviceKey = device.DeviceIndex;
@@ -215,7 +215,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 							return;
 						}
 						if (selectionDeviceNames.ContainsKey(deviceIndex)) {
-							LogManager.Instance.Log(LogMessage.CreateWarning(this, "Device already added: " + deviceIndex));
+							LogManager.Instance.Log(LogEntry.CreateWarning(this, "Device already added: " + deviceIndex));
 							return;
 						}
 						string reference = deviceType.ToString() + deviceKey.ToString();
@@ -231,7 +231,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 						return;
 					}
 					if (!selectionDeviceNames.ContainsKey(deviceIndex)) {
-						LogManager.Instance.Log(LogMessage.CreateWarning(this, "Cannot remove unknown device: " + deviceIndex));
+						LogManager.Instance.Log(LogEntry.CreateWarning(this, "Cannot remove unknown device: " + deviceIndex));
 						return;
 					}
 					selectionDeviceNames.Remove(deviceIndex);
@@ -268,14 +268,14 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// TODO: update saved config
 			int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(activeDeviceIndex, -1);
 			if (deviceId < 0) {
-				LogManager.Instance.Log(LogMessage.CreateWarning(this, "Cannot query capabilities of an unregistered device: " + activeDeviceIndex));
+				LogManager.Instance.Log(LogEntry.CreateWarning(this, "Cannot query capabilities of an unregistered device: " + activeDeviceIndex));
 				ClearCapabilitySelection();
 				return;
 			}
 			VirtualDeviceManager.Instance.Invoke(delegate {
 				IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
 				if (device == null) {
-					LogManager.Instance.Log(LogMessage.CreateWarning(this, "Cannot query capabilities of an unavailable device: " + deviceId));
+					LogManager.Instance.Log(LogEntry.CreateWarning(this, "Cannot query capabilities of an unavailable device: " + deviceId));
 					return;
 				}
 				var capabilities = new List<VirtualDeviceCapability>();

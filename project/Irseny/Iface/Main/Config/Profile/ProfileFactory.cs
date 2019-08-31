@@ -101,7 +101,7 @@ namespace Irseny.Iface.Main.Config.Profile {
 			}
 			// tracker bindings
 			ContentMaster.Instance.Profiles.SafeActiveProfile(profile);
-			LogManager.Instance.LogSignal(this, "Default profile saved");
+			LogManager.Instance.LogMessage(this, "Default profile saved");
 		}
 		private void LoadActiveProfile() {
 			var profile = ContentMaster.Instance.Profiles.LoadDefaultProfile();
@@ -148,7 +148,7 @@ namespace Irseny.Iface.Main.Config.Profile {
 					}
 				});
 			});
-			LogManager.Instance.LogSignal(this, "Default profile loaded");
+			LogManager.Instance.LogMessage(this, "Default profile loaded");
 		}
 	}
 }

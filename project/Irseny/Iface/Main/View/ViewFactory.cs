@@ -37,31 +37,77 @@ namespace Irseny.Iface.Main.View {
 			if (!Initialized) {
 				return;
 			}
-			var ntbRoot = (Gtk.Notebook)sender;
-			int page = ntbRoot.CurrentPage;
-			lock (pageLock) {
-				EquipmentMaster.Instance.Surface.Update(SurfaceProperty.ActivePage, EquipmentState.Active, page);
+			if (Monitor.IsEntered(pageLock)) {
+				return;
 			}
+			var ntbRoot = (Gtk.Notebook)sender;
+			Gtk.Widget page = ntbRoot.CurrentPageWidget;
+			string title = ntbRoot.GetTabLabelText(page);
+			int pageId;
+			if (title.StartsWith("Camera")) {
+				pageId = SurfacePage.CameraPage;
+			} else if (title.StartsWith("Tracking")) {
+				pageId =  SurfacePage.TrackingPage;
+			} else if (title.StartsWith("Device")) {
+				pageId =  SurfacePage.DevicePage;
+			} else if (title.StartsWith("Profile")) {
+				pageId =  SurfacePage.ProfilePage;
+			} else if (title.StartsWith("Settings")) {
+				pageId =  SurfacePage.SettingsPage;
+			} else if (title.StartsWith("Model")) {
+				pageId =  SurfacePage.ModelPage;
+			} else if (title.StartsWith("Binding")) {
+				pageId =  SurfacePage.BindingsPage;
+			} else {
+				return;
+			}
+			lock (pageLock) {
+				EquipmentMaster.Instance.Surface.Update(SurfacePage.ActivePage, EquipmentState.Active, pageId);
+			}
+
 		}
 		private void ActivePageUpdated(object sender, EquipmentUpdateArgs<int> args) {
 			if (Monitor.IsEntered(pageLock)) {
 				// do not change if the update message is sent from this instance
 				return;
 			}
-			if (args.Index != SurfaceProperty.ActivePage) {
+			if (args.Index != SurfacePage.ActivePage) {
 				return;
 			}
 			if (!args.Active) {
 				return;
 			}
-			int page = args.Equipment;
+			int pageId = args.Equipment;
+			string targetTitle;
+			switch (pageId) {
+			case SurfacePage.CameraPage:
+				targetTitle = "Camera";
+				break;
+			case SurfacePage.TrackingPage:
+				targetTitle = "Tracking";
+				break;
+			case SurfacePage.BindingsPage:
+			case SurfacePage.DevicePage:
+				targetTitle = "Bindings";
+				break;
+			default:
+				return;
+			}
 			Invoke(delegate {
 				if (!Initialized) {
 					return;
 				}
 				var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
-				if (ntbRoot.CurrentPage != page) {
-					ntbRoot.CurrentPage = page;
+				int pageNo = ntbRoot.NPages;
+				for (int i = 0; i < pageNo; i++) {
+					Gtk.Widget page = ntbRoot.GetNthPage(i);
+					string title = ntbRoot.GetTabLabelText(page);
+					if (title.StartsWith(targetTitle) && ntbRoot.CurrentPage != i) {
+						lock (pageLock) {
+							ntbRoot.CurrentPage = i;
+						}
+						break;
+					}
 				}
 			});
 		}

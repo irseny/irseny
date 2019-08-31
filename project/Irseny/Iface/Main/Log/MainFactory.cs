@@ -6,7 +6,7 @@ using Irseny.Content;
 namespace Irseny.Iface.Main.Log {
 	public class MainFactory : InterfaceFactory {
 
-		LinkedList<LogMessage> messages = new LinkedList<LogMessage>();
+		LinkedList<LogEntry> messages = new LinkedList<LogEntry>();
 		bool[] filter;
 		public MainFactory() : base() {
 			filter = new bool[Enum.GetValues(typeof(MessageType)).Length];
@@ -59,12 +59,12 @@ namespace Irseny.Iface.Main.Log {
 				AddMessage(args.Message);
 			});
 		}
-		public void AddMessage(LogMessage message) {
+		public void AddMessage(LogEntry message) {
 			if (!Initialized) {
 				return;
 			}
 			messages.AddLast(message);
-			LogMessage remaining = Filter(message);
+			LogEntry remaining = Filter(message);
 			if (remaining != null) {
 				var target = Container.GetWidget<Gtk.TextView>("txt_Log").Buffer;
 				string text = remaining.ToDescription();
@@ -81,7 +81,7 @@ namespace Irseny.Iface.Main.Log {
 			filter[(int)MessageType.Warning] = cbxWarning.Active;
 			filter[(int)MessageType.Error] = cbxError.Active;
 		}
-		public LogMessage Filter(LogMessage message) {
+		public LogEntry Filter(LogEntry message) {
 			if (message != null && filter[(int)message.MessageType]) {
 				return message;
 			} else {
@@ -91,8 +91,8 @@ namespace Irseny.Iface.Main.Log {
 		public void Rewrite() {
 			var target = Container.GetWidget<Gtk.TextView>("txt_Log").Buffer;
 			target.Clear();
-			foreach (LogMessage message in messages) {
-				LogMessage remaining = Filter(message);
+			foreach (LogEntry message in messages) {
+				LogEntry remaining = Filter(message);
 				if (remaining != null) {
 					string text = remaining.ToDescription();
 					var atEnd = target.EndIter;

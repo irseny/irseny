@@ -229,9 +229,9 @@ namespace Irseny.Capture.Video {
 			}*/
 
 			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
-				LogManager.Instance.Log(LogMessage.CreateWarning(this, "unable to apply framerate"));
+				LogManager.Instance.Log(LogEntry.CreateWarning(this, "unable to apply framerate"));
 			} else {
-				LogManager.Instance.Log(LogMessage.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
+				LogManager.Instance.Log(LogEntry.CreateMessage(this, "framerate set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps)));
 			}
 			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, 0.5);
 			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.)
@@ -239,11 +239,11 @@ namespace Irseny.Capture.Video {
 			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 240);
 			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0);
 			//capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 1);
-			LogManager.Instance.Log(LogMessage.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
+			LogManager.Instance.Log(LogEntry.CreateMessage(this, "auto exposure: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure)));
 			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, -20);
-			LogManager.Instance.Log(LogMessage.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
+			LogManager.Instance.Log(LogEntry.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
 			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
-			LogManager.Instance.Log(LogMessage.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
+			LogManager.Instance.Log(LogEntry.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
 			capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
 
 			return true;
@@ -301,7 +301,7 @@ namespace Irseny.Capture.Video {
 
 			public override bool HandleException(Exception exception) {
 				target.Stop(); // not capturing any longer
-				LogManager.Instance.Log(LogMessage.CreateError(this, "Video capture failed with exception: " + exception.Message));
+				LogManager.Instance.Log(LogEntry.CreateError(this, "Video capture failed with exception: " + exception.Message));
 				Debug.WriteLine(exception.StackTrace);
 				return true; // do not abort
 			}

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using Irseny.Content;
 using Irseny.Log;
 using Irseny.Inco.Device;
+using Irseny.Listing;
+using Irseny.Util;
 
 namespace Irseny.Iface.Main.Config.Devices {
 	public class DeviceConfigFactory : InterfaceFactory {
@@ -11,6 +14,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 		const string JoystickTitlePrefix = "Joy";
 		const string TrackingInterfaceTitlePrefix = "Track";
 
+		readonly object deviceLock = new object();
 
 		public DeviceConfigFactory() : base() {
 
@@ -134,7 +138,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				return false;
 			}
 			// select the title and factory
-			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
+			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			IInterfaceFactory floor;
 			string title;
 			switch (settings.DeviceType) {
@@ -165,7 +169,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				return false;
 			}
 			// get selected page
-			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
+			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int iPage = ntbDevice.CurrentPage;
 			if (iPage < 0 || iPage >= ntbDevice.NPages) {
 				return false;
@@ -190,7 +194,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 				return false;
 			}
 			// remove all tabs
-			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
+			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			while (ntbDevice.NPages > 0) {
 				Gtk.Widget page = ntbDevice.GetNthPage(0);
 				Gtk.Widget label = ntbDevice.GetTabLabel(page);
@@ -205,6 +209,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			}
 			return true;
 		}
+
 		/*private void Add() {
 			var cbbType = Container.GetWidget<Gtk.ComboBoxText>("cbb_Type");
 			string typeName = cbbType.ActiveText;
@@ -244,7 +249,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			if (!RegisterAvailableName(family, 0, 16, out name, out innerIndex)) {
 				return false;
 			}
-			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
+			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int deviceIndex = ClaimAvailableDevice();
 			if (deviceIndex < 0) {
 				return false;
@@ -296,7 +301,7 @@ namespace Irseny.Iface.Main.Config.Devices {
 			return -1;
 		}
 		private bool Remove() {
-			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Device");
+			var ntbDevice = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			Gtk.Widget pageWidget = ntbDevice.CurrentPageWidget;
 			if (pageWidget == null) {
 				return false;

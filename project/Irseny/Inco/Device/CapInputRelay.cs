@@ -137,12 +137,12 @@ namespace Irseny.Inco.Device {
 					int deviceIndex = pair.Key;
 					int deviceId = EquipmentMaster.Instance.VirtualDevice.GetEquipment(deviceIndex, -1);
 					if (deviceId < 0) {
-						LogManager.Instance.Log(LogMessage.CreateWarning(this, "Missing device " + deviceIndex));
+						LogManager.Instance.Log(LogEntry.CreateWarning(this, "Missing device " + deviceIndex));
 						continue;
 					}
 					IVirtualDevice device = VirtualDeviceManager.Instance.GetDevice(deviceId);
 					if (device == null) {
-						LogManager.Instance.Log(LogMessage.CreateWarning(this, "Missing device with id " + deviceId));
+						LogManager.Instance.Log(LogEntry.CreateWarning(this, "Missing device with id " + deviceId));
 						continue;
 					}
 					device.BeginUpdate();
@@ -151,7 +151,7 @@ namespace Irseny.Inco.Device {
 						// TODO: apply mapping
 						if (!device.SetKeyState(bind.Capability, bind.PosKey, state)) {
 							string message = string.Format("Cannot set device {0} key state {1}|{2}", deviceIndex, bind.PosKey, bind.NegKey);
-							LogManager.Instance.Log(LogMessage.CreateWarning(this, message));
+							LogManager.Instance.Log(LogEntry.CreateWarning(this, message));
 						}
 					}
 					device.EndUpdate();

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.IO;
 
 namespace Irseny.Log {
-	public class LogMessage {
+	public class LogEntry {
 		string sourceFile;
 		int sourceLine;
 		string sourceSystem;
@@ -12,7 +12,7 @@ namespace Irseny.Log {
 		MessageType messageType;
 
 
-		private LogMessage(MessageType messageType, object source, string description,string sourceFile, int sourceLine) {
+		private LogEntry(MessageType messageType, object source, string description, string sourceFile, int sourceLine) {
 			this.messageType = messageType;
 			if (source == null) {
 				this.sourceSystem = string.Empty;
@@ -29,18 +29,18 @@ namespace Irseny.Log {
 		}
 
 		public MessageType MessageType {
-			get {  return messageType; }
+			get { return messageType; }
 		}
 
 
-		public static LogMessage CreateMessage(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			return new LogMessage(MessageType.Signal, source, description, sourceFile, sourceLine);
+		public static LogEntry CreateMessage(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogEntry(MessageType.Signal, source, description, sourceFile, sourceLine);
 		}
-		public static LogMessage CreateWarning(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			return new LogMessage(MessageType.Warning, source, description, sourceFile, sourceLine);
+		public static LogEntry CreateWarning(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogEntry(MessageType.Warning, source, description, sourceFile, sourceLine);
 		}
-		public static LogMessage CreateError(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
-			return new LogMessage(MessageType.Error, source, description, sourceFile, sourceLine);
+		public static LogEntry CreateError(object source, string description, [CallerFilePath] string sourceFile = "", [CallerLineNumber] int sourceLine = 0) {
+			return new LogEntry(MessageType.Error, source, description, sourceFile, sourceLine);
 		}
 
 		public override string ToString() {

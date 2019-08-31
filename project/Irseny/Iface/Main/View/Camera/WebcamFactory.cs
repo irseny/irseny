@@ -35,12 +35,12 @@ namespace Irseny.Iface.Main.View.Camera {
 			CaptureSystem.Instance.Invoke(delegate {
 				int streamId = EquipmentMaster.Instance.VideoCaptureStream.GetEquipment(streamIndex, -1);
 				if (streamId < 0) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot find capture " + streamIndex));
+					LogManager.Instance.Log(LogEntry.CreateError(this, "Cannot find capture " + streamIndex));
 					return;
 				}
 				CaptureStream stream = CaptureSystem.Instance.GetStream(streamId);
 				if (stream == null) {
-					LogManager.Instance.Log(LogMessage.CreateError(this, "Cannot find capture " + streamIndex));
+					LogManager.Instance.Log(LogEntry.CreateError(this, "Cannot find capture " + streamIndex));
 					return;
 				}
 				stream.ImageAvailable += RetrieveImage;

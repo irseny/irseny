@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using Irseny.Content;
 using Irseny.Content.Profile;
 using Irseny.Util;
 using Irseny.Capture.Video;
+using Irseny.Listing;
 
 namespace Irseny.Iface.Main.Config.Camera {
 	public class CameraFactory : InterfaceFactory {
 		const string TitlePrefix = "Cam";
 		const string FloorPrefix = "Camera";
+
+		readonly object webcamLock = new object();
 
 		public CameraFactory() : base() {
 		}
@@ -31,13 +35,19 @@ namespace Irseny.Iface.Main.Config.Camera {
 			};
 
 			boxRoot.PackStart(boxMain, true, true, 0);
+			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			ntbRoot.SwitchPage += ActiveCameraSelected;
+			EquipmentMaster.Instance.Surface.Updated += ActiveCameraUpdated;
 			return true;
 		}
 		protected override bool DisconnectInternal() {
+			EquipmentMaster.Instance.Surface.Updated -= ActiveCameraUpdated;
 			var boxRoot = Hall.Container.GetWidget<Gtk.Box>("box_Camera");
 			var boxMain = Container.GetWidget("box_Root");
 			boxRoot.Remove(boxMain);
 			RemoveWebcams();
+			var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+			ntbRoot.SwitchPage -= ActiveCameraSelected;
 			return true;
 		}
 		protected override bool DestroyInternal() {
@@ -95,7 +105,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 			if (!factory.ApplySettings(settings)) {
 				return false;
 			}
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int iPage = ntbCamera.NPages;
 			var page = factory.Container.GetWidget("box_Root");
 			var label = new Gtk.Label(TitlePrefix + iCamera);
@@ -110,7 +120,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 				return false;
 			}
 			// read index from selected page and call removing method
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			int iPage = ntbCamera.CurrentPage;
 			if (iPage < 0 || iPage >= ntbCamera.NPages) {
 				return false;
@@ -127,7 +137,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 			if (!Initialized) {
 				return false;
 			}
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			// search for page, label
 			Gtk.Widget label = null;
 			int pageNo = ntbCamera.NPages;
@@ -181,7 +191,7 @@ namespace Irseny.Iface.Main.Config.Camera {
 			if (!Initialized) {
 				return;
 			}
-			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Camera");
+			var ntbCamera = Container.GetWidget<Gtk.Notebook>("ntb_Root");
 			while (ntbCamera.NPages > 0) {
 				Gtk.Widget page = ntbCamera.GetNthPage(0);
 				Gtk.Widget label = ntbCamera.GetTabLabel(page);
@@ -195,6 +205,58 @@ namespace Irseny.Iface.Main.Config.Camera {
 				IInterfaceFactory factory = DestructFloor(name);
 				factory.Dispose();
 			}
+		}
+		private void ActiveCameraSelected(object sender, EventArgs args) {
+			if (!Initialized) {
+				return;
+			}
+			if (Monitor.IsEntered(webcamLock)) {
+				return;
+			}
+			var ntbRoot = (Gtk.Notebook)sender;
+			Gtk.Widget page = ntbRoot.CurrentPageWidget;
+			string title = ntbRoot.GetTabLabelText(page);
+			int iCamera = TextParseTools.ParseInt(title.Substring(TitlePrefix.Length), -1);
+			if (iCamera < 0) {
+				return;
+			}
+			lock (webcamLock) {
+				EquipmentMaster.Instance.Surface.Update(SurfacePage.ActiveCamera, EquipmentState.Active, iCamera);
+			}
+		}
+		private void ActiveCameraUpdated(object sender, EquipmentUpdateArgs<int> args) {
+			if (args.Index != SurfacePage.ActiveCamera) {
+				return;
+			}
+			if (!args.Active) {
+				return;
+			}
+			int iCamera = args.Equipment;
+			if (iCamera < 0) {
+				return;
+			}
+			if (Monitor.IsEntered(webcamLock)) {
+				return;
+			}
+			Invoke(delegate {
+				if (!Initialized) {
+					return;
+				}
+				string targetTitle = TitlePrefix + iCamera;
+				var ntbRoot = Container.GetWidget<Gtk.Notebook>("ntb_Root");
+				int pageNo = ntbRoot.NPages;
+				for (int p = 0; p < pageNo; p++) {
+					Gtk.Widget page = ntbRoot.GetNthPage(p);
+					string title = ntbRoot.GetTabLabelText(page);
+					if (title.Equals(targetTitle)) {
+						if (ntbRoot.CurrentPage != p) {
+							lock (webcamLock) {
+								ntbRoot.CurrentPage = p;
+							}
+						}
+					}
+				}
+			});
 		}
 
 	}
