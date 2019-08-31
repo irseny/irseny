@@ -101,7 +101,7 @@ namespace Mycena {
 				throw new KeyNotFoundException("name");
 			}
 		}
-		public string GetProperty<T>(string name, T defaultValue) {
+		public string GetProperty<T>(string name, T fallback) {
 			if (name == null) throw new ArgumentNullException("name");
 			string result;
 			if (properties.TryGetValue(name, out result)) {
@@ -110,15 +110,15 @@ namespace Mycena {
 				}
 				return result;
 			} else {
-				if (defaultValue == null) {
+				if (fallback == null) {
 					return null;
 				} else {
-					return defaultValue.ToString();
+					return fallback.ToString();
 				}
 
 			}
 		}
-		public string GetAttribute<T>(string name, T defaultValue) {
+		public string GetAttribute<T>(string name, T fallback) {
 			if (name == null) throw new ArgumentNullException("name");
 			string result;
 			if (attributes.TryGetValue(name, out result)) {
@@ -127,19 +127,19 @@ namespace Mycena {
 				}
 				return result;
 			} else {
-				if (defaultValue == null) {
+				if (fallback == null) {
 					return null;
 				} else {
-					return defaultValue.ToString();
+					return fallback.ToString();
 				}
 
 			}
 		}
-		public string GetProperty(string name, string defaultValue) {
-			return GetProperty<string>(name, defaultValue);
+		public string GetProperty(string name, string fallback) {
+			return GetProperty<string>(name, fallback);
 		}
-		public string GetAttribute(string name, string defaultValue) {
-			return GetAttribute<string>(name, defaultValue);
+		public string GetAttribute(string name, string fallback) {
+			return GetAttribute<string>(name, fallback);
 		}
 		public bool TryGetProperty(string name, out string result) {
 			if (name == null) throw new ArgumentNullException("name");

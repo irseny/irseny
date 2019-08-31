@@ -18,6 +18,7 @@ namespace Irseny.Content.Resources {
 					"ArrowRotationTop.png",
 					"CapSide.png",
 					"CapTop.png",
+					"CapFront.png",
 					"VideoStop.png",
 					"Icon.png"
 				};

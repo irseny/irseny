@@ -2,6 +2,11 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkImage" id="img_AlignedFront">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">CapFront</property>
+  </object>
   <object class="GtkImage" id="img_AlignedSide">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -41,6 +46,16 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="resource">ArrowRotationRight</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowTop1">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationTop</property>
+  </object>
+  <object class="GtkImage" id="img_ArrowTop2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="resource">ArrowRotationTop</property>
   </object>
   <object class="GtkImage" id="img_ArrowV1">
     <property name="visible">True</property>
@@ -414,6 +429,109 @@
                 <property name="fill">True</property>
                 <property name="pack_type">end</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkGrid">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <child>
+                  <object class="GtkImage" id="img_Front">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="resource">CapFront</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleButton" id="btn_NewAxis1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="image">img_ArrowTop1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="txt_PosX2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">0.00</property>
+                    <property name="width_chars">4</property>
+                    <property name="max_width_chars">4</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="txt_PosX3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">0.00</property>
+                    <property name="width_chars">4</property>
+                    <property name="max_width_chars">4</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleButton" id="btn_NewAxis2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="image">img_ArrowTop2</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>

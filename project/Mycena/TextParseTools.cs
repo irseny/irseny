@@ -270,6 +270,22 @@ namespace Mycena {
 				throw new FormatException(text + " can not be converted to relief style");
 			}
 		}
+		public static Gtk.Align ParseAlignment(string text) {
+			text = text.Trim().ToLower();
+			if (text.Equals("fill")) {
+				return Gtk.Align.Fill;
+			} else if (text.Equals("start")) {
+				return Gtk.Align.Start;
+			} else if (text.Equals("center")) {
+				return Gtk.Align.Center;
+			} else if (text.Equals("end")) {
+				return Gtk.Align.End;
+			} else if (text.Equals("baseline")) {
+				return Gtk.Align.Baseline;
+			} else {
+				throw new FormatException(text + " can not be converted to alignment");
+			}
+		}
 	}
 }
 

@@ -173,8 +173,20 @@ namespace Mycena {
 			CommonCreationProperties.Add("can_focus", CommonWidgetMods.SetFocusable);
 			CommonCreationProperties.Add("receives_default", CommonWidgetMods.SetReceiveDefault);
 			CommonCreationProperties.Add("sensitive", CommonWidgetMods.SetSensitivity);
-			CommonCreationProperties.Add("hadjustment", CommonWidgetMods.SetScrollAdjustment);
-			CommonCreationProperties.Add("vadjustment", CommonWidgetMods.SetScrollAdjustment);
+			CommonCreationProperties.Add("halign", CommonWidgetMods.SetAlignment);
+			CommonCreationProperties.Add("valign", CommonWidgetMods.SetAlignment);
+			CommonCreationProperties.Add("hexpand", CommonWidgetMods.SetExpansion);
+			CommonCreationProperties.Add("vexpand", CommonWidgetMods.SetExpansion);
+			CommonCreationProperties.Add("margin_left", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin_right", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin_top", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin_bottom", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin_start", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin_end", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin", CommonWidgetMods.SetMargins);
+			//CommonCreationProperties.Add("hadjustment", CommonWidgetMods.SetScrollAdjustment);
+			//CommonCreationProperties.Add("vadjustment", CommonWidgetMods.SetScrollAdjustment);
+
 			//CommonCreationProperties.Add("active", CommonWidgetMods.SetActive);
 		}
 		public WidgetFactory() {
@@ -190,6 +202,7 @@ namespace Mycena {
 		protected ISet<string> PackProperties { get; private set; }
 		protected IDictionary<string, PropertyApplicationHandler<T>> CreationProperties { get; private set; }
 		protected IDictionary<string, PropertyApplicationHandler<T>> CreationAttributes { get; private set; }
+
 
 
 
