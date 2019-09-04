@@ -119,17 +119,17 @@ namespace Irseny.Iface.Main.View.Bindings {
 		private Gtk.ToggleButton[] GetBindingButtons() {
 			Gtk.ToggleButton[] buttons = new Gtk.ToggleButton[(3 + 3)*2];
 			string[] names = new string[] {
-					"btn_AxisX1",
-					"btn_AxisX2",
-					"btn_AxisY1",
-					"btn_AxisY2",
-					"btn_AxisZ1",
-					"btn_AxisZ2",
-					"btn_Yaw1",
+					"btn_X",
+					"btn_X2",
+					"btn_Y",
+					"btn_Y2",
+					"btn_Z",
+					"btn_Z2",
+					"btn_Yaw",
 					"btn_Yaw2",
-					"btn_Pitch1",
+					"btn_Pitch",
 					"btn_Pitch2",
-					"btn_Roll1",
+					"btn_Roll",
 					"btn_Roll2",
 				};
 			for (int i = 0; i < buttons.Length; i++) {
@@ -189,7 +189,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				{
 					var imgTopTarget = Container.GetWidget<Gtk.Image>("img_Top");
 					var imgTopSource = Container.GetGadget<Gtk.Image>("img_AlignedTop");
-					Gdk.Pixbuf rotated = ImageTools.Rotate(imgTopSource.Pixbuf, position.Yaw,
+					Gdk.Pixbuf rotated = ImageTools.Rotate(imgTopSource.Pixbuf, position.Yaw.SmoothAxis,
 											 ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
 											 backgroundColor, imgTopTarget.Pixbuf);
 
@@ -202,7 +202,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 				{
 					var imgSideTarget = Container.GetWidget<Gtk.Image>("img_Side");
 					var imgSideSource = Container.GetGadget<Gtk.Image>("img_AlignedSide");
-					Gdk.Pixbuf rotated = ImageTools.Rotate(imgSideSource.Pixbuf, position.Pitch,
+					Gdk.Pixbuf rotated = ImageTools.Rotate(imgSideSource.Pixbuf, position.Pitch.SmoothAxis,
 											 ImageTools.RotatedImageSize.Source, ImageTools.RotatedImageAlpha.Source,
 											 backgroundColor, imgSideTarget.Pixbuf);
 					if (imgSideTarget.Pixbuf != rotated) { // never happens
@@ -213,34 +213,30 @@ namespace Irseny.Iface.Main.View.Bindings {
 				}
 				{
 					string sYaw = string.Format("{0:N2}", position.Yaw);
-					var txtYaw1 = Container.GetWidget<Gtk.Label>("txt_Yaw1");
-					var txtYaw2 = Container.GetWidget<Gtk.Label>("txt_Yaw2");
-					txtYaw1.Text = sYaw;
-					txtYaw2.Text = sYaw;
+					var txtYaw = Container.GetWidget<Gtk.Label>("txt_Yaw");
+					txtYaw.Text = sYaw;
 				}
 				{
-					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch1");
+					var txtPitch = Container.GetWidget<Gtk.Label>("txt_Pitch");
 					txtPitch.Text = string.Format("{0:N2}", position.Pitch);
 				}
 				{
-					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll1");
+					var txtRoll = Container.GetWidget<Gtk.Label>("txt_Roll");
 					txtRoll.Text = string.Format("{0:N2}", position.Roll);
 
 				}
 				{
-					var txtPosX = Container.GetWidget<Gtk.Label>("txt_PosX1");
-					txtPosX.Text = string.Format("{0:N2}", position.PosX);
+					var txtX = Container.GetWidget<Gtk.Label>("txt_X");
+					txtX.Text = string.Format("{0:N2}", position.PosX);
 				}
 				{
-					var txtPosY = Container.GetWidget<Gtk.Label>("txt_PosY1");
-					txtPosY.Text = string.Format("{0:N2}", position.PosY);
+					var txtY = Container.GetWidget<Gtk.Label>("txt_Y");
+					txtY.Text = string.Format("{0:N2}", position.PosY);
 				}
 				{
 					string sPosZ = string.Format("{0:N2}", position.PosZ);
-					var txtPosZ = Container.GetWidget<Gtk.Label>("txt_PosZ1");
-					var txtPosZZ = Container.GetWidget<Gtk.Label>("txt_PosZ2");
-					txtPosZ.Text = sPosZ;
-					txtPosZZ.Text = sPosZ;
+					var txtZ = Container.GetWidget<Gtk.Label>("txt_Z");
+					txtZ.Text = sPosZ;
 				}
 			});
 		}

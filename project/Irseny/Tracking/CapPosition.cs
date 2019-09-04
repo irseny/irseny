@@ -1,4 +1,5 @@
 ﻿using System;
+using Irseny.Inco.Device;
 
 namespace Irseny.Tracking {
 	public struct CapPosition {
@@ -12,14 +13,14 @@ namespace Irseny.Tracking {
 			this.PosY = source.PosY;
 			this.PosZ = source.PosZ;
 		}
-		public float Yaw { get; set; }
-		public float Pitch { get; set; }
-		public float Roll { get; set; }
-		public float PosX { get; set; }
-		public float PosY { get; set; }
-		public float PosZ { get; set; }
+		public KeyState Yaw { get; set; }
+		public KeyState Pitch { get; set; }
+		public KeyState Roll { get; set; }
+		public KeyState PosX { get; set; }
+		public KeyState PosY { get; set; }
+		public KeyState PosZ { get; set; }
 
-		public float GetAxis(CapAxis axis) {
+		public KeyState GetAxis(CapAxis axis) {
 			switch (axis) {
 			case CapAxis.X:
 				return PosX;
@@ -34,28 +35,28 @@ namespace Irseny.Tracking {
 			case CapAxis.Roll:
 				return Roll;
 			default:
-				return 0f;
+				return new KeyState(0.0f, 0.0f);
 			}
 		}
-		public void SetAxis(CapAxis axis, float value) {
+		public void SetAxis(CapAxis axis, KeyState state) {
 			switch (axis) {
 			case CapAxis.X:
-				PosX = value;
+				PosX = state;
 				break;
 			case CapAxis.Y:
-				PosY = value;
+				PosY = state;
 				break;
 			case CapAxis.Z:
-				PosZ = value;
+				PosZ = state;
 				break;
 			case CapAxis.Yaw:
-				Yaw = value;
+				Yaw = state;
 				break;
 			case CapAxis.Pitch:
-				Pitch = value;
+				Pitch = state;
 				break;
 			case CapAxis.Roll:
-				Roll = value;
+				Roll = state;
 				break;
 			default:
 				break;

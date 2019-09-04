@@ -57,7 +57,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			var drwGraph = Container.GetWidget<Gtk.DrawingArea>("drw_Graph");
 			{ // target selection
 				var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
-				var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+				var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 				cbbDevice.Changed += DeviceSelected;
 				cbbCap.Changed += CapabilitySelected;
 			}
@@ -101,7 +101,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			}
 			{ // target selection
 				var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
-				var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+				var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 				cbbDevice.Changed -= DeviceSelected;
 				cbbCap.Changed -= CapabilitySelected;
 			}
@@ -130,6 +130,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = true;
 			expRoot.Sensitive = true;
+			expRoot.Label = "Output for " + axis.ToString();
 			// restore active and selection fields
 			axisSelected = true;
 			activeTrackerAxis = axis;
@@ -155,6 +156,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			var expRoot = Container.GetWidget<Gtk.Expander>("exp_Binding");
 			expRoot.Expanded = false;
 			expRoot.Sensitive = false;
+			expRoot.Label = "Output";
 			axisSelected = false;
 			activeDeviceIndex = -1;
 			activeKeyHandle = null;
@@ -374,7 +376,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 			// disable events
 			lockSelection = true;
 			// clear list
-			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 			var store = (Gtk.ListStore)cbbCap.Model;
 			store.Clear();
 			store.AppendValues("None");
@@ -390,7 +392,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		private void BuildCapabilitySelection() {
 			// disable events
 			lockSelection = true;
-			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 			var store = (Gtk.ListStore)cbbCap.Model;
 			string activeEntry = cbbCap.ActiveText;
 			// rebuild list
@@ -442,7 +444,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		/// </summary>
 		/// <returns>The active device capability information. null if none is selected of if the selection is illegal.</returns>
 		private Tuple<VirtualDeviceCapability, object> GetActiveDeviceCapability() {
-			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 			string sActive = cbbCap.ActiveText;
 			if (sActive == null || sActive.Length == 0) {
 				return Tuple.Create<VirtualDeviceCapability, object>(VirtualDeviceCapability.Key, null);
@@ -461,7 +463,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		/// <returns><c>true</c>, if active device capability was set, <c>false</c> otherwise.</returns>
 		/// <param name="keyHandle">Key.</param>
 		private bool SetActiveDeviceCapability(object keyHandle) {
-			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_Capability");
+			var cbbCap = Container.GetWidget<Gtk.ComboBoxText>("cbb_PosCap");
 			string keyDescription = keyHandle != null ? keyHandle.ToString() : string.Empty;
 			int iKey;
 			for (iKey = 0; iKey < selectionKeyHandles.Count; iKey++) {

@@ -64,7 +64,7 @@ EXTRACK_EXPORT bool ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyb
 	free(keyboard);
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, float state) {
+EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
 	if (keyIndex < 0 || keyIndex >= IVJ_KEYBOARD_KEY_NO) {
 		return false;
 	}
@@ -78,10 +78,10 @@ EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, f
 	event->type = INPUT_KEYBOARD;
 	event->ki.wVk = ivjKeyCodes[keyIndex];
 	event->ki.wScan = 0;
-	if (state <= 0.0f) {
-		event->ki.dwFlags = KEYEVENTF_KEYUP;
+	if (pressed) {
+		event->ki.dwFlags = 0; // keydown
 	} else {
-		event->ki.dwFlags = 0; // keyup
+		event->ki.dwFlags = KEYEVENTF_KEYUP;
 	}
 	event->ki.time = 0; // provided by system
 	event->ki.dwExtraInfo = GetMessageExtraInfo();
@@ -156,11 +156,12 @@ EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int p
 	freetrack->Packet.Points[pointIndex][1] = (float)y;
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float value) {
+EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
 	if (axisIndex < 0 || axisIndex >= IVJ_FREETRACK_AXIS_NO) {
 		return false;
 	}
-	freetrack->Packet.Axes[axisIndex] = value;
+	freetrack->Packet.SmoothAxes[axisIndex] = smooth;
+	freetrack->Packet.RawAxes[axisIndex] = raw;
 	return true;
 }
 EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
@@ -169,12 +170,13 @@ EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) 
 		// timeout or error
 		return false;
 	}
-	int id = freetrack->Packet.PacketID += 1;
-	if (id < 0) {
+	freetrack->Packet.PacketID = freetrack->Packet.PacketID + 1;
+	//int id = freetrack->Packet.PacketID += 1;
+	//if (id < 0) {
 		// TODO: fix undefined behaviour instead
-		freetrack->Packet.PacketID = 0;
-	}
-	memcpy(&(freetrack->Map), &(freetrack->Packet), sizeof(IvjFreetrackPacket));
+		//freetrack->Packet.PacketID = 0;
+	//}
+	memcpy(freetrack->Map, &(freetrack->Packet), sizeof(IvjFreetrackPacket));
 	ReleaseMutex(freetrack->Sync);
 	return true;
 }

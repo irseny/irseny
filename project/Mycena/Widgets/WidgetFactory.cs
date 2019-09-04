@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace Mycena {
 	internal class WidgetFactory {
 
-		IDictionary<string, IWidgetFactory> widgets;
+		Dictionary<string, IWidgetFactory> widgets;
 
 		public WidgetFactory(IInterfaceStock stock) {
 			if (stock == null) throw new ArgumentNullException("stock");
@@ -168,7 +168,7 @@ namespace Mycena {
 
 
 		static WidgetFactory() {
-			CommonCreationProperties = new Dictionary<string, PropertyApplicationHandler<Gtk.Widget>>();
+			/*CommonCreationProperties = new Dictionary<string, PropertyApplicationHandler<Gtk.Widget>>();
 			CommonCreationProperties.Add("visible", CommonWidgetMods.SetVisibility);
 			CommonCreationProperties.Add("can_focus", CommonWidgetMods.SetFocusable);
 			CommonCreationProperties.Add("receives_default", CommonWidgetMods.SetReceiveDefault);
@@ -183,20 +183,37 @@ namespace Mycena {
 			CommonCreationProperties.Add("margin_bottom", CommonWidgetMods.SetMargins);
 			CommonCreationProperties.Add("margin_start", CommonWidgetMods.SetMargins);
 			CommonCreationProperties.Add("margin_end", CommonWidgetMods.SetMargins);
-			CommonCreationProperties.Add("margin", CommonWidgetMods.SetMargins);
+			CommonCreationProperties.Add("margin", CommonWidgetMods.SetMargins);*/
 			//CommonCreationProperties.Add("hadjustment", CommonWidgetMods.SetScrollAdjustment);
 			//CommonCreationProperties.Add("vadjustment", CommonWidgetMods.SetScrollAdjustment);
 
 			//CommonCreationProperties.Add("active", CommonWidgetMods.SetActive);
 		}
 		public WidgetFactory() {
-			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>();
+			CreationProperties = new Dictionary<string, PropertyApplicationHandler<T>>(64);
+			CreationProperties.Add("visible", CommonWidgetMods.SetVisibility);
+			CreationProperties.Add("can_focus", CommonWidgetMods.SetFocusable);
+			CreationProperties.Add("receives_default", CommonWidgetMods.SetReceiveDefault);
+			CreationProperties.Add("sensitive", CommonWidgetMods.SetSensitivity);
+			CreationProperties.Add("halign", CommonWidgetMods.SetAlignment);
+			CreationProperties.Add("valign", CommonWidgetMods.SetAlignment);
+			CreationProperties.Add("hexpand", CommonWidgetMods.SetExpansion);
+			CreationProperties.Add("vexpand", CommonWidgetMods.SetExpansion);
+			CreationProperties.Add("margin_left", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin_right", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin_top", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin_bottom", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin_start", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin_end", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("margin", CommonWidgetMods.SetMargins);
+			CreationProperties.Add("width_request", CommonWidgetMods.SetSizeRequest);
+			CreationProperties.Add("height_request", CommonWidgetMods.SetSizeRequest);
 			CreationAttributes = new Dictionary<string, PropertyApplicationHandler<T>>();
 			PackProperties = new HashSet<string>();
 		}
 		protected delegate bool PropertyApplicationHandler<TW>(TW widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock);
 
-		private static IDictionary<string, PropertyApplicationHandler<Gtk.Widget>> CommonCreationProperties { get; set; }
+		//private static IDictionary<string, PropertyApplicationHandler<Gtk.Widget>> CommonCreationProperties { get; set; }
 
 
 		protected ISet<string> PackProperties { get; private set; }
@@ -324,15 +341,15 @@ namespace Mycena {
 		private void ApplyProperties(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			foreach (string p in properties.PropertyNames) {
 				PropertyApplicationHandler<T> handler;
-				PropertyApplicationHandler<Gtk.Widget> commonHandler;
+				//PropertyApplicationHandler<Gtk.Widget> commonHandler;
 				if (CreationProperties.TryGetValue(p, out handler)) {
 					if (!handler(widget, properties, container, stock)) {
 						throw new InvalidOperationException("Failed to apply property to widget: " + p);
 					}
-				} else if (CommonCreationProperties.TryGetValue(p, out commonHandler)) {
+				/*} else if (CommonCreationProperties.TryGetValue(p, out commonHandler)) {
 					if (!commonHandler(widget, properties, container, stock)) {
 						throw new InvalidOperationException("Failed to apply property to widget: " + p);
-					}
+					}*/
 				}
 			}
 #if DEBUG

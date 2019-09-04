@@ -12,19 +12,12 @@ namespace Mycena {
 			CreationProperties.Add("yalign", MiscFactory.SetAligment);
 			CreationProperties.Add("xpad", MiscFactory.SetPadding);
 			CreationProperties.Add("ypad", MiscFactory.SetPadding);
-			CreationProperties.Add("margin_left", MiscFactory.SetLeftMargin);
-			CreationProperties.Add("margin_right", MiscFactory.SetRightMargin);
-			CreationProperties.Add("margin_top", MiscFactory.SetTopMargin);
-			CreationProperties.Add("margin_bottom", MiscFactory.SetBottomMargin);
 			// label
 			CreationProperties.Add("label", SetText);
 			CreationAttributes.Add("underline", SetUnderline);
 			CreationProperties.Add("angle", SetAngle);
 			CreationProperties.Add("width_chars", SetChars);
 			CreationProperties.Add("max_width_chars", SetChars);
-			CreationProperties.Add("margin", MiscFactory.SetMargin);
-
-
 		}
 		protected override Gtk.Label CreateWidget(ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return new Gtk.Label();

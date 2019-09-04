@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 set(PROJECT_NAME Extrack)
 set(FT_DUMMY_NAME TrackIR)
 set(FT_TEST_NAME CheckFT)
+set(FT_SUPPLY_NAME SupplyFT)
 project(${PROJECT_NAME} C)
 
 # project paths
@@ -102,7 +103,7 @@ endif()
 if (WITH_FREETRACK)
 	# source files
 	if (WIN32)
-		list(APEND FT_TEST_SOURCE_FILES "${PROJECT_SOURCE_DIR}/FTTestWin.c")
+		list(APPEND FT_TEST_SOURCE_FILES "${PROJECT_SOURCE_DIR}/FTTestWin.c")
 	elseif(UNIX)
 		list(APPEND FT_TEST_SOURCE_FILES "${PROJECT_SOURCE_DIR}/FTTestLin.c")
 	endif()
@@ -116,3 +117,16 @@ if (WITH_FREETRACK)
 	# installation
 	install(TARGETS ${FT_TEST_NAME} DESTINATION "${PROJECT_BIN_DIR}")
 endif()
+
+# freetrack generator target
+#if (WITH_FREETRACK)
+#	# source files
+#	list(APPEND FT_SUPPLY_SOURCE_FILES "${PROJECT_SOURCE_DIR}/FTSupplyWin.c")
+#	# target
+#	add_executable(${FT_SUPPLY_NAME} "${FT_SUPPLY_SOURCE_FILES}")
+#	target_include_directories(${FT_SUPPLY_NAME} PUBLIC "{PROJECT_SOURCE_DIR}")
+#	# compiler options
+#	target_compile_options(${FT_SUPPLY_NAME} PUBLIC "${PROJECT_COMPILE_OPTIONS}")
+#	target_link_libraries(${FT_SUPPLY_NAME} PUBLIC "${PROJECT_LINKER_FLAGS}")
+#	target_compile_definitions(${FT_SUPPLY_NAME} PUBLIC "${PROJECT_COMPILE_DEFINITIONS}")
+#endif()

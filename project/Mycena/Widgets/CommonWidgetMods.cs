@@ -110,6 +110,23 @@ namespace Mycena {
 				return false;
 			}
 		}
+		public static bool SetSizeRequest<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock)
+			where T: Gtk.Widget {
+			int width, height;
+			try {
+				width = TextParseTools.ParseInt(properties.GetProperty("height_request", -1));
+				height = TextParseTools.ParseInt(properties.GetProperty("width_request", -1));
+			} catch (FormatException) {
+				return false;
+			}
+			if (width > -1) {
+				widget.WidthRequest = width;
+			}
+			if (height > -1) {
+				widget.HeightRequest = height;
+			}
+			return true;
+		}
 		public static bool Noop<T>(T widget, ConfigProperties properties, IInterfaceNode container, IInterfaceStock stock) {
 			return true;
 		}

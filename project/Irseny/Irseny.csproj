@@ -144,6 +144,7 @@
   <ItemGroup>
     <Compile Include="Iface\Main\Config\Devices\FreetrackConfigFactory.cs" />
     <Compile Include="Iface\Main\Config\Devices\IClassifiedDeviceConfigFactory.cs" />
+    <Compile Include="Inco\Device\KeyState.cs" />
     <Compile Include="Inco\Device\FreetrackInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -190,7 +191,6 @@
     <Compile Include="Tracking\PositionDetectedEventArgs.cs" />
     <Compile Include="Tracking\KeypointDetector.cs" />
     <Compile Include="Tracking\PointLabeler.cs" />
-    <Compile Include="Tracking\BasicPoseEstimator.cs" />
     <Compile Include="Util\ImageTools.cs" />
     <Compile Include="Content\Resources\InterfaceStockManager.cs" />
     <Compile Include="Iface\Main\Config\Camera\WebcamFactory.cs" />

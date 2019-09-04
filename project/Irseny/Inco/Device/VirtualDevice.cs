@@ -50,8 +50,8 @@ namespace Irseny.Inco.Device {
 		public virtual void BeginUpdate() {
 			// nothing to do
 		}
-		public abstract bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state);
-		public abstract float GetKeyState(VirtualDeviceCapability capability, object keyHandle);
+		public abstract bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, KeyState state);
+		public abstract KeyState GetKeyState(VirtualDeviceCapability capability, object keyHandle);
 		public abstract object[] GetModifiedKeys(VirtualDeviceCapability capability);
 		public virtual void EndUpdate() {
 			// mark the new data as sendable

@@ -23,10 +23,9 @@ namespace Irseny.Extrack {
 			freetrackAxes.Add("Yaw", 0);
 			freetrackAxes.Add("Pitch", 1);
 			freetrackAxes.Add("Roll", 2);
-			freetrackAxes.Add("PosX", 3);
-			freetrackAxes.Add("PosY", 4);
-			freetrackAxes.Add("PosZ", 5);
-
+			freetrackAxes.Add("X", 3);
+			freetrackAxes.Add("Y", 4);
+			freetrackAxes.Add("Z", 5);
 		}
 		public enum JoystickCapability {
 			Button1 = 0,
@@ -40,8 +39,8 @@ namespace Irseny.Extrack {
 			Right = 1,
 			Middle = 2,
 			Button4 = 3,
-			AxisX = 8,
-			AxisY,
+			X = 8,
+			Y,
 			Wheel,
 			XMin,
 			XMax,
@@ -92,7 +91,7 @@ namespace Irseny.Extrack {
 		public static extern bool DisconnectKeyboard(IntPtr context, IntPtr keyboard);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetKeyboardKey")]
-		public static extern bool SetKeyboardKey(IntPtr keyboard, int keyIndex, float state);
+		public static extern bool SetKeyboardKey(IntPtr keyboard, int keyIndex, bool state);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSendKeyboard")]
 		public static extern bool SendKeyboard(IntPtr keyboard);
@@ -110,7 +109,7 @@ namespace Irseny.Extrack {
 		public static extern bool DisconnectFreetrackInterface(IntPtr context, IntPtr freetrack);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetFreetrackAxis")]
-		public static extern bool SetFreetrackAxis(IntPtr freetrack, int axisIndex, float value);
+		public static extern bool SetFreetrackAxis(IntPtr freetrack, int axisIndex, float smooth, float raw);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjSetFreetrackResolution")]
 		public static extern bool SetFreetrackResolution(IntPtr freetrack, int width, int height);

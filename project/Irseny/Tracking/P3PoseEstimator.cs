@@ -7,6 +7,7 @@ using Point2f = System.Drawing.PointF;
 using Size2i = System.Drawing.Size;
 using Irseny.Log;
 using Irseny.Listing;
+using Irseny.Inco.Device;
 
 namespace Irseny.Tracking {
 	public class P3PoseEstimator {
@@ -188,13 +189,13 @@ namespace Irseny.Tracking {
 				LogManager.Instance.LogError(this, "Failed to detect pose: " + e.StackTrace);
 			}
 			if (success) {
-				result.Yaw = rotation.Data[1, 0];
-				result.Pitch = rotation.Data[0, 0];
-				result.Roll = rotation.Data[2, 0];
+				result.Yaw = new KeyState(rotation.Data[1, 0], rotation.Data[1, 0]);
+				result.Pitch = new KeyState(rotation.Data[0, 0], rotation.Data[0, 0]);
+				result.Roll = new KeyState(rotation.Data[2, 0], rotation.Data[2, 0]);
 
-				result.PosX = translation.Data[0, 0];
-				result.PosY = translation.Data[1, 0];
-				result.PosZ = translation.Data[2, 0];
+				result.PosX = new KeyState(translation.Data[0, 0], translation.Data[0, 0]);
+				result.PosY = new KeyState(translation.Data[1, 0], translation.Data[1, 0]);
+				result.PosZ = new KeyState(translation.Data[2, 0], translation.Data[2, 0]);
 			}
 			return result;
 		}

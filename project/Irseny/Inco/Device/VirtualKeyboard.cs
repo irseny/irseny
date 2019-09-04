@@ -5,13 +5,13 @@ namespace Irseny.Inco.Device {
 		static readonly object[] keyHandles = new object[] {
 			"Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P"
 		};
-		Dictionary<object, bool> keyState = new Dictionary<object, bool>(256);
+		Dictionary<string, KeyState> keyState = new Dictionary<string, KeyState>(256);
 		List<object> modifiedKeys = new List<object>(32);
 
 		public VirtualKeyboard(int index) : base(index) {
 			SendPolicy = VirtualDeviceSendPolicy.FixedRate;
 			foreach (object handle in keyHandles) {
-				keyState.Add(handle, false);
+				keyState.Add(handle.ToString(), new KeyState(false, false));
 			}
 		}
 		public override VirtualDeviceType DeviceType {
@@ -43,33 +43,32 @@ namespace Irseny.Inco.Device {
 			// TODO: maybe move to Send()
 			modifiedKeys.Clear();
 		}
-		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state) {
+		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, KeyState state) {
 			// TODO: implement
+			string keyName = keyHandle.ToString();
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				if (!keyState.ContainsKey(keyHandle)) {
+				if (!keyState.ContainsKey(keyName)) {
 					return false;
 				}
-				keyState[keyHandle] = (state > 0f);
+				keyState[keyName] = state;
 				modifiedKeys.Add(keyHandle);
 				return true;
 			default:
 				return false;
 			}
 		}
-		public override float GetKeyState(VirtualDeviceCapability capability, object keyHandle) {
+		public override KeyState GetKeyState(VirtualDeviceCapability capability, object keyHandle) {
+			string keyName = keyHandle.ToString();
 			switch (capability) {
 			case VirtualDeviceCapability.Key:
-				if (!keyState.ContainsKey(keyHandle)) {
-					return 0f;
+				KeyState result;
+				if (!keyState.TryGetValue(keyName, out result)) {
+					return result;
 				}
-				if (keyState[keyHandle]) {
-					return 1f;
-				} else {
-					return 0f;
-				}
+				return new KeyState(false, false);
 			default:
-				return 0f;
+				return new KeyState(false, false);
 			}
 		}
 		public override object[] GetModifiedKeys(VirtualDeviceCapability capability) {

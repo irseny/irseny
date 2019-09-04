@@ -147,7 +147,7 @@ namespace Irseny.Inco.Device {
 					}
 					device.BeginUpdate();
 					foreach (Binding bind in pair.Value) {
-						float state = args.Position.GetAxis(bind.Axis);
+						KeyState state = args.Position.GetAxis(bind.Axis);
 						// TODO: apply mapping
 						if (!device.SetKeyState(bind.Capability, bind.PosKey, state)) {
 							string message = string.Format("Cannot set device {0} key state {1}|{2}", deviceIndex, bind.PosKey, bind.NegKey);

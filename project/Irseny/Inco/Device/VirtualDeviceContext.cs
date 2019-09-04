@@ -69,10 +69,10 @@ namespace Irseny.Inco.Device {
 		private bool SendKeyboard(IVirtualDevice device, IntPtr handle) {
 			object[] modifiedKeys = device.GetModifiedKeys(VirtualDeviceCapability.Key);
 			foreach (object key in modifiedKeys) {
-				float state = device.GetKeyState(VirtualDeviceCapability.Key, key);
+				KeyState state = device.GetKeyState(VirtualDeviceCapability.Key, key);
 				int keyIndex = Extrack.Ivj.GetKeyboardKeyIndex(key);
 				if (keyIndex > -1) {
-					Extrack.Ivj.SetKeyboardKey(handle, keyIndex, state);
+					Extrack.Ivj.SetKeyboardKey(handle, keyIndex, state.SmoothPressed);
 				}
 			}
 			bool result = Extrack.Ivj.SendKeyboard(handle);
@@ -83,10 +83,10 @@ namespace Irseny.Inco.Device {
 		private bool SendFreetrackInterface(IVirtualDevice device, IntPtr handle) {
 			object[] modifiedKeys = device.GetModifiedKeys(VirtualDeviceCapability.Axis);
 			foreach (object key in modifiedKeys) {
-				float state = device.GetKeyState(VirtualDeviceCapability.Axis, key);
+				KeyState state = device.GetKeyState(VirtualDeviceCapability.Axis, key);
 				int axisIndex = Extrack.Ivj.GetFreetrackAxisIndex(key);
 				if (axisIndex > -1) {
-					Extrack.Ivj.SetFreetrackAxis(handle, axisIndex, state);
+					Extrack.Ivj.SetFreetrackAxis(handle, axisIndex, state.SmoothAxis, state.RawAxis);
 				}
 			}
 			bool result = Extrack.Ivj.SendFreetrackInterface(handle);

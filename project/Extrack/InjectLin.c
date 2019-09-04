@@ -109,7 +109,7 @@ bool EXTRACK_EXPORT	ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyb
 	free(keyboard);
 	return true;
 }
-bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, float state) {
+bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
 	if (keyIndex < 0 || keyIndex >= IVJ_KEYBOARD_KEY_NO) {
 		ivjLogError("Key index out of range");
 		return false;
@@ -123,7 +123,7 @@ bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, f
 	struct input_event* event = &keyboard->BufferedEvents[keyboard->BufferedEventNo];
 	event->type = EV_KEY;
 	event->code = ivjKeyCodes[keyIndex];
-	if (state > 0.0f) {
+	if (pressed) {
 		event->value = 1;
 	} else {
 		event->value = 0;
@@ -190,7 +190,7 @@ EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, 
 EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float value) {
+EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
 	return true;
 }
 EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {

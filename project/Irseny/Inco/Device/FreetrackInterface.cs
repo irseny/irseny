@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Irseny.Inco.Device {
 	class FreetrackInterface : VirtualDevice {
-		Dictionary<string, float> keyState = new Dictionary<string, float>(16);
+		Dictionary<string, KeyState> keyState = new Dictionary<string, KeyState>(16);
 		object[] keyHandles = new object[] {
 			"X", "Y", "Z", "Yaw", "Pitch", "Roll"
 		};
@@ -11,7 +11,7 @@ namespace Irseny.Inco.Device {
 		public FreetrackInterface(int index) : base(index) {
 			SendPolicy = VirtualDeviceSendPolicy.FixedRate;
 			foreach (object handle in keyHandles) {
-				keyState.Add(handle.ToString(), 0.0f);
+				keyState.Add(handle.ToString(), new KeyState(0, 0));
 			}
 		}
 		public override VirtualDeviceType DeviceType {
@@ -33,19 +33,19 @@ namespace Irseny.Inco.Device {
 				return 0;
 			}
 		}
-		public override float GetKeyState(VirtualDeviceCapability capability, object keyHandle) {
+		public override KeyState GetKeyState(VirtualDeviceCapability capability, object keyHandle) {
 			switch (capability) {
 			case VirtualDeviceCapability.Axis:
-				float result;
+				KeyState result;
 				if (keyState.TryGetValue(keyHandle.ToString(), out result)) {
 					return result;
 				}
-				return 0.0f;
+				return new KeyState(0, 0);
 			default:
-				return 0.0f;
+				return new KeyState(0, 0);
 			}
 		}
-		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, float state) {
+		public override bool SetKeyState(VirtualDeviceCapability capability, object keyHandle, KeyState state) {
 			switch (capability) {
 			case VirtualDeviceCapability.Axis:
 				if (!keyState.ContainsKey(keyHandle.ToString())) {
