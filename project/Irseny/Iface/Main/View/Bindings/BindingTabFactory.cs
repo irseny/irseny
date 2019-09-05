@@ -23,6 +23,7 @@ namespace Irseny.Iface.Main.View.Bindings {
 		//List<string> selectionKeyDescriptions = new List<string>();
 		List<object> selectionKeyHandles = new List<object>();
 		Dictionary<int, string> selectionDeviceNames = new Dictionary<int, string>();
+		HashSet<CapAxis> negCapEnabled = new HashSet<CapAxis>();
 
 		// current settings for all axes
 		/*Dictionary<CapAxis, int> setupDeviceIndexes = new Dictionary<CapAxis, int>();
@@ -61,6 +62,10 @@ namespace Irseny.Iface.Main.View.Bindings {
 				cbbDevice.Changed += DeviceSelected;
 				cbbCap.Changed += CapabilitySelected;
 			}
+			{ // negative capability sensitivity 
+				var cbxNegCap = Container.GetWidget<Gtk.ToggleButton>("cbx_NegCap");
+				cbxNegCap.Clicked += NegCapToggled;
+			}
 			{ // initial selction
 				BuildDeviceSelection();
 				BuildCapabilitySelection();
@@ -98,6 +103,10 @@ namespace Irseny.Iface.Main.View.Bindings {
 				var boxParent = Hall.Container.GetWidget<Gtk.Box>("box_Binding");
 				var boxRoot = Container.GetWidget("box_Root");
 				boxParent.Remove(boxRoot);// TODO: fix program termination due to access violation
+			}
+			{ // negative capability sensitivity
+				var cbxNegCap = Container.GetWidget<Gtk.ToggleButton>("cbx_NegCap");
+				cbxNegCap.Clicked -= NegCapToggled;
 			}
 			{ // target selection
 				var cbbDevice = Container.GetWidget<Gtk.ComboBoxText>("cbb_Target");
@@ -141,6 +150,9 @@ namespace Irseny.Iface.Main.View.Bindings {
 				Tuple<object, object> keys = inputHandler.GetDeviceKeys(axis);
 				activeKeyHandle = keys.Item1;
 			}
+			// restore negative capability sensitivity
+			var cbxNegCap = Container.GetWidget<Gtk.ToggleButton>("cbx_NegCap");
+			cbxNegCap.Active = negCapEnabled.Contains(axis);
 			// rebuild UI elements
 			BuildDeviceSelection();
 			BuildCapabilitySelection();
@@ -480,6 +492,23 @@ namespace Irseny.Iface.Main.View.Bindings {
 			}
 			cbbCap.QueueDraw();
 			return true;
+		}
+
+		private void NegCapToggled(object sender, EventArgs args) {
+			if (!Initialized) {
+				return;
+			}
+			var cbxNegCap = (Gtk.ToggleButton)sender;
+			bool sensitive = cbxNegCap.Active;
+			var lblNegCap = Container.GetWidget("lbl_NegCap");
+			var cbbNegCap = Container.GetWidget("cbb_NegCap");
+			lblNegCap.Sensitive = sensitive;
+			cbbNegCap.Sensitive = sensitive;
+			if (sensitive) {
+				negCapEnabled.Add(activeTrackerAxis);
+			} else {
+				negCapEnabled.Remove(activeTrackerAxis);
+			}
 		}
 	}
 }

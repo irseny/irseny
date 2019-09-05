@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkBox" id="box_Root">
@@ -74,7 +74,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="lbl_PosCap">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_left">2</property>
@@ -107,8 +107,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">end</property>
-                    <property name="margin_right">2</property>
-                    <property name="label" translatable="yes">Secondary Capability</property>
+                    <property name="margin_right">4</property>
+                    <property name="label" translatable="yes">Secondary</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -116,7 +116,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="cbx_SecondaryCap">
+                  <object class="GtkCheckButton" id="cbx_NegCap">
                     <property name="label">Enable</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -129,7 +129,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="lbl_NegCap">
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
@@ -176,7 +176,7 @@
                     <property name="margin_right">2</property>
                     <property name="active">0</property>
                     <items>
-                      <item id="0" translatable="yes">Linear</item>
+                      <item id="0" translatable="yes">Lines</item>
                       <item id="1" translatable="yes">Curve</item>
                       <item id="2" translatable="yes">Freehand</item>
                     </items>
@@ -232,6 +232,7 @@
                 <property name="height_request">129</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text">Tracker Axis to Device Capability Graph</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
               </object>
