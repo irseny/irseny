@@ -1,0 +1,26 @@
+﻿<Properties StartupConfiguration="{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}|Default">
+  <MonoDevelop.Ide.ItemProperties.Irseny.Main PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Irseny.Core/MyClass.cs">
+    <Files>
+      <File FileName="Irseny/Iface/Main/View/Bindings/BindingTabFactory.cs" Line="156" Column="4" />
+      <File FileName="Irseny.Core/MyClass.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Irseny" expanded="True">
+            <Node name="Irseny.Core" expanded="True" />
+            <Node name="Irseny.Main" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="LinuxDebug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.Irseny.Core FirstBuild="True" />
+</Properties>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">LinuxDebug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Irseny.Main</RootNamespace>
+    <AssemblyName>Irseny.Main</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
+    <DefineConstants>DEBUG;LINUX;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+    <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath></IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin</OutputPath>
+    <DefineConstants>LINUX;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget>x86</PlatformTarget>
+    <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath></IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="Emgu.CV.World">
+      <HintPath>..\..\lib\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Content\ContentManager.cs" />
+    <Compile Include="Content\ContentManagerSettings.cs" />
+    <Compile Include="Content\ContentMaster.cs" />
+    <Compile Include="Content\Profile\BindingsProfileReader.cs" />
+    <Compile Include="Content\Profile\BindingsProfileWriter.cs" />
+    <Compile Include="Content\Profile\CaptureProfileReader.cs" />
+    <Compile Include="Content\Profile\CaptureProfileWriter.cs" />
+    <Compile Include="Content\Profile\DeviceProfileReader.cs" />
+    <Compile Include="Content\Profile\DeviceProfileWriter.cs" />
+    <Compile Include="Content\Profile\ProfileManager.cs" />
+    <Compile Include="Content\Profile\SetupProfile.cs" />
+    <Compile Include="Content\Profile\TrackingProfileReader.cs" />
+    <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
+      <Project>{079C6237-47C4-40CA-B93F-9C47AB4F1767}</Project>
+      <Name>Irseny.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="Hierarchical" />
+          <TextStylePolicy inheritsSet="null" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchCaseSection="True" NewLineForMembersInObjectInit="True" NewLineForMembersInAnonymousTypes="True" NewLineForClausesInQuery="True" SpacingAfterMethodDeclarationName="False" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="False" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="False" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" IndentSwitchSection="False" LabelPositioning="NoIndent" NewLinesForBracesInTypes="False" NewLinesForBracesInMethods="False" NewLinesForBracesInProperties="False" NewLinesForBracesInAccessors="False" NewLinesForBracesInAnonymousMethods="False" NewLinesForBracesInControlBlocks="False" NewLinesForBracesInAnonymousTypes="False" NewLinesForBracesInObjectCollectionArrayInitializers="False" NewLinesForBracesInLambdaExpressionBody="False" NewLineForElse="False" NewLineForCatch="False" NewLineForFinally="False" SpacingAroundBinaryOperator="Ignore" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="120" TabWidth="4" TabsToSpaces="False" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Unix" scope="text/plain" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

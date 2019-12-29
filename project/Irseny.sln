@@ -1,23 +1,55 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mycena", "Mycena\Mycena.csproj", "{D238C375-B51C-45B7-8236-695FE5128F01}"
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Main", "Irseny.Main\Irseny.Main.csproj", "{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny", "Irseny\Irseny.csproj", "{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Core", "Irseny.Core\Irseny.Core.csproj", "{079C6237-47C4-40CA-B93F-9C47AB4F1767}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		LinuxDebug|Any CPU = LinuxDebug|Any CPU
-		WindowsDebug|Any CPU = WindowsDebug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+		LinuxDebug|x86 = LinuxDebug|x86
+		LinuxRelease|x86 = LinuxRelease|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.LinuxDebug|Any CPU.ActiveCfg = LinuxDebug|Any CPU
-		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.LinuxDebug|Any CPU.Build.0 = LinuxDebug|Any CPU
-		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.WindowsDebug|Any CPU.ActiveCfg = WindowsDebug|Any CPU
-		{B8A64D95-7599-4756-BA8B-FE68A7BCE3D7}.WindowsDebug|Any CPU.Build.0 = WindowsDebug|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.LinuxDebug|Any CPU.ActiveCfg = LinuxDebug|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.LinuxDebug|Any CPU.Build.0 = LinuxDebug|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.WindowsDebug|Any CPU.ActiveCfg = WindowsDebug|Any CPU
-		{D238C375-B51C-45B7-8236-695FE5128F01}.WindowsDebug|Any CPU.Build.0 = WindowsDebug|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|x86.ActiveCfg = LinuxDebug|x86
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|x86.Build.0 = LinuxDebug|x86
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|x86.ActiveCfg = LinuxRelease|x86
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|x86.Build.0 = LinuxRelease|x86
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|x86.ActiveCfg = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|x86.Build.0 = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|x86.ActiveCfg = LinuxRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|x86.Build.0 = LinuxRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = Hierarchical
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.IndentSwitchSection = False
+		$3.LabelPositioning = NoIndent
+		$3.NewLinesForBracesInTypes = False
+		$3.NewLinesForBracesInMethods = False
+		$3.NewLinesForBracesInProperties = False
+		$3.NewLinesForBracesInAccessors = False
+		$3.NewLinesForBracesInAnonymousMethods = False
+		$3.NewLinesForBracesInControlBlocks = False
+		$3.NewLinesForBracesInAnonymousTypes = False
+		$3.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$3.NewLinesForBracesInLambdaExpressionBody = False
+		$3.NewLineForElse = False
+		$3.NewLineForCatch = False
+		$3.NewLineForFinally = False
+		$3.SpacingAroundBinaryOperator = Ignore
+		$3.scope = text/x-csharp
+		$0.TextStylePolicy = $4
+		$4.EolMarker = Unix
+		$4.scope = text/plain
+		$0.StandardHeader = $5
+		outputpath = ../bin
 	EndGlobalSection
 EndGlobal
