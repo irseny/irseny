@@ -1,6 +1,11 @@
-cmake -G "NMake Makefiles" -H. -B..\..\..\build\Irseny.Native \
--DCMAKE_BUILD_TYPE=Release -DTARGET_M32=1 -DWITH_WINAPI=1 -DWITH_VJOY=1 \
+cmake -G "NMake Makefiles" -H. -B..\..\..\build\Irseny.Native ^
+-DCMAKE_BUILD_TYPE=Release -DWITH_WINAPI=1 -DWITH_VJOY=1 ^
 -DWITH_FREETRACK=1 -DWITH_FREETRACK_DUMMY=1 -DWITH_FREETRACK_TEST=1
+cd ..\..\..\build\Irseny.Native
+nmake all
+nmake install
+cd ..\..\project\Irseny.Native\maketools
 
-nmake --directory=..\..\..\build\Irseny.Native all
-nmake --directory=..\..\..\build\Irseny.Native install
+REM Commented out because CMakeFiles\Makefile2 can not be found with the /F flag
+REM nmake /F ..\..\..\build\Irseny.Native\Makefile all
+REM nmake /F ..\..\..\build\Irseny.Native\Makefile install

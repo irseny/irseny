@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "windows.h"
-#include "FTTestWin.h"
+#include "TestWin.h"
 
 void cleanup(HANDLE file, HANDLE sync, void* map) {
 	if (map != NULL) {
