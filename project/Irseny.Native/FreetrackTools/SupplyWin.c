@@ -51,7 +51,7 @@
 	return 0;
 }*/
 
-#include "FTTestWin.h"
+#include "TestWin.h"
 
 void cleanup(HANDLE file, HANDLE sync, void* map) {
 	if (map != NULL) {
