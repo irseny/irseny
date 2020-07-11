@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="Irseny" Database="" Version="10000">
+  <Project Name="Irseny.Native" Path="Irseny.Native/Irseny.Native.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Windows" Selected="yes">
+      <Environment/>
+      <Project Name="Irseny.Native" ConfigName="Windows"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Linux" Selected="no">
+      <Environment/>
+      <Project Name="Irseny.Native" ConfigName="Linux"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
