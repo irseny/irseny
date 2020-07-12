@@ -13,4 +13,5 @@ project/Irseny.Main/obj/*
 project/Irseny.Webfront/lib/angular-1.8.0/*
 project/Irseny.Webfront/css/bootstrap-4.5.0/*
 project/packages/*
+project/compile_commands.json
 
