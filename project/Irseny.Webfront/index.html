@@ -1,15 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ng-app="webfront">
 <head>
 	<meta charset="UTF-8">
 	<title>Irseny</title>
 	<script src="lib/angular-1.8.0/angular.js"></script>
 	<script src="lib/angular-1.8.0/angular-resource.js"></script>
-	<script src="lib/angular-1.8.0/angular-route.js"></script>
+<!-- 	<script src="lib/angular-1.8.0/angular-route.js"></script> -->
+
 	<link rel="stylesheet" href="css/bootstrap-4.5.0/bootstrap.css">
+
+	<script src="main-frame/main-frame.module.js"></script>
+	<script src="main-frame/main-frame.component.js"></script>
+
+	<script src="webfront.module.js"></script>
 </head>
 
 <body>
-Welcome
+Welcome before main frame
+<main-frame></main-frame>
+After main frame
 </body>
 </html>

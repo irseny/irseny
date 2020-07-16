@@ -7,8 +7,8 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Irseny.Main</RootNamespace>
     <AssemblyName>Irseny.Main</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,6 +59,18 @@
     <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Webface\HttpServer.cs" />
+    <Compile Include="Webface\WebfaceServer.cs" />
+    <Compile Include="Webface\IWebChannel.cs" />
+    <Compile Include="Webface\IWebJunction.cs" />
+    <Compile Include="Webface\WebChannelState.cs" />
+    <Compile Include="Webface\WebJunction.cs" />
+    <Compile Include="Webface\TcpChannel.cs" />
+    <Compile Include="Webface\HttpChannel.cs" />
+    <Compile Include="Webface\WebSocketChannel.cs" />
+    <Compile Include="Webface\HttpHeader.cs" />
+    <Compile Include="Webface\HttpMethod.cs" />
+    <Compile Include="Webface\Services\ResourceService.cs" />
+    <Compile Include="Webface\HttpMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
@@ -69,6 +81,16 @@
   <ItemGroup>
     <Folder Include="Content\" />
     <Folder Include="Webface\" />
+    <Folder Include="Webface\Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="PrefixedHierarchical" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
