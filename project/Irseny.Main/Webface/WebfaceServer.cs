@@ -62,11 +62,15 @@ namespace Irseny.Main.Webface {
 							    Status = HttpStatusCode.OK
 							};
 							if (resource.EndsWith(".js")) {
-								responseHeader.Fields.Add("Content-Type", "text/javascript; charset=utf-8");
+								responseHeader.Fields.Add("Content-Type", "text/javascript; charset=UTF-8");
 							} else if (resource.EndsWith(".html")) { 
-								responseHeader.Fields.Add("Content-Type", "text/html; charset=utf-8");
+								responseHeader.Fields.Add("Content-Type", "text/html; charset=UTF-8");
+							} else if (resource.EndsWith(".css")) {
+								responseHeader.Fields.Add("Content-Type", "text/css; charset=UTF-8");
+							} else if (resource.EndsWith(".ico")) {
+								responseHeader.Fields.Add("Cotnent-Type", "image/vnd.microsoft.icon");
 							} else {
-								responseHeader.Fields.Add("Content-Type", "text/plain; charset=utf-8");
+								responseHeader.Fields.Add("Content-Type", "text/plain; charset=UTF-8");
 							}
 							responseHeader.Fields.Add("Content-Encoding", "identity");
 							responseHeader.Fields.Add("Content-Length", string.Format("{0}", responseContent.Length));

@@ -2,22 +2,37 @@
 <html lang="en" ng-app="webfront">
 <head>
 	<meta charset="UTF-8">
+	<!-- <meta name="viewport" content="width=1280, height=720, initial-scale=1, shrink-to-fit=no"> -->
 	<title>Irseny</title>
+
+	<script src="lib/jquery-3.5.1/jquery.js"></script>
 	<script src="lib/angular-1.8.0/angular.js"></script>
 	<script src="lib/angular-1.8.0/angular-resource.js"></script>
+
 <!-- 	<script src="lib/angular-1.8.0/angular-route.js"></script> -->
 
-	<link rel="stylesheet" href="css/bootstrap-4.5.0/bootstrap.css">
+	<link rel="stylesheet" href="css/bootstrap-4.5.0/css/bootstrap.css">
+	<script src="css/bootstrap-4.5.0/js/bootstrap.js"></script>
 
-	<script src="main-frame/main-frame.module.js"></script>
-	<script src="main-frame/main-frame.component.js"></script>
+	<script src="main-page/camera-list/camera-list.module.js"></script>
+	<script src="main-page/camera-list/camera-list.component.js"></script>
+
+	<script src="main-page/main-page.module.js"></script>
+	<script src="main-page/main-page.component.js"></script>
 
 	<script src="webfront.module.js"></script>
+
+
+
 </head>
 
 <body>
-Welcome before main frame
-<main-frame></main-frame>
-After main frame
+	<!-- <h1>Your browser does not work with bootstrap CSS version 4.5.0</h1> -->
+
+
+
+	<main-page></main-page>
+
+
 </body>
 </html>

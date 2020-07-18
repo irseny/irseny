@@ -1,1 +1,1 @@
-angular.module("webfront", [ "mainFrame" ]);
+angular.module("webfront", [ "mainPage" ]);
