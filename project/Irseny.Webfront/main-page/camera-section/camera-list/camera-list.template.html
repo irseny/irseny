@@ -1,0 +1,37 @@
+<!-- <div class="col-12 p-0"> -->
+<div class="container-fluid px-3">
+	<div class="navbar navbar-light bg-info">
+
+		<ul class="navbar-nav">
+			<li class="navbar-item dropdown">
+				<a class="nav-link dropdown-toggle" id="cameraListAddCam" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+					Add New
+				</a>
+				<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
+					<a ng-repeat="type in $ctrl.base.cameraClasses"
+						class="dropdown-item" href="#" ng-click="$ctrl.addCamera(type)">
+						{{type}}
+					</a>
+				</div>
+				<a class="nav-link" href="#" ng-click="$ctrl.removeCamera()">
+					Remove Selected
+				</a>
+			</li>
+			<li ng-repeat="cam in $ctrl.base.availableCameras" class="navbar-item">
+				<a class="nav-link"
+					ng-if="$ctrl.base.activeCamera != cam"
+					ng-click="console.log('clicked');$ctrl.base.activeCamera = cam"
+					style="text-center" href="#">
+					{{cam}}
+				</a>
+				<a class="nav-link active"
+					ng-if="$ctrl.base.activeCamera == cam"
+					href="#">
+					{{cam}}
+				</a>
+			</li>
+		</ul>
+
+	</div>
+</div>
+<!-- </div> -->
