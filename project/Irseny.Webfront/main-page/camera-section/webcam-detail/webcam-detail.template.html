@@ -1,3 +1,68 @@
 <div class="container-fluid bg-dark text-light">
-	put {{$ctrl.cameraId}} detail here
+	<div class="row">
+		<div class="col-5">
+			<!-- nothing to put here for now -->
+		</div>
+		<div class="col-7">
+			<!-- camera configuration -->
+			<table class="table table-dark">
+				<thead>
+					<tr>
+					<th scope="col">Property</th>
+					<th scope="col">Config</th>
+					<th scope="col">Auto</th>
+					</tr>
+				</thead>
+				<tbody class="bg-dark text-light">
+					<tr>
+						<th scope="row">System ID</th>
+						<td><input class="input-group-text bg-dark text-light" style="width: 5rem" type="number" value="0" min="0" max="32"></td>
+						<td><!-- no auto config --></td>
+					</tr>
+					<tr>
+						<th scope="row">Image Size</th>
+						<td>
+							<table class="table">
+								<tbody>
+									<tr>
+										<td><label class="text-light" for="webcamConfigImageSizeSelect">Selection</label></td>
+										<td><input class="input-group-text" type="radio" id="webcamConfigImageSizeSelect" name="webcamConfigImageSizeOption" value="select" checked></td>
+										<td><input class="input-group-text bg-dark text-light" style="width: 6rem" width="50px" type="number" value="320"></td>
+									</tr>
+									<tr>
+										<td><label class="text-light" for="webcamConfigImageSizeCustom">Custom</label></td>
+										<td><input class="input-group-text" type="radio" id="webcamConfigImageSizeCustom" name="webcamConfigImageSizeOption" value="custom"></td>
+										<td><input class="input-group-text bg-dark text-light" style="width: 6rem" type="number" value="240"></td>
+									</tr>
+								</tbody>
+							</table>
+
+
+
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-6">
+
+
+									</div>
+
+									<div class="col-6">
+
+
+									</div>
+
+								</div>
+							</div>
+						</td>
+						<td><input class="input-group-text bg-dark" type="checkbox" value="auto" checked></td>
+					</tr>
+				</tbody>
+			</table>
+
+
+		</div>
+	</div>
+
+
 </div>
+put {{$ctrl.cameraId}} detail here
