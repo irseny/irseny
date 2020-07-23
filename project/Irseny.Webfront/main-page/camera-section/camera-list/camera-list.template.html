@@ -1,16 +1,16 @@
 <!-- <div class="col-12 p-0"> -->
-<div class="container-fluid px-3">
-	<div class="navbar navbar-light bg-info">
+<div class="container-fluid px-0 mx-0">
+	<div class="navbar navbar-dark bg-dark mx-3 px-0">
 
-		<ul class="navbar-nav w-100">
+		<ul class="navbar-nav w-100 px-0">
 			<!-- add new camera dropdown -->
 			<li class="navbar-item dropdown">
-				<a class="nav-link dropdown-toggle active text-right" id="cameraListAddCam" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+				<a class="nav-link dropdown-toggle active text-right px-2" id="cameraListAddCam" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 					Add New
 				</a>
-				<div class="dropdown-menu bg-dark" aria-labelledby="cameraListAddCam">
+				<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
 					<a ng-repeat="type in $ctrl.base.cameraClasses"
-						class="dropdown-item text-white" href="#" ng-click="$ctrl.addCamera(type)">
+						class="dropdown-item text-right" href="#" ng-click="$ctrl.addCamera(type)">
 						{{type}}
 					</a>
 				</div>
@@ -18,16 +18,16 @@
 			<!-- list of cameras -->
 			<li ng-repeat="cam in $ctrl.base.availableCameras" class="navbar-item w-100">
 				<!-- non selected camera -->
-				<div class="nav-link text-right" ng-if="$ctrl.base.activeCamera != cam">
-					<a class="text-right text-dark" ng-click="$ctrl.base.activeCamera = cam" href="#">
+				<div class="nav-link text-right px-3" ng-if="$ctrl.base.activeCamera != cam">
+					<a class="text-right text-light" ng-click="$ctrl.base.activeCamera = cam" href="#">
 						{{cam}}
 					</a>
 				</div>
 				<!-- selected camera -->
-				<div class="nav-link bg-dark px-2 text-right" ng-if="$ctrl.base.activeCamera == cam">
+				<div class="nav-link bg-highlight px-3 text-right" ng-if="$ctrl.base.activeCamera == cam">
 					<a class="text-muted" href="#">Remove</a>
 					<a class="text-muted" href="#">Rename</a>
-					<a class="text-white" href="#">
+					<a class="text-dark" href="#">
 						{{cam}}
 					</a>
 				</div>
