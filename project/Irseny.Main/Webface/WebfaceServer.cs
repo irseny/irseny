@@ -10,7 +10,6 @@ namespace Irseny.Main.Webface {
 		readonly AutoResetEvent stopSignal = new AutoResetEvent(false);
 		Thread listenerThread = null;
 		List<IWebChannel> channels;
-		int clientNo = 0;
 		// non accepted channels with non tested junctions
 
 
@@ -27,13 +26,15 @@ namespace Irseny.Main.Webface {
 		}
 		private void Process() {
 			// wait for clients and process channels and changes
-			var listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9232);
-			listener.Start();
-			Console.WriteLine("listening");
+			var resourceListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9232);
+			var liveListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9234);
+			resourceListener.Start();
+			liveListener.Start();
+			Console.WriteLine("Started server on port 9232");
 			while (!stopSignal.WaitOne(16)) {
 				// accept new clients
-				if (listener.Pending()) {
-					var client = listener.AcceptTcpClient();
+				if (resourceListener.Pending()) {
+					var client = resourceListener.AcceptTcpClient();
 					//client.NoDelay = true;
 					//client.ReceiveTimeout = 1;
 					//client.SendTimeout = 1;
@@ -43,68 +44,83 @@ namespace Irseny.Main.Webface {
 					AddChannelPrototype(channel);
 
 				}
+				if (liveListener.Pending()) {
+					var client = liveListener.AcceptTcpClient();
+					var baseChannel = new TcpChannel(client);
+					var channel = new WebSocketChannel(baseChannel);
+					AddChannelPrototype(channel);
+				}
+				List<IWebChannel> toClose = new List<IWebChannel>();
 				foreach (var c in channels) {
 					c.Process();
+					if (c.State == WebChannelState.InitFailed || c.State == WebChannelState.Closed) {
+						toClose.Add(c);
+						continue;
+					}
+
 					if (c.AvailableMessageNo > 0) {
-
-
-						HttpMessage message = ((HttpChannel)c).EmitMessage();
-						//Console.WriteLine("message: ");
-						//Console.WriteLine(message.Header.ToString());
-						//Console.WriteLine(Encoding.UTF8.GetString(message.Content));
-						string resource = message.Header.Resource;
-
-						byte[] responseContent = new Services.ResourceService().ProvideResource(resource);
-						HttpHeader responseHeader;
-						if (responseContent.Length > 0) {
-							responseHeader = new HttpHeader(HttpMethod.Response) { 
-								Resource = resource,
-							    Status = HttpStatusCode.OK
-							};
-							if (resource.EndsWith(".js")) {
-								responseHeader.Fields.Add("Content-Type", "text/javascript; charset=UTF-8");
-							} else if (resource.EndsWith(".html")) { 
-								responseHeader.Fields.Add("Content-Type", "text/html; charset=UTF-8");
-							} else if (resource.EndsWith(".css")) {
-								responseHeader.Fields.Add("Content-Type", "text/css; charset=UTF-8");
-							} else if (resource.EndsWith(".ico")) {
-								responseHeader.Fields.Add("Cotnent-Type", "image/vnd.microsoft.icon");
-							} else {
-								responseHeader.Fields.Add("Content-Type", "text/plain; charset=UTF-8");
-							}
-							responseHeader.Fields.Add("Content-Encoding", "identity");
-							responseHeader.Fields.Add("Content-Length", string.Format("{0}", responseContent.Length));
-							//responseHeader.Fields.Add("Transfer-Encoding", "identity");
-							responseHeader.Fields.Add("Connection", "close");
-						} else {
-							responseHeader = new HttpHeader(HttpMethod.Response) {
-								Resource = resource,
-								Status = HttpStatusCode.NotFound
-							};
-							responseHeader.Fields.Add("Content-Length", "0");
-							//responseHeader.Fields.Add("Transfer-Encoding", "identity");
-							responseHeader.Fields.Add("Connection", "close");
+						var wc = c as WebSocketChannel;
+						if (wc != null) {
+							WebSocketMessage message = wc.EmitMessage();
+							string text = message.Text;
+							Console.WriteLine("received: " + text);
 						}
-						responseHeader.Fields.Add("Server", "Irseny");
-						responseHeader.Fields.Add("Date", DateTime.UtcNow.ToString());
+						var hc = c as HttpChannel;
+						if (hc != null) {
+							HttpMessage message = hc.EmitMessage();
+							//Console.WriteLine("message: ");
+							//Console.WriteLine(message.Header.ToString());
+							//Console.WriteLine(Encoding.UTF8.GetString(message.Content));
+							string resource = message.Header.Resource;
 
-						var response = new HttpMessage(responseHeader, responseContent);
-						
-						((HttpChannel)c).SendMessage(response);
-						((HttpChannel)c).Flush();
+							byte[] responseContent = new Services.ResourceService().ProvideResource(resource);
+							HttpHeader responseHeader;
+							if (responseContent.Length > 0) {
+								responseHeader = new HttpHeader(HttpMethod.Response, resource, message.Header.Version, HttpStatusCode.OK);
 
+								if (resource.EndsWith(".js")) {
+									responseHeader.Fields.Add("Content-Type", "text/javascript; charset=UTF-8");
+								} else if (resource.EndsWith(".html")) { 
+									responseHeader.Fields.Add("Content-Type", "text/html; charset=UTF-8");
+								} else if (resource.EndsWith(".css")) {
+									responseHeader.Fields.Add("Content-Type", "text/css; charset=UTF-8");
+								} else if (resource.EndsWith(".ico")) {
+									responseHeader.Fields.Add("Content-Type", "image/vnd.microsoft.icon");
+								} else {
+									responseHeader.Fields.Add("Content-Type", "text/plain; charset=UTF-8");
+								}
+								responseHeader.Fields.Add("Content-Encoding", "identity");
+								responseHeader.Fields.Add("Content-Length", string.Format("{0}", responseContent.Length));
+								//responseHeader.Fields.Add("Transfer-Encoding", "identity");
+								responseHeader.Fields.Add("Connection", "close");
+							} else {
+								responseHeader = new HttpHeader(HttpMethod.Response, resource, message.Header.Version, HttpStatusCode.NotFound);
+								responseHeader.Fields.Add("Content-Length", "0");
+								//responseHeader.Fields.Add("Transfer-Encoding", "identity");
+								responseHeader.Fields.Add("Connection", "close");
+							}
+							responseHeader.Fields.Add("Server", "Irseny");
+							responseHeader.Fields.Add("Date", DateTime.UtcNow.ToString());
 
-						//Console.WriteLine("answer: ");
-						//Console.WriteLine(response.Header.ToString());
-						//Console.WriteLine(Encoding.UTF8.GetString(response.Content));
+							var response = new HttpMessage(responseHeader, responseContent);
+							
+							((HttpChannel)c).SendMessage(response);
+							((HttpChannel)c).Flush();
+						}
 
 					}
+
+				}
+				foreach (IWebChannel c in toClose) {
+					c.Close();
+					Console.WriteLine("closed client " + channels.IndexOf(c));
+					channels.Remove(c);
 				}
 			}
 			foreach (var c in channels) { 
 				c.Close();
 			}
-			listener.Stop();
+			resourceListener.Stop();
 		}
 
 		public void Stop() {
@@ -112,7 +128,7 @@ namespace Irseny.Main.Webface {
 		}
 		public void AddChannelPrototype(IWebChannel channel) {
 			channels.Add(channel);
-			Console.WriteLine("new client " + clientNo++);
+			Console.WriteLine("new client " + (channels.Count - 1));
 
 		}
 		public void RejectChannelPrototype(IWebChannel channel) {

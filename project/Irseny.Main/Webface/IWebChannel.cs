@@ -26,7 +26,8 @@ namespace Irseny.Main.Webface {
 		/// <summary>
 		/// Closes this channel.
 		/// </summary>
-		void Close();
+		/// <param name="closeElementary">Whether or not to close elementary channels and connections.</param>
+		void Close(bool closeElementary=true);
 		/// <summary>
 		/// Used to finish writing internal buffers.
 		/// </summary>
@@ -43,8 +44,8 @@ namespace Irseny.Main.Webface {
 		/// Returns an available message without dequeuing it.
 		/// </summary>
 		/// <returns>The message.</returns>
-		/// <param name="index">Index.</param>
-		T SnoopMessage(int index=0);
+		/// <param name="depth">Depth.</param>
+		T SnoopMessage(int depth=0);
 		/// <summary>
 		/// Enqueues a message to be sent.
 		/// </summary>

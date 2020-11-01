@@ -9,6 +9,8 @@
     <AssemblyName>Irseny.Main</AssemblyName>
     <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <StartupObject>Irseny.Main.Program</StartupObject>
+    <ApplicationIcon>..\Irseny.Webfront\favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,8 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
-    <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
-    <IntermediateOutputPath></IntermediateOutputPath>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|x86' ">
     <Optimize>true</Optimize>
@@ -31,8 +32,6 @@
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
-    <BaseIntermediateOutputPath>..\..\obj</BaseIntermediateOutputPath>
-    <IntermediateOutputPath></IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -71,6 +70,7 @@
     <Compile Include="Webface\HttpMethod.cs" />
     <Compile Include="Webface\Services\ResourceService.cs" />
     <Compile Include="Webface\HttpMessage.cs" />
+    <Compile Include="Webface\WebSocketMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
@@ -88,7 +88,7 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <DotNetNamingPolicy ResourceNamePolicy="FileFormatDefault" DirectoryNamespaceAssociation="PrefixedHierarchical" />
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="FileFormatDefault" />
         </Policies>
       </Properties>
     </MonoDevelop>

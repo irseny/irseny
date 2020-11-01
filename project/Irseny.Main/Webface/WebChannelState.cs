@@ -2,7 +2,7 @@
 namespace Irseny.Main.Webface {
 	public enum WebChannelState {
 		Initializing,
-		SetupFailed,
+		InitFailed,
 		Open,
 		Closed
 	}

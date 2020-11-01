@@ -1,4 +1,4 @@
-function WebcamDetailController() {
+function WebcamDetailController(LiveWire) {
 	this.framerate = 30;
 	this.exposure = 0.0;
 	this.imageResolutionConfigMode = "selectTypical";
@@ -83,6 +83,7 @@ function WebcamDetailController() {
 	};
 	this.applyChanges = function() {
 		console.log("applying changes");
+		LiveWire.sendMessage("live changes applied");
 	};
 	this.resetChanges = function() {
 		console.log("resetting changes");

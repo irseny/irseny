@@ -135,7 +135,7 @@ namespace Irseny.Main.Webface {
 					}
 					closeDiff.Add(channel);
 				break;
-				case WebChannelState.SetupFailed:
+				case WebChannelState.InitFailed:
 					if (ParentJunction != null) {
 						ParentJunction.RejectChannelPrototype(channel);
 					}

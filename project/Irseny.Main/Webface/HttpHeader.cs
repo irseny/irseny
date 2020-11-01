@@ -15,20 +15,32 @@ namespace Irseny.Main.Webface {
 		public Dictionary<string, string> Fields { get; private set; }
 
 
-		public HttpHeader(HttpMethod method) {
-			Method = method;
+		private HttpHeader() {
+			Method = HttpMethod.Response;
 			Status = HttpStatusCode.OK;
 			Resource = string.Empty;
 			Version = HttpVersion.Version11;
 			Fields = new Dictionary<string, string>(32, StringComparer.OrdinalIgnoreCase);
 		}
-		public HttpHeader(HttpHeader source) {
+		
+
+		public HttpHeader(Version version, HttpStatusCode status) : this() {
+			Version = version;
+			Status = status;
+		}
+		public HttpHeader(HttpMethod method, string resource, Version version, HttpStatusCode status) : this() {
+			Method = method;
+			Resource = resource;
+			Version = version;
+			Status = status;
+		}
+		public HttpHeader(HttpHeader source) : this() {
 			if (source == null) throw new ArgumentNullException("source");
 			this.Method = source.Method;
 			this.Status = source.Status;
 			this.Resource = source.Resource;
 			this.Version = source.Version;
-			this.Fields = new Dictionary<string, string>(source.Fields);
+			this.Fields = new Dictionary<string, string>(source.Fields, StringComparer.OrdinalIgnoreCase);
 		}
 
 		public override string ToString() {
@@ -68,9 +80,8 @@ namespace Irseny.Main.Webface {
 		}
 
 		public static HttpHeader Parse(string text) {
-			var result = new HttpHeader(HttpMethod.Response);
-
-			// TODO test with existing method
+			var result = new HttpHeader();
+			// TODO make compatible with RESPONSE messages
 			string[] split = text.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 			if (split.Length == 0) {
 				throw new FormatException(text);
@@ -126,6 +137,8 @@ namespace Irseny.Main.Webface {
 				return HttpMethod.Get;
 			} else if (text.Equals("post")) {
 				return HttpMethod.Post;
+			} else if (text.Equals(string.Empty)) {
+				return HttpMethod.Response;
 			} else {
 				throw new FormatException(text);
 			}

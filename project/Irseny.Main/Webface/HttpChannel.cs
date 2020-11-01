@@ -74,7 +74,7 @@ namespace Irseny.Main.Webface {
 
 		public void Process() {
 			// test for invalid state
-			if (State == WebChannelState.Closed || State == WebChannelState.SetupFailed) {
+			if (State == WebChannelState.Closed || State == WebChannelState.InitFailed) {
 				return;
 			}
 			source.Process();
@@ -82,8 +82,8 @@ namespace Irseny.Main.Webface {
 				State = WebChannelState.Closed;
 				return;
 			}
-			if (State == WebChannelState.SetupFailed) {
-				State = WebChannelState.SetupFailed;
+			if (State == WebChannelState.InitFailed) {
+				State = WebChannelState.InitFailed;
 				return;
 			}
 			if (State == WebChannelState.Initializing) { 
@@ -287,8 +287,11 @@ namespace Irseny.Main.Webface {
 			snoopedBitNo = 0;
 			State = WebChannelState.Open;
 		}
-		public void Close() {
-			source.Close();
+		public void Close(bool closeElementary=true) {
+			if (closeElementary) {
+				source.Close();
+			}
+			State = WebChannelState.Closed;
 		}
 		public void Flush() {
 			source.Flush();
