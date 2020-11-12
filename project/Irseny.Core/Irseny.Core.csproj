@@ -91,6 +91,11 @@
     <Compile Include="Inco\Ivj.cs" />
     <Compile Include="Util\BytePatternSearch.cs" />
     <Compile Include="Util\StringPatternSearch.cs" />
+    <Compile Include="Util\JsonString.cs" />
+    <Compile Include="Util\JsonStringType.cs" />
+    <Compile Include="Util\JsonStringPartition.cs" />
+    <Compile Include="Util\JsonStringInterpret.cs" />
+    <Compile Include="Util\StringifyTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Capture\" />

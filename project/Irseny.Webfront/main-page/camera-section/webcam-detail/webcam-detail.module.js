@@ -1,1 +1,1 @@
-angular.module("webcamDetail", ["liveWire"]);
+angular.module("webcamDetail", ["liveConnection"]);

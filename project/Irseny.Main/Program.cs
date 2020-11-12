@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using Irseny.Core.Util;
+using Irseny.Core.Log;
+
 namespace Irseny.Main {
 	public static class Program {
 		//public static void Main(string[] args) {
@@ -36,45 +39,60 @@ namespace Irseny.Main {
 
 		//}
 		public static void Main(string[] args) {
+
+			LogManager.MakeInstance(new LogManager());
 			Console.WriteLine("Hello, World!");
 			var server = new Webface.WebfaceServer();
 			server.Start();
 			Console.ReadLine();
 			server.Stop();
+
+			Irseny.Core.Util.JsonString.Parse(@"");
+
+			var partition = JsonString.PartitionJson(@"{
+  ""Date"": ""2019-08-01T00:00:00-07:00"",
+  ""TemperatureCelsius"": 25,
+  ""Summary"": ""Hot"",
+  ""DatesAvailable"": [
+    ""2019-08-01T00:00:00-07:00"",
+    ""2019-08-02T00:00:00-07:00""
+  ],
+  ""TemperatureRanges"": {
+    ""Cold"": {
+      ""High"": 20,
+      ""Low"": -10
+    },
+    ""Hot"": {
+      ""High"": 60,
+      ""Low"": 20
+    }
+  },
+  ""SummaryWords"": [
+    ""Cool"",
+    ""Windy"",
+    ""Humid""
+  ]
+}");
+//			var partition = JsonString.PartitionJson(@"{
+//	'jamesbond': 'gravel',
+//	'harry': {
+//		'calamity': 'jane',
+//		'lucky':'luke',
+//		'selmy':{
+//			'area':1234
+//		}
+//	}
+//}");
+			Console.WriteLine("Parts:");
+			foreach (string part in partition) {
+				Console.WriteLine(part);
+			}
+			Console.WriteLine("Formatted:");
+			Console.WriteLine(partition.ToJsonString());
+			JsonString str = JsonString.InterpretJson(partition);
+			Console.WriteLine("Interpreted:");
+			Console.WriteLine(str.ToJsonString());
+			return;
 		}
-		const string index = @"
-<!DOCTYPE html>
-<html lang='en'>
-<meat charset='utf-8'/>
-<head>
-
-<title>head</title>
-
-</head>
-<body id='home'>
-
-body of request {0}
-<!--<img src='http://localhost:5643/images/image.png' alt='does not exist' title='an image'>-->
-<script language='javascript'>
-
-var ws = WebSocket('ws://localhost:5643')
-ws.onopen = function(event) {{
-	alert('websocket open');
-}};
-ws.onerror = function(event) {{
-	alert('websocket error: ', event);
-}}
-ws.onclose = function(event) {{
-	alert('websocket closing: ', event);
-}}
-
-</script>
-
-
-<body>
-
-</html>";
-
 	}
-
 }

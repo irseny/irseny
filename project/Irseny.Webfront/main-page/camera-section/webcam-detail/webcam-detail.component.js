@@ -1,4 +1,4 @@
-function WebcamDetailController(LiveWire) {
+function WebcamDetailController(LiveWireService) {
 	this.framerate = 30;
 	this.exposure = 0.0;
 	this.imageResolutionConfigMode = "selectTypical";
@@ -98,3 +98,4 @@ module.component("webcamDetail", {
 		cameraId : "=camera"
 	}
 });
+WebcamDetailController.$inject = ["LiveWireService"];

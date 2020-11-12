@@ -57,20 +57,19 @@
     <Compile Include="Content\Profile\TrackingProfileReader.cs" />
     <Compile Include="Content\Profile\TrackingProfileWriter.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Webface\HttpServer.cs" />
     <Compile Include="Webface\WebfaceServer.cs" />
     <Compile Include="Webface\IWebChannel.cs" />
-    <Compile Include="Webface\IWebJunction.cs" />
     <Compile Include="Webface\WebChannelState.cs" />
-    <Compile Include="Webface\WebJunction.cs" />
-    <Compile Include="Webface\TcpChannel.cs" />
-    <Compile Include="Webface\HttpChannel.cs" />
-    <Compile Include="Webface\WebSocketChannel.cs" />
-    <Compile Include="Webface\HttpHeader.cs" />
-    <Compile Include="Webface\HttpMethod.cs" />
     <Compile Include="Webface\Services\ResourceService.cs" />
-    <Compile Include="Webface\HttpMessage.cs" />
-    <Compile Include="Webface\WebSocketMessage.cs" />
+    <Compile Include="Webface\Http\HttpChannel.cs" />
+    <Compile Include="Webface\Http\HttpHeader.cs" />
+    <Compile Include="Webface\Http\HttpMessage.cs" />
+    <Compile Include="Webface\Http\HttpMethod.cs" />
+    <Compile Include="Webface\Http\HttpServer.cs" />
+    <Compile Include="Webface\WebSocket\WebSocketChannel.cs" />
+    <Compile Include="Webface\WebSocket\WebSocketMessage.cs" />
+    <Compile Include="Webface\Tcp\TcpChannel.cs" />
+    <Compile Include="Webface\LiveWireServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
@@ -82,6 +81,9 @@
     <Folder Include="Content\" />
     <Folder Include="Webface\" />
     <Folder Include="Webface\Services\" />
+    <Folder Include="Webface\Http\" />
+    <Folder Include="Webface\WebSocket\" />
+    <Folder Include="Webface\Tcp\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

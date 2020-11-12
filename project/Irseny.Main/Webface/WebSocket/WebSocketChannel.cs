@@ -124,7 +124,7 @@ namespace Irseny.Main.Webface {
 				payloadLengthExt = 0;
 			} else {
 				if (payload.Length <= short.MaxValue) {
-					payloadLengthExt = 4;
+					payloadLengthExt = 2;
 				} else {
 					payloadLengthExt = 8;
 				}
@@ -145,19 +145,21 @@ namespace Irseny.Main.Webface {
 			if (payloadLengthExt == 0) {
 				result[1] = (byte)payload.Length;
 			} else {
-				if (payloadLengthExt == 4) {
+				byte[] lengthExt;
+				if (payloadLengthExt == sizeof(ushort)) {
 					result[1] = 126;
-				} else if (payloadLengthExt == 8) {
-					result[2] = 127;
+					lengthExt = BitConverter.GetBytes((ushort)payload.Length);
+				} else if (payloadLengthExt == sizeof(ulong)) {
+					result[1] = 127;
+					lengthExt = BitConverter.GetBytes((ulong)payload.LongLength);
 				} else {
 					throw new InvalidOperationException();
 				}
-				byte[] lengthExt = BitConverter.GetBytes(payload.Length);
 				if (BitConverter.IsLittleEndian) {
 					Array.Reverse(lengthExt);
 				}
 				for (int i = 0; i < payloadLengthExt; i++) {
-					result[3 + i] = lengthExt[lengthExt.Length - payloadLengthExt + i];
+					result[headLength + i] = lengthExt[i];
 				}
 			}
 			// payload
@@ -205,13 +207,10 @@ namespace Irseny.Main.Webface {
 					}
 					string sVersion;
 					if (header.Fields.TryGetValue("Sec-WebSocket-Version", out sVersion)) {
-						int version;
-						bool acceptVersion = true;
-						if (!int.TryParse(sVersion, out version)) {
-							acceptVersion = false;
-						}
-						if (version != 13) {
-							acceptVersion = false;
+						// TODO improve detection
+						bool acceptVersion = false;
+						if (sVersion.Contains("13")) {
+							acceptVersion = true;
 
 						}
 						if (!acceptVersion) {
@@ -353,7 +352,9 @@ namespace Irseny.Main.Webface {
 			} else if (payloadLength1 == 126) {
 				payloadLengthExt = 2;
 			} else if (payloadLength1 == 127) {
-				payloadLengthExt = 6;
+				payloadLengthExt = 8;
+			} else {
+				throw new InvalidOperationException();
 			}
 			const int basicHeadLength = 2;
 			const int maskLength = 4;
@@ -369,14 +370,21 @@ namespace Irseny.Main.Webface {
 			// read the extended payload length
 			ulong payloadLength = payloadLength1;
 			if (payloadLengthExt > 0) {
+				byte[] ext = new byte[payloadLengthExt];
+				for (int i = 0; i < payloadLengthExt; i++) {
+					ext[i] = message[basicHeadLength + i];
+				}
+				// payload length is always written in big-endian (MSB0) style
+				// reverse the byte order in case of little-endian bit conversion
 				if (BitConverter.IsLittleEndian) {
-					byte[] ext = new byte[payloadLengthExt];
-					for (int i = 0; i < payloadLengthExt; i++) {
-						ext[payloadLengthExt - i - 1] = message[basicHeadLength + i];
-					}
+					Array.Reverse(ext);
+				}
+				if (payloadLengthExt == sizeof(ushort)) {
+					payloadLength = BitConverter.ToUInt16(ext, 0);
+				} else if (payloadLengthExt == sizeof(ulong)) {
 					payloadLength = BitConverter.ToUInt64(ext, 0);
 				} else {
-					payloadLength = BitConverter.ToUInt64(message, basicHeadLength);
+					throw new InvalidOperationException();
 				}
 			}
 			// terminate on massive messages

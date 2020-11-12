@@ -7,6 +7,18 @@ namespace Irseny.Core.Util {
 		public readonly static NumberStyles NumberStyle = NumberStyles.Float;
 		public readonly static CultureInfo FormatProvider = CultureInfo.InvariantCulture;
 
+		public static bool TryParseNull(string text, out object result) {
+			if (text == null) {
+				result = null;
+				return true;
+			}
+			if (text.ToLower().Equals("null")) {
+				result = null;
+				return true;
+			}
+			result = null;
+			return false;
+		}
 		public static char ParseChar(string text, char fallback) {
 			if (text == null) {
 				return fallback;
@@ -15,6 +27,19 @@ namespace Irseny.Core.Util {
 				return text[0];
 			} else {
 				return fallback;
+			}
+		}
+		public static bool TryParseChar(string text, out char result) {
+			if (text == null) {
+				result = '\0';
+				return false;
+			}
+			if (text.Length > 0) {
+				result = text[0];
+				return false;
+			} else {
+				result = '\0';
+				return false;
 			}
 		}
 		public static float ParseFloat(string text, float fallback) {
@@ -29,6 +54,17 @@ namespace Irseny.Core.Util {
 			}
 			return fallback;
 		}
+		public static bool TryParseFloat(string text, out float result) {
+			if (text == null) {
+				result = 0.0f;
+				return false;
+			}
+			if (text.Length > 0) {
+				return float.TryParse(text, NumberStyle, FormatProvider, out result);
+			}
+			result = 0.0f;
+			return false;
+		}
 		public static double ParseDouble(string text, double fallback) {
 			if (text == null) {
 				return fallback;
@@ -40,6 +76,17 @@ namespace Irseny.Core.Util {
 				}
 			}
 			return fallback;
+		}
+		public static bool TryParseDouble(string text, out double result) {
+			if (text == null) {
+				result = 0.0;
+				return false;
+			}
+			if (text.Length > 0) {
+				return double.TryParse(text, NumberStyle, FormatProvider, out result);
+			}
+			result = 0.0;
+			return false;
 		}
 		/// <summary>
 		/// Reads a boolean value from the given string.
@@ -73,6 +120,40 @@ namespace Irseny.Core.Util {
 			}
 			return fallback;
 		}
+		public static bool TryParseBool(string text, out bool result) {
+			if (text == null) {
+				result = false;
+				return false;
+			}
+			text = text.Trim();
+			if (text.Length > 0) {
+				int intValue;
+				if (int.TryParse(text, out intValue)) {
+					result = (intValue != 0);
+					return true;
+				}
+				string lower = text.ToLower();
+				if (lower.Equals("true")) {
+					result = true;
+					return true;
+				}
+				if (lower.Equals("false")) {
+					result = false;
+					return true;
+				}
+				if (lower.Equals("yes")) {
+					result = true;
+					return true;
+				}
+				if (lower.Equals("no")) {
+					result = false;
+					return true;
+				}
+
+			}
+			result = false;
+			return false;
+		}
 		/// <summary>
 		/// Reads an integer from the given string.
 		/// </summary>
@@ -90,6 +171,17 @@ namespace Irseny.Core.Util {
 			}
 			return fallback;
 		}
+		public static bool TryParseInt(string text, out int result) {
+			if (text == null) {
+				result = 0;
+				return false;
+			}
+			if (text.Length > 0) {
+				return int.TryParse(text, out result);
+			}
+			result = 0;
+			return false;
+		}
 
 		public static uint ParseUInt(string text, uint fallback) {
 			if (text == null) {
@@ -102,6 +194,17 @@ namespace Irseny.Core.Util {
 				}
 			}
 			return fallback;
+		}
+		public static bool TryParseUInt(string text, out uint result) {
+			if (text == null) {
+				result = 0;
+				return false;
+			}
+			if (text.Length > 0) {
+				return uint.TryParse(text, out result);
+			}
+			result = 0;
+			return false;
 		}
 	}
 }

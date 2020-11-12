@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Text;
+using Irseny.Core.Util;
 
 namespace Irseny.Main.Webface {
 	public class WebfaceServer  {
@@ -27,11 +28,14 @@ namespace Irseny.Main.Webface {
 		private void Process() {
 			// wait for clients and process channels and changes
 			var resourceListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9232);
-			var liveListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9234);
+			//var liveListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9234);
+			var liveWire = new LiveWireServer();
+			liveWire.Start();
 			resourceListener.Start();
-			liveListener.Start();
+			//liveListener.Start();
 			Console.WriteLine("Started server on port 9232");
 			while (!stopSignal.WaitOne(16)) {
+				liveWire.Process();
 				// accept new clients
 				if (resourceListener.Pending()) {
 					var client = resourceListener.AcceptTcpClient();
@@ -44,12 +48,12 @@ namespace Irseny.Main.Webface {
 					AddChannelPrototype(channel);
 
 				}
-				if (liveListener.Pending()) {
-					var client = liveListener.AcceptTcpClient();
-					var baseChannel = new TcpChannel(client);
-					var channel = new WebSocketChannel(baseChannel);
-					AddChannelPrototype(channel);
-				}
+//				if (liveListener.Pending()) {
+//					var client = liveListener.AcceptTcpClient();
+//					var baseChannel = new TcpChannel(client);
+//					var channel = new WebSocketChannel(baseChannel);
+//					AddChannelPrototype(channel);
+//				}
 				List<IWebChannel> toClose = new List<IWebChannel>();
 				foreach (var c in channels) {
 					c.Process();
@@ -64,6 +68,16 @@ namespace Irseny.Main.Webface {
 							WebSocketMessage message = wc.EmitMessage();
 							string text = message.Text;
 							Console.WriteLine("received: " + text);
+							//string updateMsg = "{ 'type': 'request', 
+							Console.WriteLine("circling that");
+							//string updateMsg = "{ 'sender': 'minority', 'type': 'config',  'update', 'content': 'sent to update division' }";
+							//Console.WriteLine("sending update: " + updateMsg);
+							//Thread.Sleep(1000);
+							JsonString str = JsonString.Parse(text);
+							str.Dict.Add("text", "tentacles");
+							wc.SendMessage(new WebSocketMessage(str.ToJsonString()));
+
+							wc.SendMessage(new WebSocketMessage("{\"type\":\"update\", \"subject\":\"content\"  }"));
 						}
 						var hc = c as HttpChannel;
 						if (hc != null) {
@@ -137,13 +151,13 @@ namespace Irseny.Main.Webface {
 		public void AcceptChannelPrototype(IWebChannel channel) {
 			//acceptedChannels.Add(channel);
 		}
-		public void AddJunction(IWebJunction junction, string[] path, int pathStart) {
-			if (path.Length < 1) throw new ArgumentException("path.Length");
-			if (pathStart < 0) throw new ArgumentException("pathStart");
-			if (pathStart >= path.Length) throw new ArgumentException("pathStart");
-			if (pathStart < path.Length - 1) {
-				string name = path[pathStart];
-			}
-		}
+//		public void AddJunction(IWebJunction junction, string[] path, int pathStart) {
+//			if (path.Length < 1) throw new ArgumentException("path.Length");
+//			if (pathStart < 0) throw new ArgumentException("pathStart");
+//			if (pathStart >= path.Length) throw new ArgumentException("pathStart");
+//			if (pathStart < path.Length - 1) {
+//				string name = path[pathStart];
+//			}
+//		}
 	}
 }
