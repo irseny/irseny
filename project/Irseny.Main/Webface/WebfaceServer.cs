@@ -74,7 +74,7 @@ namespace Irseny.Main.Webface {
 							//Console.WriteLine("sending update: " + updateMsg);
 							//Thread.Sleep(1000);
 							JsonString str = JsonString.Parse(text);
-							str.Dict.Add("text", "tentacles");
+							str.AddTerminal("text", "tentacles");
 							wc.SendMessage(new WebSocketMessage(str.ToJsonString()));
 
 							wc.SendMessage(new WebSocketMessage("{\"type\":\"update\", \"subject\":\"content\"  }"));

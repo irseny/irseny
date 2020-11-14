@@ -61,6 +61,8 @@ namespace Irseny.Main.Webface {
 						clientOrigin, message.Text));
 					// TODO handle message
 					JsonString str = JsonString.Parse(message.Text);
+
+
 				}
 				if (channel.State == WebChannelState.InitFailed) {
 					LogManager.Instance.LogMessage(this, string.Format("LiveWire client {0} failed to connect", 
@@ -74,6 +76,7 @@ namespace Irseny.Main.Webface {
 					channel.Close(true);
 				}
 			}
+			// TODO implement pinging in order to detect suspended connections
 			// remove dead connections
 			foreach (int origin in toRemove) {
 				connections.Remove(origin);
@@ -81,10 +84,15 @@ namespace Irseny.Main.Webface {
 		}
 		private JsonString GenerateConfigMessage(int clientOrigin) {
 			var result = JsonString.CreateDict();
-			result.Add("config", "type");
-			result.Add(JsonString.CreateDict(), "subject");
-			result.Add(ServerOrigin, "subject", "serverOrigin");
-			result.Add(clientOrigin, "subject", "clientOrigin");
+			{
+				result.AddTerminal("type", @"""config""");
+				var config = JsonString.CreateDict();
+				{
+					config.AddTerminal("serverOrigin", StringifyTools.StringifyInt(ServerOrigin));
+					config.AddTerminal("clientOrigin", StringifyTools.StringifyInt(clientOrigin));
+				}
+				result.AddJsonString("subject", config);
+			}
 			return result;
 		}
 	}

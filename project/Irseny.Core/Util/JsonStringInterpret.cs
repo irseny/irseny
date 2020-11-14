@@ -40,7 +40,7 @@ namespace Irseny.Core.Util {
 				if (source[i].StartsWith("'") || source[i].StartsWith("\"")) {
 					
 					KeyValuePair<string, object> pair = InterpretJsonKeyValue(source, ref i);
-					result.Dict.Add(pair.Key, pair.Value);
+					result.dict.Add(pair.Key, pair.Value);
 					// jump to next unread part
 					i += 1;
 				} else {
@@ -93,21 +93,22 @@ namespace Irseny.Core.Util {
 				value = InterpretJsonDict(source, ref startAt);
 			} else {
 				// TODO parse as string, int or float
-				string text = source[startAt].TrimStart('"', '\'').TrimEnd('"', '\'');
-				bool bValue;
-				int iValue;
-				double dValue;
-				if (TextParseTools.TryParseNull(text, out value)) {
-					// nothing to do
-				} else if (TextParseTools.TryParseInt(text, out iValue)) {
-					value = iValue;
-				} else if (TextParseTools.TryParseBool(text, out bValue)) {
-					value = bValue;
-				} else if (TextParseTools.TryParseDouble(text, out dValue)) {
-					value = (float)dValue;
-				} else {
-					value = text;
-				}
+				value = source[startAt];
+//				string text = source[startAt];
+//				bool bValue;
+//				int iValue;
+//				double dValue;
+//				if (TextParseTools.TryParseNull(text, out value)) {
+//					// nothing to do
+//				} else if (TextParseTools.TryParseInt(text, out iValue)) {
+//					value = iValue;
+//				} else if (TextParseTools.TryParseBool(text, out bValue)) {
+//					value = bValue;
+//				} else if (TextParseTools.TryParseDouble(text, out dValue)) {
+//					value = (float)dValue;
+//				} else {
+//					value = text;
+//				}
 			}
 			return new KeyValuePair<string, object>(key, value);	
 
@@ -126,12 +127,12 @@ namespace Irseny.Core.Util {
 				// read next item
 				string value = source[i];
 				if (value.Equals("[")) {
-					result.Array.Add(InterpretJsonArray(source, ref i));
+					result.array.Add(InterpretJsonArray(source, ref i));
 				} else if (value.Equals("{")) {
-					result.Array.Add(InterpretJsonDict(source, ref i));
+					result.array.Add(InterpretJsonDict(source, ref i));
 				} else {
 					// TODO parse string, int or float
-					result.Array.Add(value);
+					result.array.Add(value);
 				}
 				// read end or continuation character
 				i += 1;

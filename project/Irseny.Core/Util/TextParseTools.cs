@@ -19,6 +19,25 @@ namespace Irseny.Core.Util {
 			result = null;
 			return false;
 		}
+		public static string ParseString(string text, string fallback) {
+			if (text == null) {
+				return fallback;
+			}
+			if (text.Length < 2) {
+				return text;
+			}
+			// try trim start and end quotes
+			char first = text[0];
+			char last = text[text.Length - 1];
+			if (first == '"' && last == '"') {
+				return text.Substring(1, text.Length - 2);
+			}
+			if (first == '\'' && last == '\'') {
+				return text.Substring(1, text.Length - 2);
+			}
+			return text;
+		}
+
 		public static char ParseChar(string text, char fallback) {
 			if (text == null) {
 				return fallback;
