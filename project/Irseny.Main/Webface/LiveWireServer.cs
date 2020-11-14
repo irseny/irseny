@@ -13,12 +13,17 @@ namespace Irseny.Main.Webface {
 		TcpListener listener = null;
 		Dictionary<int, WebSocketChannel> connections;
 		int nextClientOrigin = 1;
+		LiveRequestHandler requestHandler;
+		LiveUpdateHandler updateHandler;
+
 
 		private int GenerateClientOrigin() {
 			return nextClientOrigin++;
 		}
 		public LiveWireServer () {
 			connections = new Dictionary<int, WebSocketChannel>(16);
+			requestHandler = new LiveRequestHandler();
+			updateHandler = new LiveUpdateHandler();
 		}
 		public bool Started {
 			get { return listener != null; }
@@ -51,6 +56,8 @@ namespace Irseny.Main.Webface {
 			}
 			// process connections
 			var toRemove = new LinkedList<int>();
+			var updates = new LinkedList<WebSocketMessage>();
+			
 			foreach (var pair in connections) {
 				WebSocketChannel channel = pair.Value;
 				int clientOrigin = pair.Key;
@@ -59,13 +66,30 @@ namespace Irseny.Main.Webface {
 					var message = channel.EmitMessage();
 					LogManager.Instance.LogMessage(this, string.Format("LiveWire received from client {0}: {1}", 
 						clientOrigin, message.Text));
-					// TODO handle message
+					// outsourced message handling
 					JsonString str = JsonString.Parse(message.Text);
-
+					JsonString answer;
+					bool handled = false;
+					if (requestHandler.TryAnswer(str, out answer)) {
+						channel.SendMessage(new WebSocketMessage(answer.ToString()));
+						handled = true;
+					} 
+					JsonString update;
+					if (updateHandler.TryApplyUpdate(str, out update)) {
+						if (update != null) {
+							updates.AddLast(new WebSocketMessage(update.ToString()));
+						}
+						handled = true;
+					}
+					if (!handled) {
+						LogManager.Instance.LogError(this, string.Format("Failed to handle live message\n{0}\n",
+							str.ToJsonString()));
+					}
 
 				}
+
 				if (channel.State == WebChannelState.InitFailed) {
-					LogManager.Instance.LogMessage(this, string.Format("LiveWire client {0} failed to connect", 
+					LogManager.Instance.LogError(this, string.Format("LiveWire client {0} failed to connect", 
 						clientOrigin));
 					toRemove.AddLast(clientOrigin);
 					channel.Close(true);
@@ -74,6 +98,14 @@ namespace Irseny.Main.Webface {
 						clientOrigin));
 					toRemove.AddLast(clientOrigin);
 					channel.Close(true);
+				}
+			}
+			// send updates to all clients
+			if (updates.First != null) {
+				foreach (var pair in connections) {
+					foreach (var update in updates) {
+						pair.Value.SendMessage(update);
+					}
 				}
 			}
 			// TODO implement pinging in order to detect suspended connections

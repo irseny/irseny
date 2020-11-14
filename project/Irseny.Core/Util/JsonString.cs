@@ -34,7 +34,17 @@ namespace Irseny.Core.Util {
 		}
 		public JsonString GetJsonString(params object[] path) {
 			if (path == null) throw new ArgumentNullException("path");
-			return GetJsonString(0, path);
+			return GetJsonString(true, 0, path);
+		}
+		public JsonString TryGetJsonString(params object[] path) {
+			if (path == null) throw new ArgumentNullException("path");
+			try {
+				return GetJsonString(0, path);
+			} catch (ArgumentException) {
+			} catch (InvalidOperationException) {
+			} catch (KeyNotFoundException) {
+			} 
+			return null;
 		}
 		private JsonString GetJsonString(int startAt, object[] path) {
 			if (startAt >= path.Length) {
@@ -45,13 +55,14 @@ namespace Irseny.Core.Util {
 			case JsonStringType.Array:
 				// read the next child from an array
 				if (!(path[startAt] is int)) {
+					
 					throw new ArgumentException(string.Format("Expected an integer for path[{0}]={1}",
-						startAt, path[startAt]), "path");
+						startAt, path[startAt]));
 				}
 				int index = (int)path[startAt];
 				if (index < 0 || index >= array.Count) {
 					throw new ArgumentException(string.Format("Index path[{0}]={1} is out of index range [0...{2}]",
-						startAt, index, array.Count - 1), "path");
+						startAt, index, array.Count - 1));
 				}
 				value = array[index];
 				break;
@@ -59,12 +70,12 @@ namespace Irseny.Core.Util {
 				// read the next child from a dictionary
 				if (!(path[startAt] is string)) {
 					throw new ArgumentException(string.Format("Expected a string for path[{0}]={1}",
-						startAt, path[startAt]), "path");
+						startAt, path[startAt]));
 				}
 				string key = (string)path[startAt];
-				if (!dict.TryGetValue("key", out value)) {
+				if (!dict.TryGetValue(key, out value)) {
 					throw new ArgumentException(string.Format("Key path[{0}]={1} does not exist",
-						startAt, path[startAt]), "path");
+						startAt, path[startAt]));
 				}
 				break;
 			default:
@@ -74,7 +85,7 @@ namespace Irseny.Core.Util {
 			var child = (value as JsonString);
 			if (child == null) {
 				throw new ArgumentException(string.Format("Unexpected terminal {0} on path[{1}]={2}",
-					value, startAt, path[startAt]), "path");
+					value, startAt, path[startAt]));
 			}
 			return child.GetJsonString(startAt + 1, path);
 		}

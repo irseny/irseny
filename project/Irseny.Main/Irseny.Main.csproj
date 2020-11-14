@@ -70,6 +70,8 @@
     <Compile Include="Webface\WebSocket\WebSocketMessage.cs" />
     <Compile Include="Webface\Tcp\TcpChannel.cs" />
     <Compile Include="Webface\LiveWireServer.cs" />
+    <Compile Include="Webface\LiveRequestHandler.cs" />
+    <Compile Include="Webface\LiveUpdateHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
