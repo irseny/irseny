@@ -1,6 +1,9 @@
 bin
 build/*
-lib/*
+lib/**.dll
+lib/**.so
+lib/**.xml
+
 obj/*
 project/.codelite
 project/.vs
