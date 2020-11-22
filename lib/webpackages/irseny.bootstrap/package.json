@@ -1,0 +1,31 @@
+{
+	"name": "webfront.bootstrap",
+	"description": "Bootstrap 4 CSS with Irseny theme",
+	"version": "4.5.3",
+	"version_short": "4.5",
+	"license": "MIT",
+	"private": true,
+	"main": "dist/js/bootstrap.js",
+	"style": "dist/css/bootstrap.css",
+	"sass": "scss/bootstrap.scss",
+	"dependencies": {},
+	"devDependencies": {
+		"node-sass": "^4.14.1",
+		"nodemon": "^2.0.4",
+		"npm-run-all": "^4.1.5",
+		"cross-env": "^7.0.2",
+		"shx": "^0.3.2",
+		"clean-css-cli": "^4.3.0"
+	},
+	"scripts": {
+		"dist": "npm-run-all --parallel css js",
+		"css": "npm-run-all --sequential css-compile css-minify",
+		"css-compile": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 scss/ -o dist/css/",
+		"css-minify": "cleancss --level 1 --format breakWith=lf --source-map --source-map-inline-sources --output dist/css/bootstrap.min.css dist/css/bootstrap.css",
+		"js": "npm-run-all --sequential js-make-dist-dir js-fetch",
+		"js-make-dist-dir": "cross-env-shell shx mkdir -p dist/js/",
+		"js-fetch": "cross-env-shell shx cp bootstrap/dist/js/bootstrap*{js,map} dist/js/",
+		"clean": "cross-env-shell shx rm -r dist/",
+		"uninstall": "cross-env-shell shx rm -r node_modules/"
+	}
+}

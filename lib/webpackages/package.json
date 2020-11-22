@@ -1,0 +1,47 @@
+{
+	"name": "webpackages",
+	"description": "Meta package for downloading, building and installing libraries for Irseny.Webfront",
+	"version": "1.0.0",
+	"version_short": "1.0",
+	"license": "MIT",
+	"private": true,
+	"dependencies": {
+		"angular": "^1.8.2",
+		"angular-resource": "^1.8.2",
+		"jquery": "^3.5.1",
+		"popper.js": "^1.16.1"
+	},
+	"devDependencies": {
+		"npm-run-all": "^4.1.5",
+		"cross-env": "^7.0.2",
+		"shx": "^0.3.2"
+	},
+	"scripts": {
+		"install": "npm install --prefix irseny.bootstrap/",
+		"build": "npm run bootstrap-build",
+		"bootstrap-build": "npm run dist --prefix irseny.bootstrap/",
+		"deploy": "npm-run-all --parallel bootstrap-copy angularjs-copy popper-copy jquery-copy",
+		"bootstrap-copy": "npm-run-all --sequential bootstrap-make-lib-dir bootstrap-copy-lib",
+		"bootstrap-make-lib-dir": "cross-env-shell shx mkdir -p ../bootstrap/style",
+		"bootstrap-copy-lib": "cross-env-shell shx cp irseny.bootstrap/dist/js/bootstrap*{js,map} ../bootstrap/ && cross-env-shell shx cp irseny.bootstrap/dist/css/bootstrap*{css,map} ../bootstrap/style/",
+		"angularjs-copy": "npm-run-all --sequential angularjs-make-lib-dir angularjs-copy-lib",
+		"angularjs-make-lib-dir": "cross-env-shell shx mkdir -p ../angularjs/",
+		"angularjs-copy-lib": "cross-env-shell shx cp node_modules/angular/angular*{js,map} ../angularjs/ && cross-env-shell shx cp node_modules/angular-resource/angular-resource*{js,map} ../angularjs",
+		"popper-copy": "npm-run-all --sequential popper-make-lib-dir popper-copy-lib",
+		"popper-make-lib-dir": "cross-env-shell shx mkdir -p ../popperjs/",
+		"popper-copy-lib": "cross-env-shell shx cp node_modules/popper.js/dist/umd/popper*{js,map} ../popperjs/",
+		"jquery-copy": "npm-run-all --sequential jquery-make-lib-dir jquery-copy-lib",
+		"jquery-make-lib-dir": "cross-env-shell shx mkdir -p ../jquery/",
+		"jquery-copy-lib": "cross-env-shell shx cp node_modules/jquery/dist/jquery*{js,map} ../jquery/",
+		"clean": "npm run bootstrap-clean",
+		"bootstrap-clean": "npm run clean --prefix irseny.bootstrap",
+		"undeploy": "npm-run-all --parallel bootstrap-undeploy angularjs-undeploy jquery-undeploy popper-undeploy",
+		"bootstrap-undeploy": "cross-env-shell shx rm ../bootstrap/bootstrap*{js,map} && cross-env-shell shx rm ../bootstrap/style/bootstrap*{css,map}",
+		"angularjs-undeploy": "cross-env-shell shx rm ../angularjs/angular*{js,map}",
+		"jquery-undeploy": "cross-env-shell shx rm ../jquery/jquery*{js,map}",
+		"popper-undeploy": "cross-env-shell shx rm ../popperjs/popper*{js,map}",
+		"uninstall": "npm-run-all --sequential uninstall-bootstrap uninstall-modules",
+		"uninstall-bootstrap": "npm run uninstall --prefix irseny.bootstrap/",
+		"uninstall-modules": "cross-env-shell shx rm -r node_modules/"
+	}
+}

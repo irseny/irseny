@@ -1,12 +1,9 @@
 [submodule "bootstrap"]
-	path = lib/bootstrap_irseny/node_modules/bootstrap
+	path = lib/webpackages/irseny.bootstrap/bootstrap
 	url = https://github.com/twbs/bootstrap.git
-	branch = v4.5.3
 [submodule "jquery"]
-	path = lib/bootstrap_irseny/node_modules/jquery
+	path = lib/webfront.bootstrap/irseny_modules/jquery
 	url = https://github.com/jquery/jquery.git
-	branch = 3.5.1
 [submodule "popper"]
-	path = lib/bootstrap_irseny/node_modules/popper
+	path = lib/webfront.bootstrap/irseny_modules/popper
 	url = https://github.com/popperjs/popper-core.git
-	branch = v1.16.1
