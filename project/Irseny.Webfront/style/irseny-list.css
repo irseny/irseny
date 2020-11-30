@@ -1,0 +1,84 @@
+/* optional, found in another template */
+.list-container {
+	background-color: var(--primary);
+}
+/* first list element*/
+.list {
+	display: flex;
+	flex-direction: column;
+	color: black;
+	background-color: var(--primary);
+	font-weight: bold;
+	user-select: none;
+}
+/* left content adjustment*/
+.list-left {
+	text-align: left;
+	background-color: var(--info);
+
+}
+/* right content adjustment*/
+.list-right {
+	text-align: right;
+	background-color: var(--primary);
+}
+/* separated first list entry*/
+.list .title {
+	color: var(--secondary);
+	text-align: center;
+	margin: 1rem 0;
+	border-bottom: 2px solid var(--secondary);
+
+}
+/* complement to title*/
+.list .bottom {
+	border-top: 2px solid var(--secondary);
+	margin: 1rem 0;
+}
+/* selectable list entry*/
+.list .tab {
+	color: black;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	border-top: 1px solid var(--secondary);
+
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	align-items: stretch;
+
+}
+/* left and right list entry specialization */
+.list-left .tab {
+	 flex-direction: row-reverse;
+	 justify-content: start;
+}
+.list-right .tab {
+	flex-direction: row;
+	justify-content: end;
+}
+
+/* color switch for active entries*/
+.list .tab.active {
+	color: var(--light);
+	background-color: var(--secondary);
+}
+/* hover indicator over entries*/
+.list .tab:not(.active):hover {
+	background-color: var(--light);
+}
+
+.list .tab .icon {
+	flex-grow: 0;
+	flex-shrink: 1;
+	flex-basis: 2rem;
+
+
+}
+.list .tab .name {
+	width: 8rem;
+}
+.main-detail {
+	display: flex;
+	flex-direction: row;
+}

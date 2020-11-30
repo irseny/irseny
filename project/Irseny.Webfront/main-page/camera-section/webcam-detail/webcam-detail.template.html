@@ -1,128 +1,114 @@
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-5">
-			<!-- nothing to put here for now -->
-		</div>
-		<div class="col-7">
-			<!-- camera configuration -->
-			<table class="table">
-				<thead>
-					<tr>
-					<th scope="col">Property</th>
-					<th scope="col">Config</th>
-					<th scope="col">Auto</th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- camera id -->
-					<tr>
-						<th scope="row">System ID</th>
-						<td><input class="input-group-text" style="width: 5rem" type="number" value="0" min="0" max="32"></td>
-						<td><!-- no auto config --></td>
-					</tr>
-					<!-- image resolution -->
-					<tr>
-						<th scope="row">
-							Resolution
-							<div class="list-group" style="flex-direction: row" role="tablist">
-								<a class="list-group-item text-dark" data-toggle="list" role="tab" href="#"
-									ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'selectTypical')}"
-									ng-click="$ctrl.imageResolutionConfigMode='selectTypical'">
-									Typical
-								</a>
-								<a data-toggle="list" role="tab" href="#"
-									class="list-group-item text-dark"
-									ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'enterCustom')}"
-									ng-click="$ctrl.imageResolutionConfigMode='enterCustom'">
-									Custom
-								</a>
+<div class="d-flex flex-row min-width-400">
+	<!-- camera configuration -->
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Property</th>
+				<th scope="col">Config</th>
+				<th scope="col">Auto</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- camera id -->
+			<tr>
+				<th scope="row">System ID</th>
+				<td><input class="input-group-text" style="width: 5rem" type="number" value="0" min="0" max="32"></td>
+				<td><!-- no auto config --></td>
+			</tr>
+			<!-- image resolution -->
+			<tr>
+				<th scope="row">
+					Resolution
+					<div class="list-group" style="flex-direction: row" role="tablist">
+						<a class="list-group-item" data-toggle="list" role="tab" href="#"
+							ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'selectTypical')}"
+							ng-click="$ctrl.imageResolutionConfigMode='selectTypical'">
+							Typical
+						</a>
+						<a data-toggle="list" role="tab" href="#"
+							class="list-group-item"
+							ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'enterCustom')}"
+							ng-click="$ctrl.imageResolutionConfigMode='enterCustom'">
+							Custom
+						</a>
+					</div>
+				</th>
+				<td>
+					<!-- typical resolution -->
+					<div ng-if="$ctrl.imageResolutionConfigMode == 'selectTypical'">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" style="width: 8rem">Aspect Ratio</span>
 							</div>
-						</th>
-						<td>
-							<!-- typical resolution -->
-							<div ng-if="$ctrl.imageResolutionConfigMode == 'selectTypical'">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text" style="width: 8rem">Aspect Ratio</span>
-									</div>
-									<div class="dropdown">
-										<button class="btn dropdown-toggle border-dark" id="btn_webcamDetailAspectRatio" type="button" data-toggle="dropdown"
-											style="width: 8rem">
-											{{ $ctrl.aspectRatio }}</button>
-										<div class="dropdown-menu">
-											<a ng-repeat="ratio in $ctrl.typicalAspectRatios" class="dropdown-item" href="#"
-												ng-click="$ctrl.aspectRatio=ratio">{{ ratio }}</a>
-										</div>
-									</div>
-								</div>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text" style="width: 8rem">Resolution</span>
-									</div>
-									<div class="dropdown">
-										<button class="btn dropdown-toggle border-dark" type="button" data-toggle="dropdown"
-											style="width: 8rem">
-											{{ $ctrl.imageResolution.x }} x {{ $ctrl.imageResolution.y }}
-										</button>
-										<div class="dropdown-menu">
-											<a ng-repeat="resolution in $ctrl.getResolutionSuggestions()" class="dropdown-item" href="#"
-												ng-click="$ctrl.imageResolution={ x: resolution.x, y: resolution.y }">{{ resolution.x }} x {{ resolution.y }}</a>
-										</div>
-									</div>
+							<div class="dropdown">
+								<button class="btn dropdown-toggle" id="btn_webcamDetailAspectRatio" type="button" data-toggle="dropdown"
+									style="width: 8rem">
+									{{ $ctrl.aspectRatio }}</button>
+								<div class="dropdown-menu">
+									<a ng-repeat="ratio in $ctrl.typicalAspectRatios" class="dropdown-item" href="#"
+										ng-click="$ctrl.aspectRatio=ratio">{{ ratio }}</a>
 								</div>
 							</div>
-							<!-- custom resolution -->
-							<div ng-if="$ctrl.imageResolutionConfigMode == 'enterCustom'">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text" style="width:6rem"> Width</span>
-									</div>
-									<input class="input-group-text" style="width:6rem" type="number"
-										ng-model="$ctrl.imageResolution.x">
-								</div>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text" style="width:6rem">Height</span>
-									</div>
-									<input class="input-group-text" style="width:6rem" type="number"
-										ng-model="$ctrl.imageResolution.y">
+						</div>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" style="width: 8rem">Resolution</span>
+							</div>
+							<div class="dropdown">
+								<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
+									style="width: 8rem">
+									{{ $ctrl.imageResolution.x }} x {{ $ctrl.imageResolution.y }}
+								</button>
+								<div class="dropdown-menu">
+									<a ng-repeat="resolution in $ctrl.getResolutionSuggestions()" class="dropdown-item" href="#"
+										ng-click="$ctrl.imageResolution={ x: resolution.x, y: resolution.y }">{{ resolution.x }} x {{ resolution.y }}</a>
 								</div>
 							</div>
-						</td>
-
-						<td>
-							<input class="input-group-text" type="checkbox" value="auto" checked>
-						</td>
-					</tr>
-					<!-- framerate -->
-					<tr>
-						<th scope="row">Framerate</th>
-						<td>
-							<div class="input-group">
-								<input class="input-group-text" type="number" ng-model="$ctrl.framerate">
-								<div class="input-gropu-append">
-									<span class="input-group-text">FPS</span>
-								</div>
+						</div>
+					</div>
+					<!-- custom resolution -->
+					<div ng-if="$ctrl.imageResolutionConfigMode == 'enterCustom'">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" style="width:6rem"> Width</span>
 							</div>
-						</td>
-						<td>
-							<input class="input-group-text" type="checkbox" checked>
-						</td>
-					</tr>
-					<!-- exposure -->
-				</tbody>
-			</table>
-			<div class="input-group">
-				<button class="btn input-group-text mx-2" type="submit" ng-click="$ctrl.applyChanges()">Apply</button>
-				<button class="btn input-group-text mx-2" type="reset" ng-click="$ctrl.resetChanges()">Reset</button>
-			</div>
+							<input class="input-group-text" style="width:6rem" type="number"
+								ng-model="$ctrl.imageResolution.x">
+						</div>
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text" style="width:6rem">Height</span>
+							</div>
+							<input class="input-group-text" style="width:6rem" type="number"
+								ng-model="$ctrl.imageResolution.y">
+						</div>
+					</div>
+				</td>
 
-
-		</div>
-	</div>
-
-
+				<td>
+					<input class="input-group-text" type="checkbox" value="auto" checked>
+				</td>
+			</tr>
+			<!-- framerate -->
+			<tr>
+				<th scope="row">Framerate</th>
+				<td>
+					<div class="input-group">
+						<input class="input-group-text" type="number" ng-model="$ctrl.framerate">
+						<div class="input-gropu-append">
+							<span class="input-group-text">FPS</span>
+						</div>
+					</div>
+				</td>
+				<td>
+					<input class="input-group-text" type="checkbox" checked>
+				</td>
+			</tr>
+			<!-- exposure -->
+		</tbody>
+	</table>
+	<!--<div class="input-group">
+		<button class="btn input-group-text mx-2" type="submit" ng-click="$ctrl.applyChanges()">Apply</button>
+		<button class="btn input-group-text mx-2" type="reset" ng-click="$ctrl.resetChanges()">Reset</button>
+	<!--</div>-->
 </div>
-
-put {{$ctrl.cameraId}} detail here
-

@@ -66,10 +66,10 @@ namespace Irseny.Core.Inco {
 			return result;
 		}
 #if WINDOWS
-		const string lib = "Extrack.dll";
+		const string lib = "Irseny.Native.dll";
 		const CallingConvention ccon = CallingConvention.StdCall;
 #elif LINUX
-		const string lib = "libExtrack.dll";
+		const string lib = "libIrseny.Native.so";
 		const CallingConvention ccon = CallingConvention.Cdecl;
 #endif
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjCreateContext")]

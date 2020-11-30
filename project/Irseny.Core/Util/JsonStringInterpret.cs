@@ -6,7 +6,7 @@ namespace Irseny.Core.Util {
 		public static JsonString InterpretJson(List<string> source) {
 			if (source == null) throw new ArgumentNullException("source");
 			if (source.Count == 0) {
-				return new JsonString(JsonStringType.Empty);
+				return new JsonString(JsonStringType.Dict);
 			}
 			JsonString result;
 			int startAt = 0;

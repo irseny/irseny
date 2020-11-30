@@ -7,7 +7,7 @@ namespace Irseny.Core.Util {
 		Dictionary<string, object> dict = null;
 		List<object> array = null;
 
-		public JsonString (JsonStringType type) {
+		public JsonString(JsonStringType type) {
 			this.Type = type;
 			switch (type) {
 			case JsonStringType.Dict:
@@ -18,6 +18,29 @@ namespace Irseny.Core.Util {
 				break;
 			}
 		}
+		public JsonString(JsonString source) {
+			if (source == null) throw new ArgumentNullException("source");
+			switch (source.Type) {
+			case JsonStringType.Array:
+				this.array = new List<object>();
+
+				break;
+			case JsonStringType.Dict:
+				this.dict = new Dictionary<string, object>();
+				foreach (var pair in source.dict) {
+					if (pair.Key != null && pair.Value != null) {
+						if (pair.Value is string) {
+							this.dict.Add(pair.Key, pair.Value);
+						} else if (pair.Value is JsonString) {
+							this.dict.Add(pair.Key, new JsonString((JsonString)pair.Value));
+						}
+					}
+				}
+				break;
+			}
+		}
+
+
 		public JsonStringType Type { get; private set; }
 
 		public IReadOnlyDictionary<string, object> Dict { 
@@ -92,7 +115,7 @@ namespace Irseny.Core.Util {
 		public string GetTerminal(string key, string fallback=null) {
 			// test for method applicability
 			if (Type != JsonStringType.Dict) {
-				throw new InvalidOperationException(string.Format("Cannot string-index {0} JSON strings",
+				throw new InvalidOperationException(string.Format("String indexing not supported on {0} JSON strings",
 					Type));
 			}
 			if (key == null) throw new ArgumentNullException("key");
@@ -122,7 +145,7 @@ namespace Irseny.Core.Util {
 			// test for method applicability
 			if (Type != JsonStringType.Array) {
 				if (fallback == null) {
-					throw new InvalidOperationException(string.Format("Cannot integer-index {0} JSON strings",
+					throw new InvalidOperationException(string.Format("Integer indexing not supported on {0} JSON strings",
 						Type));
 				} else {
 					return fallback;
@@ -131,7 +154,7 @@ namespace Irseny.Core.Util {
 			// test for out of range
 			if (index < 0 || index >= array.Count) {
 				if (fallback == null) {
-					throw new ArgumentOutOfRangeException("index", string.Format("Index {0} is out of range [0...{1}]",
+					throw new ArgumentOutOfRangeException(string.Format("Index {0} is out of range [0...{1}]",
 						index, array.Count - 1));
 				} else {
 					return fallback;
@@ -149,7 +172,7 @@ namespace Irseny.Core.Util {
 			}
 			return result;
 		}
-		public bool AddTerminal(string key, string value) {
+		public bool AddTerminal(string key, string value, bool overwrite=false) {
 			if (key == null) throw new ArgumentNullException("key");
 			if (value == null) throw new ArgumentNullException("value");
 			switch (Type) {
@@ -157,17 +180,21 @@ namespace Irseny.Core.Util {
 				array.Add(value);
 				return true;
 			case JsonStringType.Dict:
-				try {
-					dict.Add(key, value);
-				} catch (ArgumentException) {
-					return false;
+				if (overwrite) {
+					dict[key] = value;
+				} else {
+					try {
+						dict.Add(key, value);
+					} catch (ArgumentException) {
+						return false;
+					}
 				}
 				return true;
 			default:
 				return false;
 			}
 		}
-		public bool AddJsonString(string key, JsonString value) {
+		public bool AddJsonString(string key, JsonString value, bool overwrite=false) {
 			if (key == null) throw new ArgumentNullException("key");
 			if (value == null) throw new ArgumentNullException("value");
 			switch (Type) {
@@ -175,89 +202,158 @@ namespace Irseny.Core.Util {
 				array.Add(value);
 				return true;
 			case JsonStringType.Dict:
-				try {
-					dict.Add(key, value);
-				} catch (ArgumentException) {
-					return false;
+				if (overwrite) {
+					dict[key] = value;
+				} else {
+					try {
+						dict.Add(key, value);
+					} catch (ArgumentException) {
+						return false;
+					}
 				}
 				return true;
 			default:
 				return false;
+			}
+		}
+		public JsonString RemoveJsonString(string key, bool failHard=true) {
+			if (key == null) throw new ArgumentNullException("key");
+			if (Type != JsonStringType.Dict) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("String indexing not supported on {0} JSON strings",
+						Type));
+				} else {
+					return null;
+				}
+			}
+			object value;
+			if (!dict.TryGetValue(key, out value)) {
+				if (failHard) {
+					throw new KeyNotFoundException(string.Format("Key {0} not found",
+						key));
+				} else {
+					return null;
+				}
+			}
+			JsonString result = value as JsonString;
+			if (result == null) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Deposited value {0} is not a JsonString",
+						value));
+				} else {
+					return null;
+				}
+			}
+			dict.Remove(key);
+			return result;
+			
+		}
+		public JsonString RemoveJsonString(int index, bool failHard=true) {
+			if (Type != JsonStringType.Array) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Integer indexing not supported on {0} JSON strings",
+						Type));
+				} else {
+					return null;
+				}
+			}
+			if (index < 0 || index >= array.Count) {
+				if (failHard) {
+					throw new ArgumentOutOfRangeException(string.Format("Index {0} is out of range [0...{1}]",
+						index, array.Count - 1));
+				} else {
+					return null;
+				}
+			}
+			object value = array[index];
+			JsonString result = value as JsonString;
+			if (result == null) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Deposited value {0} is not a JsonString",
+						value));
+				} else {
+					return null;
+				}
+			}
+			array.RemoveAt(index);
+			return result;
+		}
+		public string RemoveTerminal(string key, bool failHard=true) {
+			if (key == null) throw new ArgumentNullException("key");
+			if (Type != JsonStringType.Dict) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("String indexing not supported on {0} JSON strings",
+						Type));
+				} else {
+					return null;
+				}
+			}
+			object value;
+			if (!dict.TryGetValue(key, out value)) {
+				if (failHard) {
+					throw new KeyNotFoundException(string.Format("Key {0} not found",
+						key));
+				} else {
+					return null;
+				}
+			}
+			string result = value as string;
+			if (result == null) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Deposited value {0} is not a string",
+						value));
+				} else {
+					return null;
+				}
+			}
+			dict.Remove(key);
+			return result;
+
+		}
+		public string RemoveTerminal(int index, bool failHard=true) {
+			if (Type != JsonStringType.Array) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Integer indexing not supported on {0} JSON strings",
+						Type));
+				} else {
+					return null;
+				}
+			}
+			if (index < 0 || index >= array.Count) {
+				if (failHard) {
+					throw new ArgumentOutOfRangeException(string.Format("Index {0} is out of range [0...{1}]",
+						index, array.Count - 1));
+				} else {
+					return null;
+				}
+			}
+			object value = array[index];
+			string result = value as string;
+			if (result == null) {
+				if (failHard) {
+					throw new InvalidOperationException(string.Format("Deposited value {0} is not a JsonString",
+						value));
+				} else {
+					return null;
+				}
+			}
+			array.RemoveAt(index);
+			return result;
+		}
+
+		public void Clear() {
+			switch (Type) {
+			case JsonStringType.Array:
+				array.Clear();
+				break;
+			case JsonStringType.Dict:
+				dict.Clear();
+				break;
+			default:
+				throw new InvalidOperationException();
 			}
 		}
 
-//		public void Add(object value, params string[] path) {
-//			if (value == null) throw new ArgumentNullException("value");
-//			if (path == null) throw new ArgumentNullException("path");
-//			Add(value, 0, path);
-//		}
-//		private void Add(object value, int startAt, object[] path) {
-//			switch (Type) {
-//			case JsonStringType.Array:
-//				if (path.Length - startAt > 0) {
-//					// non empty path indicates recursive call
-//					object oIndex = path[startAt];
-//					if (!(oIndex is int)) {
-//						
-//					}
-//					int index = (int)oIndex;
-//					if (index < 0 || index >= array.Count) {
-//						
-//					}
-//					object oIter = array[index];
-//					if (!(oIter is JsonString)) {
-//						throw new ArgumentException(string.Format("Terminal {0} on path[{1}]={2}", 
-//							oIter, startAt, index), "path");
-//					}
-//					(oIter as JsonString).Add(value, startAt + 1, path);
-//				} else {
-//					// empty path indicates add value here
-//					array.Add(value);
-//					return;
-//				}
-//				break;
-//			case JsonStringType.Dict:
-//				if (path.Length - startAt > 0) {
-//					// path is not empty
-//					object oKey = path[startAt];
-//					if (!(oKey is string)) {
-//						throw new ArgumentException(string.Format("Not a key in path[{0}]={1}",
-//							startAt, path[startAt]), "path");
-//					}
-//					string key = (string)oKey;
-//					if (path.Length - startAt > 1) {
-//						// longer path indicates recursive call path
-//						object oIter;
-//						if (!dict.TryGetValue(key, out oIter)) {
-//							throw new ArgumentException(string.Format("Key path[{0}]={1} does not exist",
-//								startAt, path[startAt]), "path");
-//						}
-//
-//						if (!(oIter is JsonString)) {
-//							throw new ArgumentException(string.Format("Terminal {0} on path[{1}]={2}",
-//								oIter, startAt, key), "path");
-//						}
-//						(oIter as JsonString).Add(value, startAt + 1, path);
-//					} else {
-//						// short path indicates adding the value here
-//						if (dict.ContainsKey(key)) {
-//							throw new ArgumentException(string.Format("Key path[{0}]={2} is already in use",
-//								startAt, path[startAt]), "path");
-//						}
-//						dict.Add(key, value);
-//					}
-//				} else {
-//					// no more elements left in path
-//					throw new ArgumentException(string.Format("Cannot add path[{0}]={1} without a key",
-//						startAt, path[startAt]), "path");
-//				}
-//				break;
-//			default:
-//				throw new InvalidOperationException(string.Format("Unsupported JSON type {0} at path[{1}]={2}",
-//					Type, startAt, path[startAt]));
-//			}
-//				
-//		}
 		public override string ToString () {
 			var result = new StringBuilder();
 			ToCompressedString(result);
@@ -267,36 +363,40 @@ namespace Irseny.Core.Util {
 			switch (Type) {
 			case JsonStringType.Dict:
 				result.Append("{");
-				foreach (var pair in dict) {
-					result.Append('"').Append(pair.Key).Append("\":");
+				if (dict.Count > 0) {
+					foreach (var pair in dict) {
+						result.Append('"').Append(pair.Key).Append("\":");
 
-					if (pair.Value is JsonString) {
-						(pair.Value as JsonString).ToCompressedString(result);
-					} else if (pair.Value is string) {
-						// TODO detect real type and handle quotes accordingly
-						result.Append((string)pair.Value);
-					} else {
-						// invalid, omit
+						if (pair.Value is JsonString) {
+							(pair.Value as JsonString).ToCompressedString(result);
+						} else if (pair.Value is string) {
+							// TODO detect real type and handle quotes accordingly
+							result.Append((string)pair.Value);
+						} else {
+							// invalid, omit
+						}
+						result.Append(",");
 					}
-					result.Append(",");
+					result.Remove(result.Length - 1, 1);
 				}
-				result.Remove(result.Length - 1, 1);
 				result.Append("}");
 				break;
 			case JsonStringType.Array:
 				result.Append("[");
-				foreach (object item in array) {
-					if (item is JsonString) {
-						(item as JsonString).ToCompressedString(result);
-					} else if (item is string) {
-						// TODO detect type and handle quotes properly
-						result.Append((string)item);
-					} else {
-						// invalid, omit
+				if (array.Count > 0) {
+					foreach (object item in array) {
+						if (item is JsonString) {
+							(item as JsonString).ToCompressedString(result);
+						} else if (item is string) {
+							// TODO detect type and handle quotes properly
+							result.Append((string)item);
+						} else {
+							// invalid, omit
+						}
+						result.Append(",");
 					}
-					result.AppendLine(",");
+					result.Remove(result.Length - 1, 1);
 				}
-				result.Remove(result.Length - 1, 1);
 				result.Append("]");
 				break;
 			}

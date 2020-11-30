@@ -95,7 +95,8 @@ namespace Irseny.Core.Tracking {
 		}
 		private static IObjectModel GetModel(int modelIndex) {
 			IObjectModel result = new CapModel();
-			int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(modelIndex, -1);
+			//int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(modelIndex, -1);
+			int modelId = -1;
 			if (modelId < 0) {
 				return result;
 			}

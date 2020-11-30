@@ -1,58 +1,35 @@
-<!-- <div class="col-12 p-0"> -->
-<div class="container-fluid px-0 mx-0">
-	<div class="navbar navbar-dark bg-dark mx-3 px-0">
 
-		<ul class="navbar-nav w-100 px-0">
-			<!-- add new camera dropdown -->
-			<li class="navbar-item dropdown">
-				<a class="nav-link dropdown-toggle active text-right px-2" id="cameraListAddCam" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-					Add New
-				</a>
-				<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
-					<a ng-repeat="type in $ctrl.base.cameraClasses"
-						class="dropdown-item text-right" href="#" ng-click="$ctrl.addCamera(type)">
-						{{type}}
-					</a>
-				</div>
-			</li>
-			<!-- list of cameras -->
-			<li ng-repeat="cam in $ctrl.base.availableCameras" class="navbar-item w-100">
-				<!-- non selected camera -->
-				<div class="nav-link text-right px-3" ng-if="$ctrl.base.activeCamera != cam">
-					<a class="text-right text-light" ng-click="$ctrl.base.activeCamera = cam" href="#">
-						{{cam}}
-					</a>
-				</div>
-				<!-- selected camera -->
-				<div class="nav-link bg-highlight px-3 text-right" ng-if="$ctrl.base.activeCamera == cam">
-					<a class="text-muted" href="#">Remove</a>
-					<a class="text-muted" href="#">Rename</a>
-					<a class="text-dark" href="#">
-						{{cam}}
-					</a>
-				</div>
-			</li>
-		</ul>
-
+<div class="list">
+	<!-- list of cameras -->
+	<div class="title">
+		Cameras
 	</div>
-	<!-- try the same without a navbar -->
-	<!-- <div class="row bg-info">
-		<ul class="list-unstyled row p-0 m-0">
-			<li class="dropdown col-12 my-2">
-				<a class="dropdown-toggle text-dark col-10" id="cameraListAddCam" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-					Add New
-				</a>
-				<div class="dropdown-menu col-8" aria-labelledby="cameraListAddCam">
-					<a ng-repeat="type in $ctrl.base.cameraClasses"
-						class="dropdown-item" href="#" ng-click="$ctrl.addCamera(type)">
-						{{type}}
-					</a>
-				</div>
-				<a class="col-2 text-dark" href="#" ng-click="$$ctrl.removeCamera()">
-					Remove
-				</a>
-			</li>
-
-		</ul>
-	</div> -->
+	<div ng-repeat="cam in $ctrl.base.availableCameras">
+		<div class="tab" ng-class="{'active': $ctrl.base.activeCamera == cam}"  ng-click="$ctrl.base.activeCamera = cam">
+			<!-- selected camera -->
+			<!--<div class="icon" ng-repeat="icon in ['Remove', 'Rename']" ng-if="$ctrl.base.activeCamera == cam">
+				<a href="#">{{icon}}</a>
+			</div>-->
+			<!--<img class="icon" src="icon/delete.svg" ng-if="$ctrl.base.activeCamera == cam" alt="Remove">-->
+			<img class="icon" src="icon/rename.svg" ng-if="$ctrl.base.activeCamera == cam" alt="Rename">
+			<div class="name">{{cam}}</div>
+		</div>
+		<div class="separator"></div>
+	</div>
+	<!-- add new camera dropdown -->
+	<div class="tab">
+		<a class="dropdown-toggle active px-3" id="cameraListAddCam" href="#" data-toggle="dropdown">
+			Add New
+		</a>
+		<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
+			<a ng-repeat="type in $ctrl.base.cameraClasses"
+				class="dropdown-item" href="#" ng-click="$ctrl.addCamera(type)">
+				{{type}}
+			</a>
+		</div>
+	</div>
+	<div class="bottom">
+		<!-- empty by intention -->
+	</div>
 </div>
+

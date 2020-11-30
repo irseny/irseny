@@ -18,8 +18,17 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		console.log("exchange received message " + JSON.stringify(msg));
 	};
 
+	this.touch = function() {
+		MessageLog.log("touched");
+		var subject = {
+			topic: "camera",
+			position: 0,
+		};
+		LiveWireService.requestUpdate(subject).then(self.receiveUpdate);
+	};
+
 	this.start = function() {
-		LiveWireService.receiveUpdate.notify(self.receiveUpdate);
+		LiveWireService.receiveUpdate().notify(self.receiveUpdate);
 	};
 	this.start();
 };

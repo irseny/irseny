@@ -22,7 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|x86' ">
     <Optimize>true</Optimize>
@@ -60,7 +60,6 @@
     <Compile Include="Webface\WebfaceServer.cs" />
     <Compile Include="Webface\IWebChannel.cs" />
     <Compile Include="Webface\WebChannelState.cs" />
-    <Compile Include="Webface\Services\ResourceService.cs" />
     <Compile Include="Webface\Http\HttpChannel.cs" />
     <Compile Include="Webface\Http\HttpHeader.cs" />
     <Compile Include="Webface\Http\HttpMessage.cs" />
@@ -69,9 +68,11 @@
     <Compile Include="Webface\WebSocket\WebSocketChannel.cs" />
     <Compile Include="Webface\WebSocket\WebSocketMessage.cs" />
     <Compile Include="Webface\Tcp\TcpChannel.cs" />
-    <Compile Include="Webface\LiveWireServer.cs" />
-    <Compile Include="Webface\LiveRequestHandler.cs" />
-    <Compile Include="Webface\LiveUpdateHandler.cs" />
+    <Compile Include="Webface\LiveWire\LiveRequestHandler.cs" />
+    <Compile Include="Webface\LiveWire\LiveWireServer.cs" />
+    <Compile Include="Webface\ResourceWire\ResourceWireServer.cs" />
+    <Compile Include="Webface\ResourceWire\ResourceRequestHandler.cs" />
+    <Compile Include="ProfileActivator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
@@ -82,10 +83,11 @@
   <ItemGroup>
     <Folder Include="Content\" />
     <Folder Include="Webface\" />
-    <Folder Include="Webface\Services\" />
     <Folder Include="Webface\Http\" />
     <Folder Include="Webface\WebSocket\" />
     <Folder Include="Webface\Tcp\" />
+    <Folder Include="Webface\LiveWire\" />
+    <Folder Include="Webface\ResourceWire\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

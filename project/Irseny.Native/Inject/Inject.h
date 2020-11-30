@@ -4,7 +4,7 @@
 #if LINUX
 #ifndef EXTRACK_EXPORT
 //#define EXTRACK_EXPORT __attribute__((cdecl))
-#define EXTRACK_EXPORT __attribute__ ((dllexport))
+#define EXTRACK_EXPORT
 #endif
 
 #include "InjectLin.h"

@@ -3,8 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 
 namespace Irseny.Main.Webface.Services {
-	public class ResourceService {
-		public ResourceService() {
+	public class ResourceWireServer {
+		public ResourceWireServer() {
 		}
 		/// <summary>
 		/// Provides the resource specified by name.
@@ -19,10 +19,19 @@ namespace Irseny.Main.Webface.Services {
 			if (name.Length == 0) {
 				name = "index.html";
 			}
-			string redirect = "../project/Irseny.Webfront";
-			string prefix = Path.GetFullPath(redirect);
+			string filePath;
+			if (name.StartsWith("lib/")) {
+				string prefix = Path.GetFullPath("../");
+				filePath = Path.Combine(prefix, name);
+			} else if (name.StartsWith("icon/")) {
+				string prefix = Path.GetFullPath("../resources/icons/");
+				filePath = Path.Combine(prefix, name.Substring(5));
+			} else {
+				string prefix = Path.GetFullPath("../project/Irseny.Webfront/");
+				filePath = Path.Combine(prefix, name);
+			}
 
-			string filePath = Path.Combine(prefix, name);
+			
 			if (!File.Exists(filePath)) {
 				Console.WriteLine("cannot provide " + name + " as " + filePath);
 				return new byte[0];
@@ -48,6 +57,7 @@ namespace Irseny.Main.Webface.Services {
 				}
 			} catch (FileNotFoundException) {
 				// nothing can be done
+			} catch (IOException) {
 			}
 			return new byte[0];
 		}

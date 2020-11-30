@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using Irseny.Core.Util;
 
 namespace Irseny.Core.Capture.Video {
 	public class CaptureSettings {
-		Dictionary<CaptureProperty, double> fProps = new Dictionary<CaptureProperty, double>(16);
-		Dictionary<CaptureProperty, int> iProps = new Dictionary<CaptureProperty, int>(16);
+		Dictionary<CaptureProperty, double> fProps;
+		Dictionary<CaptureProperty, int> iProps;
+
+		public bool Running { get; set; }
 
 		public CaptureSettings() {
-			// leave everything at auto
+			// leave everything on auto
+			fProps = new Dictionary<CaptureProperty, double>(16);
+			iProps = new Dictionary<CaptureProperty, int>(16);
+			Running = false;
 		}
 
-		public CaptureSettings(CaptureSettings source) {
+		public CaptureSettings(CaptureSettings source) : this() {
 			if (source == null) throw new ArgumentNullException("source");
+			this.Running = source.Running;
 			foreach (var pair in source.fProps) {
 				this.fProps.Add(pair.Key, pair.Value);
 			}
@@ -49,6 +56,22 @@ namespace Irseny.Core.Capture.Video {
 		}
 		public bool IsAuto(CaptureProperty prop) {
 			return !fProps.ContainsKey(prop) && !iProps.ContainsKey(prop);
+		}
+		public JsonString ToJson() {
+			var result = JsonString.CreateDict();
+			{
+				result.AddTerminal("running", StringifyTools.StringifyBool(Running));
+				foreach (CaptureProperty prop in Enum.GetValues(typeof(CaptureProperty))) {
+					double fProp;
+					int iProp;
+					if (fProps.TryGetValue(prop, out fProp)) {
+						result.AddTerminal(prop.ToString().Substring(0, 1).ToLower() + prop.ToString().Substring(1), StringifyTools.StringifyDouble(fProp));
+					} else if (iProps.TryGetValue(prop, out iProp)) {
+						result.AddTerminal(prop.ToString().Substring(0, 1).ToLower() + prop.ToString().Substring(1), StringifyTools.StringifyInt(iProp));
+					}
+				}
+			}
+			return result;
 		}
 	}
 }

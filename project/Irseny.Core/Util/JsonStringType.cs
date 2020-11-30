@@ -3,10 +3,7 @@
 namespace Irseny.Core.Util {
 	public enum JsonStringType {
 		Dict,
-		Array,
-		String,
-		Number,
-		Empty
+		Array
 	}
 }
 

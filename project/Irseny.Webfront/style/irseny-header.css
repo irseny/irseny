@@ -1,0 +1,39 @@
+/* header row */
+.header {
+	display: flex;
+	flex-direction: row;
+	background-color: var(--primary);
+	justify-content: center;
+	align-items: stretch;
+	align-content: center;
+	margin-bottom: 0.4rem;
+	user-select: none;
+}
+/* logo icon */
+.header .icon {
+	margin: 1rem;
+}
+/* clickable header element */
+.header .tab {
+	color: black;
+	font-weight: bold;
+	cursor: pointer;
+	flex: 0 0 0;
+	text-align: center;
+	padding: 0 1rem;
+	margin-top: 1rem;
+	border-bottom: 1rem solid var(--primary);
+}
+/* hover indicator over clickable elements */
+.header .tab:not(.active):hover {
+	padding-top: 0.5rem;
+	border-bottom: 1rem solid var(--secondary);
+}
+/* active state for clickable elements */
+.header .tab.active {
+	color: var(--light);
+	background-color: var(--secondary);
+	padding-top: 0.5rem;
+	border-bottom: 1rem solid var(--secondary);
+}
+

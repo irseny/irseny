@@ -5,7 +5,7 @@ function CameraListController() {
 	};
 	this.removeCamera = function() {
 		console.log("removing selected camera");
-	}
+	};
 }
 var module = angular.module("cameraList", []);
 module.component("cameraList", {

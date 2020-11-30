@@ -87,7 +87,7 @@ namespace Irseny.Main.Webface {
 							//Console.WriteLine(Encoding.UTF8.GetString(message.Content));
 							string resource = message.Header.Resource;
 
-							byte[] responseContent = new Services.ResourceService().ProvideResource(resource);
+							byte[] responseContent = new Services.ResourceWireServer().ProvideResource(resource);
 							HttpHeader responseHeader;
 							if (responseContent.Length > 0) {
 								responseHeader = new HttpHeader(HttpMethod.Response, resource, message.Header.Version, HttpStatusCode.OK);
@@ -100,6 +100,8 @@ namespace Irseny.Main.Webface {
 									responseHeader.Fields.Add("Content-Type", "text/css; charset=UTF-8");
 								} else if (resource.EndsWith(".ico")) {
 									responseHeader.Fields.Add("Content-Type", "image/vnd.microsoft.icon");
+								} else if (resource.EndsWith(".svg")) {
+									responseHeader.Fields.Add("Content-Type", "image/svg+xml");
 								} else {
 									responseHeader.Fields.Add("Content-Type", "text/plain; charset=UTF-8");
 								}
@@ -118,8 +120,8 @@ namespace Irseny.Main.Webface {
 
 							var response = new HttpMessage(responseHeader, responseContent);
 							
-							((HttpChannel)c).SendMessage(response);
-							((HttpChannel)c).Flush();
+							hc.SendMessage(response);
+							hc.Close();
 						}
 
 					}

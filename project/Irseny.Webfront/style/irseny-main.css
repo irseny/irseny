@@ -1,0 +1,11 @@
+
+.page {
+	display: flex;
+	flex-direction: column;
+}
+
+
+.main-detail {
+	display: flex;
+	flex-direction: row;
+}

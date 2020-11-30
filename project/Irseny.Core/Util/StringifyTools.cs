@@ -21,10 +21,14 @@ namespace Irseny.Core.Util
 			} else if (primitive is double) {
 				return StringifyDouble((double)primitive);
 			} else if (primitive is string) {
-				return (string)primitive;
+				return StringifyString((string)primitive);
 			} else {
 				throw new ArgumentException("primitive");
 			}
+		}
+		public static string StringifyString(string primitive) {
+			// TODO check for quotes first
+			return string.Format("\"{0}\"", primitive);
 		}
 		public static string StringifyInt(int primitive) {
 			return primitive.ToString(FormatProvider);

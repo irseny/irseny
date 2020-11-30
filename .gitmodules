@@ -1,5 +1,5 @@
 [submodule "bootstrap"]
-	path = lib/webpackages/irseny.bootstrap/bootstrap
+	path = lib/webpackages/irseny.bootstrap/node_modules/bootstrap
 	url = https://github.com/twbs/bootstrap.git
 [submodule "jquery"]
 	path = lib/webfront.bootstrap/irseny_modules/jquery
@@ -7,3 +7,6 @@
 [submodule "popper"]
 	path = lib/webfront.bootstrap/irseny_modules/popper
 	url = https://github.com/popperjs/popper-core.git
+[submodule "Emgu.CV"]
+	path = lib/Emgu.CV/source
+	url = https://github.com/emgucv/emgucv.git

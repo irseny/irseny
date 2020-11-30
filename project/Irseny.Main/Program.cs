@@ -3,6 +3,13 @@ using System.Net;
 using System.Text;
 using Irseny.Core.Util;
 using Irseny.Core.Log;
+using Irseny.Core.Capture.Video;
+using Irseny.Core.Tracking;
+using Irseny.Core.Inco.Device;
+using Irseny.Core.Listing;
+
+using Irseny.Main.Content;
+using Irseny.Main.Webface;
 
 namespace Irseny.Main {
 	public static class Program {
@@ -38,61 +45,52 @@ namespace Irseny.Main {
 		//	server.Stop();
 
 		//}
-		public static void Main(string[] args) {
 
-			LogManager.MakeInstance(new LogManager());
-			Console.WriteLine("Hello, World!");
-			var server = new Webface.WebfaceServer();
-			server.Start();
-			Console.ReadLine();
-			server.Stop();
 
-			Irseny.Core.Util.JsonString.Parse(@"");
-
-			var partition = JsonString.PartitionJson(@"{
-  ""Date"": ""2019-08-01T00:00:00-07:00"",
-  ""TemperatureCelsius"": 25,
-  ""Summary"": ""Hot"",
-  ""DatesAvailable"": [
-    ""2019-08-01T00:00:00-07:00"",
-    ""2019-08-02T00:00:00-07:00""
-  ],
-  ""TemperatureRanges"": {
-    ""Cold"": {
-      ""High"": 20,
-      ""Low"": -10
-    },
-    ""Hot"": {
-      ""High"": 60,
-      ""Low"": 20
-    }
-  },
-  ""SummaryWords"": [
-    ""Cool"",
-    ""Windy"",
-    ""Humid""
-  ]
-}");
-//			var partition = JsonString.PartitionJson(@"{
-//	'jamesbond': 'gravel',
-//	'harry': {
-//		'calamity': 'jane',
-//		'lucky':'luke',
-//		'selmy':{
-//			'area':1234
+//		public static void Main(string[] args) {
+//
+//			LogManager.MakeInstance(new LogManager());
+//			Console.WriteLine("Hello, World!");
+//			var server = new Webface.WebfaceServer();
+//			server.Start();
+//			Console.ReadLine();
+//			server.Stop();
+//
 //		}
-//	}
-//}");
-			Console.WriteLine("Parts:");
-			foreach (string part in partition) {
-				Console.WriteLine(part);
+		public static void Main(string[] args) {
+			{ // start main systems
+				LogManager.MakeInstance(new LogManager());
+				CaptureSystem.MakeInstance(new CaptureSystem());
+				DetectionSystem.MakeInstance(new DetectionSystem());
+				VirtualDeviceManager.MakeInstance(new VirtualDeviceManager());
 			}
-			Console.WriteLine("Formatted:");
-			Console.WriteLine(partition.ToJsonString());
-			JsonString str = JsonString.InterpretJson(partition);
-			Console.WriteLine("Interpreted:");
-			Console.WriteLine(str.ToJsonString());
-			return;
+			{ // prepare content managers
+				ContentMaster.MakeInstance(new ContentMaster());
+				var contentSettings = new ContentManagerSettings();
+				string resourceRoot = ContentMaster.FindResourceRoot();
+				contentSettings.SetResourcePaths(resourceRoot, resourceRoot, "(no-file)");
+				string userRoot = ContentMaster.FindConfigRoot();
+				contentSettings.SetConfigPaths(userRoot, userRoot, "(no-file)");
+				ContentMaster.Instance.Load(contentSettings);
+			}
+			{ // load last configuration
+				new Emgu.CV.Mat();
+				var profile = ContentMaster.Instance.Profiles.LoadDefaultProfile();
+				new ProfileActivator().ActivateProfile(profile).Wait();
+			}
+			{ // start webserver
+				var server = new Webface.WebfaceServer();
+				server.Start();
+				Console.ReadLine();
+				server.Stop();
+			}
+			{ // cleanup main systems
+				VirtualDeviceManager.MakeInstance(null);
+				DetectionSystem.MakeInstance(null);
+				CaptureSystem.MakeInstance(null);
+				LogManager.MakeInstance(null);
+				EquipmentMaster.MakeInstance(null);
+			}
 		}
 	}
 }
