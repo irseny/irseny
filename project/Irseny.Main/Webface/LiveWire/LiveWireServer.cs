@@ -32,7 +32,7 @@ namespace Irseny.Main.Webface {
 		}
 		public bool Start() {
 			if (Started) return false;
-				listener = new TcpListener(IPAddress.Parse("127.0.0.1"), ServerPort);
+			listener = new TcpListener(IPAddress.Parse("127.0.0.1"), ServerPort);
 			try {
 				listener.Start();
 			} catch (SocketException) {
@@ -46,6 +46,7 @@ namespace Irseny.Main.Webface {
 			foreach (var client in connections.Values) {
 				client.Close();
 			}
+			connections.Clear();
 			listener.Stop();
 			listener = null;
 			return true;
@@ -84,7 +85,7 @@ namespace Irseny.Main.Webface {
 								clientOrigin, message.Text));
 							return null;
 						}
-						return requestHandler.Answer(request, clientOrigin ); 
+						return requestHandler.Respond(request, clientOrigin); 
 					});
 					pendingAnswers.AddLast(task);
 

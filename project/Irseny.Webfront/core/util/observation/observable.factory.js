@@ -1,4 +1,4 @@
-function Observable(generator) {
+function Observable() {
 	var self = this;
 	var subscriptions = [];
 	var nextSubscriptionId = 0;
@@ -9,7 +9,7 @@ function Observable(generator) {
 
 	this.subscribe = function(observer) {
 		var id = self.generateSubscriptionId();
-		self.subscriptions.push({
+		subscriptions.push({
 			id: id,
 			observer: observer
 		});
@@ -31,7 +31,6 @@ function Observable(generator) {
 	this.notify = function(message) {
 		subscriptions.forEach((sub) => sub.observer(message));
 	};
-	generator(this.notify);
 }
 
 var module = angular.module("util");

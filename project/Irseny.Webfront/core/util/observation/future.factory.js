@@ -1,4 +1,4 @@
-function Future(generator) {
+function Future() {
 	var self = this;
 	var results = [];
 	var errors = [];
@@ -22,8 +22,6 @@ function Future(generator) {
 		errorHandlers.push(handler);
 		errors.forEach((error) => handler(error));
 	};
-
-	generator(this.resolve, this.reject);
 }
 var module = angular.module("util");
 module.factory("Future", function() {

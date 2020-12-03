@@ -8,17 +8,20 @@ namespace Irseny.Core.Capture.Video {
 		Dictionary<CaptureProperty, int> iProps;
 
 		public bool Running { get; set; }
+		public string Name { get; set; }
 
 		public CaptureSettings() {
 			// leave everything on auto
 			fProps = new Dictionary<CaptureProperty, double>(16);
 			iProps = new Dictionary<CaptureProperty, int>(16);
 			Running = false;
+			Name = string.Empty;
 		}
 
 		public CaptureSettings(CaptureSettings source) : this() {
 			if (source == null) throw new ArgumentNullException("source");
 			this.Running = source.Running;
+			this.Name = source.Name;
 			foreach (var pair in source.fProps) {
 				this.fProps.Add(pair.Key, pair.Value);
 			}
@@ -61,6 +64,7 @@ namespace Irseny.Core.Capture.Video {
 			var result = JsonString.CreateDict();
 			{
 				result.AddTerminal("running", StringifyTools.StringifyBool(Running));
+				result.AddTerminal("name", StringifyTools.StringifyString(Name));
 				foreach (CaptureProperty prop in Enum.GetValues(typeof(CaptureProperty))) {
 					double fProp;
 					int iProp;

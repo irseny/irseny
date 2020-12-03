@@ -132,7 +132,8 @@ namespace Irseny.Core.Capture.Video {
 			if (settings == null) throw new ArgumentNullException("settings");
 			lock (captureSync) {
 				if (capture == null) {
-					return false;
+					this.settings = new CaptureSettings(settings);
+					return true;
 				}
 				capture.Stop();
 				// go through the restart path if the source changed

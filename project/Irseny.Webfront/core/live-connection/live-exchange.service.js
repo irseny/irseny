@@ -1,6 +1,62 @@
+function CameraUpdateHandler() {
+
+	this.handleUpdate = function(subject, cameras, observer) {
+		// extract and check status information
+		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
+			return [];
+		}
+		if (!Array.isArray(subject.data)) {
+			return result;
+		}
+		var iStart = -1;
+		if (subject.position == "all") {
+			iStart = 0;
+		} else {
+			iStart = parseInt(subject.position, 10);
+			if (!Number.isInteger(iStart)) {
+				iStart = -1;
+			}
+		}
+		if (iStart < 0) {
+			return [];
+		}
+		// extract all updated cameras
+		var result = [];
+		for (var i = iStart; i < subject.data.length; i++) {
+			var status = subject.data[i].status;
+
+			if (typeof status != 'string') {
+				return [];
+			}
+			var camera = undefined;
+			if (status == "active") {
+				if (subject.data[i].settings == undefined) {
+					return [];
+				}
+				camera = subject.data[i].settings;
+			}
+
+			result.push({
+				index: i,
+				data: camera
+			});
+		}
+		result.forEach(function(entry) {
+			cameras[entry.index] = entry.data;
+		});
+		result.forEach(function(entry) {
+			observer.notify(entry);
+		});
+
+		return result;
+	};
+}
+
 function LiveExchangeService(MessageLog, LiveWireService) {
+	const FixedEquipmentNo = 16;
 	var self = this;
-	self.setup = {
+	var updateHandler = new CameraUpdateHandler();
+	var setup = {
 		profile: {
 			available: [],
 			active: ""
@@ -8,23 +64,54 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		config: {
 			autoApplyChanges: true
 		},
-		sensors: [],
-		trackers: [],
-		inputDevices: [],
-		outputDevices: []
+		cameras: Array(FixedEquipmentNo),
+		trackers: Array(FixedEquipmentNo),
+		inputDevices: Array(FixedEquipmentNo),
+		outputDevices: Array(FixedEquipmentNo),
+		cameraObserver: new Observable(),
+		trackerObserver: new Observable(),
+		inputObserver: new Observable(),
+		outputObserver: new Observable(),
+		observers: {
+			"camera": new Observable(),
+			"tracker": new Observable(),
+			"outputDevice": new Observable(),
+			"inputDevice": new Observable()
+		}
 	};
 
-	this.receiveUpdate = function(msg) {
-		console.log("exchange received message " + JSON.stringify(msg));
+	this.receiveUpdate = function(subject) {
+		console.log("exchange received message " + JSON.stringify(subject));
+		var updated = [];
+		switch (subject.topic) {
+		case "camera":
+			updated = updateHandler.handleUpdate(subject, setup.cameras, setup.cameraObserver);
+		break;
+		default:
+			updated = [];
+		break;
+		}
+		if (updated == undefined || updated.length == 0) {
+			MessageLog.log("No data extracted from ".concat(JSON.stringify(subject)));
+		}
 	};
 
 	this.touch = function() {
-		MessageLog.log("touched");
+		MessageLog.log("Live exchange requesting camera update from server");
 		var subject = {
+			type: "get",
 			topic: "camera",
 			position: 0,
 		};
 		LiveWireService.requestUpdate(subject).then(self.receiveUpdate);
+	};
+	this.observe = function(topic) {
+		switch (topic) {
+		case "camera":
+			return setup.cameraObserver;
+		default:
+			throw new Error("topic");
+		}
 	};
 
 	this.start = function() {

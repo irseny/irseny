@@ -6,8 +6,13 @@ function CameraSectionController(LiveExchangeService) {
 
 
 
+	this.cameraUpdated = function(update) {
+		console.log("updated camera to ".concat(JSON.stringify(update)));
+	};
 
+	LiveExchangeService.observe("camera").subscribe(this.cameraUpdated);
 	LiveExchangeService.touch();
+
 }
 
 var module = angular.module("cameraSection");

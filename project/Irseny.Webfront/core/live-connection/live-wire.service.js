@@ -2,7 +2,7 @@
 
 
 function LiveWireUpdateHandler(MessageLog) {
-	var observable = new Observable(function() {});
+	var observable = new Observable();
 
 	this.tryHandleUpdate = function(msg) {
 		// TODO send to clients
@@ -25,9 +25,9 @@ function LiveWireUpdateHandler(MessageLog) {
 
 function LiveWireRequestHandler(MessageLog, connection) {
 	var self = this;
-	var pendingAnswers = [];
+	var pendingRequests = [];
 	var nextRequestId = 0;
-	var observable = new Observable(function() {});
+	var observable = new Observable();
 	var clientOrigin = -1;
 	var serverOrigin = 0;
 
@@ -39,11 +39,6 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		if (message.status != undefined && message.status != 200) {
 			MessageLog.log("LiveWire request failed with status code ".concat(
 				message.status, " in: ", JSON.stringify(message)));
-			return false;
-		}
-		if (message.type != "get" && message.type != "post") {
-			MessageLog.log("LiveWire received invalid message type ".concat(
-				message.type, " in: ", JSON.stringify(message)));
 			return false;
 		}
 		if (message.subject == undefined) {
@@ -76,31 +71,31 @@ function LiveWireRequestHandler(MessageLog, connection) {
 	this.handleResponse = function(response) {
 		// try to match the answer to a previous request
 		// in order to resolve the request
-		var index = pendingAnswers.findIndex(function(pending) {
+		var index = pendingRequests.findIndex(function(pending) {
 			return pending.requestId == response.requestId;
 		});
 		if (index < 0) {
 			MessageLog.log("LiveWire has not sent a matching request for response ".concat(response.requestId, ". Dropping packet"));
 			return false;
 		}
-		pendingAnswers[index].future.resolve(response.subject);
-		// remove the request if no more answers are to come
+		pendingRequests[index].future.resolve(response.subject);
+		// remove the request if no more responses are to come
 		if (response.final == undefined || response.final == true) {
-			if (pendingAnswers.length > 1) {
-				var last = pendingAnswers.pop();
-				pendingAnswers[index] = last;
+			if (index < pendingRequests.length - 1) {
+				var last = pendingRequests.pop();
+				pendingRequests[index] = last;
 			} else {
-				pendingAnswers.pop();
+				pendingRequests.pop();
 			}
 		} else {
 			// update the access time so that the request is kept alive
-			pendingAnswers[index].accessed = performance.now();
+			pendingRequests[index].accessed = performance.now();
+			pendingRequests[index].responseNo  += 1;
 		}
 		return true;
 	};
 	this.requestUpdate = function(subject) {
 		var request = {
-			type: "get",
 			status: 200,
 			requestId: self.generateRequestId(),
 			origin: clientOrigin,
@@ -111,18 +106,18 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		var future = new Future(function() {});
 		var pending = {
 			requestId: request.requestId,
+			responseNo: 0,
 			future: future,
 			timeout: 25000,
 			accessed: performance.now()
 		};
-		pendingAnswers.push(pending);
+		pendingRequests.push(pending);
 		connection.sendMessage(JSON.stringify(request));
 
 		return future;
 	};
 	this.sendUpdate = function(subject) {
 		var message = {
-			type: "post",
 			status: 200,
 			origin: clientOrigin,
 			target: serverOrigin,
@@ -136,11 +131,12 @@ function LiveWireRequestHandler(MessageLog, connection) {
 	};
 	this.cleanup = function() {
 		var now = performance.now();
-		pendingAnswers = pendingAnswers.filter(function(pending) {
+		pendingRequests = pendingRequests.filter(function(pending) {
 			var accessSpan = now - pending.accessed;
 			if (pending.timeout < accessSpan) {
 				pending.future.reject({ timeout: true });
-				MessageLog.log("Request ".concat(pending.requestId, " timed out after ", Math.floor(accessSpan/1000), " seconds"));
+				MessageLog.log("Request ".concat(pending.requestId, " timed out after ",
+					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses"));
 				return false;
 			} else {
 				return true;
@@ -149,6 +145,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 	};
 	this.requestOrigin = function() {
 		var subject = {
+			type: "get",
 			topic: "origin"
 		};
 		var future = self.requestUpdate(subject);

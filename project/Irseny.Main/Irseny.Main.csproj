@@ -73,6 +73,8 @@
     <Compile Include="Webface\ResourceWire\ResourceWireServer.cs" />
     <Compile Include="Webface\ResourceWire\ResourceRequestHandler.cs" />
     <Compile Include="ProfileActivator.cs" />
+    <Compile Include="Webface\LiveWire\OriginRequestHandler.cs" />
+    <Compile Include="Webface\LiveWire\CameraRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
