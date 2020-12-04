@@ -39,6 +39,8 @@ namespace Irseny.Main.Content.Profile {
 		/// <param name="root">Root node.</param>
 		public bool ReadStream(int index, SetupProfile profile, XmlNode root) {
 			var settings = new CaptureSettings();
+			// TODO read name from data
+			settings.Name = "Generic Webcam";
 			// first parse the node
 			foreach (XmlNode node in root.ChildNodes) {
 				if (node.Name.Equals("Camera")) {

@@ -12,7 +12,7 @@ function CameraUpdateHandler() {
 		if (subject.position == "all") {
 			iStart = 0;
 		} else {
-			iStart = parseInt(subject.position, 10);
+			iStart = Number.parseInt(subject.position, 10);
 			if (!Number.isInteger(iStart)) {
 				iStart = -1;
 			}
@@ -48,6 +48,13 @@ function CameraUpdateHandler() {
 			observer.notify(entry);
 		});
 
+		return result;
+	};
+	this.obtainUpdates = function(cameras) {
+		var result = new Future();
+		for (var i = 0; i < cameras.length; i++) {
+			result.resolve({ index: i, data: cameras[i]});
+		}
 		return result;
 	};
 }
@@ -101,7 +108,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		var subject = {
 			type: "get",
 			topic: "camera",
-			position: 0,
+			position: "all",
 		};
 		LiveWireService.requestUpdate(subject).then(self.receiveUpdate);
 	};
@@ -113,7 +120,15 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			throw new Error("topic");
 		}
 	};
-
+	this.obtain = function(topic) {
+		switch (topic) {
+		case "camera":
+			return updateHandler.obtainUpdates(setup.cameras);
+		break;
+		default:
+			throw new Error("topic");
+		}
+	};
 	this.start = function() {
 		LiveWireService.receiveUpdate().notify(self.receiveUpdate);
 	};

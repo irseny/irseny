@@ -88,14 +88,17 @@ function WebcamDetailController(LiveWireService) {
 	this.resetChanges = function() {
 		console.log("resetting changes");
 	};
+	this.$onInit = function() {
+		// TODO initialize from active
+	};
 }
 
 var module = angular.module("webcamDetail");
 module.component("webcamDetail", {
 	templateUrl : "main-page/camera-section/webcam-detail/webcam-detail.template.html",
+	require: {
+		shared: "^cameraSection"
+	},
 	controller : WebcamDetailController,
-	bindings : {
-		cameraId : "=camera"
-	}
 });
 WebcamDetailController.$inject = ["LiveWireService"];

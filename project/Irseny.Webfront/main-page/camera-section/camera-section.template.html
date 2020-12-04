@@ -1,15 +1,15 @@
 
 <div class="d-flex flex-row justify-content-between">
 
-	<camera-list class="list-right" base="$ctrl"></camera-list>
+	<camera-list class="list-right" align="right"></camera-list>
 
 
 	<div style="margin: 0 1rem; background-color: red;">put camera view here</div>
 	<div class="px-1">
-		<webcam-detail camera="$ctrl.activeCamera"></webcam-detail>
+		<webcam-detail shared="$ctrl"></webcam-detail>
 	</div>
 	<div>
-		<camera-list class="list-left" base="$ctrl"></camera-list>
+		<camera-list class="list-left" align="left"></camera-list>
 	</div>
 
 </div>

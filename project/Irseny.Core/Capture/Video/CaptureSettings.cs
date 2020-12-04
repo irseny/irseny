@@ -63,6 +63,7 @@ namespace Irseny.Core.Capture.Video {
 		public JsonString ToJson() {
 			var result = JsonString.CreateDict();
 			{
+				result.AddTerminal("type", StringifyTools.StringifyString("Webcam"));
 				result.AddTerminal("running", StringifyTools.StringifyBool(Running));
 				result.AddTerminal("name", StringifyTools.StringifyString(Name));
 				foreach (CaptureProperty prop in Enum.GetValues(typeof(CaptureProperty))) {
