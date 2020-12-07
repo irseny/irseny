@@ -1,5 +1,5 @@
-#if WINDOWS
-#include "Inject.h"
+
+#include "InputInjection.h"
 
 #if WITH_WINAPI
 
@@ -203,4 +203,3 @@ void ivjLogError(const char* message) {
 	printf("Ivj Error: %s\n", message);
 }
 #endif // WITH_WINAPI
-#endif // WINDOWS

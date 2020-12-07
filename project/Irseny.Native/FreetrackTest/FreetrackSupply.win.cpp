@@ -1,4 +1,6 @@
-#if WINDOWS
+
+#if WITH_WINAPI
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <windows.h>
@@ -6,52 +8,7 @@
 
 #if WITH_FREETRACK
 
-//#include "Inject.h"
-
-/*int main(int argc, char** args) {
-	IvjContext* context = ivjCreateContext();
-	IvjFreetrackConstructionInfo* info = ivjAllocFreetrackConstructionInfo();
-	IvjFreetrackInterface* freetrack = ivjConnectFreetrackInterface(context, info);
-	ivjFreeFreetrackConstructionInfo(info);
-	
-	float yaw = 0.0f;
-	float speed = 0.01f;
-	int direction = 1;
-	bool running = true;
-	while (running) {
-		ivjSetFreetrackAxis(freetrack, 0, yaw);
-		yaw += speed*direction;
-		if (yaw < -2) {
-			yaw = -2;
-			direction = 1;
-		}
-		if (yaw > 2) {
-			yaw = 2;
-			direction = -1;
-		}
-		//ivjSendFreetrackInterface(freetrack);
-		{
-			if (WaitForSingleObject(freetrack->Sync, 16) != WAIT_OBJECT_0) {
-				ivjLogError("Failed to lock shared freetrack mutex");
-				// timeout or error
-			}
-			freetrack->Packet.PacketID = freetrack->Packet.PacketID + 1;
-			memcpy(&(freetrack->Map), &(freetrack->Packet), sizeof(IvjFreetrackPacket));
-			ReleaseMutex(freetrack->Sync);
-		}
-		//ivjSendFreetrackInterface(freetrack);
-		if (GetKeyState(0x51) & 0x8000) {
-			running = false;
-		}
-		
-		Sleep(16);
-	}
-	ivjDisconnectFreetrackInterface(context, freetrack);
-	ivjDestroyContext(context);
-	return 0;
-}*/
-
-#include "TestWin.h"
+#include "FreetrackTest.win.h"
 
 void cleanup(HANDLE file, HANDLE sync, void* map) {
 	if (map != NULL) {
@@ -124,4 +81,4 @@ int main(int argc, char** args) {
 	return 0;
 }
 #endif // WITH_FREETRACK
-#endif // WINDOWS
+#endif // WITH_WINAPI

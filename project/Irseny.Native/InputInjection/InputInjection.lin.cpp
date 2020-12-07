@@ -1,6 +1,5 @@
-#if LINUX
 
-#include "Inject.h"
+#include "InputInjection.h"
 
 #if WITH_UINPUT
 #define IVJ_CONTEXT_CANDIDATE_NUM 2
@@ -15,7 +14,7 @@ const int32_t ivjKeyCodes[IVJ_KEYBOARD_KEY_NO] = {
 void ivjLogError(const char* message);
 void ivjLogWarning(const char* message);
 
-IvjContext* EXTRACK_EXPORT ivjCreateContext() {
+IvjContext*  ivjCreateContext() {
 	for (int i = 0; i < IVJ_CONTEXT_CANDIDATE_NUM; i++) {
 		int32_t fileHandle = open(ivjContextCandidates[i], O_WRONLY | O_NDELAY);
 		if (fileHandle >= 0) {
@@ -26,16 +25,16 @@ IvjContext* EXTRACK_EXPORT ivjCreateContext() {
 			return context;
 		}
 	}
-	ivjLogError("uinput file not found or unsufficient permission");
+	ivjLogError("uinput file not found or insufficient permission");
 	return NULL;
 }
 
-bool EXTRACK_EXPORT ivjDestroyContext(IvjContext* context) {
+bool  ivjDestroyContext(IvjContext* context) {
 	free(context);
 	return true;
 }
 
-IvjKeyboardConstructionInfo* EXTRACK_EXPORT ivjAllocKeyboardConstructionInfo() {
+IvjKeyboardConstructionInfo*  ivjAllocKeyboardConstructionInfo() {
 	IvjKeyboardConstructionInfo* info = (IvjKeyboardConstructionInfo*)malloc(sizeof(IvjKeyboardConstructionInfo));
 	const char* name = "Ivj Virtual Keyboard";
 	strcpy(info->Name, name);
@@ -43,12 +42,12 @@ IvjKeyboardConstructionInfo* EXTRACK_EXPORT ivjAllocKeyboardConstructionInfo() {
 	info->Product = 0x51A1;
 	return info;
 }
-bool EXTRACK_EXPORT ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info) {
+bool  ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info) {
 	free(info);
 	return true;
 }
 
-IvjKeyboard* EXTRACK_EXPORT ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
+IvjKeyboard*  ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
 	// activate all keys
 	int32_t fileHandle = open(context->FilePath, O_WRONLY | O_NDELAY);
 	if (fileHandle < 0) {
@@ -101,7 +100,7 @@ IvjKeyboard* EXTRACK_EXPORT ivjConnectKeyboard(IvjContext* context, IvjKeyboardC
 	keyboard->BufferedEventNo = 0;
 	return keyboard;
 }
-bool EXTRACK_EXPORT	ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
+bool 	ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
 	if (ioctl(keyboard->FileHandle, UI_DEV_DESTROY) < 0) {
 		ivjLogWarning("Keyboard destruction failed");
 	}
@@ -109,7 +108,7 @@ bool EXTRACK_EXPORT	ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyb
 	free(keyboard);
 	return true;
 }
-bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
+bool  ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
 	if (keyIndex < 0 || keyIndex >= IVJ_KEYBOARD_KEY_NO) {
 		ivjLogError("Key index out of range");
 		return false;
@@ -133,7 +132,7 @@ bool EXTRACK_EXPORT ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, b
 	keyboard->BufferedEventNo += 1;
 	return true;
 }
-bool EXTRACK_EXPORT ivjSendKeyboard(IvjKeyboard* keyboard) {
+bool  ivjSendKeyboard(IvjKeyboard* keyboard) {
 	if (keyboard->BufferedEventNo < 1) {
 		return true;
 	}
@@ -168,35 +167,34 @@ void ivjLogWarning(const char* message) {
 #endif // WITH_UINPUT
 
 #if WITH_FREETRACK
-EXTRACK_EXPORT IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo() {
+ IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo() {
 	return (IvjFreetrackConstructionInfo*)1;
 }
-EXTRACK_EXPORT bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info) {
+ bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info) {
 	return true;
 }
-EXTRACK_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info) {
+ IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info) {
 	IvjFreetrackInterface* result = (IvjFreetrackInterface*)malloc(sizeof(IvjFreetrackInterface));
 	memset(result, 0, sizeof(IvjFreetrackInterface));
 	return result;
 }
-EXTRACK_EXPORT bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack) {
+ bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack) {
 	free(freetrack);
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height) {
+ bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height) {
 	// TODO: implement
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
+ bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
+ bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
 	return true;
 }
-EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
+ bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
 	return true;
 }
 #endif // WITH_FREETRACK
-#endif // LINUX
 
 

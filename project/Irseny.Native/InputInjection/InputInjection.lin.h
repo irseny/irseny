@@ -1,6 +1,6 @@
-#if LINUX
-#ifndef EXTRACK_INJECT_TYPES_H
-#define EXTRACK_INJECT_TYPES_H
+
+#ifndef IRSENY_INPUT_INJECTION_TYPES_H
+#define IRSENY_INPUT_INJECTION_TYPES_H
 
 #if WITH_UINPUT
 #include <stdlib.h>
@@ -34,7 +34,8 @@ typedef struct {
 	int32_t Vendor;
 	int32_t Product;
 } IvjKeyboardConstructionInfo;
-
+#else
+#error "Require WITH_UINPUT"
 #endif // WITH_UINPUT
 
 #if WITH_FREETRACK
@@ -44,8 +45,9 @@ typedef struct {
 	int32_t FileHandle;
 	void* Map;
 } IvjFreetrackInterface;
+#else
+#error "Require WITH_FREETRACK"
 #endif // WITH_FREETRACK
 
-#endif // EXTRACK_INJECT_TYPES_H
-#endif // LINUX
+#endif // IRSENY_INPUT_INJECTION_TYPES_H
 

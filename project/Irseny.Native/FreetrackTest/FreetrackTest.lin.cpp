@@ -1,4 +1,3 @@
-#ifdef LINUX
 
 #include "unistd.h"
 
@@ -9,4 +8,4 @@ int main(int argc, char** args) {
 	}
 	return 0;
 }
-#endif // LINUX
+

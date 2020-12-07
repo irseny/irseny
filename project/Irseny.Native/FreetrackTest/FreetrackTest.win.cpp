@@ -1,4 +1,4 @@
-#if WINDOWS
+
 #if WITH_WINAPI
 #include <stdio.h>
 #include <stdbool.h>
@@ -85,5 +85,7 @@ int main(int argc, char** args) {
 	}
 	return 0;
 }
+#else
+#error "Require WITH_WINAPI
 #endif // WITH_WINAPI
-#endif // WINDOWS
+

@@ -1,4 +1,4 @@
-#if WINDOWS
+
 #include <windows.h>
 #include <inttypes.h>
 
@@ -32,6 +32,7 @@ typedef struct {
 	int Point4X;
 	int Point4Y;
 } IvjFreetrackPacket;
-
+#else
+#error "Require WITH_FREETRACK"
 #endif // WITH_FREETRACK
-#endif // WINDOWS
+

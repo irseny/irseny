@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(IRSENY_NATIVE_NAME Irseny.Native)
-set(FREETRACK_DUMMY_NAME TrackIR)
-set(FREETRACK_TEST_NAME CheckFT)
-project(${IRSENY_NATIVE_NAME} C)
+project("Irseny.Native" CXX)
 
 # project paths
 get_filename_component(IRSENY_NATIVE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
@@ -18,8 +15,8 @@ if (UNIX)
 elseif (WIN32)
 	set(IRSENY_PLATFORM "Windows")
 else()
-	message(WARNING "Platform not supported (Could not detect Windows or Linux)")
-	set(IRSENY_PLATFORM "Unknown")
+	message(WARNING "Operating system not supported")
+	set(IRSENY_PLATFORM "")
 endif()
 
 # project configuration
@@ -45,9 +42,19 @@ if (WIN32)
 elseif (UNIX)
 	list(APPEND IRSENY_COMPILE_DEFINITIONS "LINUX")
 endif()
+# find opencv
+if (WITH_OPENCV OR WITH_LOCAL_OPENCV)
+	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_OPENCV")
+	if (WITH_LOCAL_OPENCV)
+		# use custom find package script
+	endif()
+	find_package(OpenCV REQUIRED core video)
+	list(APPEND IRSENY_LIBS "${OpenCV_LIBS}")
+	list(APPEND IRSENY_INCLUDE_DIRS "${OpenCV_INCLUDE_DIRS}")
+endif()
 # find vjoy
 if (WITH_VJOY)
-	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_VJOY" "WITH_JOYSTICK")
+	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_VJOY")
 endif()
 # enable freetrack
 if (WITH_FREETRACK)
@@ -62,58 +69,48 @@ if (WITH_UINPUT)
 	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_UINPUT")
 endif()
 
-# Irseny.Native target
+# Irseny.Native
 # source files
 if (WIN32)
-	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Inject/InjectWin.c")
+	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/InputInjection/InputInjection.win.cpp")
 elseif (UNIX)
-	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Inject/InjectLin.c")
+	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/InputInjection/InputInjection.lin.cpp")
+	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/VideoCapture/VideoCapture.lin.cpp")
 endif()
 # target
-add_library(${IRSENY_NATIVE_NAME} SHARED ${IRSENY_NATIVE_SOURCE_FILES})
-target_include_directories(${IRSENY_NATIVE_NAME} PUBLIC "${PROJECT_SOURCE_DIR}")
-# compiler options
-target_compile_options(${IRSENY_NATIVE_NAME} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
-target_link_libraries(${IRSENY_NATIVE_NAME} PUBLIC "${IRSENY_LINKER_FLAGS}")
-target_compile_definitions(${IRSENY_NATIVE_NAME} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
-# installation
-install(TARGETS ${IRSENY_NATIVE_NAME} DESTINATION "${IRSENY_LIB_DIR}")
-install(TARGETS ${IRSENY_NATIVE_NAME} DESTINATION "${IRSENY_BIN_DIR}")
-
-# freetrack dummy target
-if (WITH_FREETRACK_DUMMY)
-	# source files
-	if (WIN32)
-		list(APPEND FREETRACK_DUMMY_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTools/DummyWin.c")
-	elseif(UNIX)
-		list(APPEND FREETRACK_DUMMY_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTools/DummyLin.c")
-	endif()
-	# target
-	add_executable(${FREETRACK_DUMMY_NAME} ${FREETRACK_DUMMY_SOURCE_FILES})
-	target_include_directories(${FREETRACK_DUMMY_NAME} PUBLIC "${IRSENY_NATIVE_SOURCE_DIR}/Inject")
-	# compiler options
-	target_compile_options(${FREETRACK_DUMMY_NAME} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
-	target_link_libraries(${FREETRACK_DUMMY_NAME} PUBLIC "${IRSENY_LINKER_FLAGS}")
-	target_compile_definitions(${FREETRACK_DUMMY_NAME} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
-	# installation
-	install(TARGETS ${FREETRACK_DUMMY_NAME} DESTINATION "${IRSENY_BIN_DIR}")
+if (WIN32)
+	set(IRSENY_NATIVE "Irseny.Native")
+else()
+	set(IRSENY_NATIVE "irseny_native")
 endif()
+set(CXX_STANDARD 11)
+add_library(${IRSENY_NATIVE} SHARED ${IRSENY_NATIVE_SOURCE_FILES})
+target_include_directories(${IRSENY_NATIVE} PUBLIC "${IRSENY_NATIVE_DIR}")
+target_include_directories(${IRSENY_NATIVE} PUBLIC "${IRSENY_INCLUDE_DIRS}")
+target_compile_options(${IRSENY_NATIVE} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
+target_link_libraries(${IRSENY_NATIVE} PUBLIC "${IRSENY_LINKER_FLAGS}")
+target_link_libraries(${IRSENY_NATIVE} PUBLIC "${IRSENY_LIBS}")
+target_compile_definitions(${IRSENY_NATIVE} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
+# installation
+install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_LIB_DIR}")
+install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_BIN_DIR}")
 
-# freetrack test target
+# optional FreetrackTest
 if (WITH_FREETRACK_TEST)
 	# source files
 	if (WIN32)
-		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTools/TestWin.c")
+		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest/FreetrackTest.win.cpp")
 	elseif(UNIX)
-		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTools/TestLin.c")
+		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest/FreetrackTest.lin.cpp")
 	endif()
 	# target
-	add_executable(${FREETRACK_TEST_NAME} "${FREETRACK_TEST_SOURCE_FILES}")
-	target_include_directories(${FREETRACK_TEST_NAME} PUBLIC "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTools")
+	set(FREETRACK_TEST "FreetrackTest")
+	add_executable(${FREETRACK_TEST} "${FREETRACK_TEST_SOURCE_FILES}")
+	#target_include_directories(${FREETRACK_TEST} PUBLIC "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest")
 	# compiler options
-	target_compile_options(${FREETRACK_TEST_NAME} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
-	target_link_libraries(${FREETRACK_TEST_NAME} PUBLIC "${IRSENY_LINKER_FLAGS}")
-	target_compile_definitions(${FREETRACK_TEST_NAME} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
+	target_compile_options(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
+	target_link_libraries(${FREETRACK_TEST} PUBLIC "${IRSENY_LINKER_FLAGS}")
+	target_compile_definitions(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
 	# installation
-	install(TARGETS ${FREETRACK_TEST_NAME} DESTINATION "${IRSENY_BIN_DIR}")
+	install(TARGETS ${FREETRACK_TEST} DESTINATION "${IRSENY_BIN_DIR}")
 endif()

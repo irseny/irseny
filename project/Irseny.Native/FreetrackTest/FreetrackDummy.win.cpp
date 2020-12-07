@@ -1,4 +1,4 @@
-#if WINDOWS
+
 #if WITH_WINAPI
 #include "windows.h"
 
@@ -9,4 +9,3 @@ int main(int argc, char** args) {
 	return 0;
 }
 #endif // WITH_WINAPI
-#endif // WINDOWS

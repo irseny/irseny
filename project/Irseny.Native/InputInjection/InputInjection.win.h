@@ -1,6 +1,6 @@
-#if WINDOWS
-#ifndef EXTRACK_INJECT_TYPES_H
-#define EXTRACK_INJECT_TYPES_H
+
+#ifndef IRSENY_INPUT_INJECTION_TYPES_H
+#define IRSENY_INPUT_INJECTION_TYPES_H
 
 #if WITH_WINAPI
 #include <windows.h>
@@ -53,5 +53,5 @@ typedef struct {
 
 #endif // WITH_VJOY
 #endif // WITH_WINAPI
-#endif // EXTRACK_INJECT_TYPES_H
-#endif // WINDOWS
+#endif // IRSENY_INPUT_INJECTION_TYPES_H
+
