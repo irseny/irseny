@@ -2,7 +2,8 @@
 using System.Net;
 using Irseny.Core.Util;
 using System.Threading;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors;
+using Irseny.Core.Sensors.VideoCapture;
 
 namespace Irseny.Main.Webface {
 	public class CameraRequestHandler {
@@ -43,11 +44,11 @@ namespace Irseny.Main.Webface {
 					CaptureSystem.Instance.Invoke(delegate {
 						for (int i = camStart; i < camNo; i++) {
 							var entry = JsonString.CreateDict();
-							CaptureStream stream = CaptureSystem.Instance.GetStream(i);
+							WebcamCapture stream = CaptureSystem.Instance.GetStream(i);
 							if (stream == null) {							
 								entry.AddTerminal("status", StringifyTools.StringifyString("unused"));
 							} else {
-								CaptureSettings settings = stream.GetSettings();
+								SensorSettings settings = stream.GetSettings();
 								entry.AddJsonString("settings", settings.ToJson());
 								entry.AddTerminal("status", StringifyTools.StringifyString("active"));
 							}

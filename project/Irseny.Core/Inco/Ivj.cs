@@ -69,7 +69,7 @@ namespace Irseny.Core.Inco {
 		const string lib = "Irseny.Native.dll";
 		const CallingConvention ccon = CallingConvention.StdCall;
 #elif LINUX
-		const string lib = "libIrseny.Native.so";
+		const string lib = "libirseny_native.so";
 		const CallingConvention ccon = CallingConvention.Cdecl;
 #endif
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "ivjCreateContext")]

@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using Irseny.Core.Util;
 
-namespace Irseny.Core.Capture.Video {
-	public class CaptureSettings {
-		Dictionary<CaptureProperty, double> fProps;
-		Dictionary<CaptureProperty, int> iProps;
+namespace Irseny.Core.Sensors.VideoCapture {
+	/// <summary>
+	/// Generic settings for sensor configuration.
+	/// </summary>
+	public class SensorSettings {
+		Dictionary<SensorProperty, double> fProps;
+		Dictionary<SensorProperty, int> iProps;
 
 		public bool Running { get; set; }
 		public string Name { get; set; }
 
-		public CaptureSettings() {
+		public SensorSettings() {
 			// leave everything on auto
-			fProps = new Dictionary<CaptureProperty, double>(16);
-			iProps = new Dictionary<CaptureProperty, int>(16);
+			fProps = new Dictionary<SensorProperty, double>(16);
+			iProps = new Dictionary<SensorProperty, int>(16);
 			Running = false;
 			Name = string.Empty;
 		}
 
-		public CaptureSettings(CaptureSettings source) : this() {
+		public SensorSettings(SensorSettings source) : this() {
 			if (source == null) throw new ArgumentNullException("source");
 			this.Running = source.Running;
 			this.Name = source.Name;
@@ -29,27 +32,27 @@ namespace Irseny.Core.Capture.Video {
 				this.iProps.Add(pair.Key, pair.Value);
 			}
 		}
-		public int GetInteger(CaptureProperty prop, int fallback) {
+		public int GetInteger(SensorProperty prop, int fallback) {
 			int result;
 			if (!iProps.TryGetValue(prop, out result)) {
 				return fallback;
 			}
 			return result;
 		}
-		public void SetInteger(CaptureProperty prop, int value) {
+		public void SetInteger(SensorProperty prop, int value) {
 			iProps[prop] = value;
 		}
-		public double GetDecimal(CaptureProperty prop, double fallback) {
+		public double GetDecimal(SensorProperty prop, double fallback) {
 			double result;
 			if (!fProps.TryGetValue(prop, out result)) {
 				return fallback;
 			}
 			return result;
 		}
-		public void SetDecimal(CaptureProperty prop, double value) {
+		public void SetDecimal(SensorProperty prop, double value) {
 			fProps[prop] = value;
 		}
-		public void SetAuto(CaptureProperty prop) {
+		public void SetAuto(SensorProperty prop) {
 			if (fProps.ContainsKey(prop)) {
 				fProps.Remove(prop);
 			}
@@ -57,7 +60,7 @@ namespace Irseny.Core.Capture.Video {
 				iProps.Remove(prop);
 			}
 		}
-		public bool IsAuto(CaptureProperty prop) {
+		public bool IsAuto(SensorProperty prop) {
 			return !fProps.ContainsKey(prop) && !iProps.ContainsKey(prop);
 		}
 		public JsonString ToJson() {
@@ -66,7 +69,7 @@ namespace Irseny.Core.Capture.Video {
 				result.AddTerminal("type", StringifyTools.StringifyString("Webcam"));
 				result.AddTerminal("running", StringifyTools.StringifyBool(Running));
 				result.AddTerminal("name", StringifyTools.StringifyString(Name));
-				foreach (CaptureProperty prop in Enum.GetValues(typeof(CaptureProperty))) {
+				foreach (SensorProperty prop in Enum.GetValues(typeof(SensorProperty))) {
 					double fProp;
 					int iProp;
 					if (fProps.TryGetValue(prop, out fProp)) {

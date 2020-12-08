@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors;
+using Irseny.Core.Sensors.VideoCapture;
 using Irseny.Core.Tracking;
 using Irseny.Core.Log;
 using Irseny.Core.Inco.Device;

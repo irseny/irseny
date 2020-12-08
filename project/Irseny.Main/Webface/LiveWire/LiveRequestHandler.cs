@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using Irseny.Core.Util;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors.VideoCapture;
 
 namespace Irseny.Main.Webface {
 	public class LiveRequestHandler {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors.VideoCapture;
 using Irseny.Core.Tracking;
 using Irseny.Core.Inco.Device;
 
 namespace Irseny.Main.Content.Profile {
 	public class SetupProfile {
-		Dictionary<int, CaptureSettings> captures = new Dictionary<int, CaptureSettings>(16);
+		Dictionary<int, SensorSettings> captures = new Dictionary<int, SensorSettings>(16);
 		Dictionary<int, TrackerSettings> trackers = new Dictionary<int, TrackerSettings>(16);
 		Dictionary<int, CapInputRelay> bindings = new Dictionary<int, CapInputRelay>(16);
 		Dictionary<int, VirtualDeviceSettings> devices = new Dictionary<int, VirtualDeviceSettings>(16);
@@ -20,12 +20,12 @@ namespace Irseny.Main.Content.Profile {
 		public ICollection<int> VideoCaptureIndexes {
 			get { return captures.Keys; }
 		}
-		public void AddVideoCapture(int index, CaptureSettings settings) {
+		public void AddVideoCapture(int index, SensorSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			captures[index] = settings;
 		}
-		public CaptureSettings GetVideoCapture(int index) {
-			CaptureSettings result;
+		public SensorSettings GetVideoCapture(int index) {
+			SensorSettings result;
 			if (!captures.TryGetValue(index, out result)) {
 				return null;
 			}

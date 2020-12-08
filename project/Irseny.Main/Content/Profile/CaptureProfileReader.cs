@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml;
 using Irseny.Core.Util;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors.VideoCapture;
 
 namespace Irseny.Main.Content.Profile {
 	public class CaptureProfileReader {
@@ -38,7 +38,7 @@ namespace Irseny.Main.Content.Profile {
 		/// <param name="profile">Target profile.</param>
 		/// <param name="root">Root node.</param>
 		public bool ReadStream(int index, SetupProfile profile, XmlNode root) {
-			var settings = new CaptureSettings();
+			var settings = new SensorSettings();
 			// TODO read name from data
 			settings.Name = "Generic Webcam";
 			// first parse the node
@@ -53,7 +53,7 @@ namespace Irseny.Main.Content.Profile {
 						if (camera < 0) {
 							return false;
 						}
-						settings.SetInteger(CaptureProperty.CameraId, camera);
+						settings.SetInteger(SensorProperty.CameraId, camera);
 					}
 				} else if (node.Name.Equals("Width")) {
 					bool auto = true;
@@ -65,7 +65,7 @@ namespace Irseny.Main.Content.Profile {
 						if (width < 1) {
 							return false;
 						}
-						settings.SetInteger(CaptureProperty.FrameWidth, width);
+						settings.SetInteger(SensorProperty.FrameWidth, width);
 					}
 				} else if (node.Name.Equals("Height")) {
 					bool auto = true;
@@ -77,7 +77,7 @@ namespace Irseny.Main.Content.Profile {
 						if (height < 1) {
 							return false;
 						}
-						settings.SetInteger(CaptureProperty.FrameHeight, height);
+						settings.SetInteger(SensorProperty.FrameHeight, height);
 					}
 				} else if (node.Name.Equals("FPS")) {
 					bool auto = true;
@@ -89,7 +89,7 @@ namespace Irseny.Main.Content.Profile {
 						if (fps < 0) {
 							return false;
 						}
-						settings.SetInteger(CaptureProperty.FrameRate, fps);
+						settings.SetInteger(SensorProperty.FrameRate, fps);
 					}
 				} else if (node.Name.Equals("Exposure")) {
 					bool auto = true;
@@ -98,7 +98,7 @@ namespace Irseny.Main.Content.Profile {
 					}
 					double exposure = TextParseTools.ParseDouble(node.InnerText, 0.0);
 					if (!auto) {
-						settings.SetDecimal(CaptureProperty.Exposure, exposure);
+						settings.SetDecimal(SensorProperty.Exposure, exposure);
 					}
 				} else if (node.Name.Equals("Brightness")) {
 					bool auto = true;
@@ -107,7 +107,7 @@ namespace Irseny.Main.Content.Profile {
 					}
 					double bright = TextParseTools.ParseDouble(node.InnerText, 0.0);
 					if (!auto) {
-						settings.SetDecimal(CaptureProperty.Brightness, bright);
+						settings.SetDecimal(SensorProperty.Brightness, bright);
 					}
 				} else if (node.Name.Equals("Contrast")) {
 					bool auto = true;
@@ -116,7 +116,7 @@ namespace Irseny.Main.Content.Profile {
 					}
 					double contrast = TextParseTools.ParseDouble(node.InnerText, 0.0);
 					if (!auto) {
-						settings.SetDecimal(CaptureProperty.Contrast, contrast);
+						settings.SetDecimal(SensorProperty.Contrast, contrast);
 					}
 				}
 			}

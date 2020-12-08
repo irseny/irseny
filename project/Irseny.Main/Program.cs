@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using Irseny.Core.Util;
 using Irseny.Core.Log;
-using Irseny.Core.Capture.Video;
+using Irseny.Core.Sensors;
 using Irseny.Core.Tracking;
 using Irseny.Core.Inco.Device;
 using Irseny.Core.Listing;

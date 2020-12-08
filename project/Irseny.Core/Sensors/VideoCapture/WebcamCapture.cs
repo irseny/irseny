@@ -5,14 +5,18 @@ using System.Collections.Generic;
 using System.ServiceModel.Dispatcher;
 using Irseny.Core.Log;
 using Irseny.Core.Util;
+using Irseny.Core.Sensors;
 
-namespace Irseny.Core.Capture.Video {
-	public class CaptureStream {
+namespace Irseny.Core.Sensors.VideoCapture {
+	/// <summary>
+	/// Sensor frontend for capturing video data from webcams.
+	/// </summary>
+	public class WebcamCapture : ISensorBase {
 		object captureSync = new object();
 		object imageEventSync = new object();
 		object runEventSync = new object();
 		Emgu.CV.VideoCapture capture = null;
-		CaptureSettings settings = new CaptureSettings();
+		SensorSettings settings = new SensorSettings();
 		readonly int id;
 		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
 
@@ -20,7 +24,14 @@ namespace Irseny.Core.Capture.Video {
 		event EventHandler<StreamEventArgs> captureStarted;
 		event EventHandler<StreamEventArgs> captureStopped;
 
-		public CaptureStream(int id) {
+		public SensorType SensorType {
+			get { return SensorType.Webcam; }
+		}
+		public int IntervalPrediction {
+			get { return -1; }
+		}
+
+		public WebcamCapture(int id) {
 			if (id < 0) throw new ArgumentOutOfRangeException("id");
 			this.id = id;
 		}
@@ -76,9 +87,9 @@ namespace Irseny.Core.Capture.Video {
 			}
 		}
 
-		public CaptureSettings GetSettings() {
+		public SensorSettings GetSettings() {
 			lock (captureSync) {
-				return new CaptureSettings(settings);
+				return new SensorSettings(settings);
 			}
 		}
 
@@ -128,23 +139,23 @@ namespace Irseny.Core.Capture.Video {
 				handler(this, args);
 			}
 		}
-		public bool ApplySettings(CaptureSettings settings) {
+		public bool ApplySettings(SensorSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			lock (captureSync) {
 				if (capture == null) {
-					this.settings = new CaptureSettings(settings);
+					this.settings = new SensorSettings(settings);
 					return true;
 				}
 				capture.Stop();
 				// go through the restart path if the source changed
-				int oldCamera = settings.GetInteger(CaptureProperty.CameraId, 0);
-				int newCamera = settings.GetInteger(CaptureProperty.CameraId, 0);
+				int oldCamera = settings.GetInteger(SensorProperty.CameraId, 0);
+				int newCamera = settings.GetInteger(SensorProperty.CameraId, 0);
 				if (oldCamera != newCamera) {
-					this.settings = new CaptureSettings(settings);
+					this.settings = new SensorSettings(settings);
 					Stop();
-					return Start(settings);
+					return Start();
 				}
-				this.settings = new CaptureSettings(settings);
+				this.settings = new SensorSettings(settings);
 				ApplySettings();
 				capture.Start();
 			}
@@ -249,8 +260,7 @@ namespace Irseny.Core.Capture.Video {
 
 			return true;
 		}
-		public bool Start(CaptureSettings settings) {
-			if (settings == null) throw new ArgumentNullException("settings");
+		public bool Start() {
 			lock (captureSync) {
 				if (capture != null) {
 					return false;
@@ -260,14 +270,14 @@ namespace Irseny.Core.Capture.Video {
 				capture = new Emgu.CV.VideoCapture(settings.GetInteger(CaptureProperty.CameraId, 0));
 #elif LINUX
 				//capture = new Emgu.CV.VideoCapture(Emgu.CV.CvEnum.CaptureType.V4L);
-				capture = new Emgu.CV.VideoCapture(settings.GetInteger(CaptureProperty.CameraId, 0));
+				capture = new Emgu.CV.VideoCapture(settings.GetInteger(SensorProperty.CameraId, 0));
 #endif
 				if (!capture.IsOpened) {
 					capture.Dispose();
 					capture = null;
 					return false;
 				}
-				this.settings = new CaptureSettings(settings);
+				this.settings = new SensorSettings(settings);
 				ApplySettings();
 				capture.ImageGrabbed += ReceiveImage;
 				// all settings have to be set before the capture may start
@@ -290,11 +300,16 @@ namespace Irseny.Core.Capture.Video {
 			OnCaptureStopped(new StreamEventArgs(this, Id));
 			return true;
 		}
+		/// <inheritdoc />
+		public SensorDataPacket Process(long timestamp) {
+			// TODO implement
+			return null;
+		}
 
 		private class CaptureThreadExceptionHandler : ExceptionHandler {
-			CaptureStream target;
+			WebcamCapture target;
 
-			public CaptureThreadExceptionHandler(CaptureStream target) : base() {
+			public CaptureThreadExceptionHandler(WebcamCapture target) : base() {
 				if (target == null)
 					throw new ArgumentNullException("target");
 				this.target = target;
