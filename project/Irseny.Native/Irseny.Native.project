@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="Irseny.Native" Version="11000" InternalType="Library">
+  <VirtualDirectory Name="VideoCapture">
+    <File Name="VideoCapture/VideoCapture.win.h"/>
+    <File Name="VideoCapture/VideoCapture.lin.h"/>
+    <File Name="VideoCapture/VideoCapture.lin.cpp"/>
+    <File Name="VideoCapture/VideoCapture.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="InputInjection">
+    <File Name="InputInjection/InputInjection.win.h"/>
+    <File Name="InputInjection/InputInjection.win.cpp"/>
+    <File Name="InputInjection/InputInjection.lin.h"/>
+    <File Name="InputInjection/InputInjection.lin.cpp"/>
+    <File Name="InputInjection/InputInjection.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FreetrackTest">
+    <File Name="FreetrackTest/FreetrackTest.win.h"/>
+    <File Name="FreetrackTest/FreetrackTest.win.cpp"/>
+    <File Name="FreetrackTest/FreetrackTest.lin.cpp"/>
+    <File Name="FreetrackTest/FreetrackSupply.win.cpp"/>
+    <File Name="FreetrackTest/FreetrackDummy.win.cpp"/>
+    <File Name="FreetrackTest/FreetrackDummy.lin.cpp"/>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00040001N0005Debug0000000000000001N0005Linux0000000000000001N0007Release0000000000000001N0007Windows000000000000]]>
     </Plugin>
   </Plugins>
-  <VirtualDirectory Name="FreetrackTools">
-    <File Name="FreetrackTools/TestWin.h"/>
-    <File Name="FreetrackTools/TestWin.c"/>
-    <File Name="FreetrackTools/TestLin.c"/>
-    <File Name="FreetrackTools/SupplyWin.c"/>
-    <File Name="FreetrackTools/DummyWin.c"/>
-    <File Name="FreetrackTools/DummyLin.c"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="Inject">
-    <File Name="Inject/InjectWin.h"/>
-    <File Name="Inject/InjectWin.c"/>
-    <File Name="Inject/InjectLin.h"/>
-    <File Name="Inject/InjectLin.c"/>
-    <File Name="Inject/Inject.h"/>
-  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <Settings Type="Dynamic Library">

@@ -48,7 +48,7 @@ if (WITH_OPENCV OR WITH_LOCAL_OPENCV)
 	if (WITH_LOCAL_OPENCV)
 		# use custom find package script
 	endif()
-	find_package(OpenCV REQUIRED core video)
+	find_package(OpenCV REQUIRED core highgui)
 	list(APPEND IRSENY_LIBS "${OpenCV_LIBS}")
 	list(APPEND IRSENY_INCLUDE_DIRS "${OpenCV_INCLUDE_DIRS}")
 endif()
