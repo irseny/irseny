@@ -23,7 +23,6 @@ namespace Irseny.Core.Sensors {
 		readonly ISensorBase[] sensors;
 		readonly SensorObservable[] observables;
 		readonly IDisposable[] subscriptions;
-		IList<WebcamCapture> streams = new List<WebcamCapture>(4);
 
 
 		public static CaptureSystem Instance {
@@ -86,13 +85,7 @@ namespace Irseny.Core.Sensors {
 			while (running) {
 				invokeSignal.WaitOne();
 				InvokePending();
-			}
-			// clean up
-			lock (sensorSync) {
-				for (int id = streams.Count - 1; id >= 0; id--) { // streams removed due to descending id
-					DestroyStream(id);
-				}
-
+				// TODO handle sensor processing
 			}
 		}
 		public int ConnectSensor(ISensorBase sensor, int preferredIndex=-1) {
@@ -131,6 +124,7 @@ namespace Irseny.Core.Sensors {
 		}
 		public bool DisconnectSensor(int index) {
 			ISensorBase sensor;
+			bool stopped = false;
 			lock (sensorSync) {
 				// free the index if it has been assigned
 				if (index < 0 || index >= sensors.Length) {
@@ -141,12 +135,19 @@ namespace Irseny.Core.Sensors {
 				}
 				sensor = sensors[index];
 				sensors[index] = null;
+				if (sensor.Capturing) {
+					stopped = sensor.Stop();
+				}
 			}
 			SensorObservable observable;
 			lock (observableSync) {
 				observable = observables[index];
 			}
+			if (stopped) {
+				observable.OnStopped(sensor);
+			}
 			observable.OnDisconnected(sensor);
+
 			return true;
 		}
 		public bool StartSensor(int index) {
@@ -206,51 +207,6 @@ namespace Irseny.Core.Sensors {
 				}
 				return observables[index];
 			}
-		}
-
-		public int CreateStream() {
-			WebcamCapture stream;
-			int index;
-			lock (sensorSync) {
-				// find unused stream id
-				for (index = 0; index < streams.Count; index++) {
-					if (streams[index] == null) {
-						break;
-					}
-				}
-				// create stream
-				stream = new WebcamCapture(index);
-				if (index < streams.Count) {
-					streams[index] = stream;
-				} else {
-					streams.Add(stream);
-				}
-			}
-			return index;
-		}
-		public WebcamCapture GetStream(int id) {
-			lock (sensorSync) {
-				if (id >= 0 && id < streams.Count) {
-					return streams[id];
-				}
-			}
-			return null;
-		}
-		public bool DestroyStream(int id) {
-			lock (sensorSync) {
-				if (id >= 0 && id < streams.Count) {
-					if (streams[id] != null) {
-						streams[id].Stop();
-					}
-					if (id == streams.Count - 1) {
-						streams.RemoveAt(id);
-					} else {
-						streams[id] = null;
-					}
-					return true;
-				}
-			}
-			return false;
 		}
 
 		public void Invoke(EventHandler handler) {

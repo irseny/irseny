@@ -17,7 +17,7 @@ namespace Irseny.Main.Webface {
 			int camNo = 0;
 			do {
 				string type = TextParseTools.ParseString(subject.GetTerminal("type", "error"), "error");
-				if (!type.Equals("get")) {
+				if (!type.Equals("get") && !type.Equals("post")) {
 					status = HttpStatusCode.BadRequest;
 					break;
 				}
@@ -41,16 +41,22 @@ namespace Irseny.Main.Webface {
 					subjectAnswer.AddTerminal("position", StringifyTools.StringifyString(position));
 					var data = JsonString.CreateArray();
 					var readySignal = new ManualResetEvent(false);
-					CaptureSystem.Instance.Invoke(delegate {
+					CaptureSystem.Instance.Invoke((object sender, EventArgs args) => {
+						var system = (CaptureSystem)sender;
 						for (int i = camStart; i < camNo; i++) {
 							var entry = JsonString.CreateDict();
-							WebcamCapture stream = CaptureSystem.Instance.GetStream(i);
-							if (stream == null) {							
+							ISensorBase sensor = system.GetSensor(i);
+
+							if (sensor == null) {
 								entry.AddTerminal("status", StringifyTools.StringifyString("unused"));
-							} else {
-								SensorSettings settings = stream.GetSettings();
-								entry.AddJsonString("settings", settings.ToJson());
+							} else if (sensor.SensorType == SensorType.Webcam) {
+								var capture = (WebcamCapture)sensor;
+								SensorSettings settings = capture.GetSettings();
 								entry.AddTerminal("status", StringifyTools.StringifyString("active"));
+								entry.AddJsonString("settings", SensorSettings.ToJson(settings));
+
+							} else {
+								entry.AddTerminal("status", StringifyTools.StringifyString("unused"));
 							}
 							data.AddJsonString(string.Empty, entry);
 						}

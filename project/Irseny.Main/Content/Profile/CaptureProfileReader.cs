@@ -15,15 +15,24 @@ namespace Irseny.Main.Content.Profile {
 		/// <param name="root">Root node.</param>
 		public bool Read(SetupProfile profile, XmlNode root) {
 			foreach (XmlNode node in root.ChildNodes) {
-				if (node.Name.Equals("Stream")) {
-					if (node.Attributes["Index"] == null) {
-						return false;
+				if (node.Name.Equals("Webcam")) {
+					string sIndex;
+					if (node.Attributes["Index"] != null) {
+						sIndex = node.Attributes["Index"].InnerText;
+					} else {
+						sIndex = "-1";
 					}
-					int index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
-					if (index < 0) {
-						return false;
+					int index = -1;
+					if (sIndex != null) {
+						index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
+					} 
+					string name;
+					if (node.Attributes["Name"] != null) {
+						name = node.Attributes["Name"].InnerText;
+					} else {
+						name = "Webcam";
 					}
-					if (!ReadStream(index, profile, node)) {
+					if (!ReadWebcam(name, index, profile, node)) {
 						return false;
 					}
 				}
@@ -37,17 +46,20 @@ namespace Irseny.Main.Content.Profile {
 		/// <param name="index">Capture index.</param>
 		/// <param name="profile">Target profile.</param>
 		/// <param name="root">Root node.</param>
-		public bool ReadStream(int index, SetupProfile profile, XmlNode root) {
-			var settings = new SensorSettings();
+		public bool ReadWebcam(string name, int index, SetupProfile profile, XmlNode root) {
+			var settings = new SensorSettings(typeof(SensorProperty));
 			// TODO read name from data
-			settings.Name = "Generic Webcam";
+			settings.SetText(SensorProperty.Name, name);
+			settings.SetText(SensorProperty.Type, "Webcam");
 			// first parse the node
 			foreach (XmlNode node in root.ChildNodes) {
+				
 				if (node.Name.Equals("Camera")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
 						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
+
 					if (!auto) {
 						int camera = TextParseTools.ParseInt(node.InnerText, -1);
 						if (camera < 0) {
@@ -96,7 +108,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Auto"] != null) {
 						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					double exposure = TextParseTools.ParseDouble(node.InnerText, 0.0);
+					decimal exposure = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Exposure, exposure);
 					}
@@ -105,7 +117,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Auto"] != null) {
 						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					double bright = TextParseTools.ParseDouble(node.InnerText, 0.0);
+					decimal bright = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Brightness, bright);
 					}
@@ -114,7 +126,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Auto"] != null) {
 						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					double contrast = TextParseTools.ParseDouble(node.InnerText, 0.0);
+					decimal contrast = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Contrast, contrast);
 					}

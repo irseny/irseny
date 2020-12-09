@@ -104,6 +104,7 @@
     <Compile Include="Sensors\SensorSettings.cs" />
     <Compile Include="Sensors\VideoCapture\WebcamCapture.cs" />
     <Compile Include="Sensors\VideoCapture\VideoCaptureBackend.cs" />
+    <Compile Include="Util\JsonStringContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Inco\" />

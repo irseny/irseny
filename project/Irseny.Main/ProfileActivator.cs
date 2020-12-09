@@ -20,13 +20,16 @@ namespace Irseny.Main {
 			var deviceSignal = new ManualResetEvent(false);
 			var cancel = new CancellationToken();
 
-			CaptureSystem.Instance.Invoke(delegate {
+			CaptureSystem.Instance.Invoke((object sender, EventArgs args) => {
+				var system = (CaptureSystem)sender;
 				foreach (int i in profile.VideoCaptureIndexes) {
 					var settings = profile.GetVideoCapture(i);
-					int index = CaptureSystem.Instance.CreateStream();
-					var capture = CaptureSystem.Instance.GetStream(index);
-					capture.ApplySettings(settings);
-
+					var sensor = new WebcamCapture(settings);
+					int index = system.ConnectSensor(sensor, i);
+					if (index != i) {
+						LogManager.Instance.LogWarning(this, string.Format("VideoCapture {0} assigned to different index {1}",
+							i, index));
+					}
 				}
 				captureSignal.Set();
 			});

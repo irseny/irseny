@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Collections.Generic;
 using Irseny.Core.Sensors.VideoCapture;
+using Irseny.Core.Util;
 
 namespace Irseny.Main.Content.Profile {
 	public class CaptureProfileWriter {
@@ -21,8 +22,9 @@ namespace Irseny.Main.Content.Profile {
 			return root;
 		}
 		private XmlNode WriteStream(int index, SensorSettings settings, XmlDocument target) {
-			var result = target.CreateElement("Stream");
-			result.SetAttribute("Index", index.ToString());
+			var result = target.CreateElement("Webcam");
+			result.SetAttribute("Index", index.ToString(TextParseTools.FormatProvider));
+			result.SetAttribute("Name", settings.GetText(SensorProperty.Name, "Webcam"));
 			{ // camera
 				XmlElement node = target.CreateElement("Camera");
 				result.AppendChild(node);
@@ -50,19 +52,19 @@ namespace Irseny.Main.Content.Profile {
 			{ // exposure
 				XmlElement node = target.CreateElement("Exposure");
 				result.AppendChild(node);
-				node.InnerText = settings.GetDecimal(SensorProperty.Exposure, 0.0).ToString();
+				node.InnerText = settings.GetDecimal(SensorProperty.Exposure, 0.0m).ToString();
 				node.SetAttribute("Auto", settings.IsAuto(SensorProperty.Exposure).ToString());
 			}
 			{ // brightness
 				XmlElement node = target.CreateElement("Brightness");
 				result.AppendChild(node);
-				node.InnerText = settings.GetDecimal(SensorProperty.Brightness, 0.0).ToString();
+				node.InnerText = settings.GetDecimal(SensorProperty.Brightness, 0.0m).ToString();
 				node.SetAttribute("Auto", settings.IsAuto(SensorProperty.Brightness).ToString());
 			}
 			{ // contrast
 				XmlElement node = target.CreateElement("Contrast");
 				result.AppendChild(node);
-				node.InnerText = settings.GetDecimal(SensorProperty.Contrast, 0.0).ToString();
+				node.InnerText = settings.GetDecimal(SensorProperty.Contrast, 0.0m).ToString();
 				node.SetAttribute("Auto", settings.IsAuto(SensorProperty.Contrast).ToString());
 			}
 			return result;

@@ -7,6 +7,7 @@ namespace Irseny.Core.Util {
 		public readonly static NumberStyles NumberStyle = NumberStyles.Float;
 		public readonly static CultureInfo FormatProvider = CultureInfo.InvariantCulture;
 
+
 		public static bool TryParseNull(string text, out object result) {
 			if (text == null) {
 				result = null;
@@ -36,6 +37,23 @@ namespace Irseny.Core.Util {
 				return text.Substring(1, text.Length - 2);
 			}
 			return text;
+		}
+		public static bool IsQuoted(string text) {
+			if (text == null) {
+				return false;
+			}
+			if (text.Length < 2) {
+				return false;
+			}
+			char first = text[0];
+			char last = text[text.Length - 1];
+			if (first == '"' && last == '"') {
+				return true;
+			}
+			if (first == '\'' && last == '\'') {
+				return true;
+			}
+			return false;
 		}
 
 		public static char ParseChar(string text, char fallback) {
@@ -107,11 +125,30 @@ namespace Irseny.Core.Util {
 			result = 0.0;
 			return false;
 		}
-		/// <summary>
-		/// Reads a boolean value from the given string.
-		/// </summary>
-		/// <returns><c>true</c>, if given value evaluates to "True", <c>false</c> otherwise.</returns>
-		/// <param name="text">String to read from.</param>
+		public static decimal ParseDecimal(string text, decimal fallback) {
+			if (text == null) {
+				return fallback;
+			}
+			if (text.Length > 0) {
+				decimal result;
+				if (decimal.TryParse(text, NumberStyle, FormatProvider, out result)) {
+					return result;
+				}
+			}
+			return fallback;
+		}
+		public static bool TryParseDecimal(string text, out decimal result) {
+			if (text == null) {
+				result = 0.0m;
+				return false;
+			}
+			if (text.Length > 0) {
+				return decimal.TryParse(text, NumberStyle, FormatProvider, out result);
+			}
+			result = 0.0m;
+			return false;
+		}
+
 		public static bool ParseBool(string text, bool fallback) {
 			if (text == null) {
 				return fallback;

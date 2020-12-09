@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Profile>
   <VideoCapture>
-    <Stream Index="0">
+    <Webcam Index="0" Name="Cam0">
       <Camera Auto="False">0</Camera>
       <Width Auto="False">320</Width>
       <Height Auto="False">240</Height>
@@ -9,7 +9,7 @@
       <Exposure Auto="False">0</Exposure>
       <Brightness Auto="False">0</Brightness>
       <Contrast Auto="True">0</Contrast>
-    </Stream>
+    </Webcam>
   </VideoCapture>
   <Tracking>
     <Cap3Point Index="0">

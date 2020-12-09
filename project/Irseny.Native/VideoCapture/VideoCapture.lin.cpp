@@ -5,8 +5,8 @@ IRS_VideoCaptureContext* irsCreateVideoCaptureContext() {
 	return (IRS_VideoCaptureContext*)(0x1);
 }
 
-bool irsDestroyVideoCaptureContext(IRS_VideoCaptureContext* context) {
-	return true;
+void irsDestroyVideoCaptureContext(IRS_VideoCaptureContext* context) {
+	return;
 }
 
 IRS_VideoCaptureConstructionInfo* irsAllocVideoCaptureConstructionInfo() {
@@ -21,9 +21,8 @@ IRS_VideoCaptureConstructionInfo* irsAllocVideoCaptureConstructionInfo() {
 	return info;
 }
 
-bool irsFreeVideoCaptureConstructionInfo(IRS_VideoCaptureConstructionInfo* info) {
+void irsFreeVideoCaptureConstructionInfo(IRS_VideoCaptureConstructionInfo* info) {
 	free(info);
-	return true;
 }
 
 int irsGetVideoCaptureProperty(IRS_VideoCaptureConstructionInfo* info, IRS_VideoCaptureProperty property) {
@@ -137,10 +136,9 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 	return result;
 }
 
-bool irsDestroyVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCapture* capture) {
+void irsDestroyVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCapture* capture) {
 	capture->Capture.release();
 	free(capture);
-	return true;
 }
 bool irsGetVideoCaptureSettings(IRS_VideoCapture* capture, IRS_VideoCaptureConstructionInfo* settings) {
 	*settings = capture->Settings;
@@ -157,15 +155,14 @@ bool irsStopVideoCapture(IRS_VideoCapture* capture) {
 	capture->Buffer = NULL;
 	return true;
 }
-IRS_VideoCaptureFrame* irsAllocVideoCaptureFrame(IRS_VideoCapture* capture) {
+IRS_VideoCaptureFrame* irsCreateVideoCaptureFrame(IRS_VideoCapture* capture) {
 	IRS_VideoCaptureFrame* result = (IRS_VideoCaptureFrame*)malloc(sizeof(IRS_VideoCaptureFrame));
 	result->create(capture->Settings.Resolution[1], capture->Settings.Resolution[0], sizeof(char));
 	return result;
 }
-bool irsFreeVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFrame* frame) {
+void irsDestroyVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFrame* frame) {
 	frame->release(); // TODO check if release calls are necessary or harmful
 	free(frame);
-	return true;
 }
 bool irsBeginVideoFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
@@ -186,7 +183,7 @@ bool irsEndVideoFrameGrab(IRS_VideoCapture* capture) {
 	}
 	capture->CurrentFrame = capture->Capture.get(CV_CAP_PROP_FRAME_COUNT);
 }
-bool irsCopyVideoFrame(IRS_VideoCaptureFrame* frame, char* buffer, size_t bufferSize) {
+bool irsCopyVideoCaptureFrame(IRS_VideoCaptureFrame* frame, char* buffer, size_t bufferSize) {
 	size_t frameSize = frame->cols*frame->rows*frame->elemSize();
 	if (frameSize > bufferSize) {
 		return false;

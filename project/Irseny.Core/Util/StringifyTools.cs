@@ -49,6 +49,9 @@ namespace Irseny.Core.Util
 		public static string StringifyDouble(double primitive) {
 			return primitive.ToString(FormatProvider);
 		}
+		public static string Stringify(decimal primitive) {
+			return primitive.ToString(FormatProvider);
+		}
 	}
 }
 

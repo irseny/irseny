@@ -159,6 +159,16 @@ namespace Irseny.Core.Util {
 
 	}
 	public static class JsonStringPartition {
+		public static string ToLowerCamelCase(this string value) {
+			
+			if (value == null || value.Length < 2) {
+				return value;
+			}
+			var result = new StringBuilder(value.Length);
+			result.Append(char.ToLower(value[0]));
+			result.Append(value.Substring(1));
+			return result.ToString();
+		}
 		public static string ToJsonString(this List<string> partition) {
 			return ToJsonString(partition, 0, partition.Count);
 		}

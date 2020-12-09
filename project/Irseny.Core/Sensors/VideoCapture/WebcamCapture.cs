@@ -7,11 +7,196 @@ using Irseny.Core.Log;
 using Irseny.Core.Util;
 using Irseny.Core.Sensors;
 
+
 namespace Irseny.Core.Sensors.VideoCapture {
 	/// <summary>
 	/// Sensor frontend for capturing video data from webcams.
 	/// </summary>
 	public class WebcamCapture : ISensorBase {
+		static IntPtr captureContext;
+
+		IntPtr backendSettings;
+		IntPtr videoFrame;
+		IntPtr videoCapture;
+		readonly object captureSync;
+
+		SensorSettings settings;
+		SharedRefCleaner imageCleaner;
+
+
+		static WebcamCapture() {
+			captureContext = VideoCaptureBackend.CreateVideoCaptureContext();
+		}
+
+		private WebcamCapture() {
+			backendSettings = IntPtr.Zero;
+			videoFrame = IntPtr.Zero;
+			videoCapture = IntPtr.Zero;
+
+			captureSync = new object();
+			imageCleaner = new SharedRefCleaner(32);
+		}
+		public WebcamCapture(SensorSettings settings) : this() {
+			this.settings = new SensorSettings(settings);
+		}
+
+		public bool Capturing {
+			get { 
+				lock (captureSync) {
+					return videoFrame != IntPtr.Zero; 
+				}
+			}
+		}
+		public SensorType SensorType {
+			get { return SensorType.Webcam; }
+		}
+		public int IntervalPrediction {
+			// TODO implement prediction logic
+			get { return -1; }
+		}
+		public SensorSettings GetSettings() {
+			lock (captureSync) {
+				return new SensorSettings(settings);
+			}
+		}
+		public bool ApplySettings(SensorSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			lock (captureSync) {
+				// trivial case if not started
+				if (!Capturing) {
+					this.settings = new SensorSettings(settings);
+					return true;
+				}
+				// otherwise we have to stop the capture
+				// provide new settings
+				// and restart the capture
+				if (!Stop()) {
+					return false;
+				}
+				this.settings = new SensorSettings(settings);
+				if (!Start()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		public bool Start() {
+			lock (captureSync) {
+				if (Capturing) {
+					return true;
+				}
+				if (captureContext == IntPtr.Zero) {
+					return false;
+				}
+				// create and start the capture process
+				bool started = false;
+				do {
+					backendSettings = VideoCaptureBackend.AllocVideoCaptureConstructionInfo();
+
+					if (backendSettings == IntPtr.Zero) {
+						break;
+					}
+					// TODO apply settings
+					VideoCaptureBackend.SetVideoCaptureProperty(backendSettings, SensorProperty.Exposure, 0);
+
+					videoCapture = VideoCaptureBackend.CreateVideoCapture(captureContext, backendSettings);
+					if (videoCapture == IntPtr.Zero) {
+						break;
+					}
+					videoFrame = VideoCaptureBackend.CreateVideoCaptureFrame(videoCapture);
+					if (videoFrame == IntPtr.Zero) {
+						break;
+					}
+					if (!VideoCaptureBackend.StartVideoCapture(videoCapture, videoFrame)) {
+						break;
+					}
+					started = true;
+				} while (false);
+				// clean up in the correct order if starting was unsuccessful
+				if (!started) {
+					if (videoFrame != IntPtr.Zero) {
+						VideoCaptureBackend.DestroyVideoCaptureFrame(videoCapture, videoFrame);
+						videoFrame = IntPtr.Zero;
+					}
+					if (videoCapture != IntPtr.Zero) {
+						VideoCaptureBackend.DestroyVideoCapture(captureContext, videoCapture);
+						videoFrame = IntPtr.Zero;
+					}
+					if (backendSettings != IntPtr.Zero) {
+						VideoCaptureBackend.FreeVideoCaptureConstructionInfo(backendSettings);
+						backendSettings = IntPtr.Zero;
+					}
+					return false;
+				}
+				// finally retrieve updated settings from the backend
+				if (VideoCaptureBackend.GetVideoCaptureSettings(videoCapture, backendSettings)) {
+					// TODO update local settings
+				}
+				
+			}
+			return true;
+		}
+		/// <inheritdoc/>
+		public bool Stop() {
+			lock (captureSync) {
+				if (!Capturing) {
+					return true;
+				}
+				if (!VideoCaptureBackend.StopVideoCapture(videoCapture)) {
+					return false;
+				}
+				if (videoFrame != IntPtr.Zero) {
+					VideoCaptureBackend.DestroyVideoCaptureFrame(videoCapture, videoFrame);
+					videoFrame = IntPtr.Zero;
+				}
+				if (videoCapture != IntPtr.Zero) {
+					VideoCaptureBackend.DestroyVideoCapture(captureContext, videoCapture);
+					videoFrame = IntPtr.Zero;
+				}
+				if (backendSettings != IntPtr.Zero) {
+					VideoCaptureBackend.FreeVideoCaptureConstructionInfo(backendSettings);
+					backendSettings = IntPtr.Zero;
+				}
+			}
+			return true;
+		}
+		/// <inheritdoc/>
+		public SensorDataPacket Process(long timestamp) {
+			// TODO implement
+			lock (captureSync) {
+				if (!Capturing) {
+					return null;
+				}
+
+				// TODO implrement prediction service and divide split multiple calls into grab begin/end
+				VideoCaptureBackend.BeginVideoFrameGrab(videoCapture);
+
+				VideoCaptureBackend.EndVideoFrameGrab(videoCapture);
+
+			}
+			return null;
+		}
+
+	}
+
+
+
+
+}
+
+/*
+namespace Irseny.Core.Sensors.VideoCapture {
+	/// <summary>
+	/// Sensor frontend for capturing video data from webcams.
+	/// </summary>
+	public class WebcamCaptureDisabled : ISensorBase {
+		static IntPtr captureContext;
+
+		IntPtr constructionInfo;
+		IntPtr captureFrame;
+		IntPtr videoCapture;
+
+
 		object captureSync = new object();
 		object imageEventSync = new object();
 		object runEventSync = new object();
@@ -30,8 +215,11 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		public int IntervalPrediction {
 			get { return -1; }
 		}
+		static WebcamCaptureDisabled() {
+			captureContext = VideoCaptureBackend.CreateVideoCaptureContext();
+		}
 
-		public WebcamCapture(int id) {
+		public WebcamCaptureDisabled(int id) {
 			if (id < 0) throw new ArgumentOutOfRangeException("id");
 			this.id = id;
 		}
@@ -102,7 +290,8 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				var grayImage = SharedRef.Create(new Emgu.CV.Mat());
 				capture.Retrieve(colorImage.Reference);
 				Emgu.CV.CvInvoke.CvtColor(colorImage.Reference, grayImage.Reference, Emgu.CV.CvEnum.ColorConversion.Rgb2Gray);
-				OnImageAvailable(new ImageCapturedEventArgs(this, id, colorImage, grayImage));
+				// TODO enable
+				//OnImageAvailable(new ImageCapturedEventArgs(this, id, colorImage, grayImage));
 				imageCleaner.CleanUpStep(4); // 2 images added on every receive, try to free more than those added
 				imageCleaner.AddReference(colorImage);
 				imageCleaner.AddReference(grayImage);
@@ -170,75 +359,75 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				return false;
 			}
 			// TODO: fix so that settings are actually applied like below
-			/*bool autoWidth = settings.IsAuto(CaptureProperty.FrameWidth);
-			if (!autoWidth) {
-				int width = settings.GetInteger(CaptureProperty.FrameWidth, 640);
-				autoWidth = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, width);
-			}
-			if (autoWidth) {
-				int width = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
-				settings.SetInteger(CaptureProperty.FrameWidth, width);
-			}
-			bool autoHeight = settings.IsAuto(CaptureProperty.FrameHeight);
-			if (!autoHeight) {
-				int height = settings.GetInteger(CaptureProperty.FrameHeight, 480);
-				autoHeight = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, height);
-			}
-			if (autoHeight) {
-				int height = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
-				settings.SetInteger(CaptureProperty.FrameHeight, height);
-			}
-			bool autoRate = settings.IsAuto(CaptureProperty.FrameRate);
-			if (!autoRate) {
-				int rate = settings.GetInteger(CaptureProperty.FrameRate, 30);
-				autoRate = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, rate);
-			}
-			if (autoRate) {
-				int rate = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
-				settings.SetInteger(CaptureProperty.FrameRate, rate);
-			}
-			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0.0)) {
-
-			}
-			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 0.0)) {
-				capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, -1.0);
-			}
-			bool autoExposure = settings.IsAuto(CaptureProperty.Exposure);
-			if (!autoExposure) {
-				double exposure = settings.GetDecimal(CaptureProperty.Exposure, 0.0);
-				autoExposure = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, exposure);
-			}
-			if (autoExposure) {
-				double exposure = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure);
-				settings.SetDecimal(CaptureProperty.Exposure, exposure);
-			}
-			bool autoBrightness = settings.IsAuto(CaptureProperty.Brightness);
-			if (!autoBrightness) {
-				double brightbness = settings.GetDecimal(CaptureProperty.Brightness, 0.0);
-				autoBrightness = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, brightbness);
-			}
-			if (autoBrightness) {
-				double brightness = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness);
-				settings.SetDecimal(CaptureProperty.Brightness, brightness);
-			}
-			bool autoContrast = settings.IsAuto(CaptureProperty.Contrast);
-			if (!autoContrast) {
-				double contrast = settings.GetDecimal(CaptureProperty.Contrast, 0.0);
-				autoContrast = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Contrast, contrast);
-			}
-			if (autoContrast) {
-				double contrast = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Contrast);
-				settings.SetDecimal(CaptureProperty.Contrast, contrast);
-			}
-			bool autoGain = settings.IsAuto(CaptureProperty.Gain);
-			if (!autoGain) {
-				double gain = settings.GetDecimal(CaptureProperty.Gain, 0.0);
-				autoContrast = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Gain, gain);
-			}
-			if (autoGain) {
-				double gain = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Gain);
-				settings.SetDecimal(CaptureProperty.Gain, gain);
-			}*/
+//			bool autoWidth = settings.IsAuto(CaptureProperty.FrameWidth);
+//			if (!autoWidth) {
+//				int width = settings.GetInteger(CaptureProperty.FrameWidth, 640);
+//				autoWidth = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, width);
+//			}
+//			if (autoWidth) {
+//				int width = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth);
+//				settings.SetInteger(CaptureProperty.FrameWidth, width);
+//			}
+//			bool autoHeight = settings.IsAuto(CaptureProperty.FrameHeight);
+//			if (!autoHeight) {
+//				int height = settings.GetInteger(CaptureProperty.FrameHeight, 480);
+//				autoHeight = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, height);
+//			}
+//			if (autoHeight) {
+//				int height = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight);
+//				settings.SetInteger(CaptureProperty.FrameHeight, height);
+//			}
+//			bool autoRate = settings.IsAuto(CaptureProperty.FrameRate);
+//			if (!autoRate) {
+//				int rate = settings.GetInteger(CaptureProperty.FrameRate, 30);
+//				autoRate = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, rate);
+//			}
+//			if (autoRate) {
+//				int rate = (int)capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
+//				settings.SetInteger(CaptureProperty.FrameRate, rate);
+//			}
+//			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Autograb, 0.0)) {
+//
+//			}
+//			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, 0.0)) {
+//				capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.AutoExposure, -1.0);
+//			}
+//			bool autoExposure = settings.IsAuto(CaptureProperty.Exposure);
+//			if (!autoExposure) {
+//				double exposure = settings.GetDecimal(CaptureProperty.Exposure, 0.0);
+//				autoExposure = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure, exposure);
+//			}
+//			if (autoExposure) {
+//				double exposure = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure);
+//				settings.SetDecimal(CaptureProperty.Exposure, exposure);
+//			}
+//			bool autoBrightness = settings.IsAuto(CaptureProperty.Brightness);
+//			if (!autoBrightness) {
+//				double brightbness = settings.GetDecimal(CaptureProperty.Brightness, 0.0);
+//				autoBrightness = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness, brightbness);
+//			}
+//			if (autoBrightness) {
+//				double brightness = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Brightness);
+//				settings.SetDecimal(CaptureProperty.Brightness, brightness);
+//			}
+//			bool autoContrast = settings.IsAuto(CaptureProperty.Contrast);
+//			if (!autoContrast) {
+//				double contrast = settings.GetDecimal(CaptureProperty.Contrast, 0.0);
+//				autoContrast = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Contrast, contrast);
+//			}
+//			if (autoContrast) {
+//				double contrast = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Contrast);
+//				settings.SetDecimal(CaptureProperty.Contrast, contrast);
+//			}
+//			bool autoGain = settings.IsAuto(CaptureProperty.Gain);
+//			if (!autoGain) {
+//				double gain = settings.GetDecimal(CaptureProperty.Gain, 0.0);
+//				autoContrast = !capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Gain, gain);
+//			}
+//			if (autoGain) {
+//				double gain = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Gain);
+//				settings.SetDecimal(CaptureProperty.Gain, gain);
+//			}
 
 			if (!capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 60)) {
 				LogManager.Instance.Log(LogEntry.CreateWarning(this, "unable to apply framerate"));
@@ -256,7 +445,8 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			LogManager.Instance.Log(LogEntry.CreateMessage(this, "exposure set to: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Exposure)));
 			capture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb, 1);
 			LogManager.Instance.Log(LogEntry.CreateMessage(this, "convert to rgb: " + capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.ConvertRgb)));
-			capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
+			// TODO enabnled
+			//capture.Start(new CaptureThreadExceptionHandler(this)); // exception thrown if started before setting properties
 
 			return true;
 		}
@@ -330,3 +520,5 @@ namespace Irseny.Core.Sensors.VideoCapture {
 
 
 }
+
+*/
