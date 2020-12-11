@@ -8,7 +8,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 typedef enum IRS_VideoCaptureProperty {
-	Device = 0,
+	Device = 0x0,
 	FrameWidth = CV_CAP_PROP_FRAME_WIDTH,
 	FrameHeight = CV_CAP_PROP_FRAME_HEIGHT,
 	FrameRate = CV_CAP_PROP_FPS,
@@ -16,6 +16,20 @@ typedef enum IRS_VideoCaptureProperty {
 	Gain = CV_CAP_PROP_GAIN,
 	Exposure = CV_CAP_PROP_EXPOSURE
 } IRS_VideoCaptureProperty;
+
+typedef enum IRS_VideoCaptureFrameProperty {
+	Width = 0x0,
+	Height = 0x1,
+	Stride = 0x2,
+	PixelFormat = 0x3
+} IRS_VideoCaptureFrameProperty;
+
+typedef enum IRS_VideoCapturePixelFormat {
+	GrayScale8 = 0x8,
+	GrayScale16 = 0x16,
+	RGB24 = 0x24,
+	ARGB32 = 0x32
+} IRS_VideoCapturePixelFormat;
 
 typedef int IRS_VideoCaptureContext;
 

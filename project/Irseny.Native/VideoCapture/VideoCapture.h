@@ -24,10 +24,11 @@ IRSENY_EXPORT void irsDestroyVideoCapture(IRS_VideoCaptureContext*, IRS_VideoCap
 IRSENY_EXPORT bool irsGetVideoCaptureSettings(IRS_VideoCapture*, IRS_VideoCaptureConstructionInfo*);
 IRSENY_EXPORT bool irsStartVideoCapture(IRS_VideoCapture*, IRS_VideoCaptureFrame*);
 IRSENY_EXPORT bool irsStopVideoCapture(IRS_VideoCapture*);
-IRSENY_EXPORT bool irsBeginVideoFrameGrab(IRS_VideoCapture*);
-IRSENY_EXPORT bool irsEndVideoFrameGrab(IRS_VideoCapture*);
+IRSENY_EXPORT bool irsBeginCaptureVideoFrameGrab(IRS_VideoCapture*);
+IRSENY_EXPORT bool irsEndVideoCaptureFrameGrab(IRS_VideoCapture*);
 IRSENY_EXPORT IRS_VideoCaptureFrame* irsCreateVideoCaptureFrame(IRS_VideoCapture*);
 IRSENY_EXPORT void irsDestroyVideoCaptureFrame(IRS_VideoCapture*, IRS_VideoCaptureFrame*);
+IRSENY_EXPORT int irsGetVideoCaptureFrameProperty(IRS_VideoCaptureFrame*, IRS_VideoCaptureFrameProperty);
 IRSENY_EXPORT bool irsCopyVideoCaptureFrame(IRS_VideoCaptureFrame*, char*, size_t);
 
 #endif // IRSENY_VIDEO_CATPURE_H

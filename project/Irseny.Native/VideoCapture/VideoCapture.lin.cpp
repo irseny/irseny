@@ -164,7 +164,7 @@ void irsDestroyVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFram
 	frame->release(); // TODO check if release calls are necessary or harmful
 	free(frame);
 }
-bool irsBeginVideoFrameGrab(IRS_VideoCapture* capture) {
+bool irsBeginVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
@@ -174,7 +174,7 @@ bool irsBeginVideoFrameGrab(IRS_VideoCapture* capture) {
 	return true;
 
 }
-bool irsEndVideoFrameGrab(IRS_VideoCapture* capture) {
+bool irsEndVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
@@ -182,6 +182,29 @@ bool irsEndVideoFrameGrab(IRS_VideoCapture* capture) {
 		return false;
 	}
 	capture->CurrentFrame = capture->Capture.get(CV_CAP_PROP_FRAME_COUNT);
+}
+int irsGetVideoCaptureFrameProperty(IRS_VideoCaptureFrame* frame, IRS_VideoCaptureFrameProperty property) {
+	switch (property) {
+	case IRS_VideoCaptureFrameProperty::Width:
+		return frame->cols;
+	case IRS_VideoCaptureFrameProperty::Height:
+		return frame->rows;
+	case IRS_VideoCaptureFrameProperty::Stride:
+		return frame->cols;
+	case IRS_VideoCaptureFrameProperty::PixelFormat:
+		switch (frame->elemSize()) {
+		case (sizeof(char)*1):
+			return IRS_VideoCapturePixelFormat::GrayScale8;
+		case (sizeof(char)*2):
+			return IRS_VideoCapturePixelFormat::GrayScale16;
+		case (sizeof(char)*3):
+			return IRS_VideoCapturePixelFormat::RGB24;
+		case (sizeof(char)*4):
+			return IRS_VideoCapturePixelFormat::ARGB32;
+		default:
+			return -1;
+		}
+	}
 }
 bool irsCopyVideoCaptureFrame(IRS_VideoCaptureFrame* frame, char* buffer, size_t bufferSize) {
 	size_t frameSize = frame->cols*frame->rows*frame->elemSize();
