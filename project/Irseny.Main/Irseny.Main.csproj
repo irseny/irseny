@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">LinuxDebug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Irseny.Main</RootNamespace>
@@ -12,7 +12,7 @@
     <StartupObject>Irseny.Main.Program</StartupObject>
     <ApplicationIcon>..\Irseny.Webfront\favicon.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,17 +21,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
-    <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>..\..\bin</OutputPath>
     <DefineConstants>LINUX;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -75,6 +73,8 @@
     <Compile Include="ProfileActivator.cs" />
     <Compile Include="Webface\LiveWire\OriginRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\CameraRequestHandler.cs" />
+    <Compile Include="Webface\LiveWire\SensorCaptureRequestHandler.cs" />
+    <Compile Include="Webface\LiveWire\StandardRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">

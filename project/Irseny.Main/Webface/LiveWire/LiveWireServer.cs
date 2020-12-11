@@ -161,7 +161,7 @@ namespace Irseny.Main.Webface {
 						break;
 					} while (false);
 					if (!delivered) {
-						LogManager.Instance.LogError(this, "Cannot deliver live answer " + task.Result);
+						LogManager.Instance.LogError(this, "Cannot deliver response " + task.Result);
 					}
 				}
 				foreach (var task in completedTasks) {

@@ -4,7 +4,7 @@
 	flex-direction: row;
 	background-color: var(--primary);
 	justify-content: center;
-	align-items: stretch;
+	align-items: end;
 	align-content: center;
 	margin-bottom: 0.4rem;
 	user-select: none;
@@ -20,20 +20,15 @@
 	cursor: pointer;
 	flex: 0 0 0;
 	text-align: center;
-	padding: 0 1rem;
-	margin-top: 1rem;
-	border-bottom: 1rem solid var(--primary);
+	padding: 0.8rem 1rem;
 }
 /* hover indicator over clickable elements */
 .header .tab:not(.active):hover {
-	padding-top: 0.5rem;
-	border-bottom: 1rem solid var(--secondary);
+	background-color: var(--light)
 }
 /* active state for clickable elements */
 .header .tab.active {
 	color: var(--light);
 	background-color: var(--secondary);
-	padding-top: 0.5rem;
-	border-bottom: 1rem solid var(--secondary);
 }
 

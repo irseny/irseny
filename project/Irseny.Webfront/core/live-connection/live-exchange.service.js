@@ -88,7 +88,6 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 	};
 
 	this.receiveUpdate = function(subject) {
-		console.log("exchange received message " + JSON.stringify(subject));
 		var updated = [];
 		switch (subject.topic) {
 		case "camera":
@@ -99,7 +98,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		break;
 		}
 		if (updated == undefined || updated.length == 0) {
-			MessageLog.log("No data extracted from ".concat(JSON.stringify(subject)));
+			MessageLog.logWarning("No data extracted from ".concat(JSON.stringify(subject)));
 		}
 	};
 

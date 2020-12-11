@@ -1,0 +1,14 @@
+.view {
+	display: flex;
+	flex-direction: row;
+	background-color: red;
+}
+
+.view .video {
+
+}
+.view .configline {
+	display: flex;
+	flex-direction: column;
+	background-color: var(--primary);
+}

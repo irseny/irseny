@@ -36,16 +36,13 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		return nextRequestId++;
 	};
 	this.handleMessage = function(message) {
+		var badStatus = false;
 		if (message.status != undefined && message.status != 200) {
-			MessageLog.log("LiveWire request failed with status code ".concat(
-				message.status, " in: ", JSON.stringify(message)));
-			return false;
+			MessageLog.logError("LiveWire request failed with status code ".concat(
+				message.status, " in response: ", JSON.stringify(message)));
+			badStatus = true;
 		}
-		if (message.subject == undefined) {
-			MessageLog.log("LiveWire received message with missing subject: ".concat(
-				JSON.stringify(message)));
-			return false;
-		}
+
 		// a typical response for a client's request contains an origin that matches the origin of the client
 		// responses for origin request are a special case
 		// the origin of the client is in invalid state and the server origin in the response matches 0
@@ -58,6 +55,14 @@ function LiveWireRequestHandler(MessageLog, connection) {
 				isRequest = true;
 			}
 		}
+
+		// a message without a subject cannot be handled
+		// unless it is a response with an error status code
+		if (message.subject == undefined && !(badStatus && isRequest)) {
+			MessageLog.logError("LiveWire received message with missing subject: ".concat(
+				JSON.stringify(message)));
+			return false;
+		}
 		if (isRequest) {
 			return self.handleResponse(message);
 		} else {
@@ -65,6 +70,9 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		}
 	};
 	this.handleUpdate = function(update) {
+		if (update.subject == undefined) {
+			return false;
+		}
 		observable.notify(update.subject);
 		return true;
 	};
@@ -75,10 +83,20 @@ function LiveWireRequestHandler(MessageLog, connection) {
 			return pending.requestId == response.requestId;
 		});
 		if (index < 0) {
-			MessageLog.log("LiveWire has not sent a matching request for response ".concat(response.requestId, ". Dropping packet"));
+			MessageLog.logError("LiveWire has not sent a matching request for response ".concat(response.requestId, ". Dropping packet"));
 			return false;
 		}
-		pendingRequests[index].future.resolve(response.subject);
+		// in case of a bad status code in the response reject the request and
+		// give more information with regards to which request went wrong
+		if (response.status != undefined && response.status != 200) {
+			var pending = pendingRequests[index];
+			MessageLog.logError("for request ".concat(JSON.stringify(pending.request)));
+			pending.future.reject(response.status);
+		} else {
+			// otherwise the request can be resolved
+			// and the response has a subject (tested above)
+			pendingRequests[index].future.resolve(response.subject);
+		}
 		// remove the request if no more responses are to come
 		if (response.final == undefined || response.final == true) {
 			if (index < pendingRequests.length - 1) {
@@ -103,8 +121,9 @@ function LiveWireRequestHandler(MessageLog, connection) {
 			subject: subject,
 			final: true
 		};
-		var future = new Future(function() {});
+		var future = new Future();
 		var pending = {
+			request: request,
 			requestId: request.requestId,
 			responseNo: 0,
 			future: future,
@@ -135,8 +154,8 @@ function LiveWireRequestHandler(MessageLog, connection) {
 			var accessSpan = now - pending.accessed;
 			if (pending.timeout < accessSpan) {
 				pending.future.reject({ timeout: true });
-				MessageLog.log("Request ".concat(pending.requestId, " timed out after ",
-					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses"));
+				MessageLog.logWarning("Request ".concat(pending.requestId, " timed out after ",
+					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses: ", JSON.stringify(pending.request)));
 				return false;
 			} else {
 				return true;
@@ -160,15 +179,15 @@ function LiveWireRequestHandler(MessageLog, connection) {
 				}
 				clientOrigin = result.data.clientOrigin;
 				// the server origin always stays 0
-				MessageLog.log("LiveWire client was assigned origin id ".concat(clientOrigin));
+				MessageLog.logInfo("LiveWire client was assigned origin id ".concat(clientOrigin));
 				accepted = true;
 			} while (false);
 			if (!accepted) {
-				MessaeLog.log("LiveWire received unexpected origin response ".concat(result, ". Leaving unconfigured"));
+				MessaeLog.logError("LiveWire received unexpected origin response ".concat(result, ". Leaving unconfigured"));
 			}
 		});
 		future.else(function(reason) {
-			MessageLog.log("LiveWire did not received an origin response from the server");
+			MessageLog.logError("LiveWire did not received an origin response from the server");
 		});
 	};
 	this.clearOrigin = function() {
@@ -203,7 +222,7 @@ function LiveWireService(MessageLog, $interval) {
 		if (self.isConnected()) {
 			return;
 		}
-		MessageLog.log("LiveWire establishing a connection");
+		MessageLog.logInfo("LiveWire establishing a connection");
 		var server = window.location.hostname;
 		self.connection = new WebSocket("ws:" + server + ":" + self.port);
 		self.connection.onopen = this.connected;
@@ -229,7 +248,7 @@ function LiveWireService(MessageLog, $interval) {
 			return;
 		}
 		self.connectionOpen = true;
-		MessageLog.log("LiveWire connected to server");
+		MessageLog.logInfo("LiveWire connected to server");
 		self.requestHandler.requestOrigin();
 		// handle pending messages
 		var toSend = self.pendingMessages;
@@ -242,27 +261,27 @@ function LiveWireService(MessageLog, $interval) {
 		self.connectionOpen = false;
 		self.connection = null;
 		self.requestHandler.clearOrigin();
-		MessageLog.log("LiveWire disconnected from server");
+		MessageLog.logWarning("LiveWire disconnected from server");
 	};
 	this.connectionFailed = function(ev) {
 		self.connectionOpen = false;
 		self.connection = null;
 		self.stopServeCycle();
 		self.requestHandler.clearOrigin();
-		MessageLog.log("LiveWire lost server connection");
+		MessageLog.logError("LiveWire lost server connection");
 	};
 	this.messageReceived = function(ev) {
 		var msg = null;
 		try {
 			msg = JSON.parse(ev.data);
 		} catch (error) {
-			MessageLog.log("LiveWire failed to parse message: ".concat(
+			MessageLog.logError("LiveWire failed to parse message: ".concat(
 				ev.data, " ", error));
 		}
 		if (msg != null) {
 			var handled = self.requestHandler.handleMessage(msg);
 			if (!handled) {
-				MessageLog.log("LiveWire could not make sense of message: " + ev.data);
+				MessageLog.logError("LiveWire could not make sense of message: " + ev.data);
 			}
 		}
 	};
@@ -300,9 +319,9 @@ function LiveWireService(MessageLog, $interval) {
 		// reconnecting
 		if (!self.isConnected()) {
 			if (self.connectInProgress()) {
-				MessageLog.log("Still trying to connect to live server");
+				MessageLog.logInfo("Still trying to connect to live server");
 			} else {
-				MessageLog.log("Trying to reconnect to live server");
+				MessageLog.logInfo("Trying to reconnect to live server");
 				self.connect();
 			}
 		}

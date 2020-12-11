@@ -15,6 +15,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		Exposure,
 		Brightness,
 		Contrast,
-		Gain
+		Gain,
+
 	}
 }

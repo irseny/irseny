@@ -1,4 +1,5 @@
 function WebcamDetailController(LiveWireService) {
+	var self = this;
 	this.framerate = 30;
 	this.exposure = 0.0;
 	this.imageResolutionConfigMode = "selectTypical";
@@ -38,7 +39,21 @@ function WebcamDetailController(LiveWireService) {
 
 
 	this.$onInit = function() {
-		console.log("WebcamDetailController got " + this.cameraId);
+
+		if (self.shared == undefined) {
+			console.log("nothing shared in init");
+		} else {
+			//console.log("WebcamDetailController got " + shared.getActiveCamera().data.name);
+			console.log("shared in init");
+		}
+	};
+	this.$postLink = function() {
+		if (self.shared == undefined) {
+			console.log("nothing shared in postLink");
+		} else {
+			console.log("shared in postLink");
+		}
+
 	};
 	this.switchImageSizeConfigMode = function(switchFor) {
 		console.log("switching to mode " + switchFor);
@@ -88,17 +103,34 @@ function WebcamDetailController(LiveWireService) {
 	this.resetChanges = function() {
 		console.log("resetting changes");
 	};
-	this.$onInit = function() {
-		// TODO initialize from active
+	this.$onDestroy = function() {
+		console.log("webcam details destroyed");
 	};
 }
 
 var module = angular.module("webcamDetail");
 module.component("webcamDetail", {
-	templateUrl : "main-page/camera-section/webcam-detail/webcam-detail.template.html",
 	require: {
 		shared: "^cameraSection"
 	},
-	controller : WebcamDetailController,
+	controller: WebcamDetailController,
+	templateUrl: "main-page/camera-section/webcam-detail/webcam-detail.template.html"
 });
+
+/*module.directive("webcamDetail", function() {
+	return {
+		restrict: 'E',
+		require: {
+			shared: "^cameraSection",
+			self: "webcamDetail"
+		},
+		link: function(scope, element, attrs, required) {
+			console.log("directive link");
+			required.self.shared = required.shared;
+			//console.log("link got camera " + required.shared.getActiveCamera().data.name);
+		},
+		controller: WebcamDetailController,
+		bindToController: true
+	};
+});*/
 WebcamDetailController.$inject = ["LiveWireService"];

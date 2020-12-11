@@ -1,55 +1,47 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Main", "Irseny.Main\Irseny.Main.csproj", "{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Core", "Irseny.Core\Irseny.Core.csproj", "{079C6237-47C4-40CA-B93F-9C47AB4F1767}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x86 = Debug|x86
-		Release|x86 = Release|x86
-		LinuxDebug|x86 = LinuxDebug|x86
-		LinuxRelease|x86 = LinuxRelease|x86
+		LinuxDebug|AnyCPU = LinuxDebug|AnyCPU
+		LinuxRelease|AnyCPU = LinuxRelease|AnyCPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|x86.ActiveCfg = LinuxDebug|x86
-		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|x86.Build.0 = LinuxDebug|x86
-		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|x86.ActiveCfg = LinuxRelease|x86
-		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|x86.Build.0 = LinuxRelease|x86
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|x86.ActiveCfg = LinuxDebug|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|x86.Build.0 = LinuxDebug|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|x86.ActiveCfg = LinuxRelease|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|x86.Build.0 = LinuxRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = Hierarchical
+		$1.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $2
 		$2.inheritsSet = null
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
-		$3.IndentSwitchSection = False
-		$3.LabelPositioning = NoIndent
-		$3.NewLinesForBracesInTypes = False
-		$3.NewLinesForBracesInMethods = False
-		$3.NewLinesForBracesInProperties = False
-		$3.NewLinesForBracesInAccessors = False
-		$3.NewLinesForBracesInAnonymousMethods = False
-		$3.NewLinesForBracesInControlBlocks = False
-		$3.NewLinesForBracesInAnonymousTypes = False
-		$3.NewLinesForBracesInObjectCollectionArrayInitializers = False
-		$3.NewLinesForBracesInLambdaExpressionBody = False
-		$3.NewLineForElse = False
-		$3.NewLineForCatch = False
-		$3.NewLineForFinally = False
-		$3.SpacingAroundBinaryOperator = Ignore
+		$3.AfterDelegateDeclarationParameterComma = True
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
 		$0.TextStylePolicy = $4
+		$4.FileWidth = 120
+		$4.TabsToSpaces = False
 		$4.EolMarker = Unix
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
 		$4.scope = text/plain
 		$0.StandardHeader = $5
-		outputpath = ../bin
+		$5.IncludeInNewFiles = True
+		outputpath = ..\bin
 	EndGlobalSection
 EndGlobal

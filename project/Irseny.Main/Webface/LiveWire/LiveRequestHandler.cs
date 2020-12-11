@@ -46,6 +46,8 @@ namespace Irseny.Main.Webface {
 				// answer by topic
 				if (topic.Equals("camera")) {
 					status = new CameraRequestHandler().Respond(subject, response);
+				} else if (topic.Equals("sensorCapture")) {
+					status = new SensorCaptureRequestHandler().Respond(subject, response);
 				} else if (topic.Equals("origin")) {
 					status = new OriginRequestHandler(LiveWireServer.ServerOrigin, origin).Respond(subject, response);
 				} else {

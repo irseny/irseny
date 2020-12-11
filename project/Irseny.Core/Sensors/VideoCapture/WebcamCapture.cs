@@ -162,16 +162,37 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		}
 		/// <inheritdoc/>
 		public SensorDataPacket Process(long timestamp) {
-			// TODO implement
 			lock (captureSync) {
 				if (!Capturing) {
 					return null;
 				}
 
 				// TODO implrement prediction service and divide split multiple calls into grab begin/end
-				VideoCaptureBackend.BeginVideoFrameGrab(videoCapture);
+				// get image and metadata from the backend
+				if (!VideoCaptureBackend.BeginVideoCaptureFrameGrab(videoCapture)) {
+					return null;
+				}
+				if (!VideoCaptureBackend.EndVideoCaptureFrameGrab(videoCapture)) {
+					return null;
+				}
 
-				VideoCaptureBackend.EndVideoFrameGrab(videoCapture);
+				int width = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
+					VideoCaptureBackend.TranslateProperty(VideoFrameProperty.Width));
+				int height = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
+					VideoCaptureBackend.TranslateProperty(VideoFrameProperty.Height));
+				VideoFramePixelFormat format = VideoCaptureBackend.TranslatePixelFormat(
+					VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
+						VideoCaptureBackend.TranslateProperty(VideoFrameProperty.PixelFormat)));
+				int pixelSize = VideoFrame.GetPixelSize(format);
+				// construct a data packet as result
+				if (width < 0 || width >= 16384 || height < 0 || height >= 16384 || pixelSize < 1) {
+					return null;
+				}
+				byte[] image = new byte[width*height*pixelSize];
+				var frame = new VideoFrame(width, height, format, image);
+
+				// TODO generate packet id
+				new SensorDataPacket(this, SensorDataType.Video, frame, 0);
 
 			}
 			return null;

@@ -1,4 +1,4 @@
-function CameraSectionController($scope, LiveExchangeService) {
+function CameraSectionController($scope, LiveExchangeService, LiveWireService) {
 	var self = this;
 
 	// available cameras
@@ -7,20 +7,54 @@ function CameraSectionController($scope, LiveExchangeService) {
 	var availableDirty = true;
 	var activeIndex = -1;
 	var activeModel = undefined;
-	var activeDirty = false;
+	var activeDirty = true;
 
-	const cameraClasses = [ "Webcam", "MS Kinect", "Camcorder" ];
+	const sensorClasses = [ "Webcam", "MS Kinect", "Camcorder" ];
 	//this.availableCameras = [ { index: 0, data: "LiveVision0"}, {index: 1, data: "Kintect2"}, {index: 2, data: "Logitech UltraMegaPro2"} ];
 	//this.activeCamera = 0;
 
+	this.ensureClean = function() {
+		if (availableDirty) {
+			// regenerate available
+			availableModel = [];
+			for (var i = 0; i < setup.length; i++) {
+				if (setup[i]) {
+					availableModel.push({ index: i, data: setup[i]});
+				}
+			}
+			availableDirty = false;
+		}
+		if (activeDirty) {
+			// regenerate active
+			if (activeIndex < 0 || activeIndex >= setup.length || setup[activeIndex] == undefined) {
+				activeIndex = -1;
+				activeModel = {index: -1, data: undefined};
+			} else {
+				activeModel = {index: activeIndex, data: setup[activeIndex]};
+			}
+			activeDirty = false;
+		}
+	};
+
 	this.getSensorClasses = function() {
-		return cameraClasses;
+		return sensorClasses;
 	};
 	this.isActiveCamera = function(cam) {
 		return cam.index == activeIndex;
 	};
-	this.exchangeCamera = function(cam) {
+	this.exchangeActiveSensor = function() {
 		// TODO send from LiveExchange to server
+		self.ensureClean();
+		if (activeModel.index < 0) {
+			return false;
+		}
+		var subject = {
+			type: "post",
+			topic: "camera",
+			position: activeModel.index,
+			data: activeModel.data
+		};
+		LiveWireService.sendUpdate(subject);
 	};
 	this.setActiveCamera = function(cam) {
 		if (!Number.isInteger(cam.index)) {
@@ -35,28 +69,11 @@ function CameraSectionController($scope, LiveExchangeService) {
 	};
 
 	this.getActiveCamera = function() {
-		if (activeDirty) {
-			if (activeIndex < 0 || activeIndex >= setup.length || setup[activeIndex] == undefined) {
-				activeIndex = -1;
-				activeModel = undefined;
-			} else {
-				activeModel = {index: activeIndex, data: setup[activeIndex]};
-			}
-			activeDirty = false;
-
-		}
+		self.ensureClean();
 		return activeModel;
 	};
 	this.getAvailableCameras = function() {
-		if (availableDirty) {
-			availableModel = [];
-			for (var i = 0; i < setup.length; i++) {
-				if (setup[i]) {
-					availableModel.push({ index: i, data: setup[i]});
-				}
-			}
-			availableDirty = false;
-		}
+		self.ensureClean();
 		return availableModel;
 	};
 
@@ -76,6 +93,17 @@ function CameraSectionController($scope, LiveExchangeService) {
 		availableDirty = true;
 		$scope.$digest(); // TODO maybe delay until all updates are done; timeout?
 	};
+	this.requestActiveSensorCapture = function() {
+		if (activeIndex < 0) {
+			return undefined;
+		}
+		var subject = {
+			type: "get",
+			topic: "sensorCapture",
+			position: activeIndex
+		};
+		return LiveWireService.requestUpdate(subject);
+	};
 
 
 	const liveSubscription = LiveExchangeService.observe("camera").subscribe(this.cameraUpdated);
@@ -86,7 +114,7 @@ function CameraSectionController($scope, LiveExchangeService) {
     	LiveExchangeService.observe("camera").unsubscribe(liveSubscription);
 	});
 }
-CameraSectionController.$inject = ["$scope", "LiveExchangeService"];
+CameraSectionController.$inject = ["$scope", "LiveExchangeService", "LiveWireService"];
 
 var module = angular.module("cameraSection");
 module.component("cameraSection", {

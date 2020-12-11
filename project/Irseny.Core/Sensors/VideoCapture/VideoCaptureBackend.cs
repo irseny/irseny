@@ -51,17 +51,20 @@ namespace Irseny.Core.Sensors.VideoCapture
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsStopVideoCapture")]
 		public static extern bool StopVideoCapture(IntPtr capture);
 
-		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsBeginVideoFrameGrab")]
-		public static extern bool BeginVideoFrameGrab(IntPtr capture);
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsBeginVideoCaptureFrameGrab")]
+		public static extern bool BeginVideoCaptureFrameGrab(IntPtr capture);
 
-		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsEndVideoFrameGrab")]
-		public static extern bool EndVideoFrameGrab(IntPtr capture);
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsEndVideoCaptureFrameGrab")]
+		public static extern bool EndVideoCaptureFrameGrab(IntPtr capture);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsCreateVideoCaptureFrame")]
 		public static extern IntPtr CreateVideoCaptureFrame(IntPtr capture);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsDestroyVideoCaptureFrame")]
 		public static extern void DestroyVideoCaptureFrame(IntPtr capture, IntPtr frame);
+
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsGetVideoCaptureFrameProperty")]
+		public static extern int GetVideoCaptureFrameProperty(IntPtr frame, int property);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsCopyVideoCaptureFrame")]
 		public static extern bool CopyVideoCaptureFrame(IntPtr capture, IntPtr buffer, long bufferSize);
@@ -126,8 +129,51 @@ namespace Irseny.Core.Sensors.VideoCapture
 				return 11;
 			case SensorProperty.Exposure:
 				return 15;
+			
 			default:
 				return -1;
+			}
+		}
+		public static int TranslateProperty(VideoFrameProperty property) {
+			switch (property) {
+			case VideoFrameProperty.Width:
+				return 0x0;
+			case VideoFrameProperty.Height:
+				return 0x1;
+			case VideoFrameProperty.Stride:
+				return 0x2;
+			case VideoFrameProperty.PixelFormat:
+				return 0x3;
+			default:
+				return -1;
+			}
+		}
+		public static int TranslatePixelFormat(VideoFramePixelFormat format) {
+			switch (format) {
+			case VideoFramePixelFormat.Gray8:
+				return 0x8;
+			case VideoFramePixelFormat.Gray16:
+				return 0x16;
+			case VideoFramePixelFormat.RGB24:
+				return 0x24;
+			case VideoFramePixelFormat.ARGB32:
+				return 0x32;
+			default:
+				return -1;
+			}
+		}
+		public static VideoFramePixelFormat TranslatePixelFormat(int format) {
+			switch (format) {
+			case 0x8:
+				return VideoFramePixelFormat.Gray8;
+			case 0x16:
+				return VideoFramePixelFormat.Gray16;
+			case 0x24:
+				return VideoFramePixelFormat.RGB24;
+			case 0x32:
+				return VideoFramePixelFormat.ARGB32;
+			default:
+				throw new ArgumentException("format");
 			}
 		}
 	}

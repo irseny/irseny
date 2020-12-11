@@ -1,1 +1,1 @@
-angular.module("cameraSection", ["cameraList", "webcamDetail", "liveConnection"]);
+angular.module("cameraSection", ["cameraList", "webcamView", "webcamDetail", "liveConnection"]);

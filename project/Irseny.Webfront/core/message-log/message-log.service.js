@@ -26,6 +26,15 @@ function MessageLogService() {
 		}
 		console.log(text);
 	};
+	this.logInfo = function(text) {
+		console.info(text);
+	};
+	this.logError = function(text) {
+		console.error(text);
+	};
+	this.logWarning = function(text) {
+		console.warn(text);
+	};
 };
 
 var module = angular.module("messageLog");
