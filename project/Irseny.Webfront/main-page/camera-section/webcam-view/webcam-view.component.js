@@ -10,7 +10,7 @@ function WebcamViewController($scope) {
 
 	};
 	this.requestVideoSource = function() {
-		var future = shared.requestActiveSensorCapture();
+		var future = self.shared.requestActiveSensorCapture();
 		if (future != undefined) {
 			future.then(function(response) {
 				if (response.status != 200) {

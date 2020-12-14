@@ -91,7 +91,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		if (response.status != undefined && response.status != 200) {
 			var pending = pendingRequests[index];
 			MessageLog.logError("for request ".concat(JSON.stringify(pending.request)));
-			pending.future.reject(response.status);
+			pending.future.reject({status: response.status});
 		} else {
 			// otherwise the request can be resolved
 			// and the response has a subject (tested above)
@@ -153,7 +153,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		pendingRequests = pendingRequests.filter(function(pending) {
 			var accessSpan = now - pending.accessed;
 			if (pending.timeout < accessSpan) {
-				pending.future.reject({ timeout: true });
+				pending.future.reject({timeout: true});
 				MessageLog.logWarning("Request ".concat(pending.requestId, " timed out after ",
 					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses: ", JSON.stringify(pending.request)));
 				return false;

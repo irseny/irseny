@@ -1,1 +1,1 @@
-angular.module("mainPage", [ "cameraSection" ]);
+angular.module("mainPage", [ "cameraSection", "sensorSection" ]);

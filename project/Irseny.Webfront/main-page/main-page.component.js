@@ -1,7 +1,7 @@
 function MainFrameController() {
 	this.sayHello = "Hello, World!";
 	// tabs: cameras, trackers, devices, config
-	this.availableTabs = [ "Cameras", "Trackers", "Devices", "Config" ];
+	this.availableTabs = [ "Sensors", "Cameras", "Trackers", "Devices", "Config" ];
 	this.activeTab = "Cameras";
 }
 

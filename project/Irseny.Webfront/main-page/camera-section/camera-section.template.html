@@ -1,11 +1,20 @@
 
 <div class="d-flex flex-row justify-content-between">
 
+	<div ng-if="$ctrl.getIndexTesting">
+		active camera {{$ctrl.getIndexTesting()}}
+	</div>
+
 	<camera-list class="list-right" align="right"></camera-list>
 
-	<webcam-view class="px-1"></webcam-view>
-	<webcam-detail class="px-1"></webcam-detail>
+	<div ng-if="true" style="flex: 1; padding: 1rem;">
+		<webcam-view></webcam-view>
+	</div>
+	<div ng-if="true" style="flex: 1; padding: 1rem;">
+		<webcam-detail></webcam-detail>
+	</div>
 
 	<camera-list class="list-left" align="left"></camera-list>
+
 
 </div>

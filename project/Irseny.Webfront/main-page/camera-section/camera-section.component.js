@@ -13,6 +13,8 @@ function CameraSectionController($scope, LiveExchangeService, LiveWireService) {
 	//this.availableCameras = [ { index: 0, data: "LiveVision0"}, {index: 1, data: "Kintect2"}, {index: 2, data: "Logitech UltraMegaPro2"} ];
 	//this.activeCamera = 0;
 
+
+
 	this.ensureClean = function() {
 		if (availableDirty) {
 			// regenerate available
@@ -67,7 +69,6 @@ function CameraSectionController($scope, LiveExchangeService, LiveWireService) {
 		activeDirty = true;
 		return true;
 	};
-
 	this.getActiveCamera = function() {
 		self.ensureClean();
 		return activeModel;
@@ -110,18 +111,37 @@ function CameraSectionController($scope, LiveExchangeService, LiveWireService) {
 	//LiveExchangeService.obtain("camera").then(this.cameraUpdated);
 	LiveExchangeService.touch(); // TODO remove
 
-	$scope.$on('$destroy', function () {
+	this.$onDestroy = function() {
+		LiveExchangeService.observe("camera").unsubscribe(liveSubscription);
+	};
+	/*$scope.$on('$destroy', function () {
     	LiveExchangeService.observe("camera").unsubscribe(liveSubscription);
-	});
+	});*/
 }
-CameraSectionController.$inject = ["$scope", "LiveExchangeService", "LiveWireService"];
+function SensorSectionController() {
+	this.getIndexTesting = function() {
+		return 32;
+	};
+}
 
 var module = angular.module("cameraSection");
-module.component("cameraSection", {
+CameraSectionController.$inject = ["$scope", "LiveExchangeService", "LiveWireService"];
+/*module.component("cameraSection", {
 	templateUrl : "main-page/camera-section/camera-section.template.html",
-	controller : CameraSectionController
+	controller : CameraSectionController,
+	controllerAs: "$ctrl"
+});*/
+
+
+
+module.directive("cameraSection", function() {
+	return {
+		restrict: 'E',
+		scope: true,
+		controller: SensorSectionController,
+		controllerAs: "$ctrl",
+		templateUrl: "main-page/camera-section/camera-section.template.html"
+	};
 });
-
-
 
 

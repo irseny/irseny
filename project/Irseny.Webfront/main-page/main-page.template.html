@@ -27,7 +27,9 @@
 		</li>
 
 	</div>-->
-
+	<div ng-if="$ctrl.activeTab == 'Sensors'">
+		<sensor-section></sensor-section>
+	</div>
 	<div ng-if="$ctrl.activeTab == 'Cameras'">
 		<camera-section class="main"></camera-section>
 	</div>

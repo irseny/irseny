@@ -1,9 +1,21 @@
 <div class="view">
-	<div class="video">
-		<img ng-src="{{$ctrl.getVideoSource()}}" alt="Video Out"/>
+	<div class="videoLine">
+		<div class="videoOut">
+			<img ng-src="{{$ctrl.getVideoSource()}}" alt="Video Out" width="200" height="200"/>
+		</div>
 	</div>
-	<div class="configline">
-		config line
+	<div class="videoStatus">
+		status line| active camera {{$ctrl.shared.getActiveCamera().index}}
 	</div>
+	<div class="videoControl">
+		<div class="entry" ng-click="$ctrl.requestVideoSource()">
+			Play
+		</div>
+		<div class="entry">
+			Start
+		</div>
+
+	</div>
+
 
 </div>

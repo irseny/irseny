@@ -1,0 +1,31 @@
+<div class="list">
+	<!-- list of cameras -->
+	<div class="title">
+		Cameras
+	</div>
+	<!--<div ng-repeat="cam in $ctrl.base.availableCameras">-->
+	<div ng-repeat="sensor in $ctrl.shared.getAvailableSensors()">
+		<div class="tab" ng-class="{'active': $ctrl.shared.isActiveSensor(sensor)}"  ng-click="$ctrl.shared.setActiveSensor(sensor)">
+			<img class="icon" src="icon/rename.svg" ng-if="$ctrl.shared.isActiveSensor(sensor)" alt="Rename">
+			<div class="name">{{sensor.data.name}}</div>
+		</div>
+		<div class="separator"></div>
+	</div>
+	<!-- add new camera dropdown -->
+	<div class="tab">
+		<a class="dropdown-toggle active px-3" id="cameraListAddCam" href="#" data-toggle="dropdown">
+			Add New
+		</a>
+		<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
+			<!--<a ng-repeat="type in $ctrl.shared.getSensorClasses()"-->
+			<a ng-repeat="type in $ctrl.shared.getSensorClasses()"
+				class="dropdown-item" href="#" ng-click="">
+				{{type}}
+			</a>
+		</div>
+	</div>
+	<div class="bottom">
+		<!-- empty by intention -->
+	</div>
+</div>
+
