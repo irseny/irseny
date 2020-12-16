@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="27.65mm" width="27.65mm" version="1.1" viewBox="0 0 27.647322 27.647322">
+ <g transform="translate(-32.52 -274.9)">
+  <rect stroke-linejoin="round" style="paint-order:markers fill stroke" fill-opacity="0" height="26.65" width="26.65" stroke="#000" stroke-linecap="round" y="275.4" x="33.02"/>
+  <path style="paint-order:stroke markers fill" d="m56.64 288.7-19.48 11.25v-22.49z" fill-opacity=".9847"/>
+  <rect style="paint-order:stroke markers fill" fill-opacity=".9847" height="22.62" width="3.44" y="277.4" x="53.14"/>
+ </g>
+</svg>
