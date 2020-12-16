@@ -108,6 +108,7 @@
     <Compile Include="Sensors\VideoCapture\VideoFrame.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFramePixelFormat.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrameProperty.cs" />
+    <Compile Include="Sensors\VideoCapture\VideoCaptureProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Inco\" />

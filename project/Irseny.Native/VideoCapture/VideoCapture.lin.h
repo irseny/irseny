@@ -7,6 +7,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <stdio.h>
+
 typedef enum IRS_VideoCaptureProperty {
 	Device = 0x0,
 	FrameWidth = CV_CAP_PROP_FRAME_WIDTH,
@@ -40,7 +42,7 @@ typedef struct IRS_VideoCaptureContstructionInfo {
 	int Brightness;
 	int Gain;
 	int Exposure;
-} IRS_VideoCaptureConstructionInfo;
+} IRS_VideoCaptureSettings;
 
 typedef cv::Mat IRS_VideoCaptureFrame;
 /*typedef struct IRS_VideoCatureFrame {
@@ -49,8 +51,8 @@ typedef cv::Mat IRS_VideoCaptureFrame;
 } IRS_VideoCaptureFrame;*/
 
 typedef struct IRS_VideoCapture {
-	cv::VideoCapture Capture;
-	IRS_VideoCaptureConstructionInfo Settings;
+	cv::VideoCapture* Capture;
+	IRS_VideoCaptureSettings Settings;
 	IRS_VideoCaptureFrame* Buffer;
 	int CurrentFrame;
 	float PropertyMin;

@@ -27,13 +27,13 @@ namespace Irseny.Main.Webface {
 		}
 		private void Process() {
 			// wait for clients and process channels and changes
-			var resourceListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9232);
+			var resourceListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9242);
 			//var liveListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9234);
 			var liveWire = new LiveWireServer();
 			liveWire.Start();
 			resourceListener.Start();
 			//liveListener.Start();
-			Console.WriteLine("Started server on port 9232");
+			Console.WriteLine("Started server on port 9242");
 			while (!stopSignal.WaitOne(16)) {
 				liveWire.Process();
 				// accept new clients

@@ -3,13 +3,13 @@
 
 	<div class="header">
 		<div class="icon">
-			<img src="favicon.ico" alt="logo" width="30" height="30">
+			<img src="icon/logo.png" alt="logo" width="30" height="30">
 		</div>
 		<div class="tab"
-			ng-repeat="tab in $ctrl.availableTabs"
-			ng-class="{'active': $ctrl.activeTab == tab}"
-			ng-click="$ctrl.activeTab = tab" >
-			{{tab}}
+			ng-repeat="section in $ctrl.getAvailableSections()"
+			ng-class="{'active': $ctrl.getActiveSection() == section}"
+			ng-click="$ctrl.setActiveSection(section);" >
+			{{section}}
 		</div>
 	</div>
 		<!--<div class="icon">
@@ -27,19 +27,16 @@
 		</li>
 
 	</div>-->
-	<div ng-if="$ctrl.activeTab == 'Sensors'">
+	<div ng-if="$ctrl.getActiveSection() == 'Sensors'">
 		<sensor-section></sensor-section>
 	</div>
-	<div ng-if="$ctrl.activeTab == 'Cameras'">
-		<camera-section class="main"></camera-section>
-	</div>
-	<div ng-if="$ctrl.activeTab == 'Devices'">
+	<div ng-if="$ctrl.getActiveSection() == 'Devices'">
 		<div>Devices</div>
 	</div>
-	<div ng-if="$ctrl.activeTab == 'Trackers'">
+	<div ng-if="$ctrl.getActiveSection() == 'Trackers'">
 		<div>Trackers</div>
 	</div>
-	<div ng-if="$ctrl.activeTab == 'Config'">
+	<div ng-if="$ctrl.getActiveSection() == 'Config'">
 		<div>Config</div>
 	</div>
 

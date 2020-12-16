@@ -39,16 +39,18 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 	this.isActiveSensor = function(sensor) {
 		return sensor.index == activeIndex;
 	};
-	this.exchangeActiveSensor = function() {
-		self.ensureCleanModels();
-		if (activeModel.index < 0) {
+	this.exchangeSensor = function(sensor) {
+		if (!Number.isInteger(sensor.index)) {
+			return false;
+		}
+		if (setup[sensor.index] == undefined) {
 			return false;
 		}
 		var subject = {
 			type: "post",
 			topic: "sensor",
-			position: activeModel.index,
-			data: activeModel.data
+			position: sensor.index,
+			data: setup[setup[sensor.index].data]
 		};
 		LiveWireService.sendUpdate(subject);
 		return true;

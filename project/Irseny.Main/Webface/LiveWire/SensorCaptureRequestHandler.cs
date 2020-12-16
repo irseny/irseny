@@ -17,7 +17,7 @@ namespace Irseny.Main.Webface {
 			if (subject == null) throw new ArgumentNullException("subject");
 			if (response == null) throw new ArgumentNullException("response");
 			// read properties from the request
-			string topic = TextParseTools.ParseString(response.GetTerminal("topic", string.Empty), string.Empty);
+			string topic = TextParseTools.ParseString(subject.GetTerminal("topic", string.Empty), string.Empty);
 			if (!topic.Equals("sensorCapture")) {
 				return HttpStatusCode.BadRequest;
 			}
@@ -49,27 +49,49 @@ namespace Irseny.Main.Webface {
 				observer = new SensorCaptureObserver(readySignal);
 				subscription = system.ObserveSensor(positionStart).Subscribe(observer);
 			});
+			// TODO set a timeout
 			readySignal.WaitOne();
 			if (subscription == null) {
 				// failed
 				return HttpStatusCode.NotFound;
 			}
 			subscription.Dispose();
-			if (observer.Result == null) {
+			if (observer.Image == null || observer.Settings == null) {
 				// no data captured
-				return HttpStatusCode.NotFound;
+				return HttpStatusCode.InternalServerError;
 			}
-			VideoFrame frame = observer.Result;
+			VideoFrame frame = observer.Image;
+			SensorSettings settings = observer.Settings;
+			if (frame.Data == null) {
+				return HttpStatusCode.InternalServerError;
+			}
 			// generate a base64 string from the video frame
 			string imageString = string.Empty;
-			IntPtr imageData = Marshal.UnsafeAddrOfPinnedArrayElement(frame.Data, 0);
+
 			PixelFormat bitmapFormat = VideoFrame.GetBitmapFormat(frame.Format);
-			using (var bitmap = new Bitmap(frame.Width, frame.Height, frame.Width, bitmapFormat, imageData)) {
-				using (var stream = new MemoryStream(bitmap.Width*bitmap.Height*sizeof(byte))) {
+			int pixelSize = VideoFrame.GetPixelSize(frame.Format);
+			int imageSize = frame.Width*frame.Height*pixelSize;
+			GCHandle pinnedImage = GCHandle.Alloc(frame.Data, GCHandleType.Pinned);
+			IntPtr imagePointer = pinnedImage.AddrOfPinnedObject();
+
+			// instead load from disk
+
+
+
+
+			using (var bitmap = new Bitmap(frame.Width, frame.Height, bitmapFormat)) {
+				BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.WriteOnly, bitmapFormat);
+				Marshal.Copy(frame.Data, 0, bitmapData.Scan0, imageSize);
+				bitmap.UnlockBits(bitmapData);
+
+				using (var stream = new MemoryStream(imageSize)) {
 					bitmap.Save(stream, ImageFormat.Jpeg);
-					imageString = Convert.ToBase64String(stream.ToArray());
+
+					string sData = Convert.ToBase64String(stream.ToArray());
+					imageString = string.Format("\"data:image/jpeg;base64,{0}\"", sData);
 				}
 			}
+			pinnedImage.Free();
 			// respond with the image string
 			var responseSubject = JsonString.CreateDict();
 			{
@@ -78,11 +100,17 @@ namespace Irseny.Main.Webface {
 				responseSubject.AddTerminal("position", StringifyTools.StringifyInt(positionStart));
 				var data = JsonString.CreateArray();
 				{
-					data.AddTerminal(string.Empty, StringifyTools.StringifyString(imageString));
+					var entry = JsonString.CreateDict();
+					{
+						entry.AddJsonString("settings", SensorSettings.ToJson(settings));
+						entry.AddTerminal("image", imageString);
+						
+					}
+					data.AddJsonString(string.Empty, entry);
 				}
-				response.AddJsonString("data", data);
+				responseSubject.AddJsonString("data", data);
 			}
-			response.AddJsonString("response", responseSubject);
+			response.AddJsonString("subject", responseSubject);
 			return HttpStatusCode.OK;
 		}
 
@@ -92,12 +120,14 @@ namespace Irseny.Main.Webface {
 		/// </summary>
 		private class SensorCaptureObserver : ISensorObserver {
 			AutoResetEvent readySignal;
-			public VideoFrame Result { get; private set; }
+			public SensorSettings Settings { get; private set; }
+			public VideoFrame Image { get; private set; }
 
 
 			public SensorCaptureObserver(AutoResetEvent readySignal) {
 				this.readySignal = readySignal;
-				Result = null;
+				Image = null;
+				Settings = null;
 			}
 			
 			public void OnConnected(ISensorBase sensor) {
@@ -108,13 +138,19 @@ namespace Irseny.Main.Webface {
 				readySignal.Set();
 			}
 			public void OnStarted(ISensorBase sensor) {
-				// ok
+				if (sensor.SensorType == SensorType.Webcam) {
+					Settings = ((WebcamCapture)sensor).GetSettings();
+				}
 			}
 			public void OnStopped(ISensorBase sensor) {
 				// not exepcted
 				readySignal.Set();
 			}
 			public void OnDataAvailable(SensorDataPacket packet) {
+				if (Image != null) {
+					// only work with the first data packet coming in
+					return;
+				}
 				if (packet.DataType != SensorDataType.Video) {
 					// only video data supported
 					readySignal.Set();
@@ -124,7 +160,10 @@ namespace Irseny.Main.Webface {
 					// weird data format
 					readySignal.Set();
 				}
-				Result = data;
+				Image = data;
+				if (Settings == null) {
+					Settings = ((WebcamCapture)packet.Sensor).GetSettings();
+				}
 				readySignal.Set();
 			}
 		}

@@ -9,8 +9,8 @@ void irsDestroyVideoCaptureContext(IRS_VideoCaptureContext* context) {
 	return;
 }
 
-IRS_VideoCaptureConstructionInfo* irsAllocVideoCaptureConstructionInfo() {
-	IRS_VideoCaptureConstructionInfo* info = (IRS_VideoCaptureConstructionInfo*)malloc(sizeof(IRS_VideoCaptureConstructionInfo));
+IRS_VideoCaptureSettings* irsAllocVideoCaptureSettings() {
+	IRS_VideoCaptureSettings* info = (IRS_VideoCaptureSettings*)malloc(sizeof(IRS_VideoCaptureSettings));
 	info->DeviceIndex = 0;
 	info->Resolution[0] = -1;
 	info->Resolution[1] = -1;
@@ -21,11 +21,11 @@ IRS_VideoCaptureConstructionInfo* irsAllocVideoCaptureConstructionInfo() {
 	return info;
 }
 
-void irsFreeVideoCaptureConstructionInfo(IRS_VideoCaptureConstructionInfo* info) {
+void irsFreeVideoCaptureSettings(IRS_VideoCaptureSettings* info) {
 	free(info);
 }
 
-int irsGetVideoCaptureProperty(IRS_VideoCaptureConstructionInfo* info, IRS_VideoCaptureProperty property) {
+int irsGetVideoCaptureProperty(IRS_VideoCaptureSettings* info, IRS_VideoCaptureProperty property) {
 	switch (property) {
 	case IRS_VideoCaptureProperty::FrameWidth:
 		return info->Resolution[0];
@@ -43,7 +43,7 @@ int irsGetVideoCaptureProperty(IRS_VideoCaptureConstructionInfo* info, IRS_Video
 		return -1;
 	}
 }
-bool irsSetVideoCaptureProperty(IRS_VideoCaptureConstructionInfo* info, IRS_VideoCaptureProperty property, int value) {
+bool irsSetVideoCaptureProperty(IRS_VideoCaptureSettings* info, IRS_VideoCaptureProperty property, int value) {
 	switch (property) {
 	case IRS_VideoCaptureProperty::FrameWidth:
 		info->Resolution[0] = value;
@@ -67,7 +67,7 @@ bool irsSetVideoCaptureProperty(IRS_VideoCaptureConstructionInfo* info, IRS_Vide
 		return false;
 	}
 }
-bool irsSetVideoCapturePropertyAuto(IRS_VideoCaptureConstructionInfo* info, IRS_VideoCaptureProperty property) {
+bool irsSetVideoCapturePropertyAuto(IRS_VideoCaptureSettings* info, IRS_VideoCaptureProperty property) {
 	switch (property) {
 	case IRS_VideoCaptureProperty::FrameWidth:
 		info->Resolution[0] = -1;
@@ -91,39 +91,44 @@ bool irsSetVideoCapturePropertyAuto(IRS_VideoCaptureConstructionInfo* info, IRS_
 		return false;
 	}
 }
-bool irsGetVideoCapturePropertyAuto(IRS_VideoCaptureConstructionInfo* info, IRS_VideoCaptureProperty property) {
+bool irsGetVideoCapturePropertyAuto(IRS_VideoCaptureSettings* info, IRS_VideoCaptureProperty property) {
 	switch (property) {
 	default:
 		return false;
 	}
 }
 
-IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCaptureConstructionInfo* info) {
+IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCaptureSettings* info) {
 	IRS_VideoCapture* result = (IRS_VideoCapture*)malloc(sizeof(IRS_VideoCapture));
 	result->Buffer = NULL;
 	result->Settings = *info;
 	result->CurrentFrame = -1;
-	result->Capture.open(info->DeviceIndex);
-	if (!result->Capture.isOpened()) {
+	printf("opening capture\n");
+	result->Capture = new cv::VideoCapture();
+	result->Capture->open(info->DeviceIndex);
+	if (!result->Capture->isOpened()) {
+		delete result->Capture;
 		free(result);
 		return NULL;
 	}
+	printf("capture opened\n");
+	bool widthAccepted = result->Capture->set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
+	bool heightAccepted = result->Capture->set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
+	bool fpsAccepted = result->Capture->set(CV_CAP_PROP_FPS, (double)info->FrameRate);
+	bool brightAccepted = result->Capture->set(CV_CAP_PROP_BRIGHTNESS, (double)info->Brightness);
+	bool gainAccepted = result->Capture->set(CV_CAP_PROP_GAIN, (double)info->Gain);
+	bool exposureAccepted = result->Capture->set(CV_CAP_PROP_EXPOSURE, (double)info->Exposure);
 
-	bool widthAccepted = result->Capture.set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
-	bool heightAccepted = result->Capture.set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
-	bool fpsAccepted = result->Capture.set(CV_CAP_PROP_FPS, (double)info->FrameRate);
-	bool brightAccepted = result->Capture.set(CV_CAP_PROP_BRIGHTNESS, (double)info->Brightness);
-	bool gainAccepted = result->Capture.set(CV_CAP_PROP_GAIN, (double)info->Gain);
-	bool exposureAccepted = result->Capture.set(CV_CAP_PROP_EXPOSURE, (double)info->Exposure);
+	int width = (int)result->Capture->get(CV_CAP_PROP_FRAME_WIDTH);
+	int height = (int)result->Capture->get(CV_CAP_PROP_FRAME_HEIGHT);
+	int fps = (int)result->Capture->get(CV_CAP_PROP_FPS);
+	double bright = result->Capture->get(CV_CAP_PROP_BRIGHTNESS);
+	double gain = result->Capture->get(CV_CAP_PROP_GAIN);
+	double exposure = result->Capture->get(CV_CAP_PROP_EXPOSURE);
 
-	int width = (int)result->Capture.get(CV_CAP_PROP_FRAME_WIDTH);
-	int height = (int)result->Capture.get(CV_CAP_PROP_FRAME_HEIGHT);
-	int fps = (int)result->Capture.get(CV_CAP_PROP_FPS);
-	double bright = result->Capture.get(CV_CAP_PROP_BRIGHTNESS);
-	double gain = result->Capture.get(CV_CAP_PROP_GAIN);
-	double exposure = result->Capture.get(CV_CAP_PROP_EXPOSURE);
-
-	int frame = (int)result->Capture.get(CV_CAP_PROP_FRAME_COUNT);
+	int frame = (int)result->Capture->get(CV_CAP_PROP_FRAME_COUNT);
+	printf("settings received\n");
+	printf("on frame %i\n", frame);
 
 	result->Settings.Resolution[0] = width;
 	result->Settings.Resolution[1] = height;
@@ -137,10 +142,11 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 }
 
 void irsDestroyVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCapture* capture) {
-	capture->Capture.release();
+	capture->Capture->release();
+	delete capture->Capture;
 	free(capture);
 }
-bool irsGetVideoCaptureSettings(IRS_VideoCapture* capture, IRS_VideoCaptureConstructionInfo* settings) {
+bool irsGetVideoCaptureSettings(IRS_VideoCapture* capture, IRS_VideoCaptureSettings* settings) {
 	*settings = capture->Settings;
 	return true;
 }
@@ -156,19 +162,24 @@ bool irsStopVideoCapture(IRS_VideoCapture* capture) {
 	return true;
 }
 IRS_VideoCaptureFrame* irsCreateVideoCaptureFrame(IRS_VideoCapture* capture) {
+	printf("alloc frame\n");
 	IRS_VideoCaptureFrame* result = (IRS_VideoCaptureFrame*)malloc(sizeof(IRS_VideoCaptureFrame));
-	result->create(capture->Settings.Resolution[1], capture->Settings.Resolution[0], sizeof(char));
+	printf("construct frame\n");
+	new(result) IRS_VideoCaptureFrame();
+	printf("create frame\n");
+	result->create(capture->Settings.Resolution[1], capture->Settings.Resolution[0], CV_8U);
 	return result;
 }
 void irsDestroyVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFrame* frame) {
-	frame->release(); // TODO check if release calls are necessary or harmful
+	//frame->release(); // TODO check if release calls are necessary or harmful
+	frame->~IRS_VideoCaptureFrame();
 	free(frame);
 }
 bool irsBeginVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
-	if (!capture->Capture.grab()) {
+	if (!capture->Capture->grab()) {
 		return false;
 	}
 	return true;
@@ -178,10 +189,10 @@ bool irsEndVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
-	if (!capture->Capture.retrieve(*capture->Buffer)) {
+	if (!capture->Capture->retrieve(*capture->Buffer)) {
 		return false;
 	}
-	capture->CurrentFrame = capture->Capture.get(CV_CAP_PROP_FRAME_COUNT);
+	capture->CurrentFrame = capture->Capture->get(CV_CAP_PROP_FRAME_COUNT);
 }
 int irsGetVideoCaptureFrameProperty(IRS_VideoCaptureFrame* frame, IRS_VideoCaptureFrameProperty property) {
 	switch (property) {

@@ -13,8 +13,11 @@ namespace Irseny.Core.Sensors {
 	public class CaptureSystem {
 		static CaptureSystem instance = null;
 
+		readonly int MaxSensorNo = 16;
+
 		Thread thread;
-		volatile bool running;
+		CancellationTokenSource threadCancel;
+
 		readonly object invokeSync;
 		readonly object sensorSync;
 		readonly object observableSync;
@@ -33,13 +36,13 @@ namespace Irseny.Core.Sensors {
 			invokeSync = new object();
 			sensorSync = new object();
 			observableSync = new object();
-			running = false;
 			thread = null;
+			threadCancel = null;
 			toInvoke = new Queue<EventHandler>();
 			invokeSignal = new AutoResetEvent(false);
-			sensors = new ISensorBase[16];
-			subscriptions = new IDisposable[16];
-			observables = new SensorObservable[16];
+			sensors = new ISensorBase[MaxSensorNo];
+			subscriptions = new IDisposable[MaxSensorNo];
+			observables = new SensorObservable[MaxSensorNo];
 			for (int i = 0; i < observables.Length; i++) {
 				observables[i] = new SensorObservable();
 			}
@@ -47,21 +50,11 @@ namespace Irseny.Core.Sensors {
 
 		public static void MakeInstance(CaptureSystem instance) {
 			if (CaptureSystem.instance != null) {
-				CaptureSystem.instance.SignalStop();
-				CaptureSystem.instance.thread.Join(2048);
-				if (CaptureSystem.instance.thread.IsAlive) {
-					LogManager.Instance.LogWarning(instance, "Capture thread does not terminate. Aborting.");
-					CaptureSystem.instance.thread.Abort();
-				}
-				CaptureSystem.instance.thread = null;
-			}
-			if (instance != null && instance.thread != null) {
-				throw new ArgumentException("Has a running thread", "instance");
+				CaptureSystem.instance.WaitStop(20480);
 			}
 			CaptureSystem.instance = instance;
 			if (instance != null) {
-				instance.thread = new Thread(instance.Run);
-				instance.thread.Start();
+				instance.Start();
 			}
 
 		}
@@ -76,18 +69,68 @@ namespace Irseny.Core.Sensors {
 			}
 
 		}
-		private void SignalStop() {
-			running = false;
-			invokeSignal.Set(); // wake up the operation invoking thread for exit
-		}
-		private void Run() {
-			running = true;
-			while (running) {
-				invokeSignal.WaitOne();
-				InvokePending();
-				// TODO handle sensor processing
+		private void ProcessSensors() {
+			ISensorBase[] toProcess;
+			lock (sensorSync) {
+				if (sensors.Length > 0) {
+					toProcess = new ISensorBase[sensors.Length];
+					Array.Copy(sensors, toProcess, sensors.Length);
+				} else {
+					return;
+				}
+			}
+			// process all available sensors
+			// and relay captured data
+			for (int i = 0; i < toProcess.Length; i++) {
+				if (toProcess[i] == null || !toProcess[i].Capturing) {
+					continue;
+				}
+				SensorDataPacket packet = toProcess[i].Process(-1);
+				if (packet == null) {
+					continue;
+				}
+				SensorObservable observable;
+				lock (observableSync) {
+					observable = observables[i];
+				}
+				observable.OnDataAvailable(packet);
 			}
 		}
+		private void Start() {
+			if (thread != null) {
+				return;
+			}
+			threadCancel = new CancellationTokenSource();
+			thread = new Thread(() => Run(threadCancel.Token)); 
+			thread.Start();
+		}
+		private void WaitStop(int timeout=2048) {
+			if (thread == null) {
+				return;
+			}
+			threadCancel.Cancel();
+			invokeSignal.Set(); // wake up the operation invoking thread for exit
+			thread.Join(timeout);
+			if (thread.IsAlive) {
+				LogManager.Instance.LogWarning(this, "Capture thread does not terminate. Aborting");
+				thread.Abort();
+			}
+			thread = null;
+			threadCancel = null;
+		}
+		private void Run(CancellationToken cancelToken) {
+			while (!cancelToken.IsCancellationRequested) {
+				invokeSignal.WaitOne(16);
+				InvokePending();
+				ProcessSensors();
+			}
+			// cleanup: stop all running sensors
+			// TODO: make sure that this deallocates all external memory
+			for (int i = 0; i < MaxSensorNo; i++) {
+				StopSensor(i);
+			}
+		}
+
 		public int ConnectSensor(ISensorBase sensor, int preferredIndex=-1) {
 			if (sensor == null) throw new ArgumentNullException("sensor");
 			int iSensor = -1;

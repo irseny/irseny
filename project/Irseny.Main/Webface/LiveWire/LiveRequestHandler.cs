@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Net;
 using Irseny.Core.Util;
 using Irseny.Core.Sensors.VideoCapture;
+using Irseny.Core.Log;
 
 namespace Irseny.Main.Webface {
 	public class LiveRequestHandler {
@@ -58,6 +59,8 @@ namespace Irseny.Main.Webface {
 			// handle errors which occured by breaking out of scope above
 			if (status != HttpStatusCode.OK) {
 				CreateErrorResponse(response, status);
+				LogManager.Instance.LogError(this, string.Format("Request\n{0}\nfailed with status code {1}",
+					request.ToString(), status));
 			}
 			return response;
 		}

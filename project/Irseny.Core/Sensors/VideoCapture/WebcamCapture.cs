@@ -6,6 +6,7 @@ using System.ServiceModel.Dispatcher;
 using Irseny.Core.Log;
 using Irseny.Core.Util;
 using Irseny.Core.Sensors;
+using System.Runtime.InteropServices;
 
 
 namespace Irseny.Core.Sensors.VideoCapture {
@@ -91,13 +92,14 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				// create and start the capture process
 				bool started = false;
 				do {
-					backendSettings = VideoCaptureBackend.AllocVideoCaptureConstructionInfo();
+					backendSettings = VideoCaptureBackend.AllocVideoCaptureSettings();
 
 					if (backendSettings == IntPtr.Zero) {
 						break;
 					}
 					// TODO apply settings
-					VideoCaptureBackend.SetVideoCaptureProperty(backendSettings, SensorProperty.Exposure, 0);
+					VideoCaptureBackend.SetVideoCaptureProperty(backendSettings, 
+						VideoCaptureBackend.TranslateSensorProperty(SensorProperty.Exposure), 0);
 
 					videoCapture = VideoCaptureBackend.CreateVideoCapture(captureContext, backendSettings);
 					if (videoCapture == IntPtr.Zero) {
@@ -123,7 +125,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 						videoFrame = IntPtr.Zero;
 					}
 					if (backendSettings != IntPtr.Zero) {
-						VideoCaptureBackend.FreeVideoCaptureConstructionInfo(backendSettings);
+						VideoCaptureBackend.FreeVideoCaptureSettings(backendSettings);
 						backendSettings = IntPtr.Zero;
 					}
 					return false;
@@ -131,6 +133,43 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				// finally retrieve updated settings from the backend
 				if (VideoCaptureBackend.GetVideoCaptureSettings(videoCapture, backendSettings)) {
 					// TODO update local settings
+					int width = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.FrameWidth);
+					int height = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.FrameHeight);
+					int rate = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.FrameRate);
+					int bright = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.Brightness);
+					int gain = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.Gain);
+					int exposure = VideoCaptureBackend.GetVideoCaptureProperty(backendSettings, VideoCaptureProperty.Exposure);
+
+					if (width <= 0) {
+						settings.SetAuto(SensorProperty.FrameWidth);
+					} else {
+						settings.SetInteger(SensorProperty.FrameWidth, width);
+					}
+					if (height <= 0) {
+						settings.SetAuto(SensorProperty.FrameHeight);
+					} else {
+						settings.SetInteger(SensorProperty.FrameHeight, height);
+					}
+					if (rate <= 0) {
+						settings.SetAuto(SensorProperty.FrameRate);
+					} else {
+						settings.SetInteger(SensorProperty.FrameRate, rate);
+					}
+					if (bright < 0) {
+						settings.SetAuto(SensorProperty.Brightness);
+					} else {
+						settings.SetInteger(SensorProperty.Brightness, bright);
+					}
+					if (gain < 0) {
+						settings.SetAuto(SensorProperty.Gain);
+					} else {
+						settings.SetInteger(SensorProperty.Gain, gain);
+					}
+					if (exposure < 0) {
+						settings.SetAuto(SensorProperty.Exposure);
+					} else {
+						settings.SetInteger(SensorProperty.Exposure, exposure);
+					}
 				}
 				
 			}
@@ -154,7 +193,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 					videoFrame = IntPtr.Zero;
 				}
 				if (backendSettings != IntPtr.Zero) {
-					VideoCaptureBackend.FreeVideoCaptureConstructionInfo(backendSettings);
+					VideoCaptureBackend.FreeVideoCaptureSettings(backendSettings);
 					backendSettings = IntPtr.Zero;
 				}
 			}
@@ -176,26 +215,29 @@ namespace Irseny.Core.Sensors.VideoCapture {
 					return null;
 				}
 
-				int width = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
-					VideoCaptureBackend.TranslateProperty(VideoFrameProperty.Width));
-				int height = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
-					VideoCaptureBackend.TranslateProperty(VideoFrameProperty.Height));
-				VideoFramePixelFormat format = VideoCaptureBackend.TranslatePixelFormat(
-					VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, 
-						VideoCaptureBackend.TranslateProperty(VideoFrameProperty.PixelFormat)));
+				int width = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Width);
+				int height = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Height);
+				VideoFramePixelFormat format = (VideoFramePixelFormat)VideoCaptureBackend.GetVideoCaptureFrameProperty(
+					videoFrame, VideoFrameProperty.PixelFormat);
 				int pixelSize = VideoFrame.GetPixelSize(format);
 				// construct a data packet as result
-				if (width < 0 || width >= 16384 || height < 0 || height >= 16384 || pixelSize < 1) {
+				if (width < 0 || width >= 16384 || height < 0 || height >= 16384 || pixelSize < 1 || pixelSize > 16) {
 					return null;
 				}
-				byte[] image = new byte[width*height*pixelSize];
+				int imageSize = width*height*pixelSize;
+				byte[] image = new byte[imageSize];
+				GCHandle imageBuffer = GCHandle.Alloc(image, GCHandleType.Pinned);
+				if (!VideoCaptureBackend.CopyVideoCaptureFrame(videoFrame, imageBuffer.AddrOfPinnedObject(), imageSize)) {
+					imageBuffer.Free();
+					return null;
+				}
+				imageBuffer.Free();
 				var frame = new VideoFrame(width, height, format, image);
 
 				// TODO generate packet id
-				new SensorDataPacket(this, SensorDataType.Video, frame, 0);
+				return new SensorDataPacket(this, SensorDataType.Video, frame, 0);
 
 			}
-			return null;
 		}
 
 	}

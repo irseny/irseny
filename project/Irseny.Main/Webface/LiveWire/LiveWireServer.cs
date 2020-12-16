@@ -8,8 +8,8 @@ using Irseny.Core.Log;
 
 namespace Irseny.Main.Webface {
 	public class LiveWireServer {
-		const int ServerPort = 9234;
-		const int ServerPortFallback = 9236;
+		const int ServerPort = 9243;
+		const int ServerPortFallback = 9244;
 		public static readonly int ServerOrigin = 0;
 
 		TcpListener listener = null;

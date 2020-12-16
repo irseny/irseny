@@ -18,29 +18,29 @@ namespace Irseny.Core.Sensors.VideoCapture
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsDestroyVideoCaptureContext")]
 		public static extern void DestroyVideoCaptureContext(IntPtr context);
 
-		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsAllocVideoCaptureConstructionInfo")]
-		public static extern IntPtr AllocVideoCaptureConstructionInfo();
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsAllocVideoCaptureSettings")]
+		public static extern IntPtr AllocVideoCaptureSettings();
 
-		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsFreeVideoCaptureConstructionInfo")]
-		public static extern void FreeVideoCaptureConstructionInfo(IntPtr info);
+		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsFreeVideoCaptureSettings")]
+		public static extern void FreeVideoCaptureSettings(IntPtr settings);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsCreateVideoCapture")]
-		public static extern IntPtr CreateVideoCapture(IntPtr context, IntPtr info);
+		public static extern IntPtr CreateVideoCapture(IntPtr context, IntPtr settings);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsDestroyVideoCapture")]
 		public static extern bool DestroyVideoCapture(IntPtr context, IntPtr capture);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsGetVideoCaptureProperty")]
-		public static extern int GetVideoCaptureProperty(IntPtr info, SensorProperty property);
+		public static extern int GetVideoCaptureProperty(IntPtr settings, VideoCaptureProperty property);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsSetVideoCaptureProperty")]
-		public static extern bool SetVideoCaptureProperty(IntPtr info, SensorProperty property, int value);
+		public static extern bool SetVideoCaptureProperty(IntPtr settings, VideoCaptureProperty property, int value);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsGetVideoCapturePropertyAuto")]
-		public static extern bool GetVideoCapturePropertyAuto(IntPtr info, int property);
+		public static extern bool GetVideoCapturePropertyAuto(IntPtr settings, VideoCaptureProperty property);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsSetVideoCapturePropertyAuto")]
-		public static extern bool SetVideoCapturePropertyAuto(IntPtr info, int property);
+		public static extern bool SetVideoCapturePropertyAuto(IntPtr settings, VideoCaptureProperty property);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsGetVideoCaptureSettings")]
 		public static extern bool GetVideoCaptureSettings(IntPtr capture, IntPtr settings);
@@ -64,116 +64,47 @@ namespace Irseny.Core.Sensors.VideoCapture
 		public static extern void DestroyVideoCaptureFrame(IntPtr capture, IntPtr frame);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsGetVideoCaptureFrameProperty")]
-		public static extern int GetVideoCaptureFrameProperty(IntPtr frame, int property);
+		public static extern int GetVideoCaptureFrameProperty(IntPtr frame, VideoFrameProperty property);
 
 		[DllImport(lib, CallingConvention = ccon, EntryPoint = "irsCopyVideoCaptureFrame")]
-		public static extern bool CopyVideoCaptureFrame(IntPtr capture, IntPtr buffer, long bufferSize);
+		public static extern bool CopyVideoCaptureFrame(IntPtr frame, IntPtr buffer, long bufferSize);
 
-		public static int TranslateProperty(SensorProperty property) {
-			// values originate from /usr/include/opencv2/highgui/highgui_c.h
-			/*
-			CV_CAP_PROP_POS_MSEC       =0,
-		    CV_CAP_PROP_POS_FRAMES     =1,
-		    CV_CAP_PROP_POS_AVI_RATIO  =2,
-		    CV_CAP_PROP_FRAME_WIDTH    =3,
-		    CV_CAP_PROP_FRAME_HEIGHT   =4,
-		    CV_CAP_PROP_FPS            =5,
-		    CV_CAP_PROP_FOURCC         =6,
-		    CV_CAP_PROP_FRAME_COUNT    =7,
-		    CV_CAP_PROP_FORMAT         =8,
-		    CV_CAP_PROP_MODE           =9,
-		    CV_CAP_PROP_BRIGHTNESS    =10,
-		    CV_CAP_PROP_CONTRAST      =11,
-		    CV_CAP_PROP_SATURATION    =12,
-		    CV_CAP_PROP_HUE           =13,
-		    CV_CAP_PROP_GAIN          =14,
-		    CV_CAP_PROP_EXPOSURE      =15,
-		    CV_CAP_PROP_CONVERT_RGB   =16,
-		    CV_CAP_PROP_WHITE_BALANCE_BLUE_U =17,
-		    CV_CAP_PROP_RECTIFICATION =18,
-		    CV_CAP_PROP_MONOCROME     =19,
-		    CV_CAP_PROP_SHARPNESS     =20,
-		    CV_CAP_PROP_AUTO_EXPOSURE =21, // exposure control done by camera,
-		                                   // user can adjust refernce level
-		                                   // using this feature
-		    CV_CAP_PROP_GAMMA         =22,
-		    CV_CAP_PROP_TEMPERATURE   =23,
-		    CV_CAP_PROP_TRIGGER       =24,
-		    CV_CAP_PROP_TRIGGER_DELAY =25,
-		    CV_CAP_PROP_WHITE_BALANCE_RED_V =26,
-		    CV_CAP_PROP_ZOOM          =27,
-		    CV_CAP_PROP_FOCUS         =28,
-		    CV_CAP_PROP_GUID          =29,
-		    CV_CAP_PROP_ISO_SPEED     =30,
-		    CV_CAP_PROP_MAX_DC1394    =31,
-		    CV_CAP_PROP_BACKLIGHT     =32,
-		    CV_CAP_PROP_PAN           =33,
-		    CV_CAP_PROP_TILT          =34,
-		    CV_CAP_PROP_ROLL          =35,
-		    CV_CAP_PROP_IRIS          =36,
-		    CV_CAP_PROP_SETTINGS      =37,
-
-		    */
+		public static VideoCaptureProperty TranslateSensorProperty(SensorProperty property) {
 			switch (property) {
 			case SensorProperty.FrameWidth: 
-				return 3;
+				return VideoCaptureProperty.FrameWidth;
 			case SensorProperty.FrameHeight:
-				return 4;
+				return VideoCaptureProperty.FrameHeight;
 			case SensorProperty.FrameRate:
-				return 5;
+				return VideoCaptureProperty.FrameRate;
 			case SensorProperty.Brightness:
-				return 10;
+				return VideoCaptureProperty.Brightness;
 			case SensorProperty.Gain:
-				return 14;
+				return VideoCaptureProperty.Gain;
 			case SensorProperty.Contrast:
-				return 11;
+				throw new ArgumentException();
 			case SensorProperty.Exposure:
-				return 15;
-			
+				return VideoCaptureProperty.Exposure;
 			default:
-				return -1;
+				throw new ArgumentException();
 			}
 		}
-		public static int TranslateProperty(VideoFrameProperty property) {
+		public static SensorProperty TranslateCaptureProperty(VideoCaptureProperty property) {
 			switch (property) {
-			case VideoFrameProperty.Width:
-				return 0x0;
-			case VideoFrameProperty.Height:
-				return 0x1;
-			case VideoFrameProperty.Stride:
-				return 0x2;
-			case VideoFrameProperty.PixelFormat:
-				return 0x3;
+			case VideoCaptureProperty.FrameWidth:
+				return SensorProperty.FrameWidth;
+			case VideoCaptureProperty.FrameHeight:
+				return SensorProperty.FrameHeight;
+			case VideoCaptureProperty.FrameRate:
+				return SensorProperty.FrameRate;
+			case VideoCaptureProperty.Brightness:
+				return SensorProperty.Brightness;
+			case VideoCaptureProperty.Gain:
+				return SensorProperty.Gain;
+			case VideoCaptureProperty.Exposure:
+				return SensorProperty.Exposure;
 			default:
-				return -1;
-			}
-		}
-		public static int TranslatePixelFormat(VideoFramePixelFormat format) {
-			switch (format) {
-			case VideoFramePixelFormat.Gray8:
-				return 0x8;
-			case VideoFramePixelFormat.Gray16:
-				return 0x16;
-			case VideoFramePixelFormat.RGB24:
-				return 0x24;
-			case VideoFramePixelFormat.ARGB32:
-				return 0x32;
-			default:
-				return -1;
-			}
-		}
-		public static VideoFramePixelFormat TranslatePixelFormat(int format) {
-			switch (format) {
-			case 0x8:
-				return VideoFramePixelFormat.Gray8;
-			case 0x16:
-				return VideoFramePixelFormat.Gray16;
-			case 0x24:
-				return VideoFramePixelFormat.RGB24;
-			case 0x32:
-				return VideoFramePixelFormat.ARGB32;
-			default:
-				throw new ArgumentException("format");
+				throw new ArgumentException();
 			}
 		}
 	}

@@ -200,7 +200,7 @@ function LiveWireService(MessageLog, $interval) {
 	var self = this;
 	this.connection = null;
 	this.connectionOpen = false;
-	this.port = 9234;
+	this.port = 9243;
 
 	this.pendingMessages = [];
 	this.requestHandler = new LiveWireRequestHandler(MessageLog, this);
