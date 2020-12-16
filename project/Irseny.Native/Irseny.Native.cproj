@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">LinuxDebug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ECBC1092-536A-48E8-92FE-547AEA036156}</ProjectGuid>
+    <Compiler>
+      <Compiler ctype="GccCompiler" />
+    </Compiler>
+    <Language>C</Language>
+    <Target>Bin</Target>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\lib\Irseny.Native</OutputPath>
+    <OutputName>irseny_native</OutputName>
+    <CompileTarget>SharedLibrary</CompileTarget>
+    <Includes>
+      <Includes>
+        <Include>${CombineDir}/../include</Include>
+        <Include>${ProjectDir}</Include>
+      </Includes>
+    </Includes>
+    <LibPaths>
+      <LibPaths>
+        <LibPath>${CombineDir}/../lib/opencv</LibPath>
+      </LibPaths>
+    </LibPaths>
+    <Libs>
+      <Libs>
+        <Lib>opencv_core</Lib>
+        <Lib>opencv_highgui</Lib>
+      </Libs>
+    </Libs>
+    <DefineSymbols>DEBUG MONODEVELOP LINUX WITH_UINPUT WITH_OPENCV WITH_FREETRACK</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
+    <OutputPath>..\..\lib\Irseny.Native</OutputPath>
+    <OutputName>irseny_native</OutputName>
+    <CompileTarget>SharedLibrary</CompileTarget>
+    <Includes>
+      <Includes>
+        <Include>${CombineDir}/../include</Include>
+        <Include>${ProjectDir}</Include>
+      </Includes>
+    </Includes>
+    <LibPaths>
+      <LibPaths>
+        <LibPath>${CombineDir}/../lib/opencv</LibPath>
+      </LibPaths>
+    </LibPaths>
+    <OptimizationLevel>3</OptimizationLevel>
+    <DefineSymbols>MONODEVELOP LINUX WITH_UINPUT WITH_OPENCV WITH_FREETRACK</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="IrsenyExport.h" />
+    <None Include="VideoCapture\VideoCapture.win.h" />
+    <None Include="VideoCapture\VideoCapture.lin.h" />
+    <None Include="VideoCapture\VideoCapture.h" />
+    <None Include="FreetrackTest\FreetrackTest.lin.cpp" />
+    <None Include="FreetrackTest\FreetrackTest.win.cpp" />
+    <None Include="FreetrackTest\FreetrackTest.win.h" />
+    <None Include="FreetrackTest\FreetrackDummy.win.cpp" />
+    <None Include="FreetrackTest\FreetrackSupply.win.cpp" />
+    <None Include="FreetrackTest\FreetrackDummy.lin.cpp" />
+    <None Include="InputInjection\InputInjection.lin.h" />
+    <None Include="InputInjection\InputInjection.win.cpp" />
+    <None Include="InputInjection\InputInjection.win.h" />
+    <None Include="InputInjection\InputInjection.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="VideoCapture\VideoCapture.lin.cpp" />
+    <Compile Include="InputInjection\InputInjection.lin.cpp" />
+  </ItemGroup>
+</Project>
