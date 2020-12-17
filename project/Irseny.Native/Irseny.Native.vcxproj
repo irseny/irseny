@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="WindowsDebug|x64">
       <Configuration>WindowsDebug</Configuration>
@@ -26,6 +26,8 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>IrsenyNative</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">WindowsDebug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WindowsDebug|x64'" Label="Configuration">
@@ -33,6 +35,11 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <OutputPath>.\</OutputPath>
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
+    <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>
+    <IncludePath>A:\dev\tools\Irseny\project\Irseny.Native;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WindowsRelease|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -40,6 +47,10 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <OutputPath>.\</OutputPath>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
+    <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -53,17 +64,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WindowsRelease|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
-    <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='WindowsDebug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
-    <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>
-    <IncludePath>A:\dev\tools\Irseny\project\Irseny.Native;$(IncludePath)</IncludePath>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='WindowsRelease|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>

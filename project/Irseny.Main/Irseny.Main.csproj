@@ -41,6 +41,8 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WindowsRelease|AnyCPU'">
     <OutputPath>..\..\bin\</OutputPath>
@@ -51,6 +53,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,6 +99,7 @@
     <Compile Include="Webface\LiveWire\CameraRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\SensorCaptureRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\StandardRequestHandler.cs" />
+    <Compile Include="Webface\LiveWire\LiveCaptureSubscription.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">
