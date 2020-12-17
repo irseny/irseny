@@ -1,31 +1,56 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Main", "Irseny.Main\Irseny.Main.csproj", "{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Core", "Irseny.Core\Irseny.Core.csproj", "{079C6237-47C4-40CA-B93F-9C47AB4F1767}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Irseny.Native", "Irseny.Native\Irseny.Native.vcxproj", "{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		LinuxDebug|AnyCPU = LinuxDebug|AnyCPU
 		LinuxRelease|AnyCPU = LinuxRelease|AnyCPU
+		WindowsDebug|AnyCPU = WindowsDebug|AnyCPU
+		WindowsRelease|AnyCPU = WindowsRelease|AnyCPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
-		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsDebug|AnyCPU.ActiveCfg = WindowsDebug|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsDebug|AnyCPU.Build.0 = WindowsDebug|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|Any CPU
+		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsRelease|AnyCPU.Build.0 = WindowsRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsDebug|AnyCPU.ActiveCfg = WindowsDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsDebug|AnyCPU.Build.0 = WindowsDebug|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|Any CPU
+		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsRelease|AnyCPU.Build.0 = WindowsRelease|Any CPU
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.LinuxDebug|AnyCPU.ActiveCfg = WindowsDebug|x64
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.LinuxRelease|AnyCPU.ActiveCfg = WindowsRelease|x64
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsDebug|AnyCPU.ActiveCfg = WindowsDebug|x64
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsDebug|AnyCPU.Build.0 = WindowsDebug|x64
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|x64
+		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsRelease|AnyCPU.Build.0 = WindowsRelease|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DEC4DB60-024D-4450-A506-FAB802F66705}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = Hierarchical
 		$1.ResourceNamePolicy = FileFormatDefault
-		$0.TextStylePolicy = $2
+		$0.TextStylePolicy = $4
 		$2.inheritsSet = null
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
@@ -33,7 +58,6 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
 		$4.TabsToSpaces = False
 		$4.EolMarker = Unix

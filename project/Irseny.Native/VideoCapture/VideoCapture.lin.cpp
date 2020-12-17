@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "VideoCapture.h"
 #include <cstring>
 

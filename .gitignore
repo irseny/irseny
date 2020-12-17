@@ -5,6 +5,7 @@ lib/*.dll
 lib/*.so
 lib/*.xml
 lib/Emgu.CV/*
+lib/opencv/*
 lib/Irseny.Native/*
 lib/webfront.bootstrap/node_modules/*
 lib/bootstrap/*
