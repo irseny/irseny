@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace Irseny.Core.Sensors.VideoCapture {
+namespace Irseny.Core.Sensors {
 	/// <summary>
 	/// Generic properties for sensor configuration.
 	/// </summary>
 	public enum SensorProperty {
 		Type,
 		Name,
-		Running,
+		Capturing,
 		CameraId,
 		FrameWidth,
 		FrameHeight,

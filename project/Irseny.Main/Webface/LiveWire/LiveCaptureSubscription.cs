@@ -10,7 +10,7 @@ namespace Irseny.Main.Webface {
 	/// It is typically instanciated when a live client sends a capture request through <see cref="LiveWireServer"/>.
 	/// The capture request is then temporarily active until cancelled.
 	/// </summary>
-	public class LiveCaptureSubscription {
+	public class LiveCaptureSubscription : IDisposable {
 
 		bool cancelled;
 		readonly ulong subscriptionID;
@@ -37,7 +37,8 @@ namespace Irseny.Main.Webface {
 			get { return subscriptionID; }
 		}
 		/// <summary>
-		/// Indicates whether the subscription has been marked for removal
+		/// Indicates whether the subscription has been marked for removal.
+		/// If this is set further calls to <see cref="EnqueueMessage"/> should be avoided.
 		/// </summary>
 		/// <value><c>true</c> if this instance is cancelled; otherwise, <c>false</c>.</value>
 		public bool IsCancelled {
@@ -95,10 +96,20 @@ namespace Irseny.Main.Webface {
 		/// <summary>
 		/// Marks the subscription for removal.
 		/// </summary>
-		public void Cancel() {
+		public virtual void Cancel() {
 			lock (messageSync) {
 				cancelled = true;
 			}
+		}
+		/// <summary>
+		/// Excludes the subscription from further processing.
+		/// There should not be further method calls made on the object
+		/// after calling this method.
+		/// Does not cancel the subscription. <see cref="Cancel()"/> should be called first.
+		/// </summary>
+		public virtual void Dispose() {
+			// nothing to do
+			// inheriting members can put further logic here
 		}
 
 		/// <summary>

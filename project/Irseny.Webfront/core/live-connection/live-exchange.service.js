@@ -1,48 +1,51 @@
 function CameraUpdateHandler() {
 
-	this.handleUpdate = function(subject, cameras, observer) {
+	this.handleUpdate = function(subject, branch, observer) {
 		// extract and check status information
 		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
 			return [];
 		}
 		if (!Array.isArray(subject.data)) {
-			return result;
+			return [];
 		}
-		var iStart = -1;
+		var offset = -1;
+		var length = 0;
 		if (subject.position == "all") {
-			iStart = 0;
+			offset = 0;
+			length = subject.data.length;
 		} else {
-			iStart = Number.parseInt(subject.position, 10);
-			if (!Number.isInteger(iStart)) {
-				iStart = -1;
+			offset = Number.parseInt(subject.position, 10);
+			length = Math.min(1, subject.data.length);
+			if (!Number.isInteger(offset)) {
+				offset = -1;
 			}
 		}
-		if (iStart < 0) {
+		if (offset < 0) {
 			return [];
 		}
 		// extract all updated cameras
 		var result = [];
-		for (var i = iStart; i < subject.data.length; i++) {
+		for (var i = 0; i < length; i++) {
 			var status = subject.data[i].status;
 
 			if (typeof status != 'string') {
 				return [];
 			}
-			var camera = undefined;
+			var data = undefined;
 			if (status == "active") {
 				if (subject.data[i].settings == undefined) {
 					return [];
 				}
-				camera = subject.data[i].settings;
+				data = subject.data[i].settings;
 			}
 
 			result.push({
-				index: i,
-				data: camera
+				index: i + offset,
+				data: data
 			});
 		}
 		result.forEach(function(entry) {
-			cameras[entry.index] = entry.data;
+			branch[entry.index] = entry.data;
 		});
 		result.forEach(function(entry) {
 			observer.notify(entry);
@@ -50,10 +53,45 @@ function CameraUpdateHandler() {
 
 		return result;
 	};
-	this.obtainUpdates = function(cameras) {
+	this.handleCapture = function(subject, observer) {
+		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
+			return [];
+		}
+		if (!Array.isArray(subject.data)) {
+			return [];
+		}
+		var offset = -1;
+		var length = 0;
+		if (subject.position == "all") {
+			offset = 0;
+			length = subject.data.length;
+		} else {
+			offset = Number.parseInt(subject.position, 10);
+			length = Math.min(1, subject.data.length);
+			if (!Number.isInteger(offset)) {
+				offset = -1;
+			}
+
+		}
+		if (offset < 0) {
+			return [];
+		}
+		var result = [];
+		for (var i = 0; i < length; i++) {
+			result.push({
+				index: i + offset,
+				data: subject.data[i]
+			});
+		}
+		result.forEach(function(entry) {
+			observer.notify(entry);
+		});
+		return result;
+	};
+	this.obtainUpdates = function(branch) {
 		var result = new Future();
-		for (var i = 0; i < cameras.length; i++) {
-			result.resolve({ index: i, data: cameras[i]});
+		for (var i = 0; i < branch.length; i++) {
+			result.resolve({ index: i, data: branch[i]});
 		}
 		return result;
 	};
@@ -76,6 +114,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		inputDevices: Array(FixedEquipmentNo),
 		outputDevices: Array(FixedEquipmentNo),
 		cameraObserver: new Observable(),
+		sensorCaptureObserver: new Observable(),
 		trackerObserver: new Observable(),
 		inputObserver: new Observable(),
 		outputObserver: new Observable(),
@@ -91,30 +130,50 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		var updated = [];
 		switch (subject.topic) {
 		case "camera":
+		case "sensor":
 			updated = updateHandler.handleUpdate(subject, setup.cameras, setup.cameraObserver);
+		break;
+		case "sensorCapture":
+			updated = updateHandler.handleCapture(subject, setup.sensorCaptureObserver);
 		break;
 		default:
 			updated = [];
 		break;
 		}
 		if (updated == undefined || updated.length == 0) {
-			MessageLog.logWarning("No data extracted from ".concat(JSON.stringify(subject)));
+			MessageLog.logWarning("LiveExchange can not make sense of\n".concat(JSON.stringify(subject)));
 		}
 	};
 
-	this.touch = function() {
-		MessageLog.log("Live exchange requesting camera update from server");
-		var subject = {
+	this.requestFullEquipment = function() {
+		// send requests for all equipment types
+		var sensorSubject = {
 			type: "get",
-			topic: "camera",
-			position: "all",
+			topic: "sensor",
+			position: "all"
 		};
-		LiveWireService.requestUpdate(subject).then(self.receiveUpdate);
+		// but send the requests masked as updates
+		// so that the results come back as updates and not requests
+		// (updates are relayed to observers and this instance should be subscribed to LiveWireSerive)
+		LiveWireService.sendUpdate(sensorSubject);
+
+		var trackerSubject = {
+			type: "get",
+			topic: "tracker",
+			position: "all"
+		};
+		LiveWireService.sendUpdate(trackerSubject);
 	};
+	/**
+	 *
+	 */
 	this.observe = function(topic) {
 		switch (topic) {
+		case "sensor":
 		case "camera":
 			return setup.cameraObserver;
+		case "sensorCapture":
+			return setup.sensorCaptureObserver;
 		default:
 			throw new Error("topic");
 		}
@@ -122,14 +181,21 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 	this.obtain = function(topic) {
 		switch (topic) {
 		case "camera":
+		case "sensor":
 			return updateHandler.obtainUpdates(setup.cameras);
-		break;
 		default:
 			throw new Error("topic");
 		}
 	};
+	this.$onInit = function() {
+		console.log("init from live exchange");
+	};
+	this.$onDestroy = function() {
+		console.log("destroy from live exchange");
+	};
 	this.start = function() {
-		LiveWireService.receiveUpdate().notify(self.receiveUpdate);
+		LiveWireService.receiveUpdate().subscribe(self.receiveUpdate);
+		self.requestFullEquipment();
 	};
 	this.start();
 };

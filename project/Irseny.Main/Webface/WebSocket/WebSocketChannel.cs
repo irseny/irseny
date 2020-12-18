@@ -64,25 +64,30 @@ namespace Irseny.Main.Webface {
 			return node.Value;
 
 		}
-		public void SendMessage(WebSocketMessage message) {
+		public bool SendMessage(WebSocketMessage message) {
 			switch (State) {
 			case WebChannelState.Closed:
 			case WebChannelState.InitFailed:
-				return;
+				return false;
 			case WebChannelState.Initializing:
 				toSend.AddLast(message);
-				break;
+				return true;
 			case WebChannelState.Open:
 				// TODO encode and send
 				byte[] encoded = EncodeMessage(message);
-				messageSource.SendMessage(encoded);
-				break;
+				return messageSource.SendMessage(encoded);
 			default:
-				break;
+				return false;
 			}
 		}
 
 		public void Close(bool closeInternal=true) {
+			// TODO send close message
+			byte[] message = new byte[2]; // fin bit and opcode 0x8
+			message[0] = 0x88; // fin bit and opcode 0x8
+			message[1] = 0x0; // no mask and 0 payload
+			messageSource.SendMessage(message);
+			messageSource.Flush();
 			// close connections
 			if (initSource != null) {
 				initSource.Close(false);

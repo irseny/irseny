@@ -50,7 +50,8 @@ namespace Irseny.Main.Webface {
 		/// Enqueues a message to be sent.
 		/// </summary>
 		/// <param name="message">Message to send.</param>
-		void SendMessage(T message);
+		/// <returns>Whether the message was sent<returns>
+		bool SendMessage(T message);
 
 	}
 }

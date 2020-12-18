@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Irseny.Core.Sensors.VideoCapture;
+using Irseny.Core.Sensors;
 using Irseny.Core.Tracking;
 using Irseny.Core.Inco.Device;
 

@@ -38,18 +38,19 @@ namespace Irseny.Main.Webface {
 
 		}
 
-		public void SendMessage(HttpMessage message) {
+		public bool SendMessage(HttpMessage message) {
 			if (message == null) throw new ArgumentNullException("message");
 			string header = message.Header.ToString();
-			byte[] bHeader = Encoding.UTF8.GetBytes(header);
-			source.SendMessage(bHeader);
-			byte[] content = message.Content;
-			if (content.Length > 0) {
-				source.SendMessage(content);
-				//byte[] end = new byte[] { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
-				//source.SendMessage(end);
-			}
 
+			byte[] bHeader = Encoding.UTF8.GetBytes(header);
+			if (source.SendMessage(bHeader)) {
+				byte[] content = message.Content;
+				if (content.Length > 0) {
+					return source.SendMessage(content);
+				}
+				return true;
+			}
+			return false;
 			//byte[] buffer = Encoding.UTF8.GetBytes(message);
 			//source.SendMessage(buffer, 0, buffer.Length);
 		}

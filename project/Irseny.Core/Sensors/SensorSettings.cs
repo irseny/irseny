@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Irseny.Core.Util;
 using System.Globalization;
 
-namespace Irseny.Core.Sensors.VideoCapture {
+namespace Irseny.Core.Sensors {
 	public class SensorSettings {
 
 		Dictionary<int, decimal> decimalProps;

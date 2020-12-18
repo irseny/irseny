@@ -9,10 +9,16 @@ using Irseny.Core.Log;
 
 namespace Irseny.Main.Webface {
 	public class LiveRequestHandler {
-		
-		public LiveRequestHandler () {
+
+		LiveWireServer server;
+		int clientOrigin;
+
+		public LiveRequestHandler(LiveWireServer server, int clientOrigin) {
+			if (server == null) throw new ArgumentNullException("server");
+			this.server = server;
+			this.clientOrigin = clientOrigin;
 		}
-		public JsonString Respond(JsonString request, int origin) {
+		public JsonString Respond(JsonString request) {
 			if (request == null) throw new ArgumentNullException("request");
 			var signal = new ManualResetEvent(false);
 			var status = HttpStatusCode.OK;
@@ -23,10 +29,10 @@ namespace Irseny.Main.Webface {
 				response.AddTerminal("status", StringifyTools.StringifyInt((int)HttpStatusCode.OK));
 				// the client can read the origin information and derive from that
 				// if they can apply the optional request id
-				response.AddTerminal("origin", StringifyTools.StringifyInt(origin));
+				response.AddTerminal("origin", StringifyTools.StringifyInt(clientOrigin));
 				// preliminarily we intend to send the answer to the origin only
 				// but this might get overwritten later
-				response.AddTerminal("target", StringifyTools.StringifyInt(origin));
+				response.AddTerminal("target", StringifyTools.StringifyInt(clientOrigin));
 				if (request.Type != JsonStringType.Dict) {
 					status = HttpStatusCode.BadRequest;
 					break;
@@ -45,12 +51,14 @@ namespace Irseny.Main.Webface {
 				}
 				string topic = TextParseTools.ParseString(subject.GetTerminal("topic", "error"), "error");
 				// answer by topic
-				if (topic.Equals("camera")) {
-					status = new CameraRequestHandler().Respond(subject, response);
+				if (topic.Equals("sensor")) {
+					status = new SensorRequestHandler(server).Respond(subject, response);
+				} else if (topic.Equals("camera")) {
+					status = new SensorRequestHandler(server).Respond(subject, response);
 				} else if (topic.Equals("sensorCapture")) {
-					status = new SensorCaptureRequestHandler().Respond(subject, response);
+					status = new SensorCaptureRequestHandler(server, clientOrigin).Respond(subject, response);
 				} else if (topic.Equals("origin")) {
-					status = new OriginRequestHandler(LiveWireServer.ServerOrigin, origin).Respond(subject, response);
+					status = new OriginRequestHandler(LiveWireServer.ServerOrigin, clientOrigin).Respond(subject, response);
 				} else {
 					status = HttpStatusCode.BadRequest;
 					break;
@@ -58,7 +66,7 @@ namespace Irseny.Main.Webface {
 			} while (false);
 			// handle errors which occured by breaking out of scope above
 			if (status != HttpStatusCode.OK) {
-				CreateErrorResponse(response, status);
+				CreateErrorResponse(request, response, status);
 				LogManager.Instance.LogError(this, string.Format("Request\n{0}\nfailed with status code {1}",
 					request.ToString(), status));
 			}
@@ -145,15 +153,20 @@ namespace Irseny.Main.Webface {
 //			}
 //			return;
 //		}
-		private void CreateErrorResponse(JsonString response, HttpStatusCode status) {
-			switch (response.Type) {
-			case JsonStringType.Dict:
-				response.AddTerminal("status", StringifyTools.StringifyInt((int)status), true);
-				break;
-			default:
-				// TODO pass client info to generate a sensible answer
-				response.AddTerminal("status", StringifyTools.StringifyInt((int)status));
-				break;
+		private void CreateErrorResponse(JsonString request, JsonString response, HttpStatusCode status) {
+			// add status code information
+			if (response.Type == JsonStringType.Array) {
+				// unexpected -> give minimal response
+				var error = JsonString.CreateDict();
+				error.AddTerminal("status", StringifyTools.StringifyInt((int)status));
+				response.AddJsonString(string.Empty, error);
+				return;
+			}
+			response.AddTerminal("status", StringifyTools.StringifyInt((int)status));
+			// add the original message to failed updates
+			// that way it is easier to recognize the failed operation
+			if (response.GetTerminal("requestId", string.Empty).Length == 0) {
+				response.AddJsonString("request", new JsonString(request));
 			}
 		}
 	}

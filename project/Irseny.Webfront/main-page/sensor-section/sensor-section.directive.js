@@ -10,6 +10,12 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 
 	const sensorClasses =  ["Webcam", "Kinect"];
 
+	var liveSubscription = undefined;
+
+	this.$onInit = function() {
+		liveSubscription = LiveExchangeService.observe("sensor").subscribe(this.sensorUpdated);
+	};
+
 	this.ensureCleanModels = function() {
 		if (availableDirty) {
 			// regenerate available
@@ -90,12 +96,8 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 		availableDirty = true;
 	};
 
-
-	const liveSubscription = LiveExchangeService.observe("camera").subscribe(this.sensorUpdated);
-	LiveExchangeService.touch(); // TODO remove
-
 	this.$onDestroy = function() {
-		LiveExchangeService.observe("camera").unsubscribe(liveSubscription);
+		LiveExchangeService.observe("sensor").unsubscribe(liveSubscription);
 	};
 }
 SensorSectionController.$inject = ["$scope", "LiveWireService", "LiveExchangeService"];

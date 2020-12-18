@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml;
 using System.Collections.Generic;
-using Irseny.Core.Sensors.VideoCapture;
+using Irseny.Core.Sensors;
 using Irseny.Core.Util;
 
 namespace Irseny.Main.Content.Profile {

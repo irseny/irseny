@@ -1,28 +1,4 @@
 
-
-
-function LiveWireUpdateHandler(MessageLog) {
-	var observable = new Observable();
-
-	this.tryHandleUpdate = function(msg) {
-		// TODO send to clients
-
-		if (msg.type != "update") {
-			return false;
-		}
-		//for (var client in self.clients) {
-		//	client.callback(msg);
-		//};
-		console.log("wire notified of " + JSON.stringify(msg));
-		observable.notify(msg);
-
-		return true;
-	};
-	this.receiveUpdate = function() {
-		return observable;
-	};
-}
-
 function LiveWireRequestHandler(MessageLog, connection) {
 	var self = this;
 	var pendingRequests = [];
@@ -38,30 +14,23 @@ function LiveWireRequestHandler(MessageLog, connection) {
 	this.handleMessage = function(message) {
 		var badStatus = false;
 		if (message.status != undefined && message.status != 200) {
-			MessageLog.logError("LiveWire request failed with status code ".concat(
-				message.status, " in response: ", JSON.stringify(message)));
+			MessageLog.logError("LiveWire message\n".concat(JSON.stringify(message),
+				"\nfailed with status code ", message.status));
 			badStatus = true;
 		}
-
 		// a typical response for a client's request contains an origin that matches the origin of the client
 		// responses for origin request are a special case
 		// the origin of the client is in invalid state and the server origin in the response matches 0
+		// here we assume require that all responses sent from the server have a corresponding request
 		var isRequest = false;
 		if (message.requestId != undefined) {
-			if (message.origin == clientOrigin) {
-				isRequest = true;
-			}
-			if (clientOrigin < 0 && message.subject.data.serverOrigin == serverOrigin) {
-				isRequest = true;
-			}
+			isRequest = true;
 		}
-
-		// a message without a subject cannot be handled
-		// unless it is a response with an error status code
-		if (message.subject == undefined && !(badStatus && isRequest)) {
-			MessageLog.logError("LiveWire received message with missing subject: ".concat(
+		// a typical message comes with a subject
+		// unless it contain a bad status code and cannot be processed anyway
+		if (!badStatus && message.subject == undefined) {
+			MessageLog.logError("LiveWire received message with missing subject:\n".concat(
 				JSON.stringify(message)));
-			return false;
 		}
 		if (isRequest) {
 			return self.handleResponse(message);
@@ -70,9 +39,16 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		}
 	};
 	this.handleUpdate = function(update) {
+		if (update.status != undefined && update.status != 200) {
+			MessageLog.logError("LiveWire update failed");
+			return update.subject == undefined;
+		}
 		if (update.subject == undefined) {
+			MessageLog.logError("LiveWire received an update without a subject:\n".concat(
+				JSON.stringify(update), "\nDropping packet"));
 			return false;
 		}
+
 		observable.notify(update.subject);
 		return true;
 	};
@@ -154,8 +130,8 @@ function LiveWireRequestHandler(MessageLog, connection) {
 			var accessSpan = now - pending.accessed;
 			if (pending.timeout < accessSpan) {
 				pending.future.reject({timeout: true});
-				MessageLog.logWarning("Request ".concat(pending.requestId, " timed out after ",
-					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses: ", JSON.stringify(pending.request)));
+				MessageLog.logWarning("Livewire request\n".concat(JSON.stringify(pending.request), "\ntimed out after ",
+					Math.floor(accessSpan/1000), " seconds and ", pending.responseNo, " responses"));
 				return false;
 			} else {
 				return true;
@@ -183,16 +159,16 @@ function LiveWireRequestHandler(MessageLog, connection) {
 				accepted = true;
 			} while (false);
 			if (!accepted) {
-				MessaeLog.logError("LiveWire received unexpected origin response ".concat(result, ". Leaving unconfigured"));
+				MessaeLog.logError("LiveWire received unexpected origin response\n".concat(result, "\nLeaving unconfigured"));
 			}
 		});
 		future.else(function(reason) {
-			MessageLog.logError("LiveWire did not received an origin response from the server");
+			MessageLog.logError("LiveWire did not received an origin response from the server. Leaving unconfigured");
 		});
 	};
 	this.clearOrigin = function() {
 		clientOrigin = -1;
-		serverOrigin = -1;
+		serverOrigin = 0;
 	};
 }
 
@@ -275,13 +251,13 @@ function LiveWireService(MessageLog, $interval) {
 		try {
 			msg = JSON.parse(ev.data);
 		} catch (error) {
-			MessageLog.logError("LiveWire failed to parse message: ".concat(
-				ev.data, " ", error));
+			MessageLog.logError("LiveWire failed to parse message\n".concat(
+				ev.data, "\n", error));
 		}
 		if (msg != null) {
 			var handled = self.requestHandler.handleMessage(msg);
 			if (!handled) {
-				MessageLog.logError("LiveWire could not make sense of message: " + ev.data);
+				MessageLog.logError("LiveWire could not make sense of message\n".concat(ev.data));
 			}
 		}
 	};

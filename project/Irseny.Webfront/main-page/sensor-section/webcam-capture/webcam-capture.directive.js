@@ -1,7 +1,10 @@
-function WebcamCaptureController($scope, MessageLog, LiveWireService) {
+function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchangeService) {
 	var self = this;
 	var videoSource = undefined;
-
+	var videoSize = {
+		width: 0,
+		height: 0
+	};
 	this.$onInit = function() {
 
 	};
@@ -9,7 +12,7 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService) {
 	this.$onDestroy = function() {
 
 	};
-	this.beginRequestVideoSource = function() {
+	this.requestVideoSource = function() {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
 			return false;
@@ -25,27 +28,32 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService) {
 			return false;
 		}
 		future.then(function(response) {
-			if (!(response.data.length > 0)) {
-				MessageLog.logError("Webcam sample has no data");
-				videoSource = undefined;
-				self.endRequestVideoSource();
-				return;
-			}
-			videoSource = response.data[0].image;
-			self.endRequestVideoSource();
-
+			console.log("Webcan sample query succes");
+			LiveExchangeService.observe("sensorCapture").subscribe(self.receiveVideoSource);
 		});
 		future.reject(function(response) {
 			MessageLog.logError("Webcam sample query failed");
 			videoSource = undefined;
-			self.endRequestVideoSource();
 		});
 	};
-	this.endRequestVideoSource = function() {
-		$scope.$digest();
+	this.receiveVideoSource = function(capture) {
+
+		if (capture.data.image == undefined) {
+			MessageLog.logWarning("Webcam sample has no image");
+		} else {
+			videoSource = capture.data.image;
+			videoSize = {
+				width: capture.data.width,
+				height: capture.data.height
+			};
+			$scope.$digest();
+		}
 	};
 	this.getVideoSource = function() {
 		return videoSource;
+	};
+	this.getVideoSize = function() {
+		return videoSize;
 	};
 	this.startCapture = function() {
 		var sensor = self.shared.getActiveSensor();
@@ -64,7 +72,7 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService) {
 		self.shared.exchangeSensor(sensor);
 	};
 }
-WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService"];
+WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService", "LiveExchangeService"];
 
 var module = angular.module("webcamCapture");
 module.directive("webcamCapture", function() {

@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Irseny.Main.Webface {
 	public class TcpChannel : IWebChannel<byte[]> {
@@ -47,14 +48,21 @@ namespace Irseny.Main.Webface {
 			}
 			return node.Value;
 		}
-		public void SendMessage(byte[] buffer, int startAt, int length) {
+		public bool SendMessage(byte[] buffer, int startAt, int length) {
 			if (buffer == null) throw new ArgumentNullException("buffer");
-			if (!stream.CanWrite) throw new NotSupportedException();
-			stream.Write(buffer, startAt, length);
+			if (stream.CanWrite) {
+				try {
+					stream.Write(buffer, startAt, length);
+				} catch (IOException) {
+					return false;
+				}
+				return true;
+			}
+			return false;
 		}
-		public void SendMessage(byte[] buffer) {
+		public bool SendMessage(byte[] buffer) {
 			if (buffer == null) throw new ArgumentNullException("buffer");
-			SendMessage(buffer, 0, buffer.Length);
+			return SendMessage(buffer, 0, buffer.Length);
 		}
 		public void Process() {
 			if (!client.Connected && State != WebChannelState.Closed) {
