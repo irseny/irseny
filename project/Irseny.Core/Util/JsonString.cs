@@ -20,10 +20,19 @@ namespace Irseny.Core.Util {
 		}
 		public JsonString(JsonString source) {
 			if (source == null) throw new ArgumentNullException("source");
+			this.Type = source.Type;
 			switch (source.Type) {
 			case JsonStringType.Array:
 				this.array = new List<object>();
-
+				foreach (var entry in source.array) {
+					if (entry != null) {
+						if (entry is string) {
+							this.array.Add(entry);
+						} else if (entry is JsonString) {
+							this.array.Add(new JsonString((JsonString)entry));
+						}
+					}
+				}
 				break;
 			case JsonStringType.Dict:
 				this.dict = new Dictionary<string, object>();
@@ -172,7 +181,7 @@ namespace Irseny.Core.Util {
 			}
 			return result;
 		}
-		public bool AddTerminal(string key, string value, bool overwrite=false) {
+		public bool AddTerminal(string key, string value, bool overwrite=true) {
 			if (key == null) throw new ArgumentNullException("key");
 			if (value == null) throw new ArgumentNullException("value");
 			switch (Type) {
@@ -194,7 +203,7 @@ namespace Irseny.Core.Util {
 				return false;
 			}
 		}
-		public bool AddJsonString(string key, JsonString value, bool overwrite=false) {
+		public bool AddJsonString(string key, JsonString value, bool overwrite=true) {
 			if (key == null) throw new ArgumentNullException("key");
 			if (value == null) throw new ArgumentNullException("value");
 			switch (Type) {

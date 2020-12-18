@@ -28,7 +28,22 @@ namespace Irseny.Core.Sensors {
 		/// <returns>if the subscription was cancelled</returns>
 		public bool Unsubscribe(ISensorObserver observer) {
 			lock (observerSync) {
-				return observers.Remove(observer);
+				int iObserver = observers.IndexOf(observer);
+				if (iObserver < 0) {
+					return false;
+				}
+				// we receive an exception if an observer is removed while iterating through them
+				// therefore we keep the original observer list untouched
+				// by creating a new one that will be used for future operations
+				int capacity = observers.Count;
+				var nextObservers = new List<ISensorObserver>(capacity);
+				for (int i = 0; i < capacity; i++) {
+					if (i != iObserver) {
+						nextObservers.Add(observers[iObserver]);
+					}
+				}
+				observers = nextObservers;
+				return true;
 			}
 		}
 		/// <summary>
@@ -37,9 +52,11 @@ namespace Irseny.Core.Sensors {
 		/// <param name="sensor">Connected sensor.</param>
 		public void OnConnected(ISensorBase sensor) {
 			lock (observerSync) {
+				
 				foreach (var observer in observers) {
 					observer.OnConnected(sensor);
 				}
+
 			}
 		}
 		/// <summary>
@@ -49,9 +66,11 @@ namespace Irseny.Core.Sensors {
 		/// <param name="sensor">Started sensor.</param>
 		public void OnStarted(ISensorBase sensor) {
 			lock (observerSync) {
+				
 				foreach (var observer in observers) {
 					observer.OnStarted(sensor);
 				}
+
 			}
 		}
 		/// <summary>
@@ -60,9 +79,11 @@ namespace Irseny.Core.Sensors {
 		/// <param name="args">Sensor and data information.</param>
 		public void OnDataAvailable(SensorDataPacket args) {
 			lock (observerSync) {
+				
 				foreach (var observer in observers) {
 					observer.OnDataAvailable(args);
 				}
+
 			}
 		}
 		/// <summary>
@@ -72,9 +93,11 @@ namespace Irseny.Core.Sensors {
 		/// <param name="sensor">Stopped sensor.</param>
 		public void OnStopped(ISensorBase sensor) {
 			lock (observerSync) {
+				
 				foreach (var observer in observers) {
 					observer.OnStopped(sensor);
 				}
+
 			}
 		}
 		/// <summary>
