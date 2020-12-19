@@ -1,11 +1,10 @@
-
-.page {
-	display: flex;
-	flex-direction: column;
+.section {
+	border: 2px solid var(--light);
+	margin: 0 0.5rem;
 }
-
-
-.main-detail {
-	display: flex;
-	flex-direction: row;
+.vline {
+	border-left: 2px solid var(--light);
+}
+.hline {
+	horder-top: 2px solid var(--light);
 }

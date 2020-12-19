@@ -168,9 +168,6 @@ namespace Irseny.Main.Webface {
 					// a downside of this implementation is that consecutive requests could be handeled out of order
 					while (channel.AvailableMessageNo > 0) {
 						var message = channel.EmitMessage();
-						// TODO remove debug output
-						LogManager.Instance.LogMessage(this, string.Format("LiveWire received from client {0}: {1}", 
-							clientOrigin, message.Text));
 						Task<JsonString> task = Task.Factory.StartNew(delegate { 
 							JsonString request;
 							try {

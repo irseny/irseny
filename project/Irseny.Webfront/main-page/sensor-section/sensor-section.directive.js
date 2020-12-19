@@ -1,4 +1,4 @@
-function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
+function SensorSectionController($scope, LiveWireService, LiveExchangeService, TaskScheduleService) {
 	var self = this;
 
 	var setup = [];
@@ -13,7 +13,8 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 	var liveSubscription = undefined;
 
 	this.$onInit = function() {
-		liveSubscription = LiveExchangeService.observe("sensor").subscribe(this.sensorUpdated);
+		liveSubscription = LiveExchangeService.getObserver("sensor").subscribe(self.sensorUpdated);
+		LiveExchangeService.getObtainer("sensor").then(self.sensorUpdated);
 	};
 
 	this.ensureCleanModels = function() {
@@ -49,14 +50,16 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 		if (!Number.isInteger(sensor.index)) {
 			return false;
 		}
-		if (setup[sensor.index] == undefined) {
-			return false;
-		}
+		var sensor = setup[sensor.index];
+
 		var subject = {
 			type: "post",
 			topic: "sensor",
 			position: sensor.index,
-			data: setup[setup[sensor.index].data]
+			data: [{
+				inuse: sensor != undefined,
+				settings: sensor
+			}]
 		};
 		LiveWireService.sendUpdate(subject);
 		return true;
@@ -94,13 +97,17 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService) {
 		setup = setup.slice();
 		activeDirty = true;
 		availableDirty = true;
+		TaskScheduleService.addTimeout("digest", 5000, function() {
+			$scope.$digest();
+		});
 	};
 
 	this.$onDestroy = function() {
-		LiveExchangeService.observe("sensor").unsubscribe(liveSubscription);
+		LiveExchangeService.getObserver("sensor").unsubscribe(liveSubscription);
+
 	};
 }
-SensorSectionController.$inject = ["$scope", "LiveWireService", "LiveExchangeService"];
+SensorSectionController.$inject = ["$scope", "LiveWireService", "LiveExchangeService", "TaskScheduleService"];
 
 var module = angular.module("sensorSection");
 module.directive("sensorSection", function() {

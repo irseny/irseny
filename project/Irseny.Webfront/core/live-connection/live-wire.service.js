@@ -88,7 +88,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		}
 		return true;
 	};
-	this.requestUpdate = function(subject) {
+	this.sendRequest = function(subject) {
 		var request = {
 			status: 200,
 			requestId: self.generateRequestId(),
@@ -121,7 +121,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 		};
 		connection.sendMessage(JSON.stringify(message));
 	};
-	this.receiveUpdate = function() {
+	this.getUpdateObserver = function() {
 		return observable;
 	};
 	this.cleanup = function() {
@@ -143,7 +143,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 			type: "get",
 			topic: "origin"
 		};
-		var future = self.requestUpdate(subject);
+		var future = self.sendRequest(subject);
 		future.then(function(result) {
 			var accepted = false;
 			do {
@@ -269,14 +269,14 @@ function LiveWireService(MessageLog, $interval) {
 			self.pendingMessages.push(msg);
 		}
 	};
-	this.requestUpdate = function(subject) {
-		return self.requestHandler.requestUpdate(subject);
+	this.sendRequest = function(subject) {
+		return self.requestHandler.sendRequest(subject);
 	};
 	this.sendUpdate = function(subject) {
 		self.requestHandler.sendUpdate(subject);
 	};
-	this.receiveUpdate = function() {
-		return self.requestHandler.receiveUpdate();
+	this.getUpdateObserver = function() {
+		return self.requestHandler.getUpdateObserver();
 	};
 	this.startServeCycle = function() {
 		if (self.cleanupCycle != null) {

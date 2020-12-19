@@ -1,1 +1,1 @@
-angular.module("sensorSection", ["util", "liveConnection", "messageLog", "sensorList", "webcamCapture"]);
+angular.module("sensorSection", ["util", "liveConnection", "messageLog", "taskSchedule", "sensorList", "webcamCapture", "webcamDetails"]);

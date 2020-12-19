@@ -1,7 +1,24 @@
 <div class="view d-flex flex-column align-items-stretch">
-	<div class="video-line d-flex flex-row justify-content-center" style="background-color: blue;">
-		<div class="video-out align-self-center">
-			<img ng-src="{{$ctrl.getVideoSource()}}" alt="Webcam Sample"/>
+	<div class="video-line d-flex flex-row justify-content-center">
+
+
+		<!--video output-->
+		<div class="video-frame d-flex flex-row justify-content-center" ng-click="$ctrl.requestVideoSource()">
+			<div class="info-left align-self-start">120px</div>
+			<div class="d-flex flex-column">
+				<div class="resolution-top align-self-start">160px</div>
+				<div ng-if="$ctrl.getVideoSource() == undefined" class="video-image d-flex justify-content-center align-items-center">
+					<img class="icon" src="icon/play.svg" alt="Click to Play">
+				</div>
+				<div ng-if="$ctrl.getVideoSource() != undefined" class="video-image justify-content-center">
+					<img ng-src="{{$ctrl.getVideoSource()}}" alt="Video Sample"/>
+				</div>
+				<div class="info-bottom d-flex justify-content-between">
+					<div>FPS</div>
+					<div>160px</div>
+				</div>
+			</div>
+			<div class="info-right align-self-end">120px</div>
 		</div>
 	</div>
 	<div class="video-status d-flex flex-row justify-content-around">

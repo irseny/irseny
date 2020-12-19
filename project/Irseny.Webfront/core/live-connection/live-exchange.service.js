@@ -26,13 +26,13 @@ function CameraUpdateHandler() {
 		// extract all updated cameras
 		var result = [];
 		for (var i = 0; i < length; i++) {
-			var status = subject.data[i].status;
+			var inuse = subject.data[i].inuse;
 
-			if (typeof status != 'string') {
+			if (typeof inuse != "boolean") {
 				return [];
 			}
 			var data = undefined;
-			if (status == "active") {
+			if (inuse) {
 				if (subject.data[i].settings == undefined) {
 					return [];
 				}
@@ -88,7 +88,7 @@ function CameraUpdateHandler() {
 		});
 		return result;
 	};
-	this.obtainUpdates = function(branch) {
+	this.createEquipmentObtainer = function(branch) {
 		var result = new Future();
 		for (var i = 0; i < branch.length; i++) {
 			result.resolve({ index: i, data: branch[i]});
@@ -157,17 +157,17 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		// (updates are relayed to observers and this instance should be subscribed to LiveWireSerive)
 		LiveWireService.sendUpdate(sensorSubject);
 
-		var trackerSubject = {
+		/*var trackerSubject = {
 			type: "get",
 			topic: "tracker",
 			position: "all"
 		};
-		LiveWireService.sendUpdate(trackerSubject);
+		LiveWireService.sendUpdate(trackerSubject);*/
 	};
 	/**
 	 *
 	 */
-	this.observe = function(topic) {
+	this.getObserver = function(topic) {
 		switch (topic) {
 		case "sensor":
 		case "camera":
@@ -178,11 +178,11 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			throw new Error("topic");
 		}
 	};
-	this.obtain = function(topic) {
+	this.getObtainer = function(topic) {
 		switch (topic) {
 		case "camera":
 		case "sensor":
-			return updateHandler.obtainUpdates(setup.cameras);
+			return updateHandler.createEquipmentObtainer(setup.cameras);
 		default:
 			throw new Error("topic");
 		}
@@ -194,7 +194,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		console.log("destroy from live exchange");
 	};
 	this.start = function() {
-		LiveWireService.receiveUpdate().subscribe(self.receiveUpdate);
+		LiveWireService.getUpdateObserver().subscribe(self.receiveUpdate);
 		self.requestFullEquipment();
 	};
 	this.start();

@@ -5,12 +5,16 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		width: 0,
 		height: 0
 	};
-	this.$onInit = function() {
+	var videoSubscription = undefined;
 
+	this.$onInit = function() {
+		videoSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(self.receiveVideoSource);
 	};
 
 	this.$onDestroy = function() {
-
+		if (videoSubscription != undefined) {
+			LiveExchangeService.getObserver("sensorCapture").unsubscribe(self.videoSubscription);
+		}
 	};
 	this.requestVideoSource = function() {
 		var sensor = self.shared.getActiveSensor();
@@ -22,14 +26,14 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			topic: "sensorCapture",
 			position: sensor.index,
 		};
-		var future = LiveWireService.requestUpdate(subject);
+		var future = LiveWireService.sendRequest(subject);
 		if (future == undefined) {
 			videoSource = undefined;
 			return false;
 		}
 		future.then(function(response) {
 			console.log("Webcan sample query succes");
-			LiveExchangeService.observe("sensorCapture").subscribe(self.receiveVideoSource);
+
 		});
 		future.reject(function(response) {
 			MessageLog.logError("Webcam sample query failed");

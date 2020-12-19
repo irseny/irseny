@@ -22,8 +22,13 @@ namespace Irseny.Main.Webface {
 			int sensorStart = -2;
 			int sensorEnd = 0;
 			do {
+				bool isGetRequest;
 				string type = TextParseTools.ParseString(subject.GetTerminal("type", "error"), "error");
-				if (!type.Equals("get") && !type.Equals("post")) {
+				if (type.Equals("get")) {
+					isGetRequest = true;
+				} else if (type.Equals("post")) {
+					isGetRequest = false;
+				} else {
 					status = HttpStatusCode.BadRequest;
 					break;
 				}
@@ -46,7 +51,7 @@ namespace Irseny.Main.Webface {
 				subjectAnswer.AddTerminal("position", StringifyTools.StringifyString(position));
 
 
-				if (type.Equals("get")) {
+				if (isGetRequest) {
 					object dataSync = new object();
 					JsonString data;
 					lock (dataSync) { // TODO lock required?
@@ -64,7 +69,7 @@ namespace Irseny.Main.Webface {
 							} else if (sensor.SensorType == SensorType.Webcam) {
 								var capture = (WebcamCapture)sensor;
 								SensorSettings settings = capture.GetSettings();
-								entry.AddTerminal("inuse", "false");
+								entry.AddTerminal("inuse", "true");
 								entry.AddJsonString("settings", SensorSettings.ToJson(settings));
 
 							} else {
@@ -81,7 +86,7 @@ namespace Irseny.Main.Webface {
 						subjectAnswer.AddJsonString("data", data);
 					}
 					response.AddJsonString("subject", subjectAnswer);
-				} else if (type.Equals("post")) {
+				} else {
 					object dataSync = new object();
 					// first read the data from the data array
 					JsonString data = subject.GetJsonString("data");
