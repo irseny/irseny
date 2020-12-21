@@ -41,3 +41,23 @@ $table-dark-bg: null;
 
 // geometry properties
 $border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$border-width: 1px; // default
+$border-color: $gray-300; // default
+
+// button
+$input-btn-focus-width: 0.1rem; // default 0.2
+
+// input and input group
+$input-color: $light;
+$input-bg: $secondary;
+$input-disabled-bg: $gray-900;
+$input-border-color: $gray-400; // default
+$input-focus-color: $input-color; // default
+$input-placeholder-color: $gray-600; // default
+$input-plaintext-color:$light;
+
+$input-group-addon-bg: $gray-900;
+$input-group-addon-color: $input-color; // default
+$input-group-addon-border-color: $input-border-color; // default

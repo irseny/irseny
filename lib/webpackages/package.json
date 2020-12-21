@@ -40,8 +40,8 @@
 		"angularjs-undeploy": "cross-env-shell shx rm ../angularjs/angular*{js,map}",
 		"jquery-undeploy": "cross-env-shell shx rm ../jquery/jquery*{js,map}",
 		"popper-undeploy": "cross-env-shell shx rm ../popperjs/popper*{js,map}",
-		"uninstall": "npm-run-all --sequential uninstall-bootstrap uninstall-modules",
-		"uninstall-bootstrap": "npm run uninstall --prefix irseny.bootstrap/",
-		"uninstall-modules": "cross-env-shell shx rm -r node_modules/"
+		"uninstall": "npm-run-all --sequential bootstrap-uninstall modules-uninstall",
+		"bootstrap-uninstall": "npm run uninstall --prefix irseny.bootstrap/",
+		"modules-uninstall": "cross-env-shell shx rm -r node_modules/"
 	}
 }
