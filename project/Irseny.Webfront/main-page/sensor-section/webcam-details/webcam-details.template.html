@@ -11,76 +11,90 @@
 		<tbody>
 			<!-- camera id -->
 			<tr>
-				<th scope="row">System ID</th>
-				<td><input class="input-group-text" style="width: 5rem" type="number" value="0" min="0" max="32"></td>
+				<th scope="row">Webcam</th>
+				<td>
+					<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">ID</span>
+						</div>
+						<input type="number" min="0" max="32" class="form-control" placeholder="0"
+							ng-model="$ctrl.generateWebcamPropertyGetterSetter('systemId')"
+							ng-model-options="{getterSetter: true}"/>
+					</div>
+
+
 				<td><!-- no auto config --></td>
 			</tr>
 			<!-- image resolution -->
 			<tr>
 				<th scope="row">
 					Resolution
-					<div class="list-group" style="flex-direction: row" role="tablist">
+					<div class="list-group d-flex flex-row" role="tablist">
 						<a class="list-group-item" data-toggle="list" role="tab" href="#"
-							ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'selectTypical')}"
-							ng-click="$ctrl.imageResolutionConfigMode='selectTypical'">
+							ng-class="{ 'active': ($ctrl.getResolutionMode() == 'list')}"
+							ng-click="$ctrl.setResolutionMode('list')">
 							Typical
 						</a>
 						<a data-toggle="list" role="tab" href="#"
 							class="list-group-item"
-							ng-class="{ 'active': ($ctrl.imageResolutionConfigMode == 'enterCustom')}"
-							ng-click="$ctrl.imageResolutionConfigMode='enterCustom'">
+							ng-class="{ 'active': ($ctrl.getResolutionMode() == 'custom')}"
+							ng-click="$ctrl.setResolutionMode('custom')">
 							Custom
 						</a>
 					</div>
 				</th>
 				<td>
 					<!-- typical resolution -->
-					<div ng-if="$ctrl.imageResolutionConfigMode == 'selectTypical'">
+					<div class="d-flex flex-column" ng-if="$ctrl.getResolutionMode() == 'list'">
 						<div class="input-group">
 							<div class="input-group-prepend">
-								<span class="input-group-text" style="width: 8rem">Aspect Ratio</span>
+								<span class="input-group-text" >Aspect Ratio</span>
 							</div>
 							<div class="dropdown">
-								<button class="btn dropdown-toggle" id="btn_webcamDetailAspectRatio" type="button" data-toggle="dropdown"
-									style="width: 8rem">
+								<button class="btn btn-primary dropdown-toggle" id="btn_webcamDetailAspectRatio" type="button" data-toggle="dropdown">
 									{{ $ctrl.aspectRatio }}</button>
 								<div class="dropdown-menu">
-									<a ng-repeat="ratio in $ctrl.typicalAspectRatios" class="dropdown-item" href="#"
-										ng-click="$ctrl.aspectRatio=ratio">{{ ratio }}</a>
+									<a ng-repeat="ratio in $ctrl.getTypicalAspectRatios()" class="dropdown-item" href="#"
+										ng-click="$ctrl.setAspectRatio(ratio)">{{ ratio }}</a>
 								</div>
 							</div>
 						</div>
 						<div class="input-group">
 							<div class="input-group-prepend">
-								<span class="input-group-text" style="width: 8rem">Resolution</span>
+								<span class="input-group-text">Resolution</span>
 							</div>
 							<div class="dropdown">
-								<button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
-									style="width: 8rem">
-									{{ $ctrl.imageResolution.x }} x {{ $ctrl.imageResolution.y }}
+								<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+									<div ng-if="!$ctrl.getWebcamPropertyAuto('frameWidth') && !$ctrl.getWebcamPropertyAuto('frameHeight')">
+										{{ $ctrl.getWebcamProperty('frameWidth') }} x {{ $ctrl.getWebcamProperty('frameHeight') }}
+									</div>
 								</button>
 								<div class="dropdown-menu">
-									<a ng-repeat="resolution in $ctrl.getResolutionSuggestions()" class="dropdown-item" href="#"
-										ng-click="$ctrl.imageResolution={ x: resolution.x, y: resolution.y }">{{ resolution.x }} x {{ resolution.y }}</a>
+									<a ng-repeat="res in $ctrl.getTypicalResolutions($ctrl.getAspectRatio())" class="dropdown-item" href="#"
+										ng-click="$ctrl.setWebcamProperty('frameWidth', res.width); $ctrl.setWebcamProperty('frameheight', res.height);">
+										{{ res.width }} x {{ res.height }}
+									</a>
 								</div>
 							</div>
 						</div>
 					</div>
 					<!-- custom resolution -->
-					<div ng-if="$ctrl.imageResolutionConfigMode == 'enterCustom'">
+					<div class="d-flex flex-column" ng-if="$ctrl.getResolutionMode() == 'custom'">
 						<div class="input-group">
 							<div class="input-group-prepend">
-								<span class="input-group-text" style="width:6rem"> Width</span>
+								<span class="input-group-text">Width</span>
 							</div>
-							<input class="input-group-text" style="width:6rem" type="number"
-								ng-model="$ctrl.imageResolution.x">
+							<input class="form-control" type="number" min="16" max="8192" placeholder="horizontal resolution"
+								ng-model="$ctrl.generateWebcamPropertyGetterSetter('frameWidth')"
+								ng-model-options="{getterSetter: true}">
 						</div>
 						<div class="input-group">
 							<div class="input-group-prepend">
 								<span class="input-group-text" style="width:6rem">Height</span>
 							</div>
-							<input class="input-group-text" style="width:6rem" type="number"
-								ng-model="$ctrl.imageResolution.y">
+							<input class="form-control" min="16" max="8192" type="number" placeholder="vertical resolution"
+								ng-model="$ctrl.generateWebcamPropertyGetterSetter('frameHeight')"
+								ng-model-options="{getterSetter: true}">
 						</div>
 					</div>
 				</td>
@@ -94,19 +108,28 @@
 				<th scope="row">Framerate</th>
 				<td>
 					<div class="input-group">
-						<input class="input-group-text" type="number" ng-model="$ctrl.framerate">
-						<div class="input-gropu-append">
+						<input class="form-control" type="number" placeholder="framerate" min="1" max="1000"
+							ng-model="$ctrl.generateWebcamPropertyGetterSetter('frameRate')"
+							ng-model-options="{getterSetter: true}">
+						<div class="input-group-append">
 							<span class="input-group-text">FPS</span>
 						</div>
 					</div>
 				</td>
 				<td>
-					<input class="input-group-text" type="checkbox" checked>
+					<input class="input-group-text" type="checkbox" checked="checked">
 				</td>
 			</tr>
 			<!-- exposure -->
 		</tbody>
 	</table>
+	<div class="d-flex flex-row justify-content-end">
+		<button class="button">Reset</button>
+		<div class="mx-2"></div>
+		<button class="button">Apply</button>
+		<div class="mx-2"></div>
+
+	</div>
 	<!--<div class="input-group">
 		<button class="btn input-group-text mx-2" type="submit" ng-click="$ctrl.applyChanges()">Apply</button>
 		<button class="btn input-group-text mx-2" type="reset" ng-click="$ctrl.resetChanges()">Reset</button>

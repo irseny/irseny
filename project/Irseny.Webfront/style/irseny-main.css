@@ -1,10 +1,10 @@
-.section {
+.irseny .section {
 	border: 2px solid var(--light);
 	margin: 0 0.5rem;
 }
-.vline {
+.irseny .vline {
 	border-left: 2px solid var(--light);
 }
-.hline {
+.irseny .hline {
 	horder-top: 2px solid var(--light);
 }
