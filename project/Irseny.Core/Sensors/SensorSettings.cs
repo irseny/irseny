@@ -150,6 +150,7 @@ namespace Irseny.Core.Sensors {
 				int prop = Convert.ToInt32(props.GetValue(i), TextParseTools.FormatProvider);
 				decimal mProp;
 				int iProp;
+				bool bProp;
 				if (TextParseTools.IsQuoted(value)) {
 					string text = TextParseTools.ParseString(value, null);
 					result.textProps.Add(prop, text);
@@ -157,6 +158,8 @@ namespace Irseny.Core.Sensors {
 					result.integerProps.Add(prop, iProp);
 				} else if (TextParseTools.TryParseDecimal(value, out mProp)) {
 					result.decimalProps.Add(prop, mProp);
+				} else if (TextParseTools.TryParseBool(value, out bProp)) {
+					result.integerProps.Add(prop, bProp ? 1 : 0);
 				}
 			}
 			return result;

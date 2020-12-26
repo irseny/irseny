@@ -88,15 +88,25 @@ function CameraUpdateHandler() {
 		});
 		return result;
 	};
-	this.createEquipmentObtainer = function(branch) {
+
+	this.createEquipmentObtainer = function(branch, index) {
 		var result = new Future();
-		for (var i = 0; i < branch.length; i++) {
-			result.resolve({ index: i, data: branch[i]});
+		if (arguments.length < 2) {
+			for (var i = 0; i < branch.length; i++) {
+				result.resolve({ index: i, data: branch[i]});
+			}
+		} else {
+			result.resolve({ index: index, data: branch[index]});
 		}
 		return result;
 	};
-}
 
+}
+/**
+ * LiveExchange communicates with the server through LiveWire.
+ * Specifically it handles setup changes and mirrors the state on the server.
+ * Users of the service can themself be notified of changes or obtain the current state.
+ */
 function LiveExchangeService(MessageLog, LiveWireService) {
 	const FixedEquipmentNo = 16;
 	var self = this;
@@ -125,7 +135,10 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			"inputDevice": new Observable()
 		}
 	};
-
+	/**
+	 * Handles setup changes. For internal use only.
+	 * @param {Object} subject received update
+	 */
 	this.receiveUpdate = function(subject) {
 		var updated = [];
 		switch (subject.topic) {
@@ -145,7 +158,10 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		}
 	};
 
-	this.requestFullEquipment = function() {
+	/**
+	 * Sends out requests to the server to send the full, currently active setup.
+	 */
+	this.requestFullSetup = function() {
 		// send requests for all equipment types
 		var sensorSubject = {
 			type: "get",
@@ -153,8 +169,8 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			position: "all"
 		};
 		// but send the requests masked as updates
-		// so that the results come back as updates and not requests
-		// (updates are relayed to observers and this instance should be subscribed to LiveWireSerive)
+		// so that the results come back as updates and not responses
+		// (updates are relayed to observers - this instance should be subscribed to LiveWireSerive)
 		LiveWireService.sendUpdate(sensorSubject);
 
 		/*var trackerSubject = {
@@ -165,7 +181,9 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		LiveWireService.sendUpdate(trackerSubject);*/
 	};
 	/**
-	 *
+	 * Returns an observer which can be used to observer setup changes.
+	 * @param {string} topic setup filter; accepted values are "sensor", "camear", "sensorCapture"
+	 * @return setup changes observable
 	 */
 	this.getObserver = function(topic) {
 		switch (topic) {
@@ -178,7 +196,12 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			throw new Error("topic");
 		}
 	};
-	this.getObtainer = function(topic) {
+	/**
+	 * Returns a future that provides the current setup.
+	 * @param {string} topic setup filter; accepted values are "sensor", "camera"
+	 * @return current setup providing future
+	 */
+	this.getObtainer = function(topic, index) {
 		switch (topic) {
 		case "camera":
 		case "sensor":
@@ -187,15 +210,12 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			throw new Error("topic");
 		}
 	};
-	this.$onInit = function() {
-		console.log("init from live exchange");
-	};
-	this.$onDestroy = function() {
-		console.log("destroy from live exchange");
-	};
+	/**
+	 * Initializes this instance. For internal use only.
+	 */
 	this.start = function() {
 		LiveWireService.getUpdateObserver().subscribe(self.receiveUpdate);
-		self.requestFullEquipment();
+		self.requestFullSetup();
 	};
 	this.start();
 };

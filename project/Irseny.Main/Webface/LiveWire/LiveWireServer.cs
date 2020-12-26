@@ -231,8 +231,14 @@ namespace Irseny.Main.Webface {
 						completed = new LinkedList<Task<JsonString>>();
 					}
 					completed.AddLast(task);
+					JsonString response = null;
+					try {
 					// TODO check for exception or cancellation
-					JsonString response = task.Result;
+						 response = task.Result;
+					} catch (AggregateException e) {
+						LogManager.Instance.LogError(this, string.Format("Internal exception while processing a request: {0}",
+							e.ToString()));
+					}
 					if (response == null) {
 						// may occur when not enough information is extractable
 						// in order to send an error response
@@ -293,7 +299,7 @@ namespace Irseny.Main.Webface {
 						if (target.Equals(string.Empty)) {
 							break;
 						}
-						if (target.Equals("'all'")) {
+						if (target.Equals("\"all\"")) {
 							// special send to all target
 							string text = update.ToString();
 							foreach (var connection in connections.Values) {

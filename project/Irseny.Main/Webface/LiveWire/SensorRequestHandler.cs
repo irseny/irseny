@@ -5,6 +5,7 @@ using System.Threading;
 using Irseny.Core.Sensors;
 using Irseny.Core.Sensors.VideoCapture;
 using System.Collections.Generic;
+using Irseny.Core.Log;
 
 namespace Irseny.Main.Webface {
 	public class SensorRequestHandler {
@@ -99,7 +100,7 @@ namespace Irseny.Main.Webface {
 						JsonString sensor = data.GetJsonString(i);
 						bool used = TextParseTools.ParseBool(sensor.GetTerminal("inuse", "false"), false);
 						if (used) {
-							JsonString jSettings = data.GetJsonString("settings");
+							JsonString jSettings = sensor.GetJsonString("settings");
 							if (jSettings == null) {
 								status = HttpStatusCode.BadRequest;
 								break;
@@ -113,119 +114,162 @@ namespace Irseny.Main.Webface {
 					var readySignal = new ManualResetEvent(false);
 					CaptureSystem.Instance.Invoke((object sender, EventArgs args) => {
 						var system = (CaptureSystem)sender;
-						for (int i = sensorStart; i < sensorEnd; i++) {
+						for (int iSource = sensorStart; iSource <= sensorEnd; iSource++) {
+							// first determine which operations to perform
+							int iTarget = iSource;
 							bool connect = false;
 							bool disconnect = false;
 							bool start = false;
 							bool stop = false;
-							SensorType targetType;
-							SensorSettings targetSettings;
-							if (!targetMap.TryGetValue(i, out targetSettings)) {
-								targetSettings = null;
-							}
-							var entry = data.GetJsonString(i);
-							ISensorBase sourceSensor = system.GetSensor(i);
+							bool apply = false;
+
+
+							var entry = data.GetJsonString(iSource);
+							ISensorBase sensor = system.GetSensor(iSource);
 							SensorSettings sourceSettings = null;
-							if (sourceSensor != null) {
-								sourceSettings = ((WebcamCapture)sourceSensor).GetSettings();
-							}
-							if (sourceSensor == null && targetSettings != null) {
-								connect = true;
-							} else if (sourceSensor != null && targetSettings == null) {
-								disconnect = true;
-							} else if (sourceSensor == null && targetSettings == null) {
-								// nothing to do
-							} else {
-								int iTargetType = targetSettings.GetInteger(SensorProperty.Type, -1);
-								if (iTargetType > -1) {
-									targetType = (SensorType)iTargetType;
-									if (sourceSensor.SensorType != targetType) {
-										disconnect = true;
-										connect = true;
-									}
+							SensorType sourceType = SensorType.Webcam;
+							if (sensor != null) {
+								sourceSettings = ((WebcamCapture)sensor).GetSettings();
+								int iType = sourceSettings.GetInteger(SensorProperty.Type, -1);
+								if (iType > -1) {
+									sourceType = (SensorType)iType;
 								}
 							}
-							// TODO add rename capabilities
-							// TODO handle settings update
+							SensorSettings targetSettings = null;
+							SensorType targetType = SensorType.Webcam;
+							if (targetMap.TryGetValue(iSource, out targetSettings)) {
+								int iType = targetSettings.GetInteger(SensorProperty.Type, -1);
+								if (iType > -1) {
+									targetType = (SensorType)iType;
+								}
+							}
+							if (sourceSettings == null && targetSettings != null) {
+								connect = true;
+							} else if (sourceSettings != null && targetSettings == null) {
+								disconnect = true;
+							} else if (sourceSettings == null && targetSettings == null) {
+								// nothing to do
+							} else {
+								if (sourceType != targetType) {
+									disconnect = true;
+									connect = true;
+								}
+								apply = true;
+							}
 							if (targetSettings != null) {
-								int iTargetCapturing = targetSettings.GetInteger(SensorProperty.Capturing, 0);
-								if (iTargetCapturing != 0) {
+								int iTargetCapturing = targetSettings.GetInteger(SensorProperty.Capturing, -1);
+								if (iTargetCapturing < 0) {
+									// ignore if not available
+								} else if (iTargetCapturing != 0) {
 									start = true;
 								} else {
 									stop = true;
 								}
 							}
-							if (disconnect) {
-								if (system.DisconnectSensor(i)) {
-									resultMap.Remove(i);
+							// TODO make restrictions or otherwise cover remaining possible cases
+							bool success = true;
+							// perform the operations which were activated above
+							if (disconnect && success) {
+								if (system.DisconnectSensor(iSource)) {
+									LogManager.Instance.LogMessage(this, "Disconnected sensor " + iSource);
+									sensor = null;
+									// already removed from result map
 								} else {
-									resultMap[i] = ((WebcamCapture)sourceSensor).GetSettings();
+									// nothing changed
+									LogManager.Instance.LogError(this, "Failed to disconnect sensor " + iSource);
+									resultMap[iSource] = sourceSettings;
+									success = false;
 								}
 							}
-							if (connect) {
-								var targetSensor = new WebcamCapture(targetSettings);
-								if (system.ConnectSensor(targetSensor, i) != i) {
-									resultMap.Remove(i);
+							if (connect && success) {
+								sensor = new WebcamCapture(targetSettings);
+								int iNext = system.ConnectSensor(sensor, iTarget);
+								if (iNext == iTarget) {
+									LogManager.Instance.LogMessage(this, "Connected sensor " + iNext);
+									targetSettings = sensor.GetSettings();
+									resultMap[iTarget] = targetSettings;
+								} else if (iNext < 0) {
+									// failed, leave result map entry empty
+									LogManager.Instance.LogError(this, "Failed to connect new sensor");
+									sensor = null;
+									success = false;
 								} else {
-									resultMap[i] = targetSensor.GetSettings();
+									LogManager.Instance.LogMessage(this, "Connected sensor " + iNext);
+									// sensor connected with different index, which we can accept
+									iTarget = iNext;
+									resultMap[iNext] = targetSettings;
+									targetSettings = sensor.GetSettings();
 								}
 							}
-							if (stop) {
-								if (system.StopSensor(i)) {
 
+							if (stop && success) {
+								if (system.StopSensor(iTarget)) {
+									LogManager.Instance.LogMessage(this, "Stopped sensor " + iTarget);
 								} else {
-
+									targetSettings = sensor.GetSettings();
+									success = false;
+									LogManager.Instance.LogError(this, "Failed to stop sensor " + iTarget);
+								} 
+								resultMap[iTarget] = targetSettings;
+							}
+							if (apply && success) {
+								if (sensor != null) {
+									if (sensor.ApplySettings(targetSettings)) {
+										LogManager.Instance.LogMessage(this, "Applied new settings to sensor " + iTarget);
+									} else {
+										LogManager.Instance.LogError(this, "Failed to apply new settings to sensor " + iTarget);
+									}
+									targetSettings = sensor.GetSettings();
+									resultMap[iTarget] = targetSettings;
 								}
 							}
-							if (start) {
-								if (system.StartSensor(i)) {
-									// TODO update result settings
+								
+							if (start && success) {
+								if (system.StartSensor(iSource)) {
+									LogManager.Instance.LogMessage(this, "Started sensor " + iSource);
+									targetSettings = sensor.GetSettings();
+									resultMap[iTarget] = targetSettings;
 								} else {
-
+									LogManager.Instance.LogError(this, "Failed to start sensor " + iSource);
+									targetSettings = sensor.GetSettings();
+									resultMap[iTarget] = targetSettings;
 								}
 							}
 						}
+						readySignal.Set();
 					});
 					// lastly create an update for all clients
-					var update = new JsonString(response);
-					{
-						update.RemoveTerminal("requestId", false);
-						update.AddTerminal("target", "\"all\"");
-						var updateSubject = new JsonString(subject);
-						{
-							var updateData = JsonString.CreateArray();
-							{
-								for (int i = sensorStart; i <= sensorEnd; i++) {
-									var entry = JsonString.CreateDict();
-									SensorSettings settings;
-									if (resultMap.TryGetValue(i, out settings)) {
-										entry.AddTerminal("inuse", "true");
-										entry.AddJsonString("settings", SensorSettings.ToJson(settings));
-									} else {
-										entry.AddTerminal("inuse", "false");
-									}
-								}
-							}
-							updateSubject.AddJsonString("data", updateData);
-						}
-						update.AddJsonString("subject", updateSubject);
+					if (!readySignal.WaitOne(10000)) {
+						status = HttpStatusCode.InternalServerError;
+						break;
 					}
-					server.AddUpdate(update);
-					// return a generic response
-					var responseSubject = JsonString.CreateDict();
+
+					var responseSubject = new JsonString(subject);
 					{
-						var responseData = JsonString.CreateArray();
-						responseSubject.AddJsonString("data", responseData);
+						var updateData = JsonString.CreateArray();
+						{
+							for (int i = sensorStart; i <= sensorEnd; i++) {
+								var entry = JsonString.CreateDict();
+								SensorSettings settings;
+								if (resultMap.TryGetValue(i, out settings)) {
+									entry.AddTerminal("inuse", "true");
+									entry.AddJsonString("settings", SensorSettings.ToJson(settings));
+								} else {
+									entry.AddTerminal("inuse", "false");
+								}
+								updateData.AddJsonString(string.Empty, entry);
+							}
+						}
+						responseSubject.AddJsonString("data", updateData);
 					}
 					response.AddJsonString("subject", responseSubject);
-
+					
+					var update = new JsonString(response);
+					update.RemoveTerminal("requestId", false);
+					update.AddTerminal("target", "\"all\"");
 
 
 				}
-
-
-
-
 			} while (false);
 			return status;
 		}

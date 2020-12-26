@@ -26,11 +26,11 @@
 		active camera {{$ctrl.shared.getActiveCamera().index}}
 	</div>
 	<div class="video-control d-flex flex-row justify-content-end">
-		<button class="btn btn-primary" ng-click="">
+		<button class="btn btn-primary" ng-click="$ctrl.startCapture()">
 			Start
 		</button>
 		<div class="mx-2"></div>
-		<button class="btn btn-primary" ng-click="">
+		<button class="btn btn-primary" ng-click="$ctrl.stopCapture()">
 			Stop
 		</button>
 		<div class="mx-2"></div>

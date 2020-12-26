@@ -57,7 +57,9 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		}
 		public SensorSettings GetSettings() {
 			lock (captureSync) {
-				return new SensorSettings(settings);
+				var result = new SensorSettings(settings);
+				result.SetInteger(SensorProperty.Capturing, (videoFrame != IntPtr.Zero) ? 1 : 0);
+				return result;
 			}
 		}
 		public bool ApplySettings(SensorSettings settings) {

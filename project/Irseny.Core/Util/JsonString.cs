@@ -66,7 +66,7 @@ namespace Irseny.Core.Util {
 		}
 		public JsonString GetJsonString(params object[] path) {
 			if (path == null) throw new ArgumentNullException("path");
-			return GetJsonString(true, 0, path);
+			return GetJsonString(0, path);
 		}
 		public JsonString TryGetJsonString(params object[] path) {
 			if (path == null) throw new ArgumentNullException("path");

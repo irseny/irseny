@@ -1,4 +1,95 @@
-function SensorSectionController($scope, LiveWireService, LiveExchangeService, TaskScheduleService) {
+/**
+ * Active sensor to be returned from the sensor section.
+ * Provides functionality for property access.
+ *
+ * @constructor
+ * @param {number} index sensor index
+ * @param {Object} data sensor data
+ */
+function ActiveSensor(index, active, data) {
+	if (!Number.isInteger(index)) {
+		throw Error("index");
+	}
+	if (typeof active != "boolean") {
+		throw Error("active");
+	}
+	var self = this;
+	this.index = index;
+	this.active = active;
+	this.data = data;
+
+	/**
+	 * Returns the given property.
+	 * @param {string} prop property name
+	 * @return {number} if the property is not adjusting automatically, otherwise undefined
+	 */
+	this.getProperty = function(prop) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		if (self.index >= 0) {
+			return self.data[prop];
+		}
+		return undefined;
+	};
+	/**
+	 * Indicates whether the given property is supposed to adjust automatically.
+	 * This is the case if the property is not set.
+	 * @param {string} prop property name
+	 * @return {bool} true if the property is not set, otherwise false
+	 */
+	this.getPropertyAuto = function(prop) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		if (self.index >= 0) {
+			return self.data[prop] == undefined;
+		}
+		return true;
+	};
+	/**
+	 * Sets the given property.
+	 * @param {string} prop property name
+	 * @param {number} value property value or undefinded to set the property to auto
+	 */
+	this.setProperty = function(prop, value) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		if (self.index >= 0) {
+			if (value == undefined) {
+				delete self.data[prop];
+			} else if (Number.isInteger(value)) {
+				self.data[prop] = value;
+			} else {
+				throw Error("value");
+			}
+		}
+	};
+	/**
+	 * Sets the given property to adjust automatically.
+	 * @param {string} prop property name
+	 */
+	this.setPropertyAuto = function(prop) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		if (self.index >= 0) {
+			delete self.data[prop];
+		}
+	};
+
+};
+/**
+ * Controller for the sensor section template.
+ * Provides functionality for accessing sensors.
+ * @constructor
+ * @param {Object} $scope scope service
+ * @param {Object} LiveWireService LiveWire service
+ * @param {Object} LiveExchangeService LiveExchange service
+ * @param {Object} TaskScheduleService TaskSchedule service
+ */
+function SensorSectionController($scope, LiveWireService, LiveExchangeService, TaskScheduleService, MessageLog) {
 	var self = this;
 
 	var setup = [];
@@ -9,7 +100,7 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 	var activeDirty = true;
 
 	const sensorClasses =  ["Webcam", "Kinect"];
-
+	const maxSensorNo = 16;
 	var liveSubscription = undefined;
 
 	this.$onInit = function() {
@@ -32,9 +123,9 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 			// regenerate active
 			if (activeIndex < 0 || activeIndex >= setup.length || setup[activeIndex] == undefined) {
 				activeIndex = -1;
-				activeModel = {index: -1, active: false, data: undefined};
+				activeModel = new ActiveSensor(-1, false, undefined);
 			} else {
-				activeModel = {index: activeIndex, active: true, data: setup[activeIndex]};
+				activeModel = new ActiveSensor(activeIndex, true, setup[activeIndex]);//{index: activeIndex, active: true, data: setup[activeIndex]};
 			}
 			activeDirty = false;
 		}
@@ -46,27 +137,95 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 	this.isActiveSensor = function(sensor) {
 		return sensor.index == activeIndex;
 	};
+	/**
+	 * Exchanges a sensor with the server through LiveWire.
+	 * @param {Object} sensor object with index property which specifies the sensor to exchange
+	 * @return indicates whether the operation was successful
+	 */
 	this.exchangeSensor = function(sensor) {
 		if (!Number.isInteger(sensor.index)) {
-			return false;
+			throw Error("sensor");
 		}
-		var sensor = setup[sensor.index];
+		var data = setup[sensor.index];
 
 		var subject = {
 			type: "post",
 			topic: "sensor",
 			position: sensor.index,
 			data: [{
-				inuse: sensor != undefined,
-				settings: sensor
+				inuse: data != undefined,
+				settings: data
+			}]
+		};
+		LiveWireService.sendUpdate(subject);
+		//MessageLog.logInfo("Sensor ".concat(sensor.index, " update sent to server"));
+		return true;
+	};
+	/**
+	 * Resets a sensor to the current settings in LiveExchange.
+	 * @param {Object} sensor object with index property which specifies the sensor to reset
+	 * @return {boolean} indicates whether the operation was successful
+	 */
+	this.resetSensor = function(sensor) {
+		if (!Number.isInteger(sensor.index)) {
+			throw Error("sensor");
+		}
+		// this should replace the local changes with the current state
+		LiveExchangeService.getObtainer("sensor", sensor.index).then(self.sensorUpdated);
+		//MessageLog.logInfo("Sensor ".concat(sensor.index, " reset"));
+	};
+	/**
+	 * Exchanges a new sensor through LiveWire.
+	 * @param {Object} sensor object with index and sensor data
+	 * @return {boolean} indicates whether there was a free slot to assign the new sensor to
+	 */
+	this.addSensor = function(sensor) {
+		if (sensor.data == undefined) {
+			throw Error("sensor.data");
+		}
+		var iFree = -1;
+		for (var i = 0; i < maxSensorNo; i++) {
+			if (setup[i] == undefined) {
+				iFree = i;
+			}
+		}
+		if (iFree < 0) {
+			return false;
+		}
+		var subject = {
+			type: "post",
+			topic: "sensor",
+			position: iFree,
+			data: [{
+				inuse: true,
+				settings: sensor.data
 			}]
 		};
 		LiveWireService.sendUpdate(subject);
 		return true;
 	};
+	/**
+	 * Sends an unused sensor message through LiveWire.
+	 * @param {Object} sensor object with index information
+	 * @return {boolean} indicates whether the operation was succcesful
+	 */
+	this.removeSensor = function(sensor) {
+		if (!Number.isInteger(sensor.index)) {
+			throw Error("sensor.index");
+		}
+		var subject = {
+			type: "post",
+			topic: "sensor",
+			position: sensor.index,
+			data: [{inuse: false}]
+		};
+		LiveWireService.sendUpdate(subject);
+		return true;
+	};
+
 	this.setActiveSensor = function(sensor) {
 		if (!Number.isInteger(sensor.index)) {
-			return false;
+			throw Error("sensor.index");
 		}
 		if (setup[sensor.index] == undefined) {
 			return false;
@@ -92,8 +251,9 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 		if (update.data == undefined) {
 			setup[update.index] = undefined;
 		} else {
-			setup[update.index] = Object.assign(update.data);
+			setup[update.index] = JSON.parse(JSON.stringify(update.data));
 		}
+		//MessageLog.logInfo("Received update for sensor ".concat(update.index));
 		setup = setup.slice();
 		activeDirty = true;
 		availableDirty = true;
@@ -107,7 +267,7 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 
 	};
 }
-SensorSectionController.$inject = ["$scope", "LiveWireService", "LiveExchangeService", "TaskScheduleService"];
+SensorSectionController.$inject = ["$scope", "LiveWireService", "LiveExchangeService", "TaskScheduleService", "MessageLog"];
 
 var module = angular.module("sensorSection");
 module.directive("sensorSection", function() {

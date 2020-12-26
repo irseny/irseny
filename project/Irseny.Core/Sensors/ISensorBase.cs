@@ -26,6 +26,11 @@ namespace Irseny.Core.Sensors {
 		/// <value><c>true</c> if capturing; otherwise, <c>false</c>.</value>
 		bool Capturing { get; }
 		/// <summary>
+		/// Gets the currently active settings from this instance.
+		/// </summary>
+		/// <returns>The settings.</returns>
+		SensorSettings GetSettings();
+		/// <summary>
 		/// Starts the data capturing process.
 		/// </summary>
 		bool Start();
@@ -39,6 +44,13 @@ namespace Irseny.Core.Sensors {
 		/// <param name="timestamp">Current timestamp in milliseconds for interval prediction.</param>
 		/// <returns>The latest data packet. May be null in case of errors or no new data available</returns>
 		SensorDataPacket Process(long timestamp);
+		/// <summary>
+		/// Applies the given settings to this instance.
+		/// </summary>
+		/// <returns><c>true</c>, if applied successfully, <c>false</c> if the operation failed.</returns>
+		/// <param name="settings">Settings to change.</param>
+		bool ApplySettings(SensorSettings settings);
+
 	}
 }
 

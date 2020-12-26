@@ -1,3 +1,23 @@
 .details {
 	user-select: none;
 }
+.details table .number-cell-4 {
+	--edge: calc(3rem + 10px);
+	max-width: calc(4ch + var(--edge));
+}
+.details table .number-cell-3 {
+	--edge: calc(3rem + 10px);
+	max-width: calc(3ch + var(--edge));
+}
+.details table .label-cell-6 {
+	--edge: 1.5rem;
+	min-width: calc(6ch + var(--edge));
+}
+.details table .label-cell-12 {
+	--edge: 1.5rem;
+	min-width: calc(12ch + var(--edge));
+}
+.details table .drop-cell-9 {
+	--edge: calc(2ch + 2rem);
+	min-width: calc(9ch + var(--edge));
+}

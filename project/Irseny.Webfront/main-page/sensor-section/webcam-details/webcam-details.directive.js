@@ -5,13 +5,10 @@
  */
 function WebcamDetailController() {
 	var self = this;
-	var aspectRatio = "4:3";
-	var resolution = { width: 800, height: 600 };
-	var resolutionConfigMode = "list";
-	var aspectRatios = [
-		"4:3",
-		"16:9"
-	];
+	var aspectRatio = ""; // to be initialized
+	var resolutionConfigMode = "invalid"; // to be initialized
+	var resolutionStyles = {}; // in $onInit()
+	var aspectRatios = [];
 	var resolutions = {
 		"4:3": [
 			{ width: 160, height: 120 },
@@ -26,6 +23,14 @@ function WebcamDetailController() {
 			{ width: 1440, height: 810 },
 			{ width: 1600, height: 900 }
 		]
+	};
+	/**
+	 * Initializes this instance.
+	 */
+	this.$onInit = function() {
+		aspectRatios = Object.keys(resolutions);
+		self.setAspectRatio(aspectRatios[0]);
+		self.setResolutionMode("list");
 	};
 	/**
 	 * Returns all typically used aspect ratios.
@@ -57,26 +62,11 @@ function WebcamDetailController() {
 	 * @param {string} ratio
 	 */
 	this.setAspectRatio = function(ratio) {
-		switch (ratio) {
-		case "4:3":
-			aspectRatio = "4:3";
-		break;
-		case "16:9":
-			aspectRatio = "16:9";
-		break;
-		default:
-		throw Error("ratio");
+		if (typeof ratio != "string") {
+			throw Error("ratio");
 		}
+		aspectRatio = ratio;
 	};
-	/*this.getResolution = function() {
-		return resolution;
-	};
-	this.setResolution = function(res) {
-		if (!Number.isInteger(res.width) || !Number.isInteger(res.height)) {
-			return;
-		}
-		resolution = { width: res.width, height: res.height };
-	};*/
 
 	/**
 	 * Sets the active resolution configuration mode.
@@ -87,22 +77,29 @@ function WebcamDetailController() {
 			return;
 		}
 		if (mode == "list") {
-			var ratio = resolutions.find(function(list) {
-				var res = list.find(function(r) {
-					return r.width == resolution.width && r.height == resolution.height;
-				});
-				/*if (res != undefined) {
-					resolution = { width: res.width, height: res.height };
-					return true;
-				}*/
-				return false;
-			});
+			// adjust the styling to use for resolution config
+			// the goal is to hide the complementary elements
+			// but avoid resizing the whole property table
 			resolutionConfigMode = "list";
-			if (ratio != undefined) {
-				aspectRatio = ratio;
-			}
+			resolutionStyles["list"] = {
+				"visibility": "visible"
+			};
+			// with max height 0 the elements of the two modes occupy the same vertical space
+			// while the hidden elements are still considered in layout calculations
+			// TODO is this hack platform independent?
+			resolutionStyles["custom"] = {
+				"visibility": "hidden",
+				"max-height": 0
+			};
 		} else if (mode == "custom") {
 			resolutionConfigMode = "custom";
+			resolutionStyles["custom"] = {
+				"visibility": "visible"
+			};
+			resolutionStyles["list"] = {
+				"visibility": "hidden",
+				"max-height": 0
+			};
 		} else {
 			throw new Error("mode");
 		}
@@ -114,6 +111,16 @@ function WebcamDetailController() {
 	this.getResolutionMode = function() {
 		return resolutionConfigMode;
 	};
+	/**
+	 * Returns the styling of the resolution customization box
+	 * for the given resolution mode.
+	 * @param {string} mode reference resolution mode
+	 * @return {Object} styling to be used in ng-style
+	 */
+	this.getResolutionStyle = function(mode) {
+		return resolutionStyles[mode];
+	};
+
 	/**
 	 * Returns the given property of the active sensor.
 	 * @param {string} prop property name
@@ -184,27 +191,60 @@ function WebcamDetailController() {
 		if (typeof prop != "string") {
 			throw Error("prop");
 		}
-		/**
-		 * Gets or sets the property of the active sensor.
-		 * @param {number} value optional property value tthat indicates
-		 * whether to get or set the property
-		 */
 		return function(value) {
 			if (arguments.length > 0) {
-				if (!Number.isInteger(value)) {
-					throw Error("prop");
-				}
-				self.setWebcamProperty(prop, value);
+				self.shared.getActiveSensor().setProperty(prop, value);
 			} else {
-				return self.getWebcamProperty(prop);
-
+				return self.shared.getActiveSensor().getProperty(prop);
 			}
 		};
 	};
-	this.$onInit = function() {
-
+	/**
+	 * Generates a property auto getter/setter for the given property
+	 * for use in html templates.
+	 * @param {string} prop property name
+	 */
+	this.generateWebcamAutoGetterSetter = function(prop) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		return function(value) {
+			if (arguments.length > 0) {
+				if (value) {
+					self.shared.getActiveSensor().setPropertyAuto(prop);
+				}
+			} else {
+				return self.shared.getActiveSensor().getPropertyAuto(prop);
+			}
+		};
 	};
-
+	/**
+	 * Generates a property getter/setter
+	 * that returns the given fallback value
+	 * if the given property is set to auto adjust.
+	 * for use in html templates.
+	 * @param {string} prop property name
+	 * @param {number} fallback value to return on auto
+	 */
+	this.generateWebcamRangeGetterSetter = function(prop, fallback) {
+		if (typeof prop != "string") {
+			throw Error("prop");
+		}
+		if (!Number.isInteger(fallback)) {
+			throw Error("fallback");
+		}
+		return function(value) {
+			if (arguments.length > 0) {
+				self.shared.getActiveSensor().setProperty(prop, value);
+			} else {
+				if (self.shared.getActiveSensor().getPropertyAuto(prop)) {
+					return fallback;
+				} else {
+					return self.shared.getActiveSensor().getProperty(prop);
+				}
+			}
+		};
+	};
 	this.$onDestroy = function() {
 
 	};

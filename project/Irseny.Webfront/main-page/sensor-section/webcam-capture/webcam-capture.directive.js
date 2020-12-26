@@ -59,21 +59,31 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 	this.getVideoSize = function() {
 		return videoSize;
 	};
+	/**
+	 * Sets the active webcam to capturing and exchanges it with the server.
+	 * @return {boolean} indicates whether the operation was successful
+	 */
 	this.startCapture = function() {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
-			return;
+			return false;
 		}
 		sensor.data.capturing = true;
 		self.shared.exchangeSensor(sensor);
+		return true;
 	};
+	/**
+	 * Sets the active webcam to not capturing and exchanges it with the server.
+	 * @return {boolean} indicates whether the operation was successful
+	 */
 	this.stopCapture = function() {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
-			return;
+			return false;
 		}
 		sensor.data.capturing = false;
 		self.shared.exchangeSensor(sensor);
+		return true;
 	};
 }
 WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService", "LiveExchangeService"];
