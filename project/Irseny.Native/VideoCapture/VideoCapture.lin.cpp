@@ -1,4 +1,4 @@
-#include "pch.h"
+#ifdef LINUX
 #include "VideoCapture.h"
 #include <cstring>
 
@@ -256,3 +256,4 @@ bool irsCopyVideoCaptureFrame(IRS_VideoCaptureFrame* frame, char* buffer, size_t
 	memcpy(buffer, frame->data, frameSize);
 	return true;
 }
+#endif // LINUX

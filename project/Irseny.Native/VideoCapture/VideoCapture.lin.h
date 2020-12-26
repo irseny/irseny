@@ -60,6 +60,8 @@ typedef struct IRS_VideoCapture {
 } IRS_VideoCapture;
 
 
+#else
+#error "Require WITH_OPENCV"
 #endif // WITH_OPENCV
 
 #endif // IRSENY_VIDEO_CAPTURE_TYPES_H

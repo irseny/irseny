@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="Irseny.Native" Version="11000" InternalType="Library">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00050001N0005Debug0000000000000001N0005Linux0000000000000001N0011Linux CMake0000000000000001N0007Release0000000000000001N0007Windows000000000000]]>
+    </Plugin>
+  </Plugins>
   <VirtualDirectory Name="VideoCapture">
     <File Name="VideoCapture/VideoCapture.win.h"/>
     <File Name="VideoCapture/VideoCapture.lin.h"/>
@@ -21,11 +26,6 @@
     <File Name="FreetrackTest/FreetrackDummy.win.cpp"/>
     <File Name="FreetrackTest/FreetrackDummy.lin.cpp"/>
   </VirtualDirectory>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00040001N0005Debug0000000000000001N0005Linux0000000000000001N0007Release0000000000000001N0007Windows000000000000]]>
-    </Plugin>
-  </Plugins>
   <Description/>
   <Dependencies/>
   <Settings Type="Dynamic Library">
@@ -65,7 +65,7 @@ then
 fi
 exit 0
 </Target>
-        <Target Name="Configure">cmake -Hmaketools -B../../build/Irseny.Native -DCMAKE_BUILD_TYPE=Release -DWITH_UINPUT=1 -DWITH_FREETRACK=1 -DWITH_FREETRACK_TEST=1
+        <Target Name="Configure">cmake -Hmaketools -B../../build/Irseny.Native -DCMAKE_BUILD_TYPE=Release -DWITH_UINPUT=1 -DWITH_OPENCV=1 -DWITH_FREETRACK=1 -DWITH_FREETRACK_TEST=1
 exit $?
 </Target>
         <Target Name="Clear">cd ../../build
