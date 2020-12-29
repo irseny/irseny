@@ -4,7 +4,7 @@ using Irseny.Core.Util;
 using Irseny.Core.Sensors;
 using System.Security.Cryptography;
 
-namespace Irseny.Main.Webface {
+namespace Irseny.Main.Webface.LiveWire {
 	/// <summary>
 	/// This class represents subscription state with a message passing interface for equipment data subscriptions.
 	/// It is typically instanciated when a live client sends a capture request through <see cref="LiveWireServer"/>.

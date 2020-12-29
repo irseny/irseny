@@ -23,9 +23,11 @@ namespace Irseny.Core.Sensors.VideoCapture {
 
 		SensorSettings settings;
 		SharedRefCleaner imageCleaner;
+		FrameRateAnalyzer rateAnalyzer;
 
 
 		static WebcamCapture() {
+			// TODO catch exceptions to be safe
 			captureContext = VideoCaptureBackend.CreateVideoCaptureContext();
 		}
 
@@ -36,6 +38,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 
 			captureSync = new object();
 			imageCleaner = new SharedRefCleaner(32);
+			rateAnalyzer = new FrameRateAnalyzer();
 		}
 		public WebcamCapture(SensorSettings settings) : this() {
 			this.settings = new SensorSettings(settings);
@@ -114,6 +117,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 					if (!VideoCaptureBackend.StartVideoCapture(videoCapture, videoFrame)) {
 						break;
 					}
+					rateAnalyzer.Start(1000);
 					started = true;
 				} while (false);
 				// clean up in the correct order if starting was unsuccessful
@@ -186,6 +190,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				if (!VideoCaptureBackend.StopVideoCapture(videoCapture)) {
 					return false;
 				}
+				rateAnalyzer.Stop();
 				if (videoFrame != IntPtr.Zero) {
 					VideoCaptureBackend.DestroyVideoCaptureFrame(videoCapture, videoFrame);
 					videoFrame = IntPtr.Zero;
@@ -207,7 +212,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				if (!Capturing) {
 					return null;
 				}
-
+				long startTime = rateAnalyzer.GetTimeStamp();
 				// TODO implrement prediction service and divide split multiple calls into grab begin/end
 				// get image and metadata from the backend
 				if (!VideoCaptureBackend.BeginVideoCaptureFrameGrab(videoCapture)) {
@@ -216,7 +221,11 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				if (!VideoCaptureBackend.EndVideoCaptureFrameGrab(videoCapture)) {
 					return null;
 				}
-
+				long endTime = rateAnalyzer.GetTimeStamp();
+				if (endTime - startTime > 0) {
+					Console.WriteLine("waited additional " + (endTime - startTime) + "ms for the next frame");
+				}
+				rateAnalyzer.Tick();
 				int width = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Width);
 				int height = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Height);
 				VideoFramePixelFormat format = (VideoFramePixelFormat)VideoCaptureBackend.GetVideoCaptureFrameProperty(
@@ -234,7 +243,12 @@ namespace Irseny.Core.Sensors.VideoCapture {
 					return null;
 				}
 				imageBuffer.Free();
-				var frame = new VideoFrame(width, height, format, image);
+				var metadata = new VideoFrameMetadata() {
+					FrameRate = rateAnalyzer.AverageFrameRate,
+					FrameTime = rateAnalyzer.AverageFrameTime,
+					FrameTimeDeviation = rateAnalyzer.StandardFrameTimeDeviation
+				};
+				var frame = new VideoFrame(width, height, format, image, metadata);
 
 				// TODO generate packet id
 				return new SensorDataPacket(this, SensorDataType.Video, frame, 0);

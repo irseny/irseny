@@ -6,21 +6,52 @@ namespace Irseny.Core.Sensors.VideoCapture {
 	/// Container for image data captured by a video camera.
 	/// </summary>
 	public class VideoFrame {
-		
-		public VideoFrame(int width, int height, VideoFramePixelFormat format, byte[] data) {
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Irseny.Core.Sensors.VideoCapture.VideoFrame"/> class.
+		/// </summary>
+		/// <param name="width">Width.</param>
+		/// <param name="height">Height.</param>
+		/// <param name="format">Pixel format.</param>
+		/// <param name="data">Pixel data.</param>
+		/// <param name="metadata">Associated metadata.</param>
+		public VideoFrame(int width, int height, VideoFramePixelFormat format, byte[] data, VideoFrameMetadata metadata) {
 			if (width < 0 || width > 16384) throw new ArgumentOutOfRangeException("width");
 			if (height < 0 || height > 16884) throw new ArgumentOutOfRangeException("height");
 			if (data == null) throw new ArgumentNullException("data");
+			if (metadata.FrameRate < 0) throw new ArgumentOutOfRangeException("metadata.FrameRate");
+			if (metadata.FrameTime < 0) throw new ArgumentOutOfRangeException("metadata.FrameTime");
+			if (metadata.FrameTimeDeviation < 0) throw new ArgumentOutOfRangeException("metadata.FrameTimeVariance");
 			Width = width;
 			Height = height;
 			Format = format;
 			Data = data;
+			Metadata = metadata;
 		}
+		/// <summary>
+		/// Gets the image width.
+		/// </summary>
+		/// <value>The width.</value>
 		public int Width { get; private set; }
+		/// <summary>
+		/// Gets the image height.
+		/// </summary>
+		/// <value>The height.</value>
 		public int Height { get; private set; }
+		/// <summary>
+		/// Gets the pixel format.
+		/// </summary>
+		/// <value>The pixel format.</value>
 		public VideoFramePixelFormat Format { get; private set; }
+		/// <summary>
+		/// Gets the image data buffer.
+		/// </summary>
+		/// <value>The image data buffer.</value>
 		public byte[] Data { get; private set; }
-
+		/// <summary>
+		/// Gets the metadata associated with the video capture.
+		/// </summary>
+		/// <value>The video metadata.</value>
+		public VideoFrameMetadata Metadata { get; private set; }
 		/// <summary>
 		/// Gets the bitmap format that corresponds to the given video frame format.
 		/// </summary>

@@ -131,6 +131,8 @@
     <Compile Include="Sensors\VideoCapture\VideoFramePixelFormat.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrameProperty.cs" />
     <Compile Include="Sensors\VideoCapture\VideoCaptureProperty.cs" />
+    <Compile Include="Sensors\VideoCapture\FrameRateAnalyzer.cs" />
+    <Compile Include="Sensors\VideoCapture\VideoFrameMetadata.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

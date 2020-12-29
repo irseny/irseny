@@ -29,7 +29,7 @@ namespace Irseny.Main.Webface {
 			// wait for clients and process channels and changes
 			var resourceListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9242);
 			//var liveListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9234);
-			var liveWire = new LiveWireServer();
+			var liveWire = new LiveWire.LiveWireServer();
 			liveWire.Start();
 			resourceListener.Start();
 			//liveListener.Start();

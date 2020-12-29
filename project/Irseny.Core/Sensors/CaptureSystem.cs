@@ -6,7 +6,7 @@ using Irseny.Core.Sensors.VideoCapture;
 
 namespace Irseny.Core.Sensors {
 	/// <summary>
-	/// Handles sensors management.
+	/// Handles sensor management.
 	/// Provides a collection of <see cref="ISensorBase"/> instances alongside functionlity 
 	/// to simplify sensor event handling and data capturing.
 	/// </summary>
@@ -120,7 +120,7 @@ namespace Irseny.Core.Sensors {
 		}
 		private void Run(CancellationToken cancelToken) {
 			while (!cancelToken.IsCancellationRequested) {
-				invokeSignal.WaitOne(16);
+				invokeSignal.WaitOne(4);
 				InvokePending();
 				ProcessSensors();
 			}
@@ -217,10 +217,7 @@ namespace Irseny.Core.Sensors {
 		public bool StopSensor(int index) {
 			ISensorBase sensor;
 			lock (sensorSync) {
-				if (index < 0 || index >= sensors.Length) {
-					return false;
-				}
-				if (sensors[index] == null) {
+				if (index < 0 || index >= sensors.Length || sensors[index] == null) {
 					return false;
 				}
 				sensor = sensors[index];
@@ -235,6 +232,26 @@ namespace Irseny.Core.Sensors {
 			observable.OnStopped(sensor);
 			return true;
 		}
+		public bool ApplySensorSettings(int index, SensorSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			ISensorBase sensor;
+			lock (sensorSync) {
+				if (index < 0 || index >= sensors.Length || sensors[index] == null) {
+					return false;
+				}
+				sensor = sensors[index];
+			}
+			if (!sensor.ApplySettings(settings)) {
+				return false;
+			}
+			SensorObservable observable;
+			lock (observableSync) {
+				observable = observables[index];
+			}
+			observable.OnSettingsChanged(sensor);
+			return true;
+		}
+
 		public ISensorBase GetSensor(int index) {
 			lock (sensorSync) {
 				if (index < 0 || index >= sensors.Length) {

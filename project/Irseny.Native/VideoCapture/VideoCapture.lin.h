@@ -35,7 +35,7 @@ typedef enum IRS_VideoCapturePixelFormat {
 
 typedef int IRS_VideoCaptureContext;
 
-typedef struct IRS_VideoCaptureContstructionInfo {
+typedef struct IRS_VideoCaptureSettings {
 	int DeviceIndex;
 	int Resolution[2];
 	int FrameRate;

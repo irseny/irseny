@@ -2,7 +2,7 @@
 using System.Net;
 using Irseny.Core.Util;
 
-namespace Irseny.Main.Webface {
+namespace Irseny.Main.Webface.LiveWire {
 	public abstract class StandardRequestHandler {
 		protected int MinPosition { get; set; }
 		protected int MaxPosition { get; set; }

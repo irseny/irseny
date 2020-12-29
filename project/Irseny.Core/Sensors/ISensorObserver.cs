@@ -18,6 +18,11 @@ namespace Irseny.Core.Sensors {
 		/// <param name="args">Sensor data.</param>
 		void OnDataAvailable(SensorDataPacket args);
 		/// <summary>
+		/// Notifies of changed sensor settings.
+		/// </summary>
+		/// <param name="args">Changed sensor.</param>
+		void OnSettingsChanged(ISensorBase sensor);
+		/// <summary>
 		/// Notifies of a newly stopped sensor.
 		/// </summary>
 		/// <param name="sensor">Stopped sensor.</param>

@@ -1,14 +1,20 @@
-function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchangeService) {
+function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchangeService, TaskScheduleService) {
 	var self = this;
-	var videoSource = undefined;
-	var videoSize = {
-		width: 0,
-		height: 0
-	};
+	var videoImage = undefined;
+	var videoMetadata = {}; // initialized below
+
 	var videoSubscription = undefined;
 
 	this.$onInit = function() {
-		videoSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(self.receiveVideoSource);
+		videoSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(self.receiveVideoCapture);
+
+		videoMetadata = {
+			frameWidth: 160,
+			frameHeight: 120,
+			frameRate: 30,
+			frameTime: 33,
+			frameTimeDeviation: 0
+		};
 	};
 
 	this.$onDestroy = function() {
@@ -16,7 +22,12 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			LiveExchangeService.getObserver("sensorCapture").unsubscribe(self.videoSubscription);
 		}
 	};
-	this.requestVideoSource = function() {
+	/**
+	 * Requests video capture access of the active sensor through LiveWire.
+	 * @param {boolean} includeImage indicates whether to additionally request captured images
+	 * @return {boolean} indicates whether the request was sent out
+	 */
+	this.requestVideoCapture = function(includeImage) {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
 			return false;
@@ -25,10 +36,14 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			type: "get",
 			topic: "sensorCapture",
 			position: sensor.index,
+			data: [{
+				timeout: 30000,
+				includeImage: true
+			}]
 		};
 		var future = LiveWireService.sendRequest(subject);
 		if (future == undefined) {
-			videoSource = undefined;
+			videoImage = undefined;
 			return false;
 		}
 		future.then(function(response) {
@@ -37,27 +52,43 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		});
 		future.reject(function(response) {
 			MessageLog.logError("Webcam sample query failed");
-			videoSource = undefined;
+			videoImage = undefined;
 		});
+		return true;
 	};
-	this.receiveVideoSource = function(capture) {
+	/**
+	 * Receives and processes a captured video frame.
+	 * @param {Object} capture captured video frame
+	 */
+	this.receiveVideoCapture = function(capture) {
 
-		if (capture.data.image == undefined) {
-			MessageLog.logWarning("Webcam sample has no image");
-		} else {
-			videoSource = capture.data.image;
-			videoSize = {
-				width: capture.data.width,
-				height: capture.data.height
-			};
-			$scope.$digest();
+		if (typeof capture.data.image == "string") {
+			videoImage = capture.data.image;
 		}
+		videoMetadata = {};
+		for (var prop of ["frameWidth", "frameHeight", "frameRate", "frameTime", "frameTimeDeviation"]) {
+			if (Number.isInteger(capture.data[prop])) {
+				videoMetadata[prop] = capture.data[prop];
+			}
+		}
+		TaskScheduleService.addTimeout("digest", 100, function() {
+			$scope.$digest;
+		});
+
 	};
-	this.getVideoSource = function() {
-		return videoSource;
+	/**
+	 * Gets the latest captured video image.
+	 * @return {string} captured video or undefined if nothing was captured
+	 */
+	this.getVideoImage = function() {
+		return videoImage;
 	};
-	this.getVideoSize = function() {
-		return videoSize;
+	/**
+	 * Gets the latest video metadata.
+	 * @return {Object} video metadata
+	 */
+	this.getVideoMetadata = function() {
+		return videoMetadata;
 	};
 	/**
 	 * Sets the active webcam to capturing and exchanges it with the server.
@@ -85,8 +116,25 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		self.shared.exchangeSensor(sensor);
 		return true;
 	};
+	/**
+	 * Starts or stops capturing with the active webcam depending on the current state.
+	 * Sets the capturing property and exchanges the current configuration with the server.
+	 */
+	this.toggleCapture = function() {
+		var sensor = self.shared.getActiveSensor();
+		if (sensor.index < 0) {
+			return;
+		}
+		if (sensor.data.capturing) {
+			sensor.data.capturing = false;
+		} else {
+			sensor.data.capturing = true;
+		}
+		self.shared.exchangeSensor(sensor);
+		// TODO send as request and process return info
+	};
 }
-WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService", "LiveExchangeService"];
+WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService", "LiveExchangeService", "TaskScheduleService"];
 
 var module = angular.module("webcamCapture");
 module.directive("webcamCapture", function() {

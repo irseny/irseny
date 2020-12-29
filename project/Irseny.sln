@@ -42,9 +42,7 @@ Global
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|Any CPU
 		{91F6EBE4-19F6-4FEF-9897-8C9EDD59BB24}.WindowsRelease|AnyCPU.Build.0 = WindowsRelease|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
-		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxDebug|AnyCPU.Build.0 = LinuxDebug|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
-		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxRelease|AnyCPU.Build.0 = LinuxRelease|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.WindowsDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.WindowsRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
 	EndGlobalSection

@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IrsenyExport.h" />
-    <ClInclude Include="pch.h" />
     <ClInclude Include="VideoCapture\VideoCapture.h" />
     <ClInclude Include="VideoCapture\VideoCapture.lin.h" />
     <ClInclude Include="VideoCapture\VideoCapture.win.h" />
@@ -35,7 +34,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>.</OutputPath>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
     <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>
@@ -47,7 +46,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>.</OutputPath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\lib\Irseny.Native</OutDir>
     <IntDir>$(SolutionDIR)..\obj\$(Configuration)\</IntDir>

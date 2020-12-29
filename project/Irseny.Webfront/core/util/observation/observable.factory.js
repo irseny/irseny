@@ -16,7 +16,9 @@ function Observable() {
 		return id;
 	};
 	this.unsubscribe = function(id) {
-		var index = subscriptions.findIndex((sub) => sub.id == id);
+		var index = subscriptions.findIndex(function(sub) {
+			return sub.id == id;
+		});
 		if (index < 0) {
 			return false;
 		}
@@ -29,7 +31,9 @@ function Observable() {
 		return true;
 	};
 	this.notify = function(message) {
-		subscriptions.forEach((sub) => sub.observer(message));
+		subscriptions.forEach(function(sub) {
+			sub.observer(message);
+		});
 	};
 }
 

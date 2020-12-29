@@ -2,7 +2,7 @@
 using System.Net;
 using Irseny.Core.Util;
 
-namespace Irseny.Main.Webface {
+namespace Irseny.Main.Webface.LiveWire {
 	public class OriginRequestHandler {
 		int serverOrigin;
 		int clientOrigin;

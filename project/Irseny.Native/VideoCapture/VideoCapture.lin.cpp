@@ -104,15 +104,22 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 	result->Buffer = NULL;
 	result->Settings = *info;
 	result->CurrentFrame = -1;
-	printf("opening capture\n");
+	printf("creating capture\n");
 	result->Capture = new cv::VideoCapture();
+	printf("capture created\n");
+	printf("opening capture\n");
 	result->Capture->open(info->DeviceIndex);
+	printf("open completed\n");
 	if (!result->Capture->isOpened()) {
+		printf("open failed\n");
 		delete result->Capture;
 		free(result);
+		printf("cleanup finished\n");
 		return NULL;
+
 	}
-	printf("capture opened\n");
+	printf("open successful\n");
+	printf("applying settings\n");
 	bool widthAccepted = result->Capture->set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
 	bool heightAccepted = result->Capture->set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
 	//bool fpsAccepted = result->Capture->set(CV_CAP_PROP_FPS, (double)info->FrameRate);
@@ -198,6 +205,7 @@ IRS_VideoCaptureFrame* irsCreateVideoCaptureFrame(IRS_VideoCapture* capture) {
 	//new(result) IRS_VideoCaptureFrame();
 	printf("create frame\n");
 	result->create(capture->Settings.Resolution[1], capture->Settings.Resolution[0], CV_8U);
+	printf("frame created");
 	return result;
 }
 void irsDestroyVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFrame* frame) {

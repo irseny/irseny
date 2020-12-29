@@ -7,7 +7,7 @@ using Irseny.Core.Util;
 using Irseny.Core.Log;
 using System.Threading;
 
-namespace Irseny.Main.Webface {
+namespace Irseny.Main.Webface.LiveWire {
 	public class LiveWireServer {
 		readonly int ServerPort = 9243;
 		readonly int ServerPortFallback = 9244;

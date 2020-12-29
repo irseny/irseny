@@ -7,7 +7,7 @@ using Irseny.Core.Util;
 using Irseny.Core.Sensors.VideoCapture;
 using Irseny.Core.Log;
 
-namespace Irseny.Main.Webface {
+namespace Irseny.Main.Webface.LiveWire {
 	public class LiveRequestHandler {
 
 		LiveWireServer server;
