@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" height="27.65mm" width="27.65mm" version="1.1" viewBox="0 0 27.647322 27.647322">
- <g transform="translate(20.63 -268.1)">
-  <rect stroke-linejoin="round" style="paint-order:markers fill stroke" fill-opacity="0" height="26.65" width="26.65" stroke="#000" stroke-linecap="round" y="268.6" x="-20.13"/>
-  <path style="paint-order:stroke markers fill" fill-opacity=".9847" d="m3.498 281.9-19.48 11.25v-22.49z"/>
+<svg xmlns="http://www.w3.org/2000/svg" height="32mm" width="32mm" version="1.1" viewBox="0 0 32 32">
+ <g transform="translate(-81.18 -183.7)">
+  <path style="paint-order:stroke markers fill" fill-opacity=".9847" transform="matrix(1.123 0 0 1.05 -109.3 144.9)" fill="#fff" d="m194.4 52.17-19.5 11.24v-22.49z"/>
+  <rect stroke-linejoin="round" style="paint-order:markers fill stroke" height="31" width="31" stroke="#fff" stroke-linecap="round" y="184.2" x="81.68" fill="none"/>
  </g>
 </svg>

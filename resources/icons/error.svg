@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="32mm" width="32mm" version="1.1" viewBox="0 0 31.999565 31.999563">
+ <g transform="translate(-117.7 -95.14)">
+  <rect stroke-linejoin="round" style="paint-order:markers fill stroke" height="30.84" width="30.84" stroke="#fcfcfc" stroke-linecap="round" y="95.72" x="118.3" stroke-width="1.157" fill="none"/>
+  <path style="paint-order:stroke markers fill" d="m133.7 97.71c0.2183 0-13.99 25.92-14.1 25.72-0.1092-0.1992 28.3-0.1992 28.19 0-0.1092 0.1992-14.31-25.72-14.1-25.72zm-0.4299 6.854h0.8594c0.6884 0 1.242 0.554 1.242 1.242v9.076c0 0.6884-0.554 1.242-1.242 1.242h-0.8594c-0.6884 0-1.242-0.554-1.242-1.242v-9.076c0-0.6884 0.554-1.242 1.242-1.242zm0.4299 12.66a2.425 2.425 0 0 1 2.425 2.425 2.425 2.425 0 0 1 -2.425 2.425 2.425 2.425 0 0 1 -2.425 -2.425 2.425 2.425 0 0 1 2.425 -2.425z" fill-opacity=".9863" fill="#fff"/>
+  <path stroke-linejoin="bevel" style="paint-order:stroke fill markers" d="m133.7 97.92c-0.2148 0 13.76 25.5 13.87 25.31 0.1075-0.196-27.85-0.196-27.74 0 0.1075 0.196 14.08-25.31 13.87-25.31z" stroke="#fff" stroke-width=".6379" fill="none"/>
+ </g>
+</svg>
