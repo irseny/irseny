@@ -24,7 +24,7 @@ function Future() {
 			handler(result);
 		});
 	};
-	this.else = function(handler) {
+	this.catch = function(handler) {
 		errorHandlers.push(handler);
 		errors.forEach(function(error) {
 			handler(error);

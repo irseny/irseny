@@ -23,7 +23,6 @@ webcam-capture {
 .view .video-image .icon {
 	max-width: 32px;
 	max-height: 32px;
-	filter: invert(100%);
 }
 .view .video-frame .info-top {
 

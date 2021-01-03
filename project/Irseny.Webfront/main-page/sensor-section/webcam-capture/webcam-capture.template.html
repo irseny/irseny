@@ -8,7 +8,15 @@
 			<div class="d-flex flex-column">
 				<div class="info-top align-self-start">{{$ctrl.getVideoMetadata().frameWidth}}px</div>
 				<div ng-if="$ctrl.getVideoImage() == undefined" class="video-image d-flex justify-content-center align-items-center">
-					<img class="icon" src="icon/play.svg" alt="Click to Play">
+					<div ng-if="$ctrl.getVideoStatus() == 0">
+						<img class="icon" src="icon/play.svg" alt=">>"/>
+					</div>
+					<div ng-if="$ctrl.getVideoStatus() == 1">
+						<img class="icon" src="icon/working.gif" alt="..."/>
+					</div>
+					<div ng-if="$ctrl.getVideoStatus() == 3">
+						<img class="icon" src="icon/broken.svg" alt="\?$!!%&§!/"/>
+					</div>
 				</div>
 				<div ng-if="$ctrl.getVideoImage() != undefined" class="video-image justify-content-center">
 					<img ng-src="{{$ctrl.getVideoImage()}}" alt="Video Sample"/>
@@ -21,6 +29,15 @@
 		</div>
 	</div>
 	<div class="video-status">
+		<div ng-if="$ctrl.getCaptureStatus() == 1">
+			<img class="icon" src="icon/working.gif" alt="...">
+		</div>
+		<div ng-if="$ctrl.getCatureStatus() == 2">
+			<img class="icon" src="icon/success.svg" alt="OK">
+		</div>
+		<div ng-if="$ctrl.getCaptureStatus() == 3">
+			<img class="icon" src="icon/error.svg" alt="??§!!^3\![">
+		</div>
 		<div ng-if="!$ctrl.shared.getActiveSensor().getProperty('capturing')">
 			Not running
 		</div>

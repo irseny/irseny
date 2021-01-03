@@ -1,9 +1,19 @@
 function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchangeService, TaskScheduleService) {
+	const STATUS_FLAG_CLEAR = 0x0;
+	const STATUS_FLAG_STOPPED = 0x0;
+	const STATUS_FLAG_WORKING = 0x1;
+	const STATUS_FLAG_RUNNING = 0x2;
+	const STATUS_FLAG_ERROR = 0x3;
+
 	var self = this;
 	var videoImage = undefined;
 	var videoMetadata = {}; // initialized below
 
 	var videoSubscription = undefined;
+	var videoStatusFlag = 0x0; // 0 stopped, 1 waiting, 2 running, 3 error
+	var captureStatusFlag = 0x0; // 0 clear, 1 waiting, 2 running, 3 error
+	var videoFrameElement = undefined;
+
 
 	this.$onInit = function() {
 		videoSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(self.receiveVideoCapture);
@@ -15,12 +25,37 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			frameTime: 33,
 			frameTimeDeviation: 0
 		};
+
+		videoFrameElement = document.querySelector(".video-frame");
 	};
 
 	this.$onDestroy = function() {
 		if (videoSubscription != undefined) {
 			LiveExchangeService.getObserver("sensorCapture").unsubscribe(self.videoSubscription);
 		}
+	};
+	/**
+	 * Helper function to schedule a digest call.
+	 * @param {Number} timeout time to wait before calling digest
+	 */
+	var scheduleDigest = function(timeout=100) {
+		TaskScheduleService.addTimeout("digest", 100, function() {
+			$scope.$digest;
+		});
+	}
+	/**
+	 * Returns the video status flags.
+	 * @return {Number} video status flags
+	 */
+	this.getVideoStatus = function() {
+		return videoStatusFlag;
+	};
+	/**
+	 * Returns the capture status.
+	 * @return {Number} capture status flags
+	 */
+	this.getCaptureStatus = function() {
+		return captureStatusFlag;
 	};
 	/**
 	 * Requests video capture access of the active sensor through LiveWire.
@@ -41,18 +76,20 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 				includeImage: true
 			}]
 		};
+		videoStatusFlag = 0x1;
 		var future = LiveWireService.sendRequest(subject);
 		if (future == undefined) {
 			videoImage = undefined;
 			return false;
 		}
 		future.then(function(response) {
-			console.log("Webcan sample query succes");
-
+			videoStatusFlag = 0x2;
+			scheduleDigest();
 		});
-		future.reject(function(response) {
-			MessageLog.logError("Webcam sample query failed");
+		future.catch(function(response) {
 			videoImage = undefined;
+			videoStatusFlag = 0x3;
+			scheduleDigest();
 		});
 		return true;
 	};
@@ -66,15 +103,14 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			videoImage = capture.data.image;
 		}
 		videoMetadata = {};
-		for (var prop of ["frameWidth", "frameHeight", "frameRate", "frameTime", "frameTimeDeviation"]) {
+		const properties = ["frameWidth", "frameHeight", "frameRate", "frameTime", "frameTimeDeviation"];
+		for (var prop of properties) {
 			if (Number.isInteger(capture.data[prop])) {
 				videoMetadata[prop] = capture.data[prop];
 			}
 		}
-		TaskScheduleService.addTimeout("digest", 100, function() {
-			$scope.$digest;
-		});
-
+		videoStatusFlag = 0x2;
+		scheduleDigest();
 	};
 	/**
 	 * Gets the latest captured video image.
@@ -99,8 +135,20 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		if (sensor.index < 0) {
 			return false;
 		}
+		captureStatusFlag = 0x1;
 		sensor.data.capturing = true;
-		self.shared.exchangeSensor(sensor);
+		var future = self.shared.exchangeSensor(sensor);
+		if (future == undefined) {
+			return false;
+		}
+		future.then(function() {
+			captureStatusFlag = 0x2;
+			scheduleDigest();
+		});
+		future.catch(function() {
+			captureStatusFlag = 0x3;
+			scheduleDigest();
+		});
 		return true;
 	};
 	/**
@@ -112,26 +160,38 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		if (sensor.index < 0) {
 			return false;
 		}
+		captureStatusFlag = 0x1;
 		sensor.data.capturing = false;
-		self.shared.exchangeSensor(sensor);
+		var future = self.shared.exchangeSensor(sensor);
+		if (future == undefined) {
+			return false;
+		}
+		future.then(function() {
+			captureStatusFlag = 0x0;
+			scheduleDigest();
+		});
+		future.catch(function() {
+			captureStatusFlag = 0x3;
+			scheduleDigest();
+		});
 		return true;
 	};
 	/**
 	 * Starts or stops capturing with the active webcam depending on the current state.
 	 * Sets the capturing property and exchanges the current configuration with the server.
+	 * @return {boolean} indicates whether the operation finished successfully
 	 */
 	this.toggleCapture = function() {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
-			return;
+			return false;
 		}
 		if (sensor.data.capturing) {
-			sensor.data.capturing = false;
+			return self.stopCapture();
 		} else {
-			sensor.data.capturing = true;
+			return self.startCapture();
 		}
-		self.shared.exchangeSensor(sensor);
-		// TODO send as request and process return info
+
 	};
 }
 WebcamCaptureController.$inject = ["$scope", "MessageLog", "LiveWireService", "LiveExchangeService", "TaskScheduleService"];

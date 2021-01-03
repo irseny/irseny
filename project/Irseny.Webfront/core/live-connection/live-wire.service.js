@@ -162,7 +162,7 @@ function LiveWireRequestHandler(MessageLog, connection) {
 				MessaeLog.logError("LiveWire received unexpected origin response\n".concat(result, "\nLeaving unconfigured"));
 			}
 		});
-		future.else(function(reason) {
+		future.catch(function(reason) {
 			MessageLog.logError("LiveWire did not received an origin response from the server. Leaving unconfigured");
 		});
 	};
