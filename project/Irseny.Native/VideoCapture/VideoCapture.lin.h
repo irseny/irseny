@@ -51,7 +51,7 @@ typedef cv::Mat IRS_VideoCaptureFrame;
 } IRS_VideoCaptureFrame;*/
 
 typedef struct IRS_VideoCapture {
-	cv::VideoCapture* Capture;
+	cv::VideoCapture Capture;
 	IRS_VideoCaptureSettings Settings;
 	IRS_VideoCaptureFrame* Buffer;
 	int CurrentFrame;

@@ -105,50 +105,67 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 	result->Settings = *info;
 	result->CurrentFrame = -1;
 	printf("creating capture\n");
-	result->Capture = new cv::VideoCapture();
+	new (&result->Capture) cv::VideoCapture();
 	printf("capture created\n");
 	printf("opening capture\n");
-	result->Capture->open(info->DeviceIndex);
+	result->Capture.open(info->DeviceIndex);
 	printf("open completed\n");
-	if (!result->Capture->isOpened()) {
+	if (!result->Capture.isOpened()) {
 		printf("open failed\n");
-		delete result->Capture;
+
+		printf("starting cleanup\n");
+		// TODO handle opencv 2 cases different than opencv 3
+		//result->Capture->release();
+		printf("cleanup step 1 finished\n");
+		// when calling the constructor in opencv2 internally used capture pointers
+		// are not initialized properly and they stay uninitalized when the open() operation fails
+		// unfortunately the destructor tries to cleanup the unitialized pointers
+		// and may access invalid memory locations in the process
+		// (see https://answers.opencv.org/question/11294/delete-videocapture/)
+
+		// we have tried multiple solutions but an explicit destructor call seems to work
+		// flawlessly in this configuration, contradictory to the statement above
+		result->Capture.~VideoCapture();
+		// however allocation and deallocation after failure of memory
+		// that correctly fits the VideoCapture object produced program crashes
+		// in the free() call
+		printf("cleanup step 2 finished\n");
 		free(result);
-		printf("cleanup finished\n");
+		printf("cleanup step 3 finished\n");
 		return NULL;
 
 	}
 	printf("open successful\n");
 	printf("applying settings\n");
-	bool widthAccepted = result->Capture->set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
-	bool heightAccepted = result->Capture->set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
+	bool widthAccepted = result->Capture.set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
+	bool heightAccepted = result->Capture.set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
 	//bool fpsAccepted = result->Capture->set(CV_CAP_PROP_FPS, (double)info->FrameRate);
 	bool brightAccepted = false;
 	if (info->Brightness >= 0) {
-		 brightAccepted = result->Capture->set(CV_CAP_PROP_BRIGHTNESS, (double)info->Brightness);
+		 brightAccepted = result->Capture.set(CV_CAP_PROP_BRIGHTNESS, (double)info->Brightness);
 	}
 	bool gainAccepted = false;
 	if (info->Gain >= 0) {
-		gainAccepted = result->Capture->set(CV_CAP_PROP_GAIN, (double)info->Gain);
+		gainAccepted = result->Capture.set(CV_CAP_PROP_GAIN, (double)info->Gain);
 	}
 	bool autoExposureAccepted = false;
 	bool exposureAccepted = false;
 	if (info->Exposure >= 0) {
-		autoExposureAccepted = result->Capture->set(CV_CAP_PROP_AUTO_EXPOSURE, 0.0);
-		exposureAccepted = result->Capture->set(CV_CAP_PROP_EXPOSURE, (double)info->Exposure);
+		autoExposureAccepted = result->Capture.set(CV_CAP_PROP_AUTO_EXPOSURE, 0.0);
+		exposureAccepted = result->Capture.set(CV_CAP_PROP_EXPOSURE, (double)info->Exposure);
 	} else {
-		autoExposureAccepted = result->Capture->set(CV_CAP_PROP_AUTO_EXPOSURE, 1.0);
+		autoExposureAccepted = result->Capture.set(CV_CAP_PROP_AUTO_EXPOSURE, 1.0);
 	}
 
 
-	int width = (int)result->Capture->get(CV_CAP_PROP_FRAME_WIDTH);
-	int height = (int)result->Capture->get(CV_CAP_PROP_FRAME_HEIGHT);
-	int frame = (int)result->Capture->get(CV_CAP_PROP_FRAME_COUNT);
+	int width = (int)result->Capture.get(CV_CAP_PROP_FRAME_WIDTH);
+	int height = (int)result->Capture.get(CV_CAP_PROP_FRAME_HEIGHT);
+	int frame = (int)result->Capture.get(CV_CAP_PROP_FRAME_COUNT);
 	//int fps = (int)result->Capture->get(CV_CAP_PROP_FPS);
-	double bright = result->Capture->get(CV_CAP_PROP_BRIGHTNESS);
-	double gain = result->Capture->get(CV_CAP_PROP_GAIN);
-	double exposure = result->Capture->get(CV_CAP_PROP_EXPOSURE);
-	double autoExposure = result->Capture->get(CV_CAP_PROP_AUTO_EXPOSURE);
+	double bright = result->Capture.get(CV_CAP_PROP_BRIGHTNESS);
+	double gain = result->Capture.get(CV_CAP_PROP_GAIN);
+	double exposure = result->Capture.get(CV_CAP_PROP_EXPOSURE);
+	double autoExposure = result->Capture.get(CV_CAP_PROP_AUTO_EXPOSURE);
 
 
 	printf("settings received\n");
@@ -178,8 +195,16 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 }
 
 void irsDestroyVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCapture* capture) {
-	delete capture->Capture;
+	// the initialization uses placement new for the opencv capture object
+	// so we need to call the destructor explicitly
+	// TODO circumvent invalid pointer message
+	printf("starting captrure destruuction\n");
+	capture->Capture.~VideoCapture();
+	printf("capture destruction step 1 finished\n");
+	//free(capture->Capture);
+	printf("capture destruction step 2 finished\n");
 	free(capture);
+	printf("capture destruction finished\n");
 }
 bool irsGetVideoCaptureSettings(IRS_VideoCapture* capture, IRS_VideoCaptureSettings* settings) {
 	*settings = capture->Settings;
@@ -218,7 +243,7 @@ bool irsBeginVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
-	if (!capture->Capture->grab()) {
+	if (!capture->Capture.grab()) {
 		return false;
 	}
 	return true;
@@ -228,7 +253,7 @@ bool irsEndVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 	if (capture->Buffer == NULL) {
 		return false;
 	}
-	if (!capture->Capture->retrieve(*capture->Buffer)) {
+	if (!capture->Capture.retrieve(*capture->Buffer)) {
 		return false;
 	}
 	//capture->CurrentFrame = capture->Capture->get(CV_CAP_PROP_FRAME_COUNT);
