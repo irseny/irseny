@@ -60,7 +60,7 @@ namespace Irseny.Main.Webface.LiveWire {
 			bool includeImage = false;
 			var dataArray = subject.GetJsonString("data");
 			if (dataArray != null) {
-				var data = dataArray.GetJsonString(positionStart);
+				var data = dataArray.GetJsonString(0);
 				if (data != null) {
 					timeout = TextParseTools.ParseInt(data.GetTerminal("timeout", ""), (int)timeout);
 					includeImage = TextParseTools.ParseBool(data.GetTerminal("includeImage", "false"), false);
@@ -98,15 +98,6 @@ namespace Irseny.Main.Webface.LiveWire {
 					readySignal.Set();
 					return;
 				}
-				if (!sensor.Capturing) {
-					if (!system.StartSensor(iSensor)) {
-						lock (sync) {
-							status = HttpStatusCode.InternalServerError;
-						}
-						readySignal.Set();
-						return;
-					}
-				}
 				lock (sync) {
 					// when the observer times out its subscription to camera events should end
 					// in order to save resources
@@ -116,6 +107,8 @@ namespace Irseny.Main.Webface.LiveWire {
 					observer.Cancelled += delegate {
 						subscription.Dispose();
 					};
+					LogManager.Instance.LogMessage(this, string.Format("Subscribed client {0} to webcam {1} as {2}",
+						clientOrigin, iSensor, relayID));
 					status = HttpStatusCode.OK;
 				}
 				readySignal.Set();
@@ -151,6 +144,7 @@ namespace Irseny.Main.Webface.LiveWire {
 				}
 				return HttpStatusCode.OK;
 			}
+			// TODO create an update in case the sensor was started
 		}
 
 

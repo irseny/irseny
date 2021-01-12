@@ -253,6 +253,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				// TODO generate packet id
 				return new SensorDataPacket(this, SensorDataType.Video, frame, 0);
 
+
 			}
 		}
 

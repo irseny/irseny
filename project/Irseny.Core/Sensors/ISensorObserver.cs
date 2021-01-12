@@ -1,6 +1,10 @@
 ﻿using System;
 
 namespace Irseny.Core.Sensors {
+	/// <summary>
+	/// Sensor observers are typically supplied by a <see cref="ISensorObservable"/> instance.
+	/// The interface provides all methods for notification of state changes.
+	/// </summary>
 	public interface ISensorObserver {
 		/// <summary>
 		/// Notifies of a newly connected sensor.
@@ -17,11 +21,6 @@ namespace Irseny.Core.Sensors {
 		/// </summary>
 		/// <param name="args">Sensor data.</param>
 		void OnDataAvailable(SensorDataPacket args);
-		/// <summary>
-		/// Notifies of changed sensor settings.
-		/// </summary>
-		/// <param name="args">Changed sensor.</param>
-		void OnSettingsChanged(ISensorBase sensor);
 		/// <summary>
 		/// Notifies of a newly stopped sensor.
 		/// </summary>

@@ -11,8 +11,8 @@ using System.IO;
 
 namespace Irseny.Main.Webface.LiveWire {
 	/// <summary>
-	/// Sensor observer that sets an <see cref="AutoResetEvent"/> as soon as 
-	/// the first video frame is available or an error occured.
+	/// Sensor observer that relays captured data to a <see cref="LiveCaptureSubscription"/> instance.
+	/// The Observer is only active for a limited time period after which it cancels itself.
 	/// </summary>
 	public class WebcamCaptureObserver : ISensorObserver {
 		LiveCaptureSubscription consumer;
@@ -80,9 +80,6 @@ namespace Irseny.Main.Webface.LiveWire {
 		public void OnStopped(ISensorBase sensor) {
 			// not exepcted
 			OnCancel();
-		}
-		public void OnSettingsChanged(ISensorBase sensor) {
-			// no reaction required
 		}
 		public void OnDataAvailable(SensorDataPacket packet) {
 			HandleTimeout();

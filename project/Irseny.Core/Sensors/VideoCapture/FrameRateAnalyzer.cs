@@ -53,6 +53,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		/// <value>The variance in the frametimes.</value>
 		public int StandardFrameTimeDeviation { get; private set; }
 
+		// TODO make private
 		public long GetTimeStamp() {
 			if (watch != null) {
 				return watch.ElapsedMilliseconds;
@@ -77,6 +78,9 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			avgFrameTime = 0;
 			combinedVariance = 0;
 		}
+		/// <summary>
+		/// Stops the catpure process.
+		/// </summary>
 		public void Stop() {
 			if (!Running) {
 				return;
@@ -88,6 +92,10 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			combinedVariance = 0;
 			lastTimeStamp = 0;
 		}
+		/// <summary>
+		/// Registers a tick.
+		/// Updates the frame time measurement properties in the process.
+		/// </summary>
 		public void Tick() {
 			if (!Running) {
 				throw new InvalidOperationException("Can not register a frame before starting the capture process");

@@ -117,7 +117,7 @@ namespace Irseny.Main.Webface.LiveWire {
 		/// Adds a single update to be sent to the clients specified in it.
 		/// </summary>
 		/// <param name="update">Update message.</param>
-		public void AddUpdate(JsonString update) {
+		public void PostUpdate(JsonString update) {
 			if (update == null) throw new ArgumentNullException("update");
 			lock (connectionSync) {
 				updates.AddLast(update);
@@ -168,18 +168,37 @@ namespace Irseny.Main.Webface.LiveWire {
 					// a downside of this implementation is that consecutive requests could be handeled out of order
 					while (channel.AvailableMessageNo > 0) {
 						var message = channel.EmitMessage();
-						Task<JsonString> task = Task.Factory.StartNew(delegate { 
+						Task<JsonString> task2 = new Task<JsonString>(delegate {
 							JsonString request;
 							try {
 								request = JsonString.Parse(message.Text);
 							} catch (FormatException) {
-								LogManager.Instance.LogMessage(this, string.Format("LiveWire failed to parse JSON from client {0}: {1}",
+								LogManager.Instance.LogError(this, string.Format("failed to parse JSON from client {0}: {1}",
 									clientOrigin, message.Text));
 								return null;
 							}
 							return new LiveRequestHandler(this, clientOrigin).Respond(request); 
 						});
-						pendingRequests.AddLast(task);
+
+						task2.ContinueWith((Task finished, object result) => {							
+							Exception e = finished.Exception;
+							if (e == null) {
+								LogManager.Instance.LogError(this, string.Format("Task failed but no exception was thrown while processing request\n{0}",
+									message.Text));
+								return;
+							}
+							LogManager.Instance.LogMessage(this, string.Format("{0}\noccurred while processing request\n{1}",
+								e, message.Text));
+						}, TaskContinuationOptions.OnlyOnFaulted);
+
+						task2.ContinueWith((Task finished, object result) => {
+							LogManager.Instance.LogWarning(this, string.Format("Cancelled task unexpectedly while processing request\n{1}",
+								message.Text));
+						}, TaskContinuationOptions.OnlyOnCanceled);
+
+						pendingRequests.AddLast(task2);
+						task2.Start();
+
 					}
 					// close and remove disconnected clients
 					if (channel.State == WebChannelState.InitFailed || channel.State == WebChannelState.Closed) {
@@ -227,6 +246,7 @@ namespace Irseny.Main.Webface.LiveWire {
 					if (!task.IsCompleted) {
 						break;
 					}
+
 					if (completed == null) {
 						completed = new LinkedList<Task<JsonString>>();
 					}
@@ -235,9 +255,8 @@ namespace Irseny.Main.Webface.LiveWire {
 					try {
 					// TODO check for exception or cancellation
 						 response = task.Result;
-					} catch (AggregateException e) {
-						LogManager.Instance.LogError(this, string.Format("Internal exception while processing a request: {0}",
-							e.ToString()));
+					} catch (AggregateException) {
+						// exception handeled elsewhere
 					}
 					if (response == null) {
 						// may occur when not enough information is extractable
@@ -345,114 +364,8 @@ namespace Irseny.Main.Webface.LiveWire {
 			ProcessSubscriptions();
 			ProcessPendingRequests();
 			ProcessUpdates();
-
-			// accept pending connections
-//			if (listener.Pending()) {
-//				TcpClient client = listener.AcceptTcpClient();
-//				var channel = new WebSocketChannel(new TcpChannel(client));
-//				int clientOrigin = GenerateClientOrigin();
-//				connections.Add(clientOrigin, channel);
-//				LogManager.Instance.LogMessage(this, string.Format("New LiveWire client {0}", clientOrigin));
-//			}
-			// process connections
-//			var toRemove = new HashSet<int>();
-//			var updates = new LinkedList<WebSocketMessage>();
-//			
-//			foreach (var pair in connections) {
-//				WebSocketChannel channel = pair.Value;
-//				int clientOrigin = pair.Key;
-//				channel.Process();
-//				while (channel.AvailableMessageNo > 0) {
-//					var message = channel.EmitMessage();
-//					LogManager.Instance.LogMessage(this, string.Format("LiveWire received from client {0}: {1}", 
-//						clientOrigin, message.Text));
-//					// outsourced message handling
-//					JsonString str = JsonString.Parse(message.Text);
-//					
-//					Task<JsonString> task = Task.Factory.StartNew(delegate { 
-//						JsonString request;
-//						try {
-//							request = JsonString.Parse(message.Text);
-//						} catch (FormatException) {
-//							LogManager.Instance.LogMessage(this, string.Format("LiveWire failed to parse JSON from client {0}: {1}",
-//								clientOrigin, message.Text));
-//							return null;
-//						}
-//						return requestHandler.Respond(request, clientOrigin); 
-//					});
-//					pendingRequests.AddLast(task);
-//
-//				}
-//
-//				if (channel.State == WebChannelState.InitFailed) {
-//					LogManager.Instance.LogError(this, string.Format("LiveWire client {0} failed to connect", 
-//						clientOrigin));
-//					toRemove.Add(clientOrigin);
-//					channel.Close(true);
-//				} else if (channel.State == WebChannelState.Closed) {
-//					LogManager.Instance.LogMessage(this, string.Format("LiveWire client {0} disconnected",
-//						clientOrigin));
-//					toRemove.Add(clientOrigin);
-//					channel.Close(true);
-//				}
-//			}
-
-
-//			if (pendingRequests.First != null) {
-//				var completedTasks = new LinkedList<Task<JsonString>>();
-//				foreach (Task<JsonString> task in pendingRequests) {
-//					bool delivered = false;
-//					do {
-//						if (!task.IsCompleted) {
-//							delivered = true; // avoid error logging below
-//							break;
-//						}
-//						completedTasks.AddLast(task);
-//						// TODO check for exception or cancellation
-//						JsonString answer = task.Result;
-//						if (answer == null) {
-//							// may happen on internal processing errors
-//							// when not enough information is extractable
-//							break;
-//						}
-//						string text = answer.ToString();
-//						// send to all targets
-//						string target = answer.GetTerminal("target", string.Empty);
-//						if (target.Equals(string.Empty)) {
-//							break;
-//						}
-//						if (target.Equals("'all'")) {
-//							// special send to all target
-//							foreach (var pair in connections) {
-//								pair.Value.SendMessage(new WebSocketMessage(text));
-//							}
-//							delivered = true;
-//							break;
-//						} 
-//						// read singular target from field
-//						int targetId = TextParseTools.ParseInt(target, -1);
-//						if (targetId < 0) {
-//							break;
-//						}
-//						WebSocketChannel connection;
-//						if (!connections.TryGetValue(targetId, out connection)) {
-//							break;
-//						}
-//						connection.SendMessage(new WebSocketMessage(text));
-//						delivered = true;
-//						break;
-//					} while (false);
-//					if (!delivered) {
-//						LogManager.Instance.LogError(this, "Cannot deliver response " + task.Result);
-//					}
-//				}
-//				foreach (var task in completedTasks) {
-//					pendingRequests.Remove(task);
-//				}
-//			}
-
-
 		}
+		public delegate JsonString RequestTask();
 
 	}
 }

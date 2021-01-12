@@ -232,25 +232,6 @@ namespace Irseny.Core.Sensors {
 			observable.OnStopped(sensor);
 			return true;
 		}
-		public bool ApplySensorSettings(int index, SensorSettings settings) {
-			if (settings == null) throw new ArgumentNullException("settings");
-			ISensorBase sensor;
-			lock (sensorSync) {
-				if (index < 0 || index >= sensors.Length || sensors[index] == null) {
-					return false;
-				}
-				sensor = sensors[index];
-			}
-			if (!sensor.ApplySettings(settings)) {
-				return false;
-			}
-			SensorObservable observable;
-			lock (observableSync) {
-				observable = observables[index];
-			}
-			observable.OnSettingsChanged(sensor);
-			return true;
-		}
 
 		public ISensorBase GetSensor(int index) {
 			lock (sensorSync) {

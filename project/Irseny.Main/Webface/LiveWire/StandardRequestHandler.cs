@@ -4,6 +4,8 @@ using Irseny.Core.Util;
 
 namespace Irseny.Main.Webface.LiveWire {
 	public abstract class StandardRequestHandler {
+		protected readonly int MaxRequestWaitTime = 10000;
+
 		protected int MinPosition { get; set; }
 		protected int MaxPosition { get; set; }
 		protected string PositionKey { get; set; }

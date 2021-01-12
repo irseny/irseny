@@ -87,17 +87,6 @@ namespace Irseny.Core.Sensors {
 			}
 		}
 		/// <summary>
-		/// Reports changed settings on the observed sensor.
-		/// </summary>
-		/// <param name="sensor">Changed sensor.</param>
-		public void OnSettingsChanged(ISensorBase sensor) {
-			lock (observerSync) {
-				foreach (var observer in observers) {
-					observer.OnSettingsChanged(sensor);
-				}
-			}
-		}
-		/// <summary>
 		/// Reports that the sensor has stopped operation.
 		/// The sensor will not generate more data until started again.
 		/// </summary>

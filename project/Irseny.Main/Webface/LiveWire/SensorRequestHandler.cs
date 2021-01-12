@@ -55,11 +55,14 @@ namespace Irseny.Main.Webface.LiveWire {
 				if (sensorStart != sensorEnd) {
 					return HttpStatusCode.BadRequest;
 				}
-				HttpStatusCode status = RespondApply(subject, responseSubject, sensorStart);
+				HttpStatusCode status = RespondPost(subject, responseSubject, sensorStart);
 				// not only send the result to one recipient but create an update for all clients
-				var update = new JsonString(response);
-				update.RemoveTerminal("requestId", false);
-				update.AddTerminal("target", "\"all\"");
+				if (status == HttpStatusCode.OK) {
+					var update = new JsonString(response);
+					update.RemoveTerminal("requestId", false);
+					update.AddTerminal("target", "\"all\"");
+					server.PostUpdate(update);
+				}
 				return status;
 			}
 		}
@@ -96,11 +99,11 @@ namespace Irseny.Main.Webface.LiveWire {
 			}
 			return HttpStatusCode.OK;
 		}
-		private HttpStatusCode RespondApply(JsonString requestSubject, JsonString responseSubject, int sensorIndex) {
+		private HttpStatusCode RespondPost(JsonString requestSubject, JsonString responseSubject, int sensorIndex) {
 			object dataSync = new object();
 			// first read the data from the data array
 			JsonString data = requestSubject.GetJsonString("data");
-			if (data == null || data.Type != JsonStringType.Array || data.Array.Count <= 1) {
+			if (data == null || data.Type != JsonStringType.Array || data.Array.Count < 1) {
 				return HttpStatusCode.BadRequest;
 			}
 			var targetMap = new Dictionary<int, SensorSettings>();
@@ -136,8 +139,8 @@ namespace Irseny.Main.Webface.LiveWire {
 					bool apply = false;
 
 
-					var entry = data.GetJsonString(iSource);
-					ISensorBase sensor = system.GetSensor(iSource);
+					var entry = data.TryGetJsonString(0);
+					ISensorBase sensor = system.GetSensor(sensorIndex);
 					SensorSettings sourceSettings = null;
 					SensorType sourceType = SensorType.Webcam;
 					if (sensor != null) {
@@ -198,7 +201,7 @@ namespace Irseny.Main.Webface.LiveWire {
 						int iNext = system.ConnectSensor(sensor, iTarget);
 						if (iNext == iTarget) {
 							LogManager.Instance.LogMessage(this, "Connected sensor " + iNext);
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 							resultMap[iTarget] = targetSettings;
 						} else if (iNext < 0) {
 							// failed, leave result map entry empty
@@ -210,7 +213,7 @@ namespace Irseny.Main.Webface.LiveWire {
 							// sensor connected with different index, which we can accept
 							iTarget = iNext;
 							resultMap[iNext] = targetSettings;
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 						}
 					}
 
@@ -218,7 +221,7 @@ namespace Irseny.Main.Webface.LiveWire {
 						if (system.StopSensor(iTarget)) {
 							LogManager.Instance.LogMessage(this, "Stopped sensor " + iTarget);
 						} else {
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 							success = false;
 							LogManager.Instance.LogError(this, "Failed to stop sensor " + iTarget);
 						} 
@@ -226,12 +229,12 @@ namespace Irseny.Main.Webface.LiveWire {
 					}
 					if (apply && success) {
 						if (sensor != null) {
-							if (sensor.ApplySettings(targetSettings)) {
+							if (((WebcamCapture)sensor).ApplySettings(targetSettings)) {
 								LogManager.Instance.LogMessage(this, "Applied new settings to sensor " + iTarget);
 							} else {
 								LogManager.Instance.LogError(this, "Failed to apply new settings to sensor " + iTarget);
 							}
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 							resultMap[iTarget] = targetSettings;
 						}
 					}
@@ -239,12 +242,13 @@ namespace Irseny.Main.Webface.LiveWire {
 					if (start && success) {
 						if (system.StartSensor(iSource)) {
 							LogManager.Instance.LogMessage(this, "Started sensor " + iSource);
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 							resultMap[iTarget] = targetSettings;
 						} else {
 							LogManager.Instance.LogError(this, "Failed to start sensor " + iSource);
-							targetSettings = sensor.GetSettings();
+							targetSettings = ((WebcamCapture)sensor).GetSettings();
 							resultMap[iTarget] = targetSettings;
+							success = false;
 						}
 					}
 					if (!success) {
