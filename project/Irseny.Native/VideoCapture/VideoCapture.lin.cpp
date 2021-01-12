@@ -104,19 +104,19 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 	result->Buffer = NULL;
 	result->Settings = *info;
 	result->CurrentFrame = -1;
-	printf("creating capture\n");
+	//printf("creating capture\n");
 	new (&result->Capture) cv::VideoCapture();
-	printf("capture created\n");
-	printf("opening capture\n");
+	//printf("capture created\n");
+	//printf("opening capture\n");
 	result->Capture.open(info->DeviceIndex);
-	printf("open completed\n");
+	//printf("open completed\n");
 	if (!result->Capture.isOpened()) {
-		printf("open failed\n");
+		//printf("open failed\n");
 
-		printf("starting cleanup\n");
+		//printf("starting cleanup\n");
 		// TODO handle opencv 2 cases different than opencv 3
 		//result->Capture->release();
-		printf("cleanup step 1 finished\n");
+		//printf("cleanup step 1 finished\n");
 		// when calling the constructor in opencv2 internally used capture pointers
 		// are not initialized properly and they stay uninitalized when the open() operation fails
 		// unfortunately the destructor tries to cleanup the unitialized pointers
@@ -129,14 +129,14 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 		// however allocation and deallocation after failure of memory
 		// that correctly fits the VideoCapture object produced program crashes
 		// in the free() call
-		printf("cleanup step 2 finished\n");
+		//printf("cleanup step 2 finished\n");
 		free(result);
-		printf("cleanup step 3 finished\n");
+		//printf("cleanup step 3 finished\n");
 		return NULL;
 
 	}
-	printf("open successful\n");
-	printf("applying settings\n");
+	//printf("open successful\n");
+	//printf("applying settings\n");
 	bool widthAccepted = result->Capture.set(CV_CAP_PROP_FRAME_WIDTH, (double)info->Resolution[0]);
 	bool heightAccepted = result->Capture.set(CV_CAP_PROP_FRAME_HEIGHT, (double)info->Resolution[1]);
 	//bool fpsAccepted = result->Capture->set(CV_CAP_PROP_FPS, (double)info->FrameRate);
@@ -198,13 +198,13 @@ void irsDestroyVideoCapture(IRS_VideoCaptureContext* context, IRS_VideoCapture* 
 	// the initialization uses placement new for the opencv capture object
 	// so we need to call the destructor explicitly
 	// TODO circumvent invalid pointer message
-	printf("starting captrure destruuction\n");
+	//printf("starting captrure destruuction\n");
 	capture->Capture.~VideoCapture();
-	printf("capture destruction step 1 finished\n");
+	//printf("capture destruction step 1 finished\n");
 	//free(capture->Capture);
-	printf("capture destruction step 2 finished\n");
+	//printf("capture destruction step 2 finished\n");
 	free(capture);
-	printf("capture destruction finished\n");
+	//printf("capture destruction finished\n");
 }
 bool irsGetVideoCaptureSettings(IRS_VideoCapture* capture, IRS_VideoCaptureSettings* settings) {
 	*settings = capture->Settings;
@@ -222,15 +222,15 @@ bool irsStopVideoCapture(IRS_VideoCapture* capture) {
 	return true;
 }
 IRS_VideoCaptureFrame* irsCreateVideoCaptureFrame(IRS_VideoCapture* capture) {
-	printf("alloc frame\n");
+	//printf("alloc frame\n");
 	IRS_VideoCaptureFrame* result = new IRS_VideoCaptureFrame();
 
 	//IRS_VideoCaptureFrame* result = (IRS_VideoCaptureFrame*)malloc(sizeof(IRS_VideoCaptureFrame));
 	//printf("construct frame\n");
 	//new(result) IRS_VideoCaptureFrame();
-	printf("create frame\n");
+	//printf("create frame\n");
 	result->create(capture->Settings.Resolution[1], capture->Settings.Resolution[0], CV_8U);
-	printf("frame created");
+	//printf("frame created");
 	return result;
 }
 void irsDestroyVideoCaptureFrame(IRS_VideoCapture* capture, IRS_VideoCaptureFrame* frame) {
@@ -257,6 +257,7 @@ bool irsEndVideoCaptureFrameGrab(IRS_VideoCapture* capture) {
 		return false;
 	}
 	//capture->CurrentFrame = capture->Capture->get(CV_CAP_PROP_FRAME_COUNT);
+	return true;
 }
 int irsGetVideoCaptureFrameProperty(IRS_VideoCaptureFrame* frame, IRS_VideoCaptureFrameProperty property) {
 	switch (property) {

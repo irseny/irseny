@@ -1,1 +1,1 @@
-angular.module("mainPage", [ "sensorSection" ]);
+angular.module("mainPage", [ "sensorSection", "trackerSection" ]);
