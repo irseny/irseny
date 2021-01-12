@@ -8,6 +8,9 @@ function Observable() {
 	};
 
 	this.subscribe = function(observer) {
+		if (typeof observer != "function") {
+			throw Error("observer");
+		}
 		var id = self.generateSubscriptionId();
 		subscriptions.push({
 			id: id,

@@ -3,23 +3,36 @@
 	<div class="title">
 		Cameras
 	</div>
-	<!--<div ng-repeat="cam in $ctrl.base.availableCameras">-->
 	<div ng-repeat="sensor in $ctrl.shared.getAvailableSensors()">
-		<div class="tab" ng-class="{'active': $ctrl.shared.isActiveSensor(sensor)}"  ng-click="$ctrl.shared.setActiveSensor(sensor)">
-			<img class="icon" src="icon/rename.svg" ng-if="$ctrl.shared.isActiveSensor(sensor)" alt="Rename">
-			<div class="name">{{sensor.data.name}}</div>
+		<div class="tab active d-flex justify-content-between align-items-center" ng-show="$ctrl.shared.isActiveSensor(sensor)">
+			<div>
+				<img class="icon" src="icon/delete.svg" alt="X" ng-click="$ctrl.shared.removeSensor(sensor)"/>
+				<img class="icon" src="icon/rename.svg" alt="__" ng-click="$ctrl.startRenaming()"/>
+			</div>
+			<div class="name">
+				<input class="name form-control" type="text" placeholder="name" ng-if="$ctrl.isRenaming()"
+					ng-on-rename-finish="$ctrl.listenRenameFinish($event)"
+					equipment-rename="$ctrl.shared.getActiveSensor().getProperty('name')"/>
+				<span class="name" ng-if="!$ctrl.isRenaming()" ng-dblclick="$ctrl.startRenaming()">{{sensor.data.name}}</span>
+			</div>
 		</div>
-		<div class="separator"></div>
+		<div class="tab d-flex justify-content-between align-items-center" ng-hide="$ctrl.shared.isActiveSensor(sensor)" ng-click="$ctrl.shared.setActiveSensor(sensor)">
+			<div>
+				<span class="icon-placeholder"></span>
+				<span class="icon-placeholder"></span>
+			</div>
+			<span class="name">{{sensor.data.name}}</span>
+		</div>
+		<span class="separator"></span>
 	</div>
-	<!-- add new camera dropdown -->
+	<!-- new camera dropdown -->
 	<div class="tab">
 		<a class="dropdown-toggle active px-3" id="cameraListAddCam" href="#" data-toggle="dropdown">
 			Add New
 		</a>
 		<div class="dropdown-menu" aria-labelledby="cameraListAddCam">
-			<!--<a ng-repeat="type in $ctrl.shared.getSensorClasses()"-->
 			<a ng-repeat="type in $ctrl.shared.getSensorClasses()"
-				class="dropdown-item" href="#" ng-click="">
+				class="dropdown-item" href="#" ng-click="$ctrl.shared.addSensor($ctrl.getSensorTemplate(type.toLowerCase()))">
 				{{type}}
 			</a>
 		</div>

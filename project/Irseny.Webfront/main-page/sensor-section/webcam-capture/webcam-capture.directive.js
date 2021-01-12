@@ -6,17 +6,16 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 	const STATUS_FLAG_ERROR = 0x3;
 
 	var self = this;
-	var videoImage = undefined;
+	var videoImage = undefined; // compressed last live image string
 	var videoMetadata = {}; // initialized below
 
-	var videoSubscription = undefined;
+	var liveSubscription = undefined; // subscription to receive data from LiveExchange
 	var videoStatusFlag = 0x0; // 0 stopped, 1 waiting, 2 running, 3 error
 	var captureStatusFlag = 0x0; // 0 clear, 1 waiting, 2 running, 3 error
-	var videoFrameElement = undefined;
 
 
 	this.$onInit = function() {
-		videoSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(self.receiveVideoCapture);
+		liveSubscription = LiveExchangeService.getObserver("sensorCapture").subscribe(receiveVideoCapture);
 
 		videoMetadata = {
 			frameWidth: 160,
@@ -25,22 +24,23 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			frameTime: 33,
 			frameTimeDeviation: 0
 		};
-
-		videoFrameElement = document.querySelector(".video-frame");
+		self.subscribeToCapture();
+		// react to changes
 	};
 
 	this.$onDestroy = function() {
-		if (videoSubscription != undefined) {
-			LiveExchangeService.getObserver("sensorCapture").unsubscribe(self.videoSubscription);
+		if (liveSubscription != undefined) {
+			LiveExchangeService.getObserver("sensorCapture").unsubscribe(liveSubscription);
 		}
+		self.unsubscribeFromCapture();
 	};
 	/**
 	 * Helper function to schedule a digest call.
 	 * @param {Number} timeout time to wait before calling digest
 	 */
-	var scheduleDigest = function(timeout=100) {
+	function scheduleDigest(timeout=100) {
 		TaskScheduleService.addTimeout("digest", 100, function() {
-			$scope.$digest;
+			$scope.$digest();
 		});
 	}
 	/**
@@ -58,11 +58,39 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		return captureStatusFlag;
 	};
 	/**
+	 * Subscribes the client to receive webcam capture from the server.
+	 * A single subscription is active for the given timespan.
+	 * The subscription is then automatically renewed which is roughly the case
+	 * when the server automatically cancels the previous subscription.
+	 * The subscription for this instance to receive data from LiveExchangeService
+	 * is handled in the controller initialization.
+	 * @param {boolean} includeImage indicates whether to also request image data from the server
+	 * @param {Number} timeout timespan after which the subscription times out
+	 */
+	this.subscribeToCapture = function(includeImage=false, timeout=30000) {
+		requestVideoCapture(includeImage);
+		TaskScheduleService.addTimeout("webcamCapture", timeout, function() {
+			// when the timer runs out, resubscribe
+			// unsubscribe from video data by default
+			self.subscribeToCapture(false, timeout);
+		});
+	}
+	/**
+	 * Unsubscribes the client from receiving webcam capture from the server.
+	 * This only cancels any resubscription after timeout so that the server
+	 * is likely to send captured data for a few more seconds.
+	 */
+	this.unsubscribeFromCapture = function() {
+		// the server will end the subscription by itself after timeout
+		// we just do not want any more subscription calls
+		TaskScheduleService.cancelTimeout("webcamCapture");
+	};
+	/**
 	 * Requests video capture access of the active sensor through LiveWire.
 	 * @param {boolean} includeImage indicates whether to additionally request captured images
 	 * @return {boolean} indicates whether the request was sent out
 	 */
-	this.requestVideoCapture = function(includeImage) {
+	function requestVideoCapture(includeImage=true, timeout=30000) {
 		var sensor = self.shared.getActiveSensor();
 		if (sensor.index < 0) {
 			return false;
@@ -72,36 +100,52 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 			topic: "sensorCapture",
 			position: sensor.index,
 			data: [{
-				timeout: 30000,
-				includeImage: true
+				timeout: timeout,
+				includeImage: includeImage
 			}]
 		};
-		videoStatusFlag = 0x1;
+
+		if (includeImage) {
+			videoStatusFlag = 0x1;
+		} else {
+			videoStatusFlag = 0x0;
+		}
 		var future = LiveWireService.sendRequest(subject);
 		if (future == undefined) {
 			videoImage = undefined;
 			return false;
 		}
 		future.then(function(response) {
-			videoStatusFlag = 0x2;
-			scheduleDigest();
+			// nothing to do
+			// react when the first actual frame arrives
 		});
 		future.catch(function(response) {
-			videoImage = undefined;
-			videoStatusFlag = 0x3;
+			if (includeImage) {
+				videoImage = undefined;
+				videoStatusFlag = 0x3;
+			}
 			scheduleDigest();
 		});
 		return true;
 	};
+
+
 	/**
 	 * Receives and processes a captured video frame.
-	 * @param {Object} capture captured video frame
+	 * @param {Object} capture captured video frame including metadata
 	 */
-	this.receiveVideoCapture = function(capture) {
-
+	function receiveVideoCapture(capture) {
+		// look for an optional image in the data
+		var realtime = false;
 		if (typeof capture.data.image == "string") {
 			videoImage = capture.data.image;
+			videoStatusFlag = 0x2;
+			realtime = true;
+		} else {
+			videoImage = undefined;
+			videoStatusFlag = 0x0;
 		}
+		// look for additional metadata
 		videoMetadata = {};
 		const properties = ["frameWidth", "frameHeight", "frameRate", "frameTime", "frameTimeDeviation"];
 		for (var prop of properties) {
@@ -109,8 +153,8 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 				videoMetadata[prop] = capture.data[prop];
 			}
 		}
-		videoStatusFlag = 0x2;
-		scheduleDigest();
+		//scheduleDigest(0);
+		$scope.$digest();
 	};
 	/**
 	 * Gets the latest captured video image.
@@ -147,6 +191,7 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		});
 		future.catch(function() {
 			captureStatusFlag = 0x3;
+			self.shared.resetSensor(sensor);
 			scheduleDigest();
 		});
 		return true;
@@ -168,10 +213,12 @@ function WebcamCaptureController($scope, MessageLog, LiveWireService, LiveExchan
 		}
 		future.then(function() {
 			captureStatusFlag = 0x0;
+			videoStatusFlag = 0x0;
 			scheduleDigest();
 		});
 		future.catch(function() {
 			captureStatusFlag = 0x3;
+			self.shared.resetSensor(sensor);
 			scheduleDigest();
 		});
 		return true;

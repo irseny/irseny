@@ -1,1 +1,1 @@
-angular.module("sensorList", []);
+angular.module("sensorList", ["messageLog", "equipmentRename"]);

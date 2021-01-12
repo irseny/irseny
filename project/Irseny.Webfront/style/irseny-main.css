@@ -9,5 +9,13 @@
 	horder-top: 2px solid var(--light);
 }
 .irseny .icon {
-
+	width: 2rem;
+	height: 2rem;
+	user-select: none;
+}
+.irseny .icon-placeholder {
+	width: 2rem;
+	height: 2rem;
+	user-select: none;
+	visibility: hidden;
 }

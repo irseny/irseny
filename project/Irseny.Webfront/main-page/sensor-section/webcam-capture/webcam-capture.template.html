@@ -3,23 +3,23 @@
 
 
 		<!--video output-->
-		<div class="video-frame d-flex flex-row justify-content-center" ng-click="$ctrl.requestVideoCapture()">
+		<div class="video-frame d-flex flex-row justify-content-center" ng-click="$ctrl.startCapture(); $ctrl.unsubscribeFromCapture(); $ctrl.subscribeToCapture(true)">
 			<div class="info-left align-self-start">{{$ctrl.getVideoMetadata().frameHeight}}px</div>
 			<div class="d-flex flex-column">
 				<div class="info-top align-self-start">{{$ctrl.getVideoMetadata().frameWidth}}px</div>
 				<div ng-if="$ctrl.getVideoImage() == undefined" class="video-image d-flex justify-content-center align-items-center">
 					<div ng-if="$ctrl.getVideoStatus() == 0">
-						<img class="icon" src="icon/play.svg" alt=">>"/>
+						<img class="icon" src="icon/play.svg" alt=">>" ondragstart="return false"/>
 					</div>
 					<div ng-if="$ctrl.getVideoStatus() == 1">
-						<img class="icon" src="icon/working.gif" alt="..."/>
+						<img class="icon" src="icon/working.gif" alt="..." ondragstart="return false"/>
 					</div>
 					<div ng-if="$ctrl.getVideoStatus() == 3">
-						<img class="icon" src="icon/broken.svg" alt="\?$!!%&§!/"/>
+						<img class="icon" src="icon/broken.svg" alt="\?$!!%&§!/" ondragstart="return false"/>
 					</div>
 				</div>
 				<div ng-if="$ctrl.getVideoImage() != undefined" class="video-image justify-content-center">
-					<img ng-src="{{$ctrl.getVideoImage()}}" alt="Video Sample"/>
+					<img ng-src="{{$ctrl.getVideoImage()}}" alt="Video Sample" ondragstart="return false"/>
 				</div>
 				<div class="info-bottom align-self-end">
 					<span>{{$ctrl.getVideoMetadata().frameWidth}}px</span>
@@ -29,36 +29,45 @@
 		</div>
 	</div>
 	<div class="video-status">
-		<div ng-if="$ctrl.getCaptureStatus() == 1">
-			<img class="icon" src="icon/working.gif" alt="...">
-		</div>
-		<div ng-if="$ctrl.getCatureStatus() == 2">
-			<img class="icon" src="icon/success.svg" alt="OK">
-		</div>
-		<div ng-if="$ctrl.getCaptureStatus() == 3">
-			<img class="icon" src="icon/error.svg" alt="??§!!^3\![">
-		</div>
-		<div ng-if="!$ctrl.shared.getActiveSensor().getProperty('capturing')">
-			Not running
-		</div>
-		<div class="input-group" ng-if="$ctrl.shared.getActiveSensor().getProperty('capturing')">
+
+		<div class="input-group">
 			<div class="input-group-prepend">
+				<div ng-if="$ctrl.getCaptureStatus() == 0">
+					<div class="icon" style="border: 1px solid var(--light); width: 2rem; height: 2rem;">
+
+					</div>
+				</div>
+				<div ng-if="$ctrl.getCaptureStatus() == 1">
+					<img class="icon" src="icon/working.gif" alt="..." ondragstart="return false">
+				</div>
+				<div ng-if="$ctrl.getCatureStatus() == 2">
+					<img class="icon" src="icon/success.svg" alt="OK" ondragstart="return false">
+				</div>
+				<div ng-if="$ctrl.getCaptureStatus() == 3">
+					<img class="icon" src="icon/error.svg" alt="??§!!^3\![" ondragstart="return false">
+				</div>
+				<div ng-if="!$ctrl.shared.getActiveSensor().getProperty('capturing')">
+					Not running
+				</div>
+			</div>
+			<div class="input-group-prepend" ng-if="$ctrl.shared.getActiveSensor().getProperty('capturing')">
+
 				<span class="input-group-text">{{$ctrl.getVideoMetadata().frameRate}}</span>
 				<span class="input-group-text">FPS</span>
 			</div>
-			<div class="input-group-append">
+			<div class="input-group-append" ng-if="$ctrl.shared.getActiveSensor().getProperty('capturing')">
 				<span class="input-group-text">+/-</span>
 				<span class="input-group-text">{{$ctrl.getVideoMetadata().frameTimeDeviation}}</span>
 				<span class="input-group-text">ms</span>
 			</div>
+			<div class="input-group-append">
+				<button class="btn btn-primary form-control" ng-click="$ctrl.toggleCapture()">
+					<span ng-if="$ctrl.shared.getActiveSensor().getProperty('capturing')">Stop</span>
+					<span ng-if="!$ctrl.shared.getActiveSensor().getProperty('capturing')">Start</span>
+				</button>
+			</div>
 		</div>
 
-	</div>
-	<div class="video-control d-flex justify-content-end">
-		<button class="btn btn-primary" ng-click="$ctrl.toggleCapture()">
-			<span ng-if="$ctrl.shared.getActiveSensor().getProperty('capturing')">Stop</span>
-			<span ng-if="!$ctrl.shared.getActiveSensor().getProperty('capturing')">Start</span>
-		</button>
 	</div>
 
 

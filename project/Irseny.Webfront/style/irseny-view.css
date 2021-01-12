@@ -2,12 +2,12 @@ webcam-capture {
 
 }
 .view {
-	background-color: var(--primary);
+	background-color: var(--secondary);
 	user-select: none;
 }
 
 .view .video-line {
-	background-color: var(--secondary);
+
 }
 .view .video-frame {
 	border: 1px solid var(--light);
@@ -38,26 +38,8 @@ webcam-capture {
 	rotate: 90deg;
 	margin: 2rem -0.5rem;
 }
-.view .video-control {
-	background-color: var(--red);
-}
+
 .view .video-status {
 
 }
-.view .video-control .entry {
-	cursor: pointer;
-	color: var(--dark);
-	background-color: var(--primary);
-	border-color: 1px solid var(--light);
-	padding: 0.5rem 0.5rem;
-}
 
-.view .video-control .entry:active {
-	color: var(--light);
-	background-color: var(--secondary);
-
-}
-.view .video-control .entry:hover:not(active) {
-	color: var(--dark);
-	background-color: var(--light);
-}

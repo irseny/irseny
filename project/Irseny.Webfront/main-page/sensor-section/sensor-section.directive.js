@@ -61,6 +61,8 @@ function ActiveSensor(index, active, data) {
 				delete self.data[prop];
 			} else if (Number.isInteger(value)) {
 				self.data[prop] = value;
+			} else if (typeof value == "string") {
+				self.data[prop] = value;
 			} else {
 				throw Error("value");
 			}
@@ -135,6 +137,9 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 		return sensorClasses;
 	};
 	this.isActiveSensor = function(sensor) {
+		if (sensor == undefined) {
+			return false;
+		}
 		return sensor.index == activeIndex;
 	};
 	/**
@@ -178,17 +183,23 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 	 * @return {Object} request future, or undefined if the operation failed
 	 */
 	this.addSensor = function(sensor) {
-		if (sensor.data == undefined) {
+		if (sensor == undefined || sensor.data == undefined) {
 			throw Error("sensor.data");
 		}
 		var iFree = -1;
 		for (var i = 0; i < maxSensorNo; i++) {
 			if (setup[i] == undefined) {
 				iFree = i;
+				break;
 			}
 		}
 		if (iFree < 0) {
 			return undefined;
+		}
+		if (sensor.data.name != undefined) {
+			sensor.data.name = sensor.data.name.concat(iFree);
+		} else {
+			sensor.data.name = "Sensor".concat(iFree);
 		}
 		var subject = {
 			type: "post",
@@ -265,11 +276,10 @@ function SensorSectionController($scope, LiveWireService, LiveExchangeService, T
 		} else {
 			setup[update.index] = JSON.parse(JSON.stringify(update.data));
 		}
-		//MessageLog.logInfo("Received update for sensor ".concat(update.index));
 		setup = setup.slice();
 		activeDirty = true;
 		availableDirty = true;
-		TaskScheduleService.addTimeout("digest", 5000, function() {
+		TaskScheduleService.addTimeout("digest", 100, function() {
 			$scope.$digest();
 		});
 	};
