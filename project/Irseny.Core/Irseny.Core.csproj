@@ -102,7 +102,6 @@
     <Compile Include="Util\ISharedRef.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Util\SharedRefCleaner.cs" />
-    <Compile Include="Util\TextParseTools.cs" />
     <Compile Include="Inco\Artf.cs" />
     <Compile Include="Inco\Ivj.cs" />
     <Compile Include="Util\BytePatternSearch.cs" />
@@ -111,7 +110,6 @@
     <Compile Include="Util\JsonStringType.cs" />
     <Compile Include="Util\JsonStringPartition.cs" />
     <Compile Include="Util\JsonStringInterpret.cs" />
-    <Compile Include="Util\StringifyTools.cs" />
     <Compile Include="Sensors\VideoCapture\ImageCapturedEventArgs.cs" />
     <Compile Include="Sensors\VideoCapture\StreamEventArgs.cs" />
     <Compile Include="Sensors\CaptureSystem.cs" />
@@ -126,13 +124,14 @@
     <Compile Include="Sensors\SensorSettings.cs" />
     <Compile Include="Sensors\VideoCapture\WebcamCapture.cs" />
     <Compile Include="Sensors\VideoCapture\VideoCaptureBackend.cs" />
-    <Compile Include="Util\JsonStringContent.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrame.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFramePixelFormat.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrameProperty.cs" />
     <Compile Include="Sensors\VideoCapture\VideoCaptureProperty.cs" />
     <Compile Include="Sensors\VideoCapture\FrameRateAnalyzer.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrameMetadata.cs" />
+    <Compile Include="Util\JsonStringParse.cs" />
+    <Compile Include="Util\JsonStringStringify.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -328,7 +328,7 @@ namespace Irseny.Main.Webface.LiveWire {
 							break;
 						} 
 						// read singular target from field
-						int targetId = TextParseTools.ParseInt(target, -1);
+						int targetId = JsonString.ParseInt(target, -1);
 						if (targetId < 0) {
 							break;
 						}

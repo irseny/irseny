@@ -29,8 +29,29 @@ function LiveWireRequestHandler(MessageLog, connection) {
 	this.handleMessage = function(message) {
 		var badStatus = false;
 		if (message.status != undefined && message.status != 200) {
-			MessageLog.logError("LiveWire message\n".concat(JSON.stringify(message),
-				"\nfailed with status code ", message.status));
+			var suffix = "with status code ";
+			switch (message.status) {
+			case undefined:
+				suffix = "";
+			break;
+			case 200:
+				suffix = suffix.concat("200 - OK");
+			break;
+			case 400:
+				suffix = suffix.concat("400 - Bad request");
+			break;
+			case 404:
+				suffix = suffix.concat("404 - Not found");
+			break;
+			case 500:
+				suffix = suffix.concat("500 - Internal server error");
+			break;
+			default:
+				suffix = suffix.concat(message.status);
+			break;
+			}
+			MessageLog.logError("LiveWire received error message ".concat(
+				suffix, "\n", JSON.stringify(message)));
 			badStatus = true;
 		}
 		// a typical response for a client's request contains an origin that matches the origin of the client

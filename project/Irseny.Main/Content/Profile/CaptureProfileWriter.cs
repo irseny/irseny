@@ -23,7 +23,7 @@ namespace Irseny.Main.Content.Profile {
 		}
 		private XmlNode WriteStream(int index, SensorSettings settings, XmlDocument target) {
 			var result = target.CreateElement("Webcam");
-			result.SetAttribute("Index", index.ToString(TextParseTools.FormatProvider));
+			result.SetAttribute("Index", index.ToString(JsonString.FormatProvider));
 			result.SetAttribute("Name", settings.GetText(SensorProperty.Name, "Webcam"));
 			{ // camera
 				XmlElement node = target.CreateElement("Camera");

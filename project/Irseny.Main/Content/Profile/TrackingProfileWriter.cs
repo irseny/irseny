@@ -55,7 +55,7 @@ namespace Irseny.Main.Content.Profile {
 				if (mixingDecline > -1.0) {
 					XmlElement node = target.CreateElement("SmoothingDropoff");
 					result.AppendChild(node);
-					node.InnerText = mixingDecline.ToString(TextParseTools.FormatProvider);
+					node.InnerText = mixingDecline.ToString(JsonString.FormatProvider);
 				}
 			}
 			{

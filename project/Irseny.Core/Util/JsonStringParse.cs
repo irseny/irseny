@@ -1,12 +1,35 @@
 ﻿using System;
-using System.IO;
-using System.Globalization;
+using System.Collections.Generic;
 
 namespace Irseny.Core.Util {
-	public static class TextParseTools {
-		public readonly static NumberStyles NumberStyle = NumberStyles.Float;
-		public readonly static CultureInfo FormatProvider = CultureInfo.InvariantCulture;
-
+	public partial class JsonString {
+		/// <summary>
+		/// Parse the specified source.
+		/// </summary>
+		/// <param name="source">Source.</param>
+		public static JsonString Parse(string source) {
+			List<string> parts = PartitionJson(source);
+			return InterpretJson(parts);
+		}
+		/// <summary>
+		/// Tries to parse the specified source
+		/// </summary>
+		/// <returns><c>true</c>, if parse was successful, <c>false</c> otherwise.</returns>
+		/// <param name="source">Source.</param>
+		/// <param name="result">Result.</param>
+		public static bool TryParse(string source, out JsonString result) {
+			try {
+				List<string> parts = PartitionJson(source);
+				result = InterpretJson(parts);
+				return true;
+			} catch (ArgumentException) {
+				result = null;
+				return false;
+			} catch (FormatException) {
+				result = null;
+				return false;
+			}
+		}
 
 		public static bool TryParseNull(string text, out object result) {
 			if (text == null) {
@@ -238,29 +261,6 @@ namespace Irseny.Core.Util {
 			result = 0;
 			return false;
 		}
-
-		public static uint ParseUInt(string text, uint fallback) {
-			if (text == null) {
-				return fallback;
-			}
-			if (text.Length > 0) {
-				uint result;
-				if (uint.TryParse(text, out result)) {
-					return result;
-				}
-			}
-			return fallback;
-		}
-		public static bool TryParseUInt(string text, out uint result) {
-			if (text == null) {
-				result = 0;
-				return false;
-			}
-			if (text.Length > 0) {
-				return uint.TryParse(text, out result);
-			}
-			result = 0;
-			return false;
-		}
 	}
 }
+

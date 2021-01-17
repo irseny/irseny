@@ -14,7 +14,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Index"] == null) {
 						return false;
 					}
-					int index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
+					int index = JsonString.ParseInt(node.Attributes["Index"].InnerText, -1);
 					if (index < 0) {
 						return false;
 					}
@@ -33,86 +33,86 @@ namespace Irseny.Main.Content.Profile {
 			int streamNo = 0;
 			foreach (XmlNode node in root.ChildNodes) {
 				if (node.Name.Equals("Stream")) {
-					int stream = TextParseTools.ParseInt(node.InnerText, -1);
+					int stream = JsonString.ParseInt(node.InnerText, -1);
 					if (stream < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.Stream0 + streamNo, stream);
 					streamNo += 1;
 				} else if (node.Name.Equals("Model")) {
-					int model = TextParseTools.ParseInt(node.InnerText, -1);
+					int model = JsonString.ParseInt(node.InnerText, -1);
 					if (model < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.Model, model);
 				} else if (node.Name.Equals("Smoothing")) {
-					int smoothing = TextParseTools.ParseInt(node.InnerText, -1);
+					int smoothing = JsonString.ParseInt(node.InnerText, -1);
 					if (smoothing < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.Smoothing, smoothing);
 				} else if (node.Name.Equals("SmoothingDropoff")) {
-					double dropoff = TextParseTools.ParseDouble(node.InnerText, -1.0);
+					double dropoff = JsonString.ParseDouble(node.InnerText, -1.0);
 					if (dropoff == -1.0) {
 						return null;
 					}
 					result.SetDecimal(TrackerProperty.SmoothingDropoff, dropoff);
 				} else if (node.Name.Equals("MinBrightness")) {
-					int brightness = TextParseTools.ParseInt(node.InnerText, -1);
+					int brightness = JsonString.ParseInt(node.InnerText, -1);
 					if (brightness < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MinBrightness, brightness);
 				} else if (node.Name.Equals("MinClusterRadius")) {
-					int radius = TextParseTools.ParseInt(node.InnerText, -1);
+					int radius = JsonString.ParseInt(node.InnerText, -1);
 					if (radius < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MinClusterRadius, radius);
 				} else if (node.Name.Equals("MaxClusterRadius")) {
-					int radius = TextParseTools.ParseInt(node.InnerText, -1);
+					int radius = JsonString.ParseInt(node.InnerText, -1);
 					if (radius < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MaxClusterRadius, radius);
 				} else if (node.Name.Equals("MinLayerEnergy")) {
-					int energy = TextParseTools.ParseInt(node.InnerText, -1);
+					int energy = JsonString.ParseInt(node.InnerText, -1);
 					if (energy < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MinLayerEnergy, energy);
 				} else if (node.Name.Equals("MaxClusterMembers")) {
-					int members = TextParseTools.ParseInt(node.InnerText, -1);
+					int members = JsonString.ParseInt(node.InnerText, -1);
 					if (members < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MaxClusterMembers, members);
 				} else if (node.Name.Equals("MaxClusters")) {
-					int clusters = TextParseTools.ParseInt(node.InnerText, -1);
+					int clusters = JsonString.ParseInt(node.InnerText, -1);
 					if (clusters < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MaxClusterNo, clusters);
 				} else if (node.Name.Equals("MaxPoints")) {
-					int points = TextParseTools.ParseInt(node.InnerText, -1);
+					int points = JsonString.ParseInt(node.InnerText, -1);
 					if (points < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.MaxPointNo, points);
 				} else if (node.Name.Equals("Labels")) {
-					int labelNo = TextParseTools.ParseInt(node.InnerText, -1);
+					int labelNo = JsonString.ParseInt(node.InnerText, -1);
 					if (labelNo < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.LabelNo, labelNo);
 				} else if (node.Name.Equals("FastApproxThreshold")) {
-					int threshold = TextParseTools.ParseInt(node.InnerText, -1);
+					int threshold = JsonString.ParseInt(node.InnerText, -1);
 					if (threshold < 0) {
 						return null;
 					}
 					result.SetInteger(TrackerProperty.FastApproxThreshold, threshold);
 				} else if (node.Name.Equals("MaxQueuedImages")) {
-					int images = TextParseTools.ParseInt(node.InnerText, -1);
+					int images = JsonString.ParseInt(node.InnerText, -1);
 					if (images < 0) {
 						return null;
 					}

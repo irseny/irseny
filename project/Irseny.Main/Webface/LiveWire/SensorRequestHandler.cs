@@ -22,7 +22,7 @@ namespace Irseny.Main.Webface.LiveWire {
 			int sensorStart = -2;
 			int sensorEnd = 0;
 			bool isGetRequest;
-			string type = TextParseTools.ParseString(subject.GetTerminal("type", "error"), "error");
+			string type = JsonString.ParseString(subject.GetTerminal("type", "error"), "error");
 			if (type.Equals("get")) {
 				isGetRequest = true;
 			} else if (type.Equals("post")) {
@@ -31,12 +31,12 @@ namespace Irseny.Main.Webface.LiveWire {
 				return HttpStatusCode.BadRequest;
 			}
 
-			string position = TextParseTools.ParseString(subject.GetTerminal("position", "all"), "all");
+			string position = JsonString.ParseString(subject.GetTerminal("position", "all"), "all");
 			if (position.Equals("all")) {
 				sensorStart = 0;
 				sensorEnd = 15; // TODO replace with actual capacity
 			} else {
-				sensorStart = TextParseTools.ParseInt(position, -1);
+				sensorStart = JsonString.ParseInt(position, -1);
 				sensorEnd = sensorStart;
 			}
 			if (sensorStart < 0) {
@@ -44,9 +44,9 @@ namespace Irseny.Main.Webface.LiveWire {
 			}
 
 			var responseSubject = JsonString.CreateDict();
-			responseSubject.AddTerminal("type", StringifyTools.StringifyString("post"));
-			responseSubject.AddTerminal("topic", StringifyTools.StringifyString("camera"));
-			responseSubject.AddTerminal("position", StringifyTools.StringifyString(position));
+			responseSubject.AddTerminal("type", JsonString.StringifyString("post"));
+			responseSubject.AddTerminal("topic", JsonString.StringifyString("camera"));
+			responseSubject.AddTerminal("position", JsonString.StringifyString(position));
 			response.AddJsonString("subject", responseSubject);
 
 			if (isGetRequest) {
@@ -59,7 +59,7 @@ namespace Irseny.Main.Webface.LiveWire {
 				// not only send the result to one recipient but create an update for all clients
 				if (status == HttpStatusCode.OK) {
 					var update = new JsonString(response);
-					update.RemoveTerminal("requestId", false);
+					update.RemoveTerminal("requestId");
 					update.AddTerminal("target", "\"all\"");
 					server.PostUpdate(update);
 				}
@@ -112,7 +112,7 @@ namespace Irseny.Main.Webface.LiveWire {
 				if (sensor == null) {
 					return HttpStatusCode.BadRequest;
 				}
-				bool used = TextParseTools.ParseBool(sensor.GetTerminal("inuse", "false"), false);
+				bool used = JsonString.ParseBool(sensor.GetTerminal("inuse", "false"), false);
 				if (used) {
 					JsonString jSettings = sensor.GetJsonString("settings");
 					if (jSettings == null) {
@@ -139,7 +139,7 @@ namespace Irseny.Main.Webface.LiveWire {
 					bool apply = false;
 
 
-					var entry = data.TryGetJsonString(0);
+					var entry = data.GetJsonString(0);
 					ISensorBase sensor = system.GetSensor(sensorIndex);
 					SensorSettings sourceSettings = null;
 					SensorType sourceType = SensorType.Webcam;

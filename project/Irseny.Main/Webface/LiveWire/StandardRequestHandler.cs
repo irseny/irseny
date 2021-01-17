@@ -25,12 +25,12 @@ namespace Irseny.Main.Webface.LiveWire {
 		protected virtual bool ReadPosition(JsonString subject, out int lowBound, out int highBound) {
 			lowBound = MinPosition - 1;
 			highBound = MinPosition - 1;
-			string position = TextParseTools.ParseString(subject.GetTerminal(PositionKey, "all"), "all");
+			string position = JsonString.ParseString(subject.GetTerminal(PositionKey, "all"), "all");
 			if (position.Equals("all")) {
 				lowBound = MinPosition;
 				highBound = MaxPosition;
 			} else {
-				lowBound = TextParseTools.ParseInt(position, -1);
+				lowBound = JsonString.ParseInt(position, -1);
 				highBound = lowBound;
 			}
 			return lowBound >= MinPosition && lowBound <= MaxPosition;

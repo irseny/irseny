@@ -24,7 +24,7 @@ namespace Irseny.Main.Content.Profile {
 					}
 					int index = -1;
 					if (sIndex != null) {
-						index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
+						index = JsonString.ParseInt(node.Attributes["Index"].InnerText, -1);
 					} 
 					string name;
 					if (node.Attributes["Name"] != null) {
@@ -57,11 +57,11 @@ namespace Irseny.Main.Content.Profile {
 				if (node.Name.Equals("Camera")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
 
 					if (!auto) {
-						int camera = TextParseTools.ParseInt(node.InnerText, -1);
+						int camera = JsonString.ParseInt(node.InnerText, -1);
 						if (camera < 0) {
 							return false;
 						}
@@ -70,10 +70,10 @@ namespace Irseny.Main.Content.Profile {
 				} else if (node.Name.Equals("Width")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
 					if (!auto) {
-						int width = TextParseTools.ParseInt(node.InnerText, 640);
+						int width = JsonString.ParseInt(node.InnerText, 640);
 						if (width < 1) {
 							return false;
 						}
@@ -82,10 +82,10 @@ namespace Irseny.Main.Content.Profile {
 				} else if (node.Name.Equals("Height")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
 					if (!auto) {
-						int height = TextParseTools.ParseInt(node.InnerText, 480);
+						int height = JsonString.ParseInt(node.InnerText, 480);
 						if (height < 1) {
 							return false;
 						}
@@ -94,10 +94,10 @@ namespace Irseny.Main.Content.Profile {
 				} else if (node.Name.Equals("FPS")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
 					if (!auto) {
-						int fps = TextParseTools.ParseInt(node.InnerText, 30);
+						int fps = JsonString.ParseInt(node.InnerText, 30);
 						if (fps < 0) {
 							return false;
 						}
@@ -106,27 +106,27 @@ namespace Irseny.Main.Content.Profile {
 				} else if (node.Name.Equals("Exposure")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					decimal exposure = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
+					decimal exposure = JsonString.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Exposure, exposure);
 					}
 				} else if (node.Name.Equals("Brightness")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					decimal bright = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
+					decimal bright = JsonString.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Brightness, bright);
 					}
 				} else if (node.Name.Equals("Contrast")) {
 					bool auto = true;
 					if (node.Attributes["Auto"] != null) {
-						auto = TextParseTools.ParseBool(node.Attributes["Auto"].InnerText, true);
+						auto = JsonString.ParseBool(node.Attributes["Auto"].InnerText, true);
 					}
-					decimal contrast = TextParseTools.ParseDecimal(node.InnerText, 0.0m);
+					decimal contrast = JsonString.ParseDecimal(node.InnerText, 0.0m);
 					if (!auto) {
 						settings.SetDecimal(SensorProperty.Contrast, contrast);
 					}

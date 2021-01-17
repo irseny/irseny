@@ -26,30 +26,30 @@ namespace Irseny.Main.Webface.LiveWire {
 			do {
 				// set basic information before we drop out of this scope
 				// this could alternatively also be read from the request
-				response.AddTerminal("status", StringifyTools.StringifyInt((int)HttpStatusCode.OK));
+				response.AddTerminal("status", JsonString.Stringify((int)HttpStatusCode.OK));
 				// the client can read the origin information and derive from that
 				// if they can apply the optional request id
-				response.AddTerminal("origin", StringifyTools.StringifyInt(clientOrigin));
+				response.AddTerminal("origin", JsonString.Stringify(clientOrigin));
 				// preliminarily we intend to send the answer to the origin only
 				// but this might get overwritten later
-				response.AddTerminal("target", StringifyTools.StringifyInt(clientOrigin));
+				response.AddTerminal("target", JsonString.Stringify(clientOrigin));
 				if (request.Type != JsonStringType.Dict) {
 					status = HttpStatusCode.BadRequest;
 					break;
 				}
 				// the optional request id is only useful at the origin client side
 				// for request-answer matching
-				int requestId = TextParseTools.ParseInt(request.GetTerminal("requestId", "-1"), -1);
+				int requestId = JsonString.ParseInt(request.GetTerminal("requestId", "-1"), -1);
 				if (requestId > -1) {
-					response.AddTerminal("requestId", StringifyTools.StringifyInt(requestId));
+					response.AddTerminal("requestId", JsonString.Stringify(requestId));
 				}
 
-				JsonString subject = request.TryGetJsonString("subject");
+				JsonString subject = request.GetJsonString("subject");
 				if (subject == null) {
 					status = HttpStatusCode.BadRequest;
 					break;
 				}
-				string topic = TextParseTools.ParseString(subject.GetTerminal("topic", "error"), "error");
+				string topic = JsonString.ParseString(subject.GetTerminal("topic", "error"), "error");
 				// answer by topic
 				if (topic.Equals("sensor")) {
 					status = new SensorRequestHandler(server).Respond(subject, response);
@@ -158,11 +158,11 @@ namespace Irseny.Main.Webface.LiveWire {
 			if (response.Type == JsonStringType.Array) {
 				// unexpected -> give minimal response
 				var error = JsonString.CreateDict();
-				error.AddTerminal("status", StringifyTools.StringifyInt((int)status));
+				error.AddTerminal("status", JsonString.Stringify((int)status));
 				response.AddJsonString(string.Empty, error);
 				return;
 			}
-			response.AddTerminal("status", StringifyTools.StringifyInt((int)status));
+			response.AddTerminal("status", JsonString.Stringify((int)status));
 			// add the original message to failed updates
 			// that way it is easier to recognize the failed operation
 			if (response.GetTerminal("requestId", string.Empty).Length == 0) {

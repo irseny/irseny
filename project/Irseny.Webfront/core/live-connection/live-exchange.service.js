@@ -1,5 +1,20 @@
+/**
+ * Helper for interpreting update messages.
+ * A standard update message contains state information that is made available
+ * through eqiupment setup for later access. An example for this are sensor settings.
+ * A capture update message contains data that is only relevant for a small
+ * period of time and not critical for operation,
+ * e.g. a single video frame.
+ */
 function CameraUpdateHandler() {
-
+	/**
+	 * Handles an update message.
+	 * Updates setup data and notifies observers of setup changes.
+	 * @param {Object} subject subject of an update message
+	 * @param {Array} branch setup branch to modify
+	 * @param {Object} observer observable to notify in case of changes
+	 * @return {Array} changed entries
+	 */
 	this.handleUpdate = function(subject, branch, observer) {
 		// extract and check status information
 		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
@@ -53,6 +68,13 @@ function CameraUpdateHandler() {
 
 		return result;
 	};
+	/**
+	 * Handles a capture update message.
+	 * The captured data is only relayed to observers and not cached.
+	 * @param {Object} subject of the update message
+	 * @param {observer} observable through which observers are notified
+	 * @return {Array} updated data
+	 */
 	this.handleCapture = function(subject, observer) {
 		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
 			return [];
@@ -88,7 +110,12 @@ function CameraUpdateHandler() {
 		});
 		return result;
 	};
-
+	/**
+	 * Returns a future that provides the current setup.
+	 * @param {Array} branch data that the future shall provide
+	 * @param {Number} index optional restriction to a single entry
+	 * @return {Object} future with the given data already cached
+	 */
 	this.createEquipmentObtainer = function(branch, index) {
 		var result = new Future();
 		if (arguments.length < 2) {
@@ -110,6 +137,7 @@ function CameraUpdateHandler() {
 function LiveExchangeService(MessageLog, LiveWireService) {
 	const FixedEquipmentNo = 16;
 	var self = this;
+
 	var updateHandler = new CameraUpdateHandler();
 	var setup = {
 		profile: {
@@ -139,7 +167,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 	 * Handles setup changes. For internal use only.
 	 * @param {Object} subject received update
 	 */
-	this.receiveUpdate = function(subject) {
+	function receiveUpdate(subject) {
 		var updated = [];
 		switch (subject.topic) {
 		case "camera":
@@ -148,6 +176,12 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		break;
 		case "sensorCapture":
 			updated = updateHandler.handleCapture(subject, setup.sensorCaptureObserver);
+		break;
+		case "tracker":
+			updated = updateHandler.handleUpdate(subject, setup.trackers, setup.trackerObserver);
+		break;
+		case "trackerCapture":
+			updated = updateHandler.handleCapture(subject, setup.trackerCaptureObserver);
 		break;
 		default:
 			updated = [];
@@ -161,7 +195,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 	/**
 	 * Sends out requests to the server to send the full, currently active setup.
 	 */
-	this.requestFullSetup = function() {
+	function requestFullSetup() {
 		// send requests for all equipment types
 		var sensorSubject = {
 			type: "get",
@@ -173,12 +207,12 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		// (updates are relayed to observers - this instance should be subscribed to LiveWireSerive)
 		LiveWireService.sendUpdate(sensorSubject);
 
-		/*var trackerSubject = {
+		var trackerSubject = {
 			type: "get",
 			topic: "tracker",
 			position: "all"
 		};
-		LiveWireService.sendUpdate(trackerSubject);*/
+		LiveWireService.sendUpdate(trackerSubject);
 	};
 	/**
 	 * Returns an observer which can be used to observer setup changes.
@@ -192,6 +226,10 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 			return setup.cameraObserver;
 		case "sensorCapture":
 			return setup.sensorCaptureObserver;
+		case "tracker":
+			return setup.trackerObserver;
+		case "trackerCapture":
+			return setup.trackerCaptureObserver;
 		default:
 			throw new Error("topic");
 		}
@@ -206,6 +244,8 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		case "camera":
 		case "sensor":
 			return updateHandler.createEquipmentObtainer(setup.cameras);
+		case "tracker":
+			return updateHandler.createEquipmentObtainer(setup.trackers);
 		default:
 			throw new Error("topic");
 		}
@@ -213,11 +253,11 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 	/**
 	 * Initializes this instance. For internal use only.
 	 */
-	this.start = function() {
-		LiveWireService.getUpdateObserver().subscribe(self.receiveUpdate);
-		self.requestFullSetup();
+	function init() {
+		LiveWireService.getUpdateObserver().subscribe(receiveUpdate);
+		requestFullSetup();
 	};
-	this.start();
+	init();
 };
 
 var module = angular.module("liveConnection");

@@ -30,7 +30,7 @@ namespace Irseny.Main.Webface.LiveWire {
 			if (subject == null) throw new ArgumentNullException("subject");
 			if (response == null) throw new ArgumentNullException("response");
 			// read properties from the request
-			string topic = TextParseTools.ParseString(subject.GetTerminal("topic", string.Empty), string.Empty);
+			string topic = JsonString.ParseString(subject.GetTerminal("topic", string.Empty), string.Empty);
 			if (!topic.Equals("sensorCapture")) {
 				return HttpStatusCode.BadRequest;
 			}
@@ -43,12 +43,12 @@ namespace Irseny.Main.Webface.LiveWire {
 				return HttpStatusCode.BadRequest;
 			}
 			var template = new JsonString(response);
-			template.RemoveTerminal("requestId", false);
+			template.RemoveTerminal("requestId");
 			var responseSubject = JsonString.CreateDict();
 			{
 				responseSubject.AddTerminal("type", "\"post\"");
 				responseSubject.AddTerminal("topic", "\"sensorCapture\"");
-				responseSubject.AddTerminal("position", StringifyTools.StringifyInt(positionStart));
+				responseSubject.AddTerminal("position", JsonString.Stringify(positionStart));
 				responseSubject.AddJsonString("data", JsonString.CreateArray());
 			}
 
@@ -62,8 +62,8 @@ namespace Irseny.Main.Webface.LiveWire {
 			if (dataArray != null) {
 				var data = dataArray.GetJsonString(0);
 				if (data != null) {
-					timeout = TextParseTools.ParseInt(data.GetTerminal("timeout", ""), (int)timeout);
-					includeImage = TextParseTools.ParseBool(data.GetTerminal("includeImage", "false"), false);
+					timeout = JsonString.ParseInt(data.GetTerminal("timeout", ""), (int)timeout);
+					includeImage = JsonString.ParseBool(data.GetTerminal("includeImage", "false"), false);
 				}
 			}
 

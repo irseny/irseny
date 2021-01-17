@@ -106,9 +106,9 @@ namespace Irseny.Main.Webface.LiveWire {
 
 			var subject = JsonString.CreateDict();
 			{
-				subject.AddTerminal("type", StringifyTools.StringifyString("post"));
-				subject.AddTerminal("topic", StringifyTools.StringifyString("sensorCapture"));
-				subject.AddTerminal("position", StringifyTools.StringifyInt(sensorIndex));
+				subject.AddTerminal("type", JsonString.StringifyString("post"));
+				subject.AddTerminal("topic", JsonString.StringifyString("sensorCapture"));
+				subject.AddTerminal("position", JsonString.Stringify(sensorIndex));
 				var dataArray = JsonString.CreateArray();
 				{
 					var dataEntry = JsonString.CreateDict();
@@ -116,18 +116,18 @@ namespace Irseny.Main.Webface.LiveWire {
 						if (includeImage) {
 							dataEntry.AddTerminal("image", imageString);
 						}
-						dataEntry.AddTerminal("frameWidth", StringifyTools.StringifyInt(frame.Width));
-						dataEntry.AddTerminal("frameHeight", StringifyTools.StringifyInt(frame.Height));
+						dataEntry.AddTerminal("frameWidth", JsonString.Stringify(frame.Width));
+						dataEntry.AddTerminal("frameHeight", JsonString.Stringify(frame.Height));
 						var metadata = frame.Metadata;
-						dataEntry.AddTerminal("frameRate", StringifyTools.StringifyInt(metadata.FrameRate));
-						dataEntry.AddTerminal("frameTime", StringifyTools.StringifyInt(metadata.FrameTime));
-						dataEntry.AddTerminal("frameTimeDeviation", StringifyTools.StringifyInt(metadata.FrameTimeDeviation));
+						dataEntry.AddTerminal("frameRate", JsonString.Stringify(metadata.FrameRate));
+						dataEntry.AddTerminal("frameTime", JsonString.Stringify(metadata.FrameTime));
+						dataEntry.AddTerminal("frameTimeDeviation", JsonString.Stringify(metadata.FrameTimeDeviation));
 					}
 					dataArray.AddJsonString(string.Empty, dataEntry);
 				}
 				subject.AddJsonString("data", dataArray);
 			}
-			message.AddJsonString("subject", subject, true);
+			message.AddJsonString("subject", subject);
 			string str = message.ToJsonString();
 			consumer.EnqueueMessage(message);
 		}

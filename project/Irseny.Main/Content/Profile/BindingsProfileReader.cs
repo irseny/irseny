@@ -16,7 +16,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Index"] == null) {
 						return false;
 					}
-					int index = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
+					int index = JsonString.ParseInt(node.Attributes["Index"].InnerText, -1);
 					if (index < 0) {
 						return false;
 					}
@@ -41,7 +41,7 @@ namespace Irseny.Main.Content.Profile {
 					if (!Enum.TryParse(node.Attributes["Axis"].InnerText, out axis)) {
 						return null;
 					}
-					int device = TextParseTools.ParseInt(node.Attributes["Index"].InnerText, -1);
+					int device = JsonString.ParseInt(node.Attributes["Index"].InnerText, -1);
 					if (device < 0) {
 						return null;
 					}

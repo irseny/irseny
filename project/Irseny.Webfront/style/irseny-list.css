@@ -4,8 +4,6 @@
 }
 /* first list element*/
 .list {
-	display: flex;
-	flex-direction: column;
 	color: black;
 	background-color: var(--primary);
 	font-weight: bold;
