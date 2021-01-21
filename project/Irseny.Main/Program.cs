@@ -1,4 +1,21 @@
-﻿using System;
+﻿// This file is part of Irseny.
+//
+// Copyright (C) 2021  Thilo Gabel
+//
+// Irseny is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Irseny is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+using System;
 using System.Net;
 using System.Text;
 using Irseny.Core.Util;
@@ -13,50 +30,6 @@ using Irseny.Main.Webface;
 
 namespace Irseny.Main {
 	public static class Program {
-		//public static void Main(string[] args) {
-		//	Console.WriteLine("Hello, World!");
-		//	var server = new Webface.HttpServer(5643);
-		//	int requestNo = 0;
-		//	server.ClientAccepted += (object sender, EventArgs e) => {
-		//		HttpListenerContext context = (HttpListenerContext)sender;
-		//		if (context.Request.IsWebSocketRequest) {
-		//			Console.WriteLine("websocket request!");
-		//		}
-		//		string request = context.Request.Url.AbsolutePath;
-		//		//string name = context.User.Identity.Name;
-		//		string type = context.Request.ContentType;
-		//		Console.WriteLine(string.Format("Request {0} of {1}: {2}", requestNo, type, request));
-		//		requestNo += 1;
-		//		if (request.StartsWith("/")) {
-		//			byte[] data = Encoding.UTF8.GetBytes(string.Format(index, requestNo));
-		//			context.Response.ContentType = "text/html";
-		//			context.Response.ContentLength64 = data.Length;
-		//			context.Response.OutputStream.Write(data, 0, data.Length);
-		//			//context.Response.StatusCode = (int)HttpStatusCode.OK;
-					
-		//			context.Response.OutputStream.Flush();
-		//			context.Response.OutputStream.Close();
-
-		//		}
-		//	};
-
-		//	server.Start();
-		//	System.Threading.Thread.Sleep(30000);
-		//	server.Stop();
-
-		//}
-
-
-//		public static void Main(string[] args) {
-//
-//			LogManager.MakeInstance(new LogManager());
-//			Console.WriteLine("Hello, World!");
-//			var server = new Webface.WebfaceServer();
-//			server.Start();
-//			Console.ReadLine();
-//			server.Stop();
-//
-//		}
 		public static void Main(string[] args) {
 			{ // start main systems
 				LogManager.MakeInstance(new LogManager());

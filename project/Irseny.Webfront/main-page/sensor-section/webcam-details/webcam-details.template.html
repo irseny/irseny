@@ -1,3 +1,21 @@
+<!-- This file is part of Irseny.
+
+Copyright (C) 2021  Thilo Gabel
+
+Irseny is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Irseny is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
 <div class="details d-flex flex-column">
 	<!-- camera configuration -->
 	<table class="table">
@@ -165,14 +183,10 @@
 		</tbody>
 	</table>
 	<div class="d-flex flex-row justify-content-end">
-		<button class="btn btn-primary"ng-click="$ctrl.shared.resetSensor($ctrl.shared.getActiveSensor())">Reset</button>
+		<button class="btn btn-primary" ng-click="$ctrl.shared.resetSensor($ctrl.shared.getActiveSensor())">Reset</button>
 		<div class="mx-2"></div>
 		<button class="btn btn-primary" ng-click="$ctrl.shared.exchangeSensor($ctrl.shared.getActiveSensor())">Apply</button>
 		<div class="mx-2"></div>
 
 	</div>
-	<!--<div class="input-group">
-		<button class="btn input-group-text mx-2" type="submit" ng-click="$ctrl.applyChanges()">Apply</button>
-		<button class="btn input-group-text mx-2" type="reset" ng-click="$ctrl.resetChanges()">Reset</button>
-	<!--</div>-->
 </div>

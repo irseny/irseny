@@ -1,3 +1,20 @@
+// This file is part of Irseny.
+//
+// Copyright (C) 2021  Thilo Gabel
+//
+// Irseny is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Irseny is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Helper for interpreting update messages.
  * A standard update message contains state information that is made available
@@ -17,10 +34,41 @@ function CameraUpdateHandler() {
 	 */
 	this.handleUpdate = function(subject, branch, observer) {
 		// extract and check status information
-		if (subject.type != "post" || subject.data == undefined || subject.position == undefined) {
+		if (subject.type != "post" || subject.data == undefined) {
 			return [];
 		}
 		if (!Array.isArray(subject.data)) {
+			if (typeof subject.data != "object") {
+				return [];
+			}
+			// alternative format: data contains index and entry
+			var result = [];
+			for (var key in subject.data) {
+				var index = Number.parseInt(key);
+				if (!Number.isInteger(index)) {
+					return [];
+				}
+				var data = undefined;
+				if (subject.data[index].inuse) {
+					data = subject.data[index].settings;
+					if (data == undefined) {
+						return [];
+					}
+				}
+				result.push({
+					index: index,
+					data: data
+				});
+			}
+			result.forEach(function(entry) {
+				branch[entry.index] = entry.data;
+			});
+			result.forEach(function(entry) {
+				observer.notify(entry);
+			});
+			return result;
+		}
+		if (subject.position == undefined) {
 			return [];
 		}
 		var offset = -1;
@@ -210,7 +258,7 @@ function LiveExchangeService(MessageLog, LiveWireService) {
 		var trackerSubject = {
 			type: "get",
 			topic: "tracker",
-			position: "all"
+			data: Object.assign({}, Array(FixedEquipmentNo).fill(null))
 		};
 		LiveWireService.sendUpdate(trackerSubject);
 	};

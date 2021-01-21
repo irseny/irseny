@@ -92,7 +92,6 @@
     <Compile Include="Webface\LiveWire\LiveRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\LiveWireServer.cs" />
     <Compile Include="Webface\ResourceWire\ResourceWireServer.cs" />
-    <Compile Include="Webface\ResourceWire\ResourceRequestHandler.cs" />
     <Compile Include="ProfileActivator.cs" />
     <Compile Include="Webface\LiveWire\OriginRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\SensorCaptureRequestHandler.cs" />

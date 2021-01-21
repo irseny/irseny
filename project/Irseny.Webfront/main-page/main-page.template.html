@@ -1,3 +1,20 @@
+<!-- This file is part of Irseny.
+
+Copyright (C) 2021  Thilo Gabel
+
+Irseny is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Irseny is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
 
 <div class="page">
 
@@ -12,21 +29,6 @@
 			{{section}}
 		</div>
 	</div>
-		<!--<div class="icon">
-			<img src="favicon.ico" width="30" height="30" alt="logo">
-		</div>
-		<div class="tab" ng-repeat="tab in $ctrl.availableTabs" ng-click="$ctrl.activeTab = tab">
-
-			<a class="link" href="#" ng-if="$ctrl.activeTab == tab">{{tab}}</a>
-			<a class="link" href="#" ng-if="$ctrl.activeTab != tab" ng-click="$ctrl.activeTab = tab">{{tab}}</a>
-		</div>
-
-		<div class="tab" ng-repeat="tab in $ctrl.availableTabs">
-			<a class="link" ng-if="$ctrl.activeTab != tab" ng-click="console.log('clicked'); $ctrl.activeTab = tab" href="#">{{tab}}</a>
-			<a class="link" ng-if="$ctrl.activeTab == tab" href="#">{{tab}}</a>
-		</li>
-
-	</div>-->
 	<div ng-if="$ctrl.getActiveSection() == 'Sensors'">
 		<sensor-section></sensor-section>
 	</div>
@@ -45,38 +47,3 @@
 		<div>and don't go over please</div>
 	</div>
 </div>
-<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light"> -->
-  <!-- <a class="navbar-brand" href="#">Navbar</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-      </li>
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
-  </div>
-</nav> -->
