@@ -83,9 +83,9 @@ namespace Irseny.Main.Webface.LiveWire {
 						entry.AddTerminal("inuse", "false");
 					} else if (sensor.SensorType == SensorType.Webcam) {
 						var capture = (WebcamCapture)sensor;
-						SensorSettings settings = capture.GetSettings();
+						EquipmentSettings settings = capture.GetSettings();
 						entry.AddTerminal("inuse", "true");
-						entry.AddJsonString("settings", SensorSettings.ToJson(settings));
+						entry.AddJsonString("settings", EquipmentSettings.ToJson(settings));
 					} else {
 						entry.AddTerminal("inuse", "false");
 					}
@@ -106,7 +106,7 @@ namespace Irseny.Main.Webface.LiveWire {
 			if (data == null || data.Type != JsonStringType.Array || data.Array.Count < 1) {
 				return HttpStatusCode.BadRequest;
 			}
-			var targetMap = new Dictionary<int, SensorSettings>();
+			var targetMap = new Dictionary<int, EquipmentSettings>();
 			for (int i = 0; i <= 0; i++) {
 				JsonString sensor = data.GetJsonString(0);
 				if (sensor == null) {
@@ -118,14 +118,14 @@ namespace Irseny.Main.Webface.LiveWire {
 					if (jSettings == null) {
 						return HttpStatusCode.BadRequest;
 					}
-					var settings = SensorSettings.FromJson(jSettings, typeof(SensorProperty));
+					var settings = EquipmentSettings.FromJson(jSettings, typeof(SensorProperty));
 					targetMap.Add(sensorIndex + i, settings);
 				}
 			}
 
 			// secondly satisfy the request 
 			var status = HttpStatusCode.OK;
-			var resultMap = new Dictionary<int, SensorSettings>();
+			var resultMap = new Dictionary<int, EquipmentSettings>();
 			var readySignal = new ManualResetEvent(false);
 			CaptureSystem.Instance.Invoke((object sender, EventArgs args) => {
 				var system = (CaptureSystem)sender;
@@ -141,7 +141,7 @@ namespace Irseny.Main.Webface.LiveWire {
 
 					var entry = data.GetJsonString(0);
 					ISensorBase sensor = system.GetSensor(sensorIndex);
-					SensorSettings sourceSettings = null;
+					EquipmentSettings sourceSettings = null;
 					SensorType sourceType = SensorType.Webcam;
 					if (sensor != null) {
 						sourceSettings = ((WebcamCapture)sensor).GetSettings();
@@ -150,7 +150,7 @@ namespace Irseny.Main.Webface.LiveWire {
 							sourceType = (SensorType)iType;
 						}
 					}
-					SensorSettings targetSettings = null;
+					EquipmentSettings targetSettings = null;
 					SensorType targetType = SensorType.Webcam;
 					if (targetMap.TryGetValue(iSource, out targetSettings)) {
 						int iType = targetSettings.GetInteger(SensorProperty.Type, -1);
@@ -270,10 +270,10 @@ namespace Irseny.Main.Webface.LiveWire {
 				{
 					for (int i = sensorIndex; i <= sensorIndex; i++) {
 						var entry = JsonString.CreateDict();
-						SensorSettings settings;
+						EquipmentSettings settings;
 						if (resultMap.TryGetValue(i, out settings)) {
 							entry.AddTerminal("inuse", "true");
-							entry.AddJsonString("settings", SensorSettings.ToJson(settings));
+							entry.AddJsonString("settings", EquipmentSettings.ToJson(settings));
 						} else {
 							entry.AddTerminal("inuse", "false");
 						}

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Irseny.Core.Util;
 using Size2i = System.Drawing.Size;
 using Point2i = System.Drawing.Point;
 
 namespace Irseny.Core.Tracking {
 	public class KeypointDetector {
-		TrackerSettings settings;
+		EquipmentSettings settings;
 		Point2i[] imagePoints = new Point2i[0];
 		int imagePointNo;
 		Point2i[] clusterMembers = new Point2i[0];
@@ -17,7 +18,7 @@ namespace Irseny.Core.Tracking {
 		int imageHeight;
 		int imageStride;
 
-		public KeypointDetector(TrackerSettings settings) {
+		public KeypointDetector(EquipmentSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			this.settings = settings;
 		}

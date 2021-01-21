@@ -8,6 +8,7 @@ using Size2i = System.Drawing.Size;
 using Irseny.Core.Log;
 using Irseny.Core.Listing;
 using Irseny.Core.Inco.Device;
+using Irseny.Core.Util;
 
 namespace Irseny.Core.Tracking {
 	public class P3PoseEstimator {
@@ -16,7 +17,7 @@ namespace Irseny.Core.Tracking {
 		const int LeftPointIndex = 2;
 		const int AcceptedPointNo = 3;
 
-		TrackerSettings settings;
+		EquipmentSettings settings;
 		IObjectModel model;
 		Point2i[] inPoints = new Point2i[0];
 		int[] inLabels = new int[0];
@@ -30,7 +31,7 @@ namespace Irseny.Core.Tracking {
 
 		LinkedList<CapPosition> positionHistory = new LinkedList<CapPosition>();
 
-		public P3PoseEstimator(TrackerSettings settings, IObjectModel model) {
+		public P3PoseEstimator(EquipmentSettings settings, IObjectModel model) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			if (model == null) throw new ArgumentNullException("model");
 			this.settings = settings;

@@ -19,7 +19,7 @@ namespace Irseny.Main.Content.Profile {
 						return false;
 					}
 
-					TrackerSettings settings = ReadCap3Point(node);
+					EquipmentSettings settings = ReadCap3Point(node);
 					if (settings == null) {
 						return false;
 					}
@@ -28,8 +28,8 @@ namespace Irseny.Main.Content.Profile {
 			}
 			return true;
 		}
-		private TrackerSettings ReadCap3Point(XmlNode root) {
-			var result = new TrackerSettings();
+		private EquipmentSettings ReadCap3Point(XmlNode root) {
+			var result = new EquipmentSettings(typeof(TrackerProperty));
 			int streamNo = 0;
 			foreach (XmlNode node in root.ChildNodes) {
 				if (node.Name.Equals("Stream")) {
@@ -44,7 +44,9 @@ namespace Irseny.Main.Content.Profile {
 					if (model < 0) {
 						return null;
 					}
-					result.SetInteger(TrackerProperty.Model, model);
+					// TODO replace with another system
+					//result.SetInteger(TrackerProperty.Model, model);
+
 				} else if (node.Name.Equals("Smoothing")) {
 					int smoothing = JsonString.ParseInt(node.InnerText, -1);
 					if (smoothing < 0) {
@@ -52,8 +54,8 @@ namespace Irseny.Main.Content.Profile {
 					}
 					result.SetInteger(TrackerProperty.Smoothing, smoothing);
 				} else if (node.Name.Equals("SmoothingDropoff")) {
-					double dropoff = JsonString.ParseDouble(node.InnerText, -1.0);
-					if (dropoff == -1.0) {
+					decimal dropoff = JsonString.ParseDecimal(node.InnerText, -1.0m);
+					if (dropoff == -1.0m) {
 						return null;
 					}
 					result.SetDecimal(TrackerProperty.SmoothingDropoff, dropoff);

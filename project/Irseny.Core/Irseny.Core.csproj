@@ -87,7 +87,6 @@
     <Compile Include="Tracking\CapModel.cs" />
     <Compile Include="Tracking\CapPosition.cs" />
     <Compile Include="Tracking\CapTracker.cs" />
-    <Compile Include="Tracking\DetectionSystem.cs" />
     <Compile Include="Tracking\ImageProcessedEventArgs.cs" />
     <Compile Include="Tracking\IObjectModel.cs" />
     <Compile Include="Tracking\IPoseTracker.cs" />
@@ -98,7 +97,6 @@
     <Compile Include="Tracking\PositionDetectedEventArgs.cs" />
     <Compile Include="Tracking\SingleImageCapTracker.cs" />
     <Compile Include="Tracking\TrackerProperty.cs" />
-    <Compile Include="Tracking\TrackerSettings.cs" />
     <Compile Include="Util\ISharedRef.cs" />
     <Compile Include="Util\SharedRef.cs" />
     <Compile Include="Util\SharedRefCleaner.cs" />
@@ -121,7 +119,6 @@
     <Compile Include="Sensors\SensorDataPacket.cs" />
     <Compile Include="Sensors\SensorType.cs" />
     <Compile Include="Sensors\SensorProperty.cs" />
-    <Compile Include="Sensors\SensorSettings.cs" />
     <Compile Include="Sensors\VideoCapture\WebcamCapture.cs" />
     <Compile Include="Sensors\VideoCapture\VideoCaptureBackend.cs" />
     <Compile Include="Sensors\VideoCapture\VideoFrame.cs" />
@@ -132,6 +129,8 @@
     <Compile Include="Sensors\VideoCapture\VideoFrameMetadata.cs" />
     <Compile Include="Util\JsonStringParse.cs" />
     <Compile Include="Util\JsonStringStringify.cs" />
+    <Compile Include="Sensors\EquipmentSettings.cs" />
+    <Compile Include="Tracking\TrackingSystem.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -144,4 +143,7 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Tracking\HeadTracking\" />
+  </ItemGroup>
 </Project>

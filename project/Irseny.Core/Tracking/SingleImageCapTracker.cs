@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Irseny.Core.Util;
 
 namespace Irseny.Core.Tracking {
-	public abstract class SingleImageCapTracker : CapTracker, ISingleImageCapTracker {
+	public abstract class SingleImageCapTracker : CapTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
 		Queue<SharedRef<Emgu.CV.Mat>> pendingImages = new Queue<SharedRef<Emgu.CV.Mat>>();
@@ -100,6 +100,6 @@ namespace Irseny.Core.Tracking {
 				pendingImages.Clear();
 			}
 		}
-		protected abstract TrackerSettings GetSettings();
+		public abstract EquipmentSettings GetSettings();
 	}
 }

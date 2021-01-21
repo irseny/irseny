@@ -100,6 +100,7 @@
     <Compile Include="Webface\LiveWire\LiveCaptureSubscription.cs" />
     <Compile Include="Webface\LiveWire\SensorRequestHandler.cs" />
     <Compile Include="Webface\LiveWire\WebcamCaptureObserver.cs" />
+    <Compile Include="Webface\LiveWire\TrackerRequestHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irseny.Core\Irseny.Core.csproj">

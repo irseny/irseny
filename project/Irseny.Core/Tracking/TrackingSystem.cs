@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Irseny.Core.Log;
 
 namespace Irseny.Core.Tracking {
-	public class DetectionSystem {
+	public class TrackingSystem {
 		static object instanceSync = new object();
-		static DetectionSystem instance = null;
+		static TrackingSystem instance = null;
 		static Thread instanceThread = null;
 
 		volatile bool running = false;
@@ -21,14 +21,14 @@ namespace Irseny.Core.Tracking {
 		List<IObjectModel> models = new List<IObjectModel>(4);
 
 
-		public DetectionSystem() {
+		public TrackingSystem() {
 		}
 
 		/// <summary>
 		/// Gets the currently active instance.
 		/// </summary>
 		/// <value>The instance.</value>
-		public static DetectionSystem Instance {
+		public static TrackingSystem Instance {
 			get {
 				lock (instanceSync) {
 					return instance;
@@ -42,9 +42,8 @@ namespace Irseny.Core.Tracking {
 		/// <returns>Identifier for the tracker. Less than 0 if starting was not successful.</returns>
 		/// <param name="tracker">Tracker.</param>
 		/// <param name="settings">Settings.</param>
-		public int StartTracker(IPoseTracker tracker, TrackerSettings settings) {
+		public int StartTracker(IPoseTracker tracker) {
 			if (tracker == null) throw new ArgumentNullException("tracker");
-			if (settings == null) throw new ArgumentNullException("settings");
 			lock (trackerSync) {
 				int id;
 				// find unused index
@@ -62,7 +61,7 @@ namespace Irseny.Core.Tracking {
 				// the tracker signals when it has data to process
 				// to let it process we pick up the signal
 				tracker.InputAvailable += SignalStep;
-				if (!tracker.Start(settings)) {
+				if (!tracker.Start()) {
 					return -1;
 				}
 				return id;
@@ -256,21 +255,21 @@ namespace Irseny.Core.Tracking {
 		/// Runs the new instance on a separate thread.
 		/// </summary>
 		/// <param name="instance">Instance to make current.</param>
-		public static void MakeInstance(DetectionSystem instance) {
+		public static void MakeInstance(TrackingSystem instance) {
 			lock (instanceSync) {
-				if (DetectionSystem.instance != null) {
-					DetectionSystem.instance.SignalStop();
-					DetectionSystem.instanceThread.Join(2048);
-					if (DetectionSystem.instanceThread.IsAlive) {
+				if (TrackingSystem.instance != null) {
+					TrackingSystem.instance.SignalStop();
+					TrackingSystem.instanceThread.Join(2048);
+					if (TrackingSystem.instanceThread.IsAlive) {
 						LogManager.Instance.LogWarning(instance, "Detection system thread does not terminate. Aborting.");
-						DetectionSystem.instanceThread.Abort();
+						TrackingSystem.instanceThread.Abort();
 					}
-					DetectionSystem.instanceThread = null;
-					DetectionSystem.instance = null;
+					TrackingSystem.instanceThread = null;
+					TrackingSystem.instance = null;
 				}
 				if (instance != null) {
-					DetectionSystem.instance = instance;
-					DetectionSystem.instanceThread = new Thread(instance.Run);
+					TrackingSystem.instance = instance;
+					TrackingSystem.instanceThread = new Thread(instance.Run);
 					instanceThread.Start();
 				}
 			}

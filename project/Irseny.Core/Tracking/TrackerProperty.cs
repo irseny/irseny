@@ -1,9 +1,9 @@
 ﻿using System;
 namespace Irseny.Core.Tracking {
 	public enum TrackerProperty {
+		Tracking,
 		Stream0,
 		Stream1,
-		Model,
 		Smoothing,
 		SmoothingDropoff,
 		MinBrightness,

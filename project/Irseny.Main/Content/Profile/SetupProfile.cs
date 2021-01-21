@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Irseny.Core.Util;
 using Irseny.Core.Sensors;
 using Irseny.Core.Tracking;
 using Irseny.Core.Inco.Device;
 
 namespace Irseny.Main.Content.Profile {
 	public class SetupProfile {
-		Dictionary<int, SensorSettings> captures = new Dictionary<int, SensorSettings>(16);
-		Dictionary<int, TrackerSettings> trackers = new Dictionary<int, TrackerSettings>(16);
+		Dictionary<int, EquipmentSettings> captures = new Dictionary<int, EquipmentSettings>(16);
+		Dictionary<int, EquipmentSettings> trackers = new Dictionary<int, EquipmentSettings>(16);
 		Dictionary<int, CapInputRelay> bindings = new Dictionary<int, CapInputRelay>(16);
 		Dictionary<int, VirtualDeviceSettings> devices = new Dictionary<int, VirtualDeviceSettings>(16);
 
@@ -20,12 +21,12 @@ namespace Irseny.Main.Content.Profile {
 		public ICollection<int> VideoCaptureIndexes {
 			get { return captures.Keys; }
 		}
-		public void AddVideoCapture(int index, SensorSettings settings) {
+		public void AddVideoCapture(int index, EquipmentSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			captures[index] = settings;
 		}
-		public SensorSettings GetVideoCapture(int index) {
-			SensorSettings result;
+		public EquipmentSettings GetVideoCapture(int index) {
+			EquipmentSettings result;
 			if (!captures.TryGetValue(index, out result)) {
 				return null;
 			}
@@ -34,12 +35,12 @@ namespace Irseny.Main.Content.Profile {
 		public ICollection<int> TrackerIndexes {
 			get { return trackers.Keys; }
 		}
-		public void AddTracker(int index, TrackerSettings settings) {
+		public void AddTracker(int index, EquipmentSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			trackers[index] = settings;
 		}
-		public TrackerSettings GetTracker(int index) {
-			TrackerSettings result;
+		public EquipmentSettings GetTracker(int index) {
+			EquipmentSettings result;
 			if (!trackers.TryGetValue(index, out result)) {
 				return null;
 			}

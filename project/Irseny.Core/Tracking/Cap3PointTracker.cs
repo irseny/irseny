@@ -9,45 +9,63 @@ using Irseny.Core.Listing;
 
 namespace Irseny.Core.Tracking {
 	public class Cap3PointTracker : SingleImageCapTracker {
-		KeypointDetector pointDetector = null;
-		PointLabeler pointLabeler = null;
-		P3PoseEstimator poseEstimator = null;
-		TrackerSettings settings = null;
-		SharedRef<Emgu.CV.Mat> imageOut = SharedRef.Create(new Emgu.CV.Mat());
-		SharedRefCleaner imageCleaner = new SharedRefCleaner(32);
+		KeypointDetector pointDetector;
+		PointLabeler pointLabeler;
+		P3PoseEstimator poseEstimator;
+		EquipmentSettings settings;
+		SharedRef<Emgu.CV.Mat> imageOut;
+		SharedRefCleaner imageCleaner;
+		readonly object trackerSync;
+
 
 		public override bool Running {
-			get { return pointDetector != null && poseEstimator != null && pointLabeler != null; }
-		}
-		protected override TrackerSettings GetSettings() {
-			if (settings == null) {
-				return new TrackerSettings();
-			} else {
-				return new TrackerSettings(settings);
+			get { 
+				lock (trackerSync) {
+					return pointDetector != null && poseEstimator != null && pointLabeler != null; 
+				}
 			}
 		}
+		public override EquipmentSettings GetSettings() {
+			lock (trackerSync) {
+				settings.SetInteger(TrackerProperty.Tracking, Running ? 1 : 0);
+				return new EquipmentSettings(settings);
+			}
+		}
+		public Cap3PointTracker(EquipmentSettings settings) : base() {
+			if (settings == null) throw new ArgumentNullException("settings");
+			this.settings = new EquipmentSettings(settings);
+			this.pointDetector = null;
+			this.pointLabeler = null;
+			this.poseEstimator = null;
+
+			this.imageOut = SharedRef.Create(new Emgu.CV.Mat());
+			this.imageCleaner = new SharedRefCleaner(32);
+			this.trackerSync = new object();
+		}
+
 		public override bool Center() {
-			if (poseEstimator == null) {
-				return false;
+			lock (trackerSync) {
+				if (poseEstimator == null) {
+					return false;
+				}
+				return poseEstimator.Center();
 			}
-			return poseEstimator.Center();
 		}
-		public override bool ApplySettings(TrackerSettings settings) {
-			if (!Running) {
-				return false;
+		public override bool ApplySettings(EquipmentSettings settings) {
+			if (settings == null) throw new ArgumentNullException("settings");
+			lock (trackerSync) {
+				this.settings = new EquipmentSettings(settings);
+				if (Running) {
+					var model = new CapModel();
+					pointDetector = new KeypointDetector(this.settings);
+					pointLabeler = new PointLabeler(this.settings);
+					poseEstimator = new P3PoseEstimator(this.settings, model);
+				}
 			}
-			int iModel = settings.GetInteger(TrackerProperty.Model, -1);
-			IObjectModel model = GetModel(iModel);
-
-
-			pointDetector = new KeypointDetector(settings);
-			pointLabeler = new PointLabeler(settings);
-			poseEstimator = new P3PoseEstimator(settings, model);
 			return true;
 		}
-		public override bool Start(TrackerSettings settings) {
-			int iModel = settings.GetInteger(TrackerProperty.Model, -1);
-			IObjectModel model = GetModel(iModel);
+		public override bool Start() {
+			var model = new CapModel();
 			pointDetector = new KeypointDetector(settings);
 			pointLabeler = new PointLabeler(settings);
 			poseEstimator = new P3PoseEstimator(settings, model);
@@ -92,20 +110,6 @@ namespace Irseny.Core.Tracking {
 				imageCleaner.CleanUpAll();
 				imageOut = SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
 			}
-		}
-		private static IObjectModel GetModel(int modelIndex) {
-			IObjectModel result = new CapModel();
-			//int modelId = EquipmentMaster.Instance.HeadModel.GetEquipment(modelIndex, -1);
-			int modelId = -1;
-			if (modelId < 0) {
-				return result;
-			}
-			var model = DetectionSystem.Instance.GetModel(modelId);
-			if (model == null || model.PointNo < 3) {
-				return result;
-			}
-			result = model;
-			return result;
 		}
 	}
 

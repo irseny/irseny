@@ -13,7 +13,7 @@ namespace Irseny.Main.Content.Profile {
 			if (target == null) throw new ArgumentNullException("target");
 			if (root == null) throw new ArgumentNullException("root");
 			foreach (int i in profile.VideoCaptureIndexes) {
-				SensorSettings settings = profile.GetVideoCapture(i);
+				EquipmentSettings settings = profile.GetVideoCapture(i);
 				XmlNode node = WriteStream(i, settings, target);
 				if (node != null) {
 					root.AppendChild(node);
@@ -21,7 +21,7 @@ namespace Irseny.Main.Content.Profile {
 			}
 			return root;
 		}
-		private XmlNode WriteStream(int index, SensorSettings settings, XmlDocument target) {
+		private XmlNode WriteStream(int index, EquipmentSettings settings, XmlDocument target) {
 			var result = target.CreateElement("Webcam");
 			result.SetAttribute("Index", index.ToString(JsonString.FormatProvider));
 			result.SetAttribute("Name", settings.GetText(SensorProperty.Name, "Webcam"));

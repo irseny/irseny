@@ -1,4 +1,6 @@
 ﻿using System;
+using Irseny.Core.Util;
+
 namespace Irseny.Core.Tracking {
 	public interface IPoseTracker : IDisposable {
 		/// <summary>
@@ -31,12 +33,12 @@ namespace Irseny.Core.Tracking {
 		/// </summary>
 		/// <param name="settings">Settings.</param>
 		/// <returns>Whether the application was successful.</returns>
-		bool ApplySettings(TrackerSettings settings);
+		bool ApplySettings(EquipmentSettings settings);
 		/// <summary>
 		/// Starts the detection process.
 		/// </summary>
 		/// <returns>Whether the operation was successful.</returns>
-		bool Start(TrackerSettings settings);
+		bool Start();
 		/// <summary>
 		/// Executes one detection iteration.
 		/// </summary>

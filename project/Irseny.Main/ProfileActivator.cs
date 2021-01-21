@@ -34,11 +34,11 @@ namespace Irseny.Main {
 				captureSignal.Set();
 			});
 
-			DetectionSystem.Instance.Invoke(delegate {
+			TrackingSystem.Instance.Invoke(delegate {
 				foreach (int i in profile.TrackerIndexes) {
 					var settings = profile.GetTracker(i);
-					var tracker = new Cap3PointTracker();
-					int index = DetectionSystem.Instance.StartTracker(tracker, settings);
+					var tracker = new Cap3PointTracker(settings);
+					int index = TrackingSystem.Instance.StartTracker(tracker);
 				}
 				trackerSignal.Set();
 			});

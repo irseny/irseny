@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Irseny.Core.Util;
 using Point2i = System.Drawing.Point;
 using Size2i = System.Drawing.Size;
 
 namespace Irseny.Core.Tracking {
 	public partial class PointLabeler {
-		TrackerSettings settings;
+		EquipmentSettings settings;
 		Point2i[] inPoints;
 		Point2i[] lastPoints;
 		int[] lastLabels;
@@ -22,7 +23,7 @@ namespace Irseny.Core.Tracking {
 
 
 
-		public PointLabeler(TrackerSettings settings) {
+		public PointLabeler(EquipmentSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			this.settings = settings;
 			this.lastLabels = new int[0];

@@ -61,7 +61,7 @@ namespace Irseny.Main {
 			{ // start main systems
 				LogManager.MakeInstance(new LogManager());
 				CaptureSystem.MakeInstance(new CaptureSystem());
-				DetectionSystem.MakeInstance(new DetectionSystem());
+				TrackingSystem.MakeInstance(new TrackingSystem());
 				VirtualDeviceManager.MakeInstance(new VirtualDeviceManager());
 			}
 			{ // prepare content managers
@@ -86,7 +86,7 @@ namespace Irseny.Main {
 			}
 			{ // cleanup main systems
 				VirtualDeviceManager.MakeInstance(null);
-				DetectionSystem.MakeInstance(null);
+				TrackingSystem.MakeInstance(null);
 				CaptureSystem.MakeInstance(null);
 				LogManager.MakeInstance(null);
 				EquipmentMaster.MakeInstance(null);

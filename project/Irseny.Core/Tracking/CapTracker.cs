@@ -1,4 +1,5 @@
 ﻿using System;
+using Irseny.Core.Util;
 
 namespace Irseny.Core.Tracking {
 	public abstract class CapTracker : IPoseTracker {
@@ -111,8 +112,8 @@ namespace Irseny.Core.Tracking {
 			}
 		}
 		public abstract bool Center();
-		public abstract bool ApplySettings(TrackerSettings settings);
-		public abstract bool Start(TrackerSettings settings);
+		public abstract bool ApplySettings(EquipmentSettings settings);
+		public abstract bool Start();
 		public abstract bool Step();
 		public abstract bool Stop();
 

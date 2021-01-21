@@ -51,10 +51,10 @@ namespace Irseny.Main.Webface.LiveWire {
 				}
 				string topic = JsonString.ParseString(subject.GetTerminal("topic", "error"), "error");
 				// answer by topic
-				if (topic.Equals("sensor")) {
+				if (topic.Equals("sensor") || topic.Equals("camera")) {
 					status = new SensorRequestHandler(server).Respond(subject, response);
-				} else if (topic.Equals("camera")) {
-					status = new SensorRequestHandler(server).Respond(subject, response);
+				} else if (topic.Equals("tracker")) {
+					status = new TrackerRequestHandler(server).Respond(subject, response);
 				} else if (topic.Equals("sensorCapture")) {
 					status = new SensorCaptureRequestHandler(server, clientOrigin).Respond(subject, response);
 				} else if (topic.Equals("origin")) {
@@ -72,87 +72,6 @@ namespace Irseny.Main.Webface.LiveWire {
 			}
 			return response;
 		}
-//		private void AnswerOriginRequest(JsonString subject, string type, int origin, JsonString answer) {
-//			// send the client and server origin ids as subject
-//			// while the type must be 'get' which is answered with 'post'
-//			HttpStatusCode status = HttpStatusCode.OK;
-//			do {
-//				if (!type.Equals("get")) {
-//					status = HttpStatusCode.Forbidden;
-//					break;
-//				}
-//				answer.AddTerminal("type", StringifyTools.StringifyString("post"), true);
-//				answer.AddTerminal("origin", StringifyTools.StringifyInt(LiveWireServer.ServerOrigin), true);
-//				var sub = JsonString.CreateDict();
-//				{
-//					sub.AddTerminal("topic", StringifyTools.StringifyString("origin"));
-//					var data = JsonString.CreateDict();
-//					{
-//						data.AddTerminal("serverOrigin", StringifyTools.StringifyInt(LiveWireServer.ServerOrigin)); // TODO read from server
-//						data.AddTerminal("clientOrigin", StringifyTools.StringifyInt(origin));
-//					}
-//					sub.AddJsonString("data", data);
-//				}
-//				answer.AddJsonString("subject", sub);
-//			} while (false);
-//			if (status != HttpStatusCode.OK) {
-//				CreateErrorAnswer(answer, status);
-//			}
-//		}
-//		private void AnswerCameraRequest(JsonString subject, string type, JsonString answer) {
-//			HttpStatusCode status = HttpStatusCode.OK;
-//			int camStart = -2;
-//			int camNo = 0;
-//			do {
-//				if (!type.Equals("get")) {
-//					status = HttpStatusCode.BadRequest;
-//					break;
-//				}
-//				string position = subject.GetTerminal("position", "-2");
-//				if (position.Equals("all")) {
-//					camStart = 0;
-//					camNo = 16; // TODO replace with actual capacity
-//				} else {
-//					camStart = TextParseTools.ParseInt(position, -1);
-//					camNo = 1;
-//				}
-//				if (camStart < 0) {
-//					status = HttpStatusCode.NotFound;
-//					break;
-//				}
-//				var subjectAnswer = JsonString.CreateDict();
-//				{
-//					subjectAnswer.AddTerminal("type", StringifyTools.StringifyString("post"));
-//					subjectAnswer.AddTerminal("position", StringifyTools.StringifyString(position));
-//					var data = JsonString.CreateArray();
-//					var readySignal = new ManualResetEvent(false);
-//					CaptureSystem.Instance.Invoke(delegate {
-//						for (int i = camStart; i < camNo; i++) {
-//							var entry = JsonString.CreateDict();
-//							CaptureStream stream = CaptureSystem.Instance.GetStream(i);
-//							if (stream == null) {							
-//								entry.AddTerminal("status", StringifyTools.StringifyString("hidden"));
-//							} else {
-//								CaptureSettings settings = stream.GetSettings();
-//								entry.AddJsonString("settings", settings.ToJson());
-//								entry.AddTerminal("status", StringifyTools.StringifyString("active"));
-//							}
-//							data.AddJsonString(string.Empty, entry);
-//						}
-//						readySignal.Set();
-//					});
-//					readySignal.WaitOne();
-//					subjectAnswer.AddJsonString("data", data);
-//				}
-//				answer.AddJsonString("subject", subjectAnswer);
-//				answer.ToString();
-//
-//			} while (false);
-//			if (status != HttpStatusCode.OK) {
-//				CreateErrorAnswer(answer, status);
-//			}
-//			return;
-//		}
 		private void CreateErrorResponse(JsonString request, JsonString response, HttpStatusCode status) {
 			// add status code information
 			if (response.Type == JsonStringType.Array) {

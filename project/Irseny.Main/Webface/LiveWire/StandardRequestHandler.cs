@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using Irseny.Core.Util;
+using System.Collections.Generic;
 
 namespace Irseny.Main.Webface.LiveWire {
 	public abstract class StandardRequestHandler {
@@ -34,6 +35,28 @@ namespace Irseny.Main.Webface.LiveWire {
 				highBound = lowBound;
 			}
 			return lowBound >= MinPosition && lowBound <= MaxPosition;
+		}
+		/// <summary>
+		/// Reads the position information from the data property of a subject.
+		/// </summary>
+		/// <returns>The valid positions.</returns>
+		/// <param name="subject">Message subject.</param>
+		protected virtual int[] ReadPosition(JsonString subject) {
+			if (subject == null) throw new ArgumentNullException("subject");
+			JsonString data = subject.GetJsonString("data");
+			if (data == null || data.Type != JsonStringType.Dict) {
+				return null;
+			}
+			int[] result = new int[data.Dict.Count];
+			int iResult = 0;
+			foreach (string key in data.Dict.Keys) {
+				int index = JsonString.ParseInt(key, -1);
+				if (index < 0) {
+					return null;
+				}
+				result[iResult++] = index;
+			}
+			return result;
 		}
 		/// <summary>
 		/// Creates a response to the request formulated in the given subject JSON string.

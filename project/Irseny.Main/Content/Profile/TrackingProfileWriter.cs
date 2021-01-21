@@ -13,7 +13,7 @@ namespace Irseny.Main.Content.Profile {
 			if (target == null) throw new ArgumentNullException("target");
 			if (root == null) throw new ArgumentNullException("root");
 			foreach (int i in profile.TrackerIndexes) {
-				TrackerSettings settings = profile.GetTracker(i);
+				EquipmentSettings settings = profile.GetTracker(i);
 				XmlNode node = WriteCap3Point(i, settings, target);
 				if (node != null) {
 					root.AppendChild(node);
@@ -22,7 +22,7 @@ namespace Irseny.Main.Content.Profile {
 			}
 			return true;
 		}
-		private XmlNode WriteCap3Point(int index, TrackerSettings settings, XmlDocument target) {
+		private XmlNode WriteCap3Point(int index, EquipmentSettings settings, XmlDocument target) {
 			XmlElement result = target.CreateElement("Cap3Point");
 			result.SetAttribute("Index", index.ToString());
 			// stream
@@ -35,12 +35,7 @@ namespace Irseny.Main.Content.Profile {
 				}
 			}
 			{ // model
-				int model = settings.GetInteger(TrackerProperty.Model, -1);
-				if (model > -1) {
-					XmlElement node = target.CreateElement("Model");
-					result.AppendChild(node);
-					node.InnerText = model.ToString();
-				}
+				// TODO implement
 			}
 			{ // mixing
 				int mixing = settings.GetInteger(TrackerProperty.Smoothing, -1);
@@ -51,8 +46,8 @@ namespace Irseny.Main.Content.Profile {
 				}
 			}
 			{
-				double mixingDecline = settings.GetDecimal(TrackerProperty.SmoothingDropoff, -1.0);
-				if (mixingDecline > -1.0) {
+				decimal mixingDecline = settings.GetDecimal(TrackerProperty.SmoothingDropoff, -1.0m);
+				if (mixingDecline > -1.0m) {
 					XmlElement node = target.CreateElement("SmoothingDropoff");
 					result.AppendChild(node);
 					node.InnerText = mixingDecline.ToString(JsonString.FormatProvider);

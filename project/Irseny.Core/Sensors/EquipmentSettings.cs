@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Irseny.Core.Util;
 using System.Globalization;
 
-namespace Irseny.Core.Sensors {
-	public class SensorSettings {
+namespace Irseny.Core.Util {
+	public class EquipmentSettings {
 
 		Dictionary<int, decimal> decimalProps;
 		Dictionary<int, int> integerProps;
@@ -12,7 +12,7 @@ namespace Irseny.Core.Sensors {
 
 		public Type PropertyType { get; private set; }
 
-		public SensorSettings(Type propertyType) {
+		public EquipmentSettings(Type propertyType) {
 			if (propertyType == null) throw new ArgumentNullException("propertyType");
 			if (!typeof(IConvertible).IsAssignableFrom(propertyType)) {
 				throw new ArgumentException("Not convertible", "propertyType");
@@ -22,7 +22,7 @@ namespace Irseny.Core.Sensors {
 			integerProps = new Dictionary<int, int>(16);
 			textProps = new Dictionary<int, string>(16);
 		}
-		public SensorSettings(SensorSettings source) : this(source == null ? typeof(IConvertible) : source.PropertyType) {
+		public EquipmentSettings(EquipmentSettings source) : this(source == null ? typeof(IConvertible) : source.PropertyType) {
 			if (source == null) throw new ArgumentNullException("source");
 			foreach (var pair in source.decimalProps) {
 				this.decimalProps.Add(pair.Key, pair.Value);
@@ -92,7 +92,7 @@ namespace Irseny.Core.Sensors {
 			}
 			return true;
 		}
-		public static JsonString ToJson(SensorSettings source) {
+		public static JsonString ToJson(EquipmentSettings source) {
 			if (source == null) throw new ArgumentNullException("source");
 			if (!source.PropertyType.IsEnum) throw new ArgumentException("Must have enum properties", "source");
 			var result = JsonString.CreateDict();
@@ -121,13 +121,13 @@ namespace Irseny.Core.Sensors {
 			}
 			return result;
 		}
-		public static SensorSettings FromJson(JsonString source, Type propertyType) {
+		public static EquipmentSettings FromJson(JsonString source, Type propertyType) {
 			if (source == null) throw new ArgumentNullException("source");
 			if (source.Type != JsonStringType.Dict) throw new ArgumentException("Expected a JSON dictionary", "source");
 			if (propertyType == null) throw new ArgumentNullException("propertyType");
 			if (!propertyType.IsEnum) throw new ArgumentException("Must be an enum type", "propertyType");
 
-			var result = new SensorSettings(propertyType);
+			var result = new EquipmentSettings(propertyType);
 			string type = JsonString.ParseString(source.GetTerminal("type", string.Empty), string.Empty);
 			//T type = ParseProperty(sType);
 			bool running = JsonString.ParseBool(source.GetTerminal("running", "false"), false);

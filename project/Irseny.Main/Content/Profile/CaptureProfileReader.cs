@@ -47,7 +47,7 @@ namespace Irseny.Main.Content.Profile {
 		/// <param name="profile">Target profile.</param>
 		/// <param name="root">Root node.</param>
 		public bool ReadWebcam(string name, int index, SetupProfile profile, XmlNode root) {
-			var settings = new SensorSettings(typeof(SensorProperty));
+			var settings = new EquipmentSettings(typeof(SensorProperty));
 			// TODO read name from data
 			settings.SetText(SensorProperty.Name, name);
 			settings.SetText(SensorProperty.Type, "Webcam");

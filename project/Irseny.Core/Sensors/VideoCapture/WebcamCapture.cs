@@ -21,7 +21,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		IntPtr videoCapture;
 		readonly object captureSync;
 
-		SensorSettings settings;
+		EquipmentSettings settings;
 		SharedRefCleaner imageCleaner;
 		FrameRateAnalyzer rateAnalyzer;
 
@@ -40,8 +40,8 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			imageCleaner = new SharedRefCleaner(32);
 			rateAnalyzer = new FrameRateAnalyzer();
 		}
-		public WebcamCapture(SensorSettings settings) : this() {
-			this.settings = new SensorSettings(settings);
+		public WebcamCapture(EquipmentSettings settings) : this() {
+			this.settings = new EquipmentSettings(settings);
 		}
 
 		public bool Capturing {
@@ -58,19 +58,19 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			// TODO implement prediction logic
 			get { return -1; }
 		}
-		public SensorSettings GetSettings() {
+		public EquipmentSettings GetSettings() {
 			lock (captureSync) {
-				var result = new SensorSettings(settings);
+				var result = new EquipmentSettings(settings);
 				result.SetInteger(SensorProperty.Capturing, (videoFrame != IntPtr.Zero) ? 1 : 0);
 				return result;
 			}
 		}
-		public bool ApplySettings(SensorSettings settings) {
+		public bool ApplySettings(EquipmentSettings settings) {
 			if (settings == null) throw new ArgumentNullException("settings");
 			lock (captureSync) {
 				// trivial case if not started
 				if (!Capturing) {
-					this.settings = new SensorSettings(settings);
+					this.settings = new EquipmentSettings(settings);
 					return true;
 				}
 				// otherwise we have to stop the capture
@@ -79,7 +79,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				if (!Stop()) {
 					return false;
 				}
-				this.settings = new SensorSettings(settings);
+				this.settings = new EquipmentSettings(settings);
 				if (!Start()) {
 					return false;
 				}
