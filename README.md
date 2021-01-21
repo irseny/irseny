@@ -1,4 +1,4 @@
-# IRSENY [soon to be] Head Tracking Application
+# IRSENY [soon to be] Head Motion Capturing Application
 
 Main Dependencies and Build Tools
 * Monodevelop
