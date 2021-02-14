@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Irseny.Core.Sensors;
 using Irseny.Core.Sensors.VideoCapture;
 using Irseny.Core.Tracking;
+using Irseny.Core.Tracking.HeadTracking;
 using Irseny.Core.Log;
 using Irseny.Core.Inco.Device;
 using Irseny.Main.Content.Profile;
@@ -54,7 +55,7 @@ namespace Irseny.Main {
 			TrackingSystem.Instance.Invoke(delegate {
 				foreach (int i in profile.TrackerIndexes) {
 					var settings = profile.GetTracker(i);
-					var tracker = new Cap3PointTracker(settings);
+					var tracker = new P3CapTracker(settings);
 					int index = TrackingSystem.Instance.StartTracker(tracker);
 				}
 				trackerSignal.Set();

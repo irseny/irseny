@@ -18,11 +18,11 @@
 using System;
 using Irseny.Core.Inco.Device;
 
-namespace Irseny.Core.Tracking {
-	public struct CapPosition {
+namespace Irseny.Core.Tracking.HeadTracking {
+	public struct HeadPostition {
 
 
-		public CapPosition(CapPosition source) {
+		public HeadPostition(HeadPostition source) {
 			this.Yaw = source.Yaw;
 			this.Pitch = source.Pitch;
 			this.Roll = source.Roll;
@@ -37,42 +37,42 @@ namespace Irseny.Core.Tracking {
 		public KeyState PosY { get; set; }
 		public KeyState PosZ { get; set; }
 
-		public KeyState GetAxis(CapAxis axis) {
+		public KeyState GetAxis(HeadAxis axis) {
 			switch (axis) {
-			case CapAxis.X:
+			case HeadAxis.X:
 				return PosX;
-			case CapAxis.Y:
+			case HeadAxis.Y:
 				return PosY;
-			case CapAxis.Z:
+			case HeadAxis.Z:
 				return PosZ;
-			case CapAxis.Yaw:
+			case HeadAxis.Yaw:
 				return Yaw;
-			case CapAxis.Pitch:
+			case HeadAxis.Pitch:
 				return Pitch;
-			case CapAxis.Roll:
+			case HeadAxis.Roll:
 				return Roll;
 			default:
 				return new KeyState(0.0f, 0.0f);
 			}
 		}
-		public void SetAxis(CapAxis axis, KeyState state) {
+		public void SetAxis(HeadAxis axis, KeyState state) {
 			switch (axis) {
-			case CapAxis.X:
+			case HeadAxis.X:
 				PosX = state;
 				break;
-			case CapAxis.Y:
+			case HeadAxis.Y:
 				PosY = state;
 				break;
-			case CapAxis.Z:
+			case HeadAxis.Z:
 				PosZ = state;
 				break;
-			case CapAxis.Yaw:
+			case HeadAxis.Yaw:
 				Yaw = state;
 				break;
-			case CapAxis.Pitch:
+			case HeadAxis.Pitch:
 				Pitch = state;
 				break;
-			case CapAxis.Roll:
+			case HeadAxis.Roll:
 				Roll = state;
 				break;
 			default:

@@ -18,19 +18,20 @@
 using System;
 using System.Collections.Generic;
 using Irseny.Core.Tracking;
+using Irseny.Core.Tracking.HeadTracking;
 using Irseny.Core.Listing;
 using Irseny.Core.Log;
 
 namespace Irseny.Core.Inco.Device {
 	public class CapInputRelay {
 		private struct Binding {
-			CapAxis sourceAxis;
+			HeadAxis sourceAxis;
 			VirtualDeviceCapability targetCapability;
 			object targetPosKey;
 			object targetNegKey;
 			object mapping;
 
-			public CapAxis Axis {
+			public HeadAxis Axis {
 				get { return sourceAxis; }
 			}
 			public VirtualDeviceCapability Capability {
@@ -45,7 +46,7 @@ namespace Irseny.Core.Inco.Device {
 			public object Mapping {
 				get { return mapping; }
 			}
-			public Binding(CapAxis axis, VirtualDeviceCapability capability, object posKey, object negKey, object mapping) {
+			public Binding(HeadAxis axis, VirtualDeviceCapability capability, object posKey, object negKey, object mapping) {
 				this.sourceAxis = axis;
 				this.targetCapability = capability;
 				this.targetPosKey = posKey;
@@ -68,7 +69,7 @@ namespace Irseny.Core.Inco.Device {
 		public bool Empty {
 			get { return config.Count == 0; }
 		}
-		public int GetDeviceIndex(CapAxis axis) {
+		public int GetDeviceIndex(HeadAxis axis) {
 			foreach (var pair in config) {
 				foreach (var binding in pair.Value) {
 					if (binding.Axis == axis) {
@@ -78,7 +79,7 @@ namespace Irseny.Core.Inco.Device {
 			}
 			return -1;
 		}
-		public VirtualDeviceCapability GetDeviceCapability(CapAxis axis) {
+		public VirtualDeviceCapability GetDeviceCapability(HeadAxis axis) {
 			foreach (var lst in config.Values) {
 				foreach (var binding in lst) {
 					if (binding.Axis == axis) {
@@ -88,7 +89,7 @@ namespace Irseny.Core.Inco.Device {
 			}
 			return VirtualDeviceCapability.Axis;
 		}
-		public Tuple<object, object> GetDeviceKeys(CapAxis axis) {
+		public Tuple<object, object> GetDeviceKeys(HeadAxis axis) {
 			foreach (var lst in config.Values) {
 				foreach (var binding in lst) {
 					if (binding.Axis == axis) {
@@ -98,7 +99,7 @@ namespace Irseny.Core.Inco.Device {
 			}
 			return null;
 		}
-		public object GetMapping(CapAxis axis) {
+		public object GetMapping(HeadAxis axis) {
 			foreach (var lst in config.Values) {
 				foreach (var binding in lst) {
 					if (binding.Axis == axis) {
@@ -108,7 +109,7 @@ namespace Irseny.Core.Inco.Device {
 			}
 			return null;
 		}
-		public void AddBinding(CapAxis axis, int deviceIndex, VirtualDeviceCapability capability, object posKey, object negKey, object mapping) {
+		public void AddBinding(HeadAxis axis, int deviceIndex, VirtualDeviceCapability capability, object posKey, object negKey, object mapping) {
 			List<Binding> deviceBindings;
 			if (!config.TryGetValue(deviceIndex, out deviceBindings)) {
 				deviceBindings = new List<Binding>();
@@ -117,7 +118,7 @@ namespace Irseny.Core.Inco.Device {
 			var binding = new Binding(axis, capability, posKey, negKey, mapping);
 			deviceBindings.Add(binding);
 		}
-		public bool RemoveBinding(CapAxis axis) {
+		public bool RemoveBinding(HeadAxis axis) {
 			// remove the axis from all devices
 			bool result = false;
 			var removeFrom = new Queue<List<Binding>>(config.Values);

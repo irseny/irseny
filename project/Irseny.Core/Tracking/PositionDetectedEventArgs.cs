@@ -17,12 +17,14 @@
 
 using System;
 
+using Irseny.Core.Tracking.HeadTracking;
+
 namespace Irseny.Core.Tracking {
 	public class PositionDetectedEventArgs : EventArgs {
 
-		public PositionDetectedEventArgs(CapPosition position) : base() {
+		public PositionDetectedEventArgs(HeadPostition position) : base() {
 			Position = position;
 		}
-		public CapPosition Position { get; private set; }
+		public HeadPostition Position { get; private set; }
 	}
 }

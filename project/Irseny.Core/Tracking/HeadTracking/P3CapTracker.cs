@@ -25,8 +25,8 @@ using Irseny.Core.Util;
 using Irseny.Core.Listing;
 using Irseny.Core.Shared;
 
-namespace Irseny.Core.Tracking {
-	public class Cap3PointTracker : SingleImageCapTracker {
+namespace Irseny.Core.Tracking.HeadTracking {
+	public class P3CapTracker : SingleSourceHeadTracker {
 		KeypointDetector pointDetector;
 		PointLabeler pointLabeler;
 		P3PoseEstimator poseEstimator;
@@ -49,7 +49,7 @@ namespace Irseny.Core.Tracking {
 				return new EquipmentSettings(settings);
 			}
 		}
-		public Cap3PointTracker(EquipmentSettings settings) : base() {
+		public P3CapTracker(EquipmentSettings settings) : base() {
 			if (settings == null) throw new ArgumentNullException("settings");
 			this.settings = new EquipmentSettings(settings);
 			this.pointDetector = null;

@@ -18,6 +18,7 @@
 using System;
 using System.Xml;
 using Irseny.Core.Tracking;
+using Irseny.Core.Tracking.HeadTracking;
 using Irseny.Core.Inco.Device;
 using Irseny.Core.Util;
 
@@ -54,7 +55,7 @@ namespace Irseny.Main.Content.Profile {
 					if (node.Attributes["Axis"] == null || node.Attributes["Index"] == null || node.Attributes["Capability"] == null) {
 						return null;
 					}
-					CapAxis axis;
+					HeadAxis axis;
 					if (!Enum.TryParse(node.Attributes["Axis"].InnerText, out axis)) {
 						return null;
 					}

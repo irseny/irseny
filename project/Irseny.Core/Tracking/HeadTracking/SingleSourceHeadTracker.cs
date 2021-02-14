@@ -20,8 +20,8 @@ using System.Collections.Generic;
 using Irseny.Core.Util;
 using Irseny.Core.Shared;
 
-namespace Irseny.Core.Tracking {
-	public abstract class SingleImageCapTracker : CapTracker {
+namespace Irseny.Core.Tracking.HeadTracking {
+	public abstract class SingleSourceHeadTracker : HeadTracker, ISingleSourceHeadTracker {
 		readonly object inputSync = new object();
 		readonly object processedEventSync = new object();
 		Queue<SharedRef<IRasterImageBase>> pendingImages = new Queue<SharedRef<IRasterImageBase>>();

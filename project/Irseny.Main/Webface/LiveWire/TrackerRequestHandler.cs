@@ -20,6 +20,7 @@ using System.Net;
 using Irseny.Core.Util;
 using System.Threading;
 using Irseny.Core.Tracking;
+using Irseny.Core.Tracking.HeadTracking;
 
 namespace Irseny.Main.Webface.LiveWire {
 	public class TrackerRequestHandler : StandardRequestHandler {
@@ -83,8 +84,8 @@ namespace Irseny.Main.Webface.LiveWire {
 					IPoseTracker tracker = system.GetTracker(pos);
 					if (tracker == null) {
 						entry.AddTerminal("inuse", "false");
-					} else if (tracker is Cap3PointTracker) {
-						var capTracker = (Cap3PointTracker)tracker;
+					} else if (tracker is P3CapTracker) {
+						var capTracker = (P3CapTracker)tracker;
 						EquipmentSettings settings = capTracker.GetSettings();
 						entry.AddTerminal("inuse", "true");
 						entry.AddJsonString("settings", EquipmentSettings.ToJson(settings));

@@ -27,7 +27,7 @@ using Irseny.Core.Listing;
 using Irseny.Core.Inco.Device;
 using Irseny.Core.Util;
 
-namespace Irseny.Core.Tracking {
+namespace Irseny.Core.Tracking.HeadTracking {
 	public class P3PoseEstimator {
 		const int TopPointIndex = 0;
 		const int RightPointIndex = 1;
@@ -46,7 +46,7 @@ namespace Irseny.Core.Tracking {
 
 
 
-		LinkedList<CapPosition> positionHistory = new LinkedList<CapPosition>();
+		LinkedList<HeadPostition> positionHistory = new LinkedList<HeadPostition>();
 
 		public P3PoseEstimator(EquipmentSettings settings, IObjectModel model) {
 			if (settings == null) throw new ArgumentNullException("settings");
@@ -57,16 +57,16 @@ namespace Irseny.Core.Tracking {
 		private bool Centered {
 			get { return topPointLabel > -1 && rightPointLabel > -1 && leftPointLabel > -1; }
 		}
-		private CapPosition LastPosition {
+		private HeadPostition LastPosition {
 			get {
 				if (positionHistory.Count > 0) {
 					return positionHistory.Last.Value;
 				} else {
-					return new CapPosition();
+					return new HeadPostition();
 				}
 			}
 		}
-		public CapPosition Estimate(Point2i[] points, int[] labels, int pointNo) {
+		public HeadPostition Estimate(Point2i[] points, int[] labels, int pointNo) {
 			if (!Setup(points, labels, pointNo)) {
 				return LastPosition;
 			}
@@ -76,7 +76,7 @@ namespace Irseny.Core.Tracking {
 				}
 			}
 
-			CapPosition position = EstimatePosition();
+			HeadPostition position = EstimatePosition();
 			position = RegisterPosition(position);
 			return position;
 		}
@@ -168,8 +168,8 @@ namespace Irseny.Core.Tracking {
 			}
 			return true;
 		}
-		private CapPosition EstimatePosition() {
-			var result = new CapPosition();
+		private HeadPostition EstimatePosition() {
+			var result = new HeadPostition();
 			// working
 			//var objectPoints = new Emgu.CV.Mat(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
 			//var imagePoints = new Emgu.CV.Mat(3, 2, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
@@ -221,7 +221,7 @@ namespace Irseny.Core.Tracking {
 			return result;
 		}
 
-		private CapPosition RegisterPosition(CapPosition position) {
+		private HeadPostition RegisterPosition(HeadPostition position) {
 			positionHistory.Clear();
 			positionHistory.AddLast(position);
 			// TODO: smooth with history

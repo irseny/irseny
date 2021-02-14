@@ -16,18 +16,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
-using Irseny.Core.Shared;
-
-namespace Irseny.Core.Tracking {
-	public interface ISingleImageCapTracker : IPoseTracker {
-		/// <summary>
-		/// Occurs when an input image has been processed.
-		/// </summary>
-		event EventHandler<ImageProcessedEventArgs> InputProcessed;
-		/// <summary>
-		/// Queues an image for pose detection. Creates a copy of the given reference.
-		/// </summary>
-		/// <param name="image">Image.</param>
-		void QueueInput(Util.SharedRef<IRasterImageBase> image);
+namespace Irseny.Core.Tracking.HeadTracking {
+	public enum HeadAxis : int {
+		X = 0,
+		Y,
+		Z,
+		Yaw,
+		Pitch,
+		Roll
 	}
 }

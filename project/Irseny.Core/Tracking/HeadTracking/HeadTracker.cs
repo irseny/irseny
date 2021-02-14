@@ -18,8 +18,8 @@
 using System;
 using Irseny.Core.Util;
 
-namespace Irseny.Core.Tracking {
-	public abstract class CapTracker : IPoseTracker {
+namespace Irseny.Core.Tracking.HeadTracking {
+	public abstract class HeadTracker : IPoseTracker {
 		readonly object inputEventSync = new object();
 		readonly object detectedEventSync = new object();
 		readonly object executionEventSync = new object();

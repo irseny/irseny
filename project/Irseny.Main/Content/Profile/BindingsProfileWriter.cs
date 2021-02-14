@@ -20,6 +20,7 @@ using System.Xml;
 using System.Collections.Generic;
 using Irseny.Core.Inco.Device;
 using Irseny.Core.Tracking;
+using Irseny.Core.Tracking.HeadTracking;
 
 namespace Irseny.Main.Content.Profile {
 	public class BindingsProfileWriter {
@@ -41,7 +42,7 @@ namespace Irseny.Main.Content.Profile {
 		private XmlNode WriteRelay(int index, CapInputRelay settings, XmlDocument document) {
 			var result = document.CreateElement("Bindings");
 			result.SetAttribute("Index", index.ToString());
-			foreach (CapAxis axis in (CapAxis[])Enum.GetValues(typeof(CapAxis))) {
+			foreach (HeadAxis axis in (HeadAxis[])Enum.GetValues(typeof(HeadAxis))) {
 				int device = settings.GetDeviceIndex(axis);
 				if (device < 0) {
 					continue;

@@ -79,20 +79,12 @@
     <Compile Include="Log\LogManager.cs" />
     <Compile Include="Log\MessageEventArgs.cs" />
     <Compile Include="Log\MessageType.cs" />
-    <Compile Include="Tracking\Cap3PointTracker.cs" />
-    <Compile Include="Tracking\CapAxis.cs" />
-    <Compile Include="Tracking\CapModel.cs" />
-    <Compile Include="Tracking\CapPosition.cs" />
-    <Compile Include="Tracking\CapTracker.cs" />
     <Compile Include="Tracking\ImageProcessedEventArgs.cs" />
     <Compile Include="Tracking\IObjectModel.cs" />
     <Compile Include="Tracking\IPoseTracker.cs" />
-    <Compile Include="Tracking\ISingleImageCapTracker.cs" />
     <Compile Include="Tracking\KeypointDetector.cs" />
-    <Compile Include="Tracking\P3PoseEstimator.cs" />
     <Compile Include="Tracking\PointLabeler.cs" />
     <Compile Include="Tracking\PositionDetectedEventArgs.cs" />
-    <Compile Include="Tracking\SingleImageCapTracker.cs" />
     <Compile Include="Tracking\TrackerProperty.cs" />
     <Compile Include="Util\ISharedRef.cs" />
     <Compile Include="Util\SharedRef.cs" />
@@ -130,6 +122,14 @@
     <Compile Include="Shared\IRasterImageBase.cs" />
     <Compile Include="Shared\RasterImagePixelFormat.cs" />
     <Compile Include="Shared\FrameRateAnalyzer.cs" />
+    <Compile Include="Tracking\HeadTracking\CapModel.cs" />
+    <Compile Include="Tracking\HeadTracking\P3PoseEstimator.cs" />
+    <Compile Include="Tracking\HeadTracking\HeadAxis.cs" />
+    <Compile Include="Tracking\HeadTracking\HeadTracker.cs" />
+    <Compile Include="Tracking\HeadTracking\ISingleSourceHeadTracker.cs" />
+    <Compile Include="Tracking\HeadTracking\SingleSourceHeadTracker.cs" />
+    <Compile Include="Tracking\HeadTracking\HeadPostition.cs" />
+    <Compile Include="Tracking\HeadTracking\P3CapTracker.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
