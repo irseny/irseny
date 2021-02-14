@@ -28,7 +28,7 @@ else()
 	message(WARNING "Build type unspecified: ${CMAKE_BUILD_TYPE}")
 	set(IRSENY_CONFIGURATION "${IRSENY_PLATFORM}Build")
 endif()
-set(IRSENY_LIB_DIR "${IRSENY_ROOT_DIR}/lib")
+set(IRSENY_LIB_DIR "${IRSENY_ROOT_DIR}/lib/Irseny.Native")
 set(IRSENY_BIN_DIR "${IRSENY_ROOT_DIR}/bin")
 
 # force 32 bit
