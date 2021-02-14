@@ -173,7 +173,10 @@ namespace Irseny.Core.Tracking {
 			// working
 			//var objectPoints = new Emgu.CV.Mat(3, 3, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
 			//var imagePoints = new Emgu.CV.Mat(3, 2, Emgu.CV.CvEnum.DepthType.Cv32F, 1);
-			Tuple<int, int, int> topPoint = model.GetPoint(0);
+
+			// TODO call external pose reconstruction code
+
+			/*Tuple<int, int, int> topPoint = model.GetPoint(0);
 			Tuple<int, int, int> leftPoint = model.GetPoint(1);
 			Tuple<int, int, int> rightPoint = model.GetPoint(2);
 			var objectPoints = new Emgu.CV.Matrix<float>(new float[,] {
@@ -214,7 +217,7 @@ namespace Irseny.Core.Tracking {
 				result.PosX = new KeyState(translation.Data[0, 0], translation.Data[0, 0]);
 				result.PosY = new KeyState(translation.Data[1, 0], translation.Data[1, 0]);
 				result.PosZ = new KeyState(translation.Data[2, 0], translation.Data[2, 0]);
-			}
+			}*/
 			return result;
 		}
 

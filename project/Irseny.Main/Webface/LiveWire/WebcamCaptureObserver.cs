@@ -154,21 +154,21 @@ namespace Irseny.Main.Webface.LiveWire {
 		/// <returns>The compressed and encoded image.</returns>
 		/// <param name="frame">Video frame.</param>
 		private string CompressImage(VideoFrame frame) {
-			if (frame.Data == null || frame.Width <= 0 || frame.Height <= 0) {
+			if (frame.PixelData == null || frame.Width <= 0 || frame.Height <= 0) {
 				// missing image data
 				return string.Empty;
 			}
 			string result = string.Empty;
-			PixelFormat bitmapFormat = VideoFrame.GetBitmapFormat(frame.Format);
-			int pixelSize = VideoFrame.GetPixelSize(frame.Format);
+			PixelFormat bitmapFormat = VideoFrame.GetBitmapFormat(frame.PixelFormat);
+			int pixelSize = VideoFrame.GetPixelSize(frame.PixelFormat);
 			int imageSize = frame.Width*frame.Height*pixelSize;
-			GCHandle pinnedImage = GCHandle.Alloc(frame.Data, GCHandleType.Pinned);
+			GCHandle pinnedImage = GCHandle.Alloc(frame.PixelData, GCHandleType.Pinned);
 			IntPtr imagePointer = pinnedImage.AddrOfPinnedObject();
 			// create a bitmap, copy the frame over, convert to jpeg
 			// and generate a base64 string from that
 			using (var bitmap = new Bitmap(frame.Width, frame.Height, bitmapFormat)) {
 				BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.WriteOnly, bitmapFormat);
-				Marshal.Copy(frame.Data, 0, bitmapData.Scan0, imageSize);
+				Marshal.Copy(frame.PixelData, 0, bitmapData.Scan0, imageSize);
 				bitmap.UnlockBits(bitmapData);
 
 				using (var stream = new MemoryStream(imageSize)) {

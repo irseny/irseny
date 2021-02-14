@@ -16,22 +16,25 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
+using Irseny.Core.Shared;
 
 namespace Irseny.Core.Sensors.VideoCapture {
 	public class ImageCapturedEventArgs : StreamEventArgs {
-		Util.SharedRef<Emgu.CV.Mat> colorImage;
-		Util.SharedRef<Emgu.CV.Mat> grayImage;
+		Util.SharedRef<IRasterImageBase> colorImage;
+		Util.SharedRef<IRasterImageBase> grayImage;
 
-		public ImageCapturedEventArgs(WebcamCapture stream, int streamId, Util.SharedRef<Emgu.CV.Mat> colorImage, Util.SharedRef<Emgu.CV.Mat> grayImage) : base(stream, streamId) {
+		public ImageCapturedEventArgs(
+			WebcamCapture stream, int streamId, Util.SharedRef<IRasterImageBase> colorImage, 
+			Util.SharedRef<IRasterImageBase> grayImage) : base(stream, streamId) {
 			if (colorImage == null) throw new ArgumentNullException("colorImage");
 			if (grayImage == null) throw new ArgumentNullException("grayImage");
 			this.colorImage = colorImage;
 			this.grayImage = grayImage;
 		}
-		public Util.SharedRef<Emgu.CV.Mat> ColorImage {
+		public Util.SharedRef<IRasterImageBase> ColorImage {
 			get { return Util.SharedRef.Copy(colorImage); }
 		}
-		public Util.SharedRef<Emgu.CV.Mat> GrayImage {
+		public Util.SharedRef<IRasterImageBase> GrayImage {
 			get { return Util.SharedRef.Copy(grayImage); }
 		}
 	}

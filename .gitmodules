@@ -7,6 +7,3 @@
 [submodule "popper"]
 	path = lib/webfront.bootstrap/irseny_modules/popper
 	url = https://github.com/popperjs/popper-core.git
-[submodule "Emgu.CV"]
-	path = lib/Emgu.CV/source
-	url = https://github.com/emgucv/emgucv.git

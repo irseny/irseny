@@ -16,16 +16,18 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
+using Irseny.Core.Util;
+using Irseny.Core.Shared;
 
 namespace Irseny.Core.Tracking {
 	public class ImageProcessedEventArgs : EventArgs {
-		Util.SharedRef<Emgu.CV.Mat> image;
+		SharedRef<IRasterImageBase> image;
 		/// <summary>
 		/// Creates an instance of this class that holds the given image.
 		/// </summary>
 		/// <param name="image">Image argument. 
 		/// Copies of the given instance are created when the image is used through the respective property of this class.</param>
-		public ImageProcessedEventArgs(Util.SharedRef<Emgu.CV.Mat> image) {
+		public ImageProcessedEventArgs(SharedRef<IRasterImageBase> image) {
 			if (image == null) throw new ArgumentNullException("image");
 			this.image = image;
 		}
@@ -33,10 +35,8 @@ namespace Irseny.Core.Tracking {
 		/// Gets the image argument.
 		/// </summary>
 		/// <value>The image. Note that the instance returned is a copy and should be disposed after usage.</value>
-		public Util.SharedRef<Emgu.CV.Mat> Image {
-			get {
-				return Util.SharedRef.Copy(image);
-			}
+		public SharedRef<IRasterImageBase> Image {
+			get { return SharedRef.Copy(image); }
 		}
 	}
 }

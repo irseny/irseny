@@ -17,9 +17,11 @@
 
 using System;
 
-namespace Irseny.Core.Sensors.VideoCapture
-{
-	public enum VideoFramePixelFormat {
+namespace Irseny.Core.Shared {
+	/// <summary>
+	/// Common pixel formats of raster images.
+	/// </summary>
+	public enum RasterImagePixelFormat {
 		Gray8 = 0x8,
 		Gray16 = 0x16,
 		RGB24 = 0x24,

@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Irseny.Core.Sensors.VideoCapture {
+namespace Irseny.Core.Shared {
 	/// <summary>
 	/// Analyzation tool for average framerate and frametime variance.
 	/// </summary>

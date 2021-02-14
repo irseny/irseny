@@ -47,7 +47,6 @@ namespace Irseny.Main {
 				ContentMaster.Instance.Load(contentSettings);
 			}
 			{ // load last configuration
-				new Emgu.CV.Mat();
 				var profile = ContentMaster.Instance.Profiles.LoadDefaultProfile();
 				new ProfileActivator().ActivateProfile(profile).Wait();
 			}

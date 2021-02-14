@@ -20,8 +20,13 @@ using System.Runtime.InteropServices;
 using Irseny.Core.Util;
 using Size2i = System.Drawing.Size;
 using Point2i = System.Drawing.Point;
+using Irseny.Core.Shared;
 
 namespace Irseny.Core.Tracking {
+	/// <summary>
+	/// Implements keypoint detection that builds clusters from adjacent bright pixels.
+	/// The cluster centers form the detected key points.
+	/// </summary>
 	public class KeypointDetector {
 		EquipmentSettings settings;
 		Point2i[] imagePoints = new Point2i[0];
@@ -46,7 +51,7 @@ namespace Irseny.Core.Tracking {
 		/// <param name="imageIn">Input Image.</param>
 		/// <param name="imageOut">Output Image.</param>
 		/// <param name="keypoints">Detected keypoints.</param>
-		public int Detect(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut, out Point2i[] keypoints) {
+		public int Detect(IRasterImageBase imageIn, IRasterImageBase imageOut, out Point2i[] keypoints) {
 			Setup(imageIn, imageOut);
 			Threshold(imageIn, imageOut);
 			FindClusters(imageIn, imageOut);
@@ -61,10 +66,12 @@ namespace Irseny.Core.Tracking {
 		/// </summary>
 		/// <param name="imageIn">Input Image.</param>
 		/// <param name="imageOut">Output Image.</param>
-		private void Setup(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
-			if (imageIn.ElementSize != sizeof(byte)) throw new ArgumentException("imageIn: Wrong pixel format");
-			if (imageOut.ElementSize != sizeof(byte)) throw new ArgumentException("imageOut: Wrong pixel format");
-			if (!imageOut.Size.Equals(imageIn.Size)) throw new ArgumentException("imageOut: Size differs from imageIn");
+		private void Setup(IRasterImageBase imageIn, IRasterImageBase imageOut) {
+			if (imageIn.PixelSize != sizeof(byte)) throw new ArgumentException("imageIn: Wrong pixel format");
+			if (imageOut.PixelSize != sizeof(byte)) throw new ArgumentException("imageOut: Wrong pixel format");
+			if (imageOut.Width != imageIn.Width || imageOut.Height != imageIn.Height) {
+				throw new ArgumentException("imageOut: Size differs from imageIn");
+			}
 			imageWidth = imageIn.Width;
 			imageHeight = imageIn.Height;
 			imageStride = imageWidth;
@@ -98,24 +105,27 @@ namespace Irseny.Core.Tracking {
 		/// </summary>
 		/// <param name="imageIn">Input image.</param>
 		/// <param name="imageOut">Output image.</param>
-		private void Threshold(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
+		private void Threshold(IRasterImageBase imageIn, IRasterImageBase imageOut) {
 			int threshold = settings.GetInteger(TrackerProperty.MinBrightness, 32);
 			// assumes that one pixel is represented with one byte
-			IntPtr bufferIn = imageIn.DataPointer;
-			IntPtr bufferOut = imageOut.DataPointer;
+			byte[] bufferIn = imageIn.PixelData;
+			byte[] bufferOut = imageOut.PixelData;
 			for (int r = 0; r < imageHeight; r++) {
 				for (int c = 0; c < imageWidth; c++) {
-					byte bright = Marshal.ReadByte(bufferIn, r*imageStride + c);
+					//byte bright = Marshal.ReadByte(bufferIn, r*imageStride + c);
+					byte bright = bufferIn[r*imageStride + c];
 					if (bright >= threshold) {
 						visibilityMap[r*imageStride + c] = true;
 						if (imagePointNo < imagePoints.Length) {
 							imagePoints[imagePointNo] = new Point2i(c, r);
 							imagePointNo += 1;
 						}
-						Marshal.WriteByte(bufferOut, r*imageStride + c, 64);
+						//Marshal.WriteByte(bufferOut, r*imageStride + c, 64);
+						bufferOut[r*imageStride + c] = 0x40;
 					} else {
 						visibilityMap[r*imageStride + c] = false;
-						Marshal.WriteByte(bufferOut, r*imageStride + c, 0);
+						//Marshal.WriteByte(bufferOut, r*imageStride + c, 0);
+						bufferOut[r*imageStride + c] = 0x0;
 					}
 				}
 			}
@@ -124,7 +134,7 @@ namespace Irseny.Core.Tracking {
 		/// Finds clusters within the given image.
 		/// </summary>
 		/// <param name="imageIn">Input image.</param>
-		private void FindClusters(Emgu.CV.Mat imageIn, Emgu.CV.Mat imageOut) {
+		private void FindClusters(IRasterImageBase imageIn, IRasterImageBase imageOut) {
 			// try with cluster origins at all bright points in the image
 			for (int p = 0; p < imagePointNo; p++) {
 				Point2i point = imagePoints[p];
@@ -156,12 +166,12 @@ namespace Irseny.Core.Tracking {
 		/// <param name="center">Cluster center.</param>
 		/// <param name="radius">Cluster radius.</param>
 		/// <prama name="critical">Critical error.</prama>
-		private bool DetectCluster(Point2i start, out Point2i center, out int radius, out bool critical, Emgu.CV.Mat imageOut) {
+		private bool DetectCluster(Point2i start, out Point2i center, out int radius, out bool critical, IRasterImageBase imageOut) {
 			// initialization to be able to return at any point
 			int minClusterRadius = settings.GetInteger(TrackerProperty.MinClusterRadius, 2);
 			int maxClusterRadius = settings.GetInteger(TrackerProperty.MaxClusterRadius, 32);
 			int minLayerEnergy = settings.GetInteger(TrackerProperty.MinLayerEnergy, 32);
-			IntPtr bufferOut = imageOut.DataPointer;
+			byte[] bufferOut = imageOut.PixelData;
 			center = new Point2i(-1, -1);
 			radius = -1;
 			critical = false;
@@ -193,7 +203,8 @@ namespace Irseny.Core.Tracking {
 						clusterMembers[clusterMemberNo] = new Point2i(c, point.Y);
 						clusterMemberNo += 1;
 						suppressionMap[point.Y*imageStride + c] = true;
-						Marshal.WriteByte(bufferOut, point.Y*imageStride + c, 146);
+						//Marshal.WriteByte(bufferOut, point.Y*imageStride + c, 146);
+						bufferOut[point.Y*imageStride + c] = 0x92;
 					}
 					int r = point.Y + d;
 					if (visibilityMap[r*imageStride + point.X] && !suppressionMap[r*imageStride + point.X]) {
@@ -201,7 +212,8 @@ namespace Irseny.Core.Tracking {
 						clusterMembers[clusterMemberNo] = new Point2i(point.X, r);
 						clusterMemberNo += 1;
 						suppressionMap[r*imageStride + point.X] = true;
-						Marshal.WriteByte(bufferOut, r*imageStride + point.X, 146);
+						//Marshal.WriteByte(bufferOut, r*imageStride + point.X, 146);
+						bufferOut[r*imageStride + point.X] = 0x92;
 					}
 				}
 
@@ -227,7 +239,7 @@ namespace Irseny.Core.Tracking {
 			}
 			// with increasing size we get a tendency to high deviation
 			// as there are can exist more points further away from the center
-			// TODO: evaluate how to get a good radius estimate (at which radius are the most points located)
+			// TODO evaluate how to get a good radius estimate (at which radius are the most points located)
 			var clusterRadius = new Point2i((int)(clusterDeviation.X/clusterMemberNo*1.4f), (int)(clusterDeviation.Y/clusterMemberNo*1.4f));
 			radius = Math.Max(clusterRadius.X, clusterRadius.Y);
 			if (clusterRadius.X < minClusterRadius || clusterRadius.X > maxClusterRadius) {
@@ -242,21 +254,23 @@ namespace Irseny.Core.Tracking {
 		/// Marks detected clusters visually.
 		/// </summary>
 		/// <param name="imageOut">Output image.</param>
-		private void MarkClusters(Emgu.CV.Mat imageOut) {
+		private void MarkClusters(IRasterImageBase imageOut) {
 			int radius = 10;
-			IntPtr dataOut = imageOut.DataPointer;
+			byte[] dataOut = imageOut.PixelData;
 			for (int i = 0; i < clusterCenterNo; i++) {
 				Point2i center = clusterCenters[i];
 				// draws a cross at the cluster center
 				int rLow = Math.Max(0, center.Y - radius);
 				int rHigh = Math.Min(imageHeight, center.Y + radius);
 				for (int r = rLow; r < rHigh; r++) {
-					Marshal.WriteByte(dataOut, r*imageStride + center.X, 255);
+					//Marshal.WriteByte(dataOut, r*imageStride + center.X, 255);
+					dataOut[r*imageStride + center.X] = 0xFF;
 				}
 				int cLow = Math.Max(0, center.X - radius);
 				int cHigh = Math.Min(imageWidth, center.X + radius);
 				for (int c = cLow; c < cHigh; c++) {
-					Marshal.WriteByte(dataOut, center.Y*imageStride + c, 255);
+					//Marshal.WriteByte(dataOut, center.Y*imageStride + c, 255);
+					dataOut[center.Y*imageStride + c] = 0xFF;
 				}
 			}
 		}

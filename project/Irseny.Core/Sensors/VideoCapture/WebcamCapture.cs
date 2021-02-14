@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.ServiceModel.Dispatcher;
 using Irseny.Core.Log;
 using Irseny.Core.Util;
-using Irseny.Core.Sensors;
+using Irseny.Core.Shared;
 using System.Runtime.InteropServices;
 
 
@@ -245,7 +245,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 				rateAnalyzer.Tick();
 				int width = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Width);
 				int height = VideoCaptureBackend.GetVideoCaptureFrameProperty(videoFrame, VideoFrameProperty.Height);
-				VideoFramePixelFormat format = (VideoFramePixelFormat)VideoCaptureBackend.GetVideoCaptureFrameProperty(
+				RasterImagePixelFormat format = (RasterImagePixelFormat)VideoCaptureBackend.GetVideoCaptureFrameProperty(
 					videoFrame, VideoFrameProperty.PixelFormat);
 				int pixelSize = VideoFrame.GetPixelSize(format);
 				// construct a data packet as result

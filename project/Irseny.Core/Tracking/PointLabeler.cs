@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Irseny.Core.Util;
+using Irseny.Core.Shared;
 using Point2i = System.Drawing.Point;
 using Size2i = System.Drawing.Size;
 
@@ -59,7 +60,7 @@ namespace Irseny.Core.Tracking {
 		/// <param name="pointNo">Number of points detected.</param>
 		/// <param name="imageOut">Image out.</param>
 		/// <param name="labels">Point labels.</param>
-		public int Label(Point2i[] points, int pointNo, Emgu.CV.Mat imageOut, out int[] labels) {
+		public int Label(Point2i[] points, int pointNo, IRasterImageBase imageOut, out int[] labels) {
 			if (!Setup(points, pointNo)) {
 				labels = lastLabels;
 				return 0;
@@ -275,11 +276,11 @@ namespace Irseny.Core.Tracking {
 		static PointLabeler() {
 			BuildVisuals();
 		}
-		private void ShowLabels(Emgu.CV.Mat imageOut) {
+		private void ShowLabels(IRasterImageBase imageOut) {
 			int width = imageOut.Width;
 			int height = imageOut.Height;
 			int stride = width;
-			IntPtr dataOut = imageOut.DataPointer;
+			byte[] dataOut = imageOut.PixelData;
 			for (int p = 0; p < outPointNo; p++) {
 				Point2i point = outPoints[p];
 				int label = outLabels[p];
@@ -296,7 +297,8 @@ namespace Irseny.Core.Tracking {
 				for (int i = 0; i < pixels.Length; i++) {
 					int c = point.X + offset.X + pixels[i].X;
 					int r = point.Y + offset.Y + pixels[i].Y;
-					Marshal.WriteByte(dataOut, r*stride + c, 255);
+					//Marshal.WriteByte(dataOut, r*stride + c, 255);
+					dataOut[r*stride + c] = 0xFF;
 				}
 			}
 		}

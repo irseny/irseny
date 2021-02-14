@@ -17,12 +17,14 @@
 
 using System;
 using System.Drawing.Imaging;
+using Irseny.Core.Shared;
+using BitmapPixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Irseny.Core.Sensors.VideoCapture {
 	/// <summary>
 	/// Container for image data captured by a video camera.
 	/// </summary>
-	public class VideoFrame {
+	public class VideoFrame : IRasterImageBase {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Irseny.Core.Sensors.VideoCapture.VideoFrame"/> class.
 		/// </summary>
@@ -31,7 +33,7 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		/// <param name="format">Pixel format.</param>
 		/// <param name="data">Pixel data.</param>
 		/// <param name="metadata">Associated metadata.</param>
-		public VideoFrame(int width, int height, VideoFramePixelFormat format, byte[] data, VideoFrameMetadata metadata) {
+		public VideoFrame(int width, int height, RasterImagePixelFormat format, byte[] data, VideoFrameMetadata metadata) {
 			if (width < 0 || width > 16384) throw new ArgumentOutOfRangeException("width");
 			if (height < 0 || height > 16884) throw new ArgumentOutOfRangeException("height");
 			if (data == null) throw new ArgumentNullException("data");
@@ -40,8 +42,8 @@ namespace Irseny.Core.Sensors.VideoCapture {
 			if (metadata.FrameTimeDeviation < 0) throw new ArgumentOutOfRangeException("metadata.FrameTimeVariance");
 			Width = width;
 			Height = height;
-			Format = format;
-			Data = data;
+			PixelFormat = format;
+			PixelData = data;
 			Metadata = metadata;
 		}
 		/// <summary>
@@ -58,12 +60,19 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		/// Gets the pixel format.
 		/// </summary>
 		/// <value>The pixel format.</value>
-		public VideoFramePixelFormat Format { get; private set; }
+		public RasterImagePixelFormat PixelFormat { get; private set; }
+		/// <summary>
+		/// Gets the size in bytes of a single pixel in memory.
+		/// </summary>
+		/// <value>The size of a pixel.</value>
+		public int PixelSize {
+			get { return GetPixelSize(PixelFormat); }
+		}
 		/// <summary>
 		/// Gets the image data buffer.
 		/// </summary>
 		/// <value>The image data buffer.</value>
-		public byte[] Data { get; private set; }
+		public byte[] PixelData { get; private set; }
 		/// <summary>
 		/// Gets the metadata associated with the video capture.
 		/// </summary>
@@ -74,16 +83,16 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		/// </summary>
 		/// <returns>The target format.</returns>
 		/// <param name="format">Source format.</param>
-		public static PixelFormat GetBitmapFormat(VideoFramePixelFormat format) {
+		public static BitmapPixelFormat GetBitmapFormat(RasterImagePixelFormat format) {
 			switch (format) {
-			case VideoFramePixelFormat.Gray8:
-				return PixelFormat.Alpha;
-			case VideoFramePixelFormat.Gray16:
-				return PixelFormat.Format16bppGrayScale;
-			case VideoFramePixelFormat.RGB24:
-				return PixelFormat.Format24bppRgb;
-			case VideoFramePixelFormat.ARGB32:
-				return PixelFormat.Format32bppArgb;
+			case RasterImagePixelFormat.Gray8:
+				return BitmapPixelFormat.Alpha;
+			case RasterImagePixelFormat.Gray16:
+				return BitmapPixelFormat.Format16bppGrayScale;
+			case RasterImagePixelFormat.RGB24:
+				return BitmapPixelFormat.Format24bppRgb;
+			case RasterImagePixelFormat.ARGB32:
+				return BitmapPixelFormat.Format32bppArgb;
 			default:
 				throw new ArgumentException("No complementary format found", "format");
 			}
@@ -93,15 +102,15 @@ namespace Irseny.Core.Sensors.VideoCapture {
 		/// </summary>
 		/// <returns>The pixel size.</returns>
 		/// <param name="format">Format of the pixel.</param>
-		public static int GetPixelSize(VideoFramePixelFormat format) {
+		public static int GetPixelSize(RasterImagePixelFormat format) {
 			switch (format) {
-			case VideoFramePixelFormat.Gray8:
+			case RasterImagePixelFormat.Gray8:
 				return sizeof(byte)*1;
-			case VideoFramePixelFormat.Gray16:
+			case RasterImagePixelFormat.Gray16:
 				return sizeof(byte)*2;
-			case VideoFramePixelFormat.RGB24:
+			case RasterImagePixelFormat.RGB24:
 				return sizeof(byte)*3;
-			case VideoFramePixelFormat.ARGB32:
+			case RasterImagePixelFormat.ARGB32:
 				return sizeof(byte)*4;
 			default:
 				return -1;

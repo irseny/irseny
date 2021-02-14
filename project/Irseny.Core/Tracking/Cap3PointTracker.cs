@@ -23,6 +23,7 @@ using Point2i = System.Drawing.Point;
 using Point2f = System.Drawing.PointF;
 using Irseny.Core.Util;
 using Irseny.Core.Listing;
+using Irseny.Core.Shared;
 
 namespace Irseny.Core.Tracking {
 	public class Cap3PointTracker : SingleImageCapTracker {
@@ -30,7 +31,7 @@ namespace Irseny.Core.Tracking {
 		PointLabeler pointLabeler;
 		P3PoseEstimator poseEstimator;
 		EquipmentSettings settings;
-		SharedRef<Emgu.CV.Mat> imageOut;
+		SharedRef<IRasterImageBase> imageOut;
 		SharedRefCleaner imageCleaner;
 		readonly object trackerSync;
 
@@ -54,8 +55,8 @@ namespace Irseny.Core.Tracking {
 			this.pointDetector = null;
 			this.pointLabeler = null;
 			this.poseEstimator = null;
-
-			this.imageOut = SharedRef.Create(new Emgu.CV.Mat());
+			IRasterImageBase frame = new TrackerVideoFrame(1, 1, new byte[1]);
+			this.imageOut = SharedRef.Create(frame);
 			this.imageCleaner = new SharedRefCleaner(32);
 			this.trackerSync = new object();
 		}
@@ -101,7 +102,7 @@ namespace Irseny.Core.Tracking {
 			imageCleaner.DisposeAll(); // should not matter if some images are disposed on non detection threads
 			base.Dispose();
 		}
-		protected override bool Step(SharedRef<Emgu.CV.Mat> imageIn) {
+		protected override bool Step(SharedRef<IRasterImageBase> imageIn) {
 			if (!Running) {
 				return false;
 			}
@@ -119,13 +120,14 @@ namespace Irseny.Core.Tracking {
 			OnPositionDetected(new PositionDetectedEventArgs(position));
 			return true;
 		}
-		private void SetupStep(SharedRef<Emgu.CV.Mat> imageIn) {
-			Emgu.CV.Mat imgIn = imageIn.Reference;
-			Emgu.CV.Mat imgOut = imageOut.Reference;
+		private void SetupStep(SharedRef<IRasterImageBase> imageIn) {
+			IRasterImageBase imgIn = imageIn.Reference;
+			IRasterImageBase imgOut = imageOut.Reference;
 			if (imgIn.Width != imgOut.Width || imgIn.Height != imgOut.Height) {
 				imageCleaner.AddReference(imageOut);
 				imageCleaner.CleanUpAll();
-				imageOut = SharedRef.Create(new Emgu.CV.Mat(imgIn.Height, imgIn.Width, Emgu.CV.CvEnum.DepthType.Cv8U, 1));
+				IRasterImageBase frame = new TrackerVideoFrame(imgIn.Height, imgIn.Width, new byte[imgIn.Height*imgIn.Width]);
+				imageOut = SharedRef.Create(frame);
 			}
 		}
 	}

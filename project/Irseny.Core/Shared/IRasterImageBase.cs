@@ -16,18 +16,37 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
-using Irseny.Core.Shared;
 
-namespace Irseny.Core.Tracking {
-	public interface ISingleImageCapTracker : IPoseTracker {
+namespace Irseny.Core.Shared {
+	/// <summary>
+	/// Shared interface for raster image containers.
+	/// </summary>
+	public interface IRasterImageBase {
 		/// <summary>
-		/// Occurs when an input image has been processed.
+		/// Gets the image width.
 		/// </summary>
-		event EventHandler<ImageProcessedEventArgs> InputProcessed;
+		/// <value>The width.</value>
+		int Width { get; }
 		/// <summary>
-		/// Queues an image for pose detection. Creates a copy of the given reference.
+		/// Gets the image height
 		/// </summary>
-		/// <param name="image">Image.</param>
-		void QueueInput(Util.SharedRef<IRasterImageBase> image);
+		/// <value>The height.</value>
+		int Height { get; }
+		/// <summary>
+		/// Gets the formatting information of pixels in the image.
+		/// </summary>
+		/// <value>The pixel format.</value>
+		RasterImagePixelFormat PixelFormat { get; }
+		/// <summary>
+		/// Gets the size in bytes of a single pixel in memory.
+		/// </summary>
+		/// <value>The size of a pixel.</value>
+		int PixelSize { get; }
+		/// <summary>
+		/// Gets the image data buffer.
+		/// </summary>
+		/// <value>The pixel data.</value>
+		byte[] PixelData { get; }
 	}
 }
+
