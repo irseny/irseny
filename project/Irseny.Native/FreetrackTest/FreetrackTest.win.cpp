@@ -19,7 +19,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "windows.h"
-#include "TestWin.h"
+
+#include "FreetrackTest.win.h"
 
 void cleanup(HANDLE file, HANDLE sync, void* map) {
 	if (map != NULL) {
@@ -39,31 +40,32 @@ int main(int argc, char** args) {
 	}
 	{
 		const char* message = "Setting up freetrack ...\n";
-		WriteConsole(console, message, strlen(message), NULL, NULL);
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 	}
 	HANDLE freetrackFile = OpenFileMappingA(FILE_MAP_READ, FALSE, "FT_SharedMem");
 	HANDLE freetrackSync = CreateMutexA(NULL, FALSE, "FT_Mutex");
 	if (freetrackFile == NULL) {
-		const char* message = "Shared memory not available\n";
-		WriteConsole(console, message, strlen(message), NULL, NULL);
-		//printf("Shared memory not available");
+		const char* message = "FATAL: Shared memory not available\n";
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 		cleanup(freetrackFile, freetrackSync, NULL);
 		return -1;
 	}
 	if (freetrackSync == NULL) {
-		printf("Shared mutex not available");
+		const char* message = "FATAL: Shared mutex not available\n";
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 		cleanup(freetrackFile, freetrackSync, NULL);
 		return -1;
 	}
 	IvjFreetrackPacket* freetrackMap = (IvjFreetrackPacket*)MapViewOfFile(freetrackFile, FILE_MAP_READ, 0, 0, sizeof(IvjFreetrackPacket));
 	if (freetrackMap == NULL) {
-		printf("Failed to map file\n");
+		const char* message = "FATAL: Failed to map shared memory\n";
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 		cleanup(freetrackFile, freetrackSync, freetrackMap);
 		return -1;
 	}
 	{
 		const char* message = "Setup finished. Starting to listen ...\n";
-		WriteConsole(console, message, strlen(message), NULL, NULL);
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 	}
 	IvjFreetrackPacket freetrackPacket;
 	int lastPacketID = -1;
@@ -73,21 +75,22 @@ int main(int argc, char** args) {
 			memcpy(&freetrackPacket, freetrackMap, sizeof(IvjFreetrackPacket));
 			ReleaseMutex(freetrackSync);
 		} else {
-			printf("sync blocked\n");
+			const char* message = "WARNING: Synchronization blocked\n";
+			WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 		}
 		if (freetrackPacket.PacketID != lastPacketID) {
 			lastPacketID = freetrackPacket.PacketID;
 			COORD origin = {
 				0, 2
 			};
-			//SetConsoleCursorPosition(console, origin);
+			SetConsoleCursorPosition(console, origin);
 			char message[80];
 			snprintf(message, 80, "Packet ID: %d\n", freetrackPacket.PacketID);
-			WriteConsole(console, message, strlen(message), NULL, NULL);
+			WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 			snprintf(message, 80, "Yaw: %f\n", freetrackPacket.Yaw);
-			WriteConsole(console, message, strlen(message), NULL, NULL);
+			WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 			snprintf(message, 80, "Pitch: %f\n", freetrackPacket.Pitch);
-			WriteConsole(console, message, strlen(message), NULL, NULL);
+			WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 		}
 		if (GetKeyState(0x51) & 0x8000) {
 			running = false;
@@ -97,7 +100,7 @@ int main(int argc, char** args) {
 	cleanup(freetrackFile, freetrackSync, freetrackMap);
 	{
 		const char* message = "Terminated by user input\n";
-		WriteConsole(console, message, strlen(message), NULL, NULL);
+		WriteConsole(console, message, (DWORD)strlen(message), NULL, NULL);
 	}
 	return 0;
 }

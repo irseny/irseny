@@ -28,7 +28,7 @@ else()
 	message(WARNING "Build type unspecified: ${CMAKE_BUILD_TYPE}")
 	set(IRSENY_CONFIGURATION "${IRSENY_PLATFORM}Build")
 endif()
-set(IRSENY_LIB_DIR "${IRSENY_ROOT_DIR}/lib/Irseny.Native")
+set(IRSENY_LIB_DIR "${IRSENY_ROOT_DIR}/lib")
 set(IRSENY_BIN_DIR "${IRSENY_ROOT_DIR}/bin")
 
 # force 32 bit
@@ -47,10 +47,27 @@ if (WITH_OPENCV OR WITH_LOCAL_OPENCV)
 	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_OPENCV")
 	if (WITH_LOCAL_OPENCV)
 		# use custom find package script
+		# set local search paths 
+		# and make sure that our FindOpenCV.cmake file is used
+		list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/modules")
+		list(APPEND CMAKE_PREFIX_PATH "${IRSENY_LIB_DIR}/opencv")
+		set(OpenCV_FIND_RUNTIME_LIBS ON)
+		find_package(OpenCV MODULE REQUIRED COMPONENTS core highgui)
+	else()
+		find_package(OpenCV REQUIRED COMPONENTS core highgui)
 	endif()
-	find_package(OpenCV REQUIRED core highgui)
+	
+	#message(DEBUG " mangled paths: ${OpenCV_USE_MANGLED_PATHS}")
 	list(APPEND IRSENY_LIBS "${OpenCV_LIBS}")
 	list(APPEND IRSENY_INCLUDE_DIRS "${OpenCV_INCLUDE_DIRS}")
+	
+	#message(DEBUG " opencv version: ${OpenCV_VERSION}|${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}" )
+	#message(DEBUG " opencv suffix: ${OpenCV_MODULES_SUFFIX}")
+	#message(DEBUG " opencv libs are: ${OpenCV_LIBS}")
+	#message(DEBUG " opencv lib dir: ${OpenCV_LIB_DIR}")
+	#message(DEBUG " opencv components: ${OpenCV_LIB_COMPONENTS}")
+	#message(DEBUG " opencv include dir is: ${OpenCV_INCLUDE_DIRS}")
+	#message(DEBUG " mangled paths: ${OpenCV_USE_MANGLED_PATHS}")
 endif()
 # find vjoy
 if (WITH_VJOY)
@@ -73,6 +90,7 @@ endif()
 # source files
 if (WIN32)
 	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/InputInjection/InputInjection.win.cpp")
+	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/VideoCapture/VideoCapture.win.cpp")
 elseif (UNIX)
 	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/InputInjection/InputInjection.lin.cpp")
 	list(APPEND IRSENY_NATIVE_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/VideoCapture/VideoCapture.lin.cpp")
@@ -92,8 +110,14 @@ target_link_libraries(${IRSENY_NATIVE} PUBLIC "${IRSENY_LINKER_FLAGS}")
 target_link_libraries(${IRSENY_NATIVE} PUBLIC "${IRSENY_LIBS}")
 target_compile_definitions(${IRSENY_NATIVE} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
 # installation
-install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_LIB_DIR}")
+install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_LIB_DIR}/Irseny.Native")
 install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_BIN_DIR}")
+message("runtime libs: ${OpenCV_RUNTIME_LIBS}")
+if ((WITH_OPENCV OR WITH_LOCAL_OPENCV) AND DEFINED OpenCV_RUNTIME_LIBS)
+	foreach (_LIB ${OpenCV_RUNTIME_LIBS})
+		install(FILES "${_LIB}" DESTINATION "${IRSENY_BIN_DIR}")
+	endforeach()
+endif()
 
 # optional FreetrackTest
 if (WITH_FREETRACK_TEST)

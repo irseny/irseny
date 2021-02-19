@@ -17,7 +17,7 @@
 		"shx": "^0.3.2"
 	},
 	"scripts": {
-		"install": "npm install --prefix irseny.bootstrap/",
+		"install": "cd irseny.bootstrap && npm install",
 		"build": "npm run bootstrap-build",
 		"bootstrap-build": "npm run dist --prefix irseny.bootstrap/",
 		"deploy": "npm-run-all --parallel bootstrap-copy angularjs-copy popper-copy jquery-copy",

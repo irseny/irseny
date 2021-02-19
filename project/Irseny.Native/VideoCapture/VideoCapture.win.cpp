@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifdef LINUX
+#ifdef WINDOWS
 #include "VideoCapture.h"
 #include <cstring>
 
@@ -215,9 +215,9 @@ IRS_VideoCapture* irsCreateVideoCapture(IRS_VideoCaptureContext* context, IRS_Vi
 	result->Settings.Resolution[0] = width;
 	result->Settings.Resolution[1] = height;
 	//result->Settings.FrameRate = fps;
-	result->Settings.Brightness = bright;
-	result->Settings.Gain = gain;
-	result->Settings.Exposure = exposure;
+	result->Settings.Brightness = (int)bright;
+	result->Settings.Gain = (int)gain;
+	result->Settings.Exposure = (int)exposure;
 	result->CurrentFrame = frame - 1;
 
 	return result;
@@ -321,4 +321,4 @@ bool irsCopyVideoCaptureFrame(IRS_VideoCaptureFrame* frame, char* buffer, size_t
 	memcpy(buffer, frame->data, frameSize);
 	return true;
 }
-#endif // LINUX
+#endif // WINDOWS

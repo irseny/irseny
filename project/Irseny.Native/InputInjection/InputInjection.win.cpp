@@ -25,7 +25,7 @@ WORD ivjKeyCodes[IVJ_KEYBOARD_KEY_NO] = {
 };
 void ivjLogError(const char* message);
 
-EXTRACK_EXPORT IvjContext* ivjCreateContext() {
+IRSENY_EXPORT IvjContext* ivjCreateContext() {
 	IvjContext* result = (IvjContext*)malloc(sizeof(IvjContext));
 	memset(result, 0, sizeof(IvjContext));
 #if WITH_FREETRACK
@@ -49,7 +49,7 @@ EXTRACK_EXPORT IvjContext* ivjCreateContext() {
 #endif // WITH_FREETRACK
 	return result;
 }
-EXTRACK_EXPORT bool ivjDestroyContext(IvjContext* context) {
+IRSENY_EXPORT bool ivjDestroyContext(IvjContext* context) {
 	if (context == NULL) {
 		return true;
 	}
@@ -64,23 +64,23 @@ EXTRACK_EXPORT bool ivjDestroyContext(IvjContext* context) {
 	free(context);
 	return true;
 }
-EXTRACK_EXPORT IvjKeyboardConstructionInfo* ivjAllocKeyboardConstructionInfo() {
+IRSENY_EXPORT IvjKeyboardConstructionInfo* ivjAllocKeyboardConstructionInfo() {
 	return (IvjKeyboardConstructionInfo*)1;
 }
-EXTRACK_EXPORT bool ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info) {
+IRSENY_EXPORT bool ivjFreeKeyboardConstructionInfo(IvjKeyboardConstructionInfo* info) {
 	//free(info);
 	return true;
 }
-EXTRACK_EXPORT IvjKeyboard* ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
+IRSENY_EXPORT IvjKeyboard* ivjConnectKeyboard(IvjContext* context, IvjKeyboardConstructionInfo* info) {
 	IvjKeyboard* keyboard = (IvjKeyboard*)malloc(sizeof(IvjKeyboard));
 	keyboard->BufferedEventNo = 0;
 	return keyboard;
 }
-EXTRACK_EXPORT bool ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
+IRSENY_EXPORT bool ivjDisconnectKeyboard(IvjContext* context, IvjKeyboard* keyboard) {
 	free(keyboard);
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
+IRSENY_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, bool pressed) {
 	if (keyIndex < 0 || keyIndex >= IVJ_KEYBOARD_KEY_NO) {
 		return false;
 	}
@@ -104,7 +104,7 @@ EXTRACK_EXPORT bool ivjSetKeyboardKey(IvjKeyboard* keyboard, int32_t keyIndex, b
 	keyboard->BufferedEventNo += 1;
 	return true;
 }
-EXTRACK_EXPORT bool ivjSendKeyboard(IvjKeyboard* keyboard) {
+IRSENY_EXPORT bool ivjSendKeyboard(IvjKeyboard* keyboard) {
 	bool result = true;
 	if (keyboard->BufferedEventNo < 1) {
 		return true;
@@ -122,13 +122,13 @@ EXTRACK_EXPORT bool ivjSendKeyboard(IvjKeyboard* keyboard) {
 	return  result;
 }
 #if WITH_FREETRACK
-EXTRACK_EXPORT IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo() {
+IRSENY_EXPORT IvjFreetrackConstructionInfo* ivjAllocFreetrackConstructionInfo() {
 	return (IvjFreetrackConstructionInfo*)1;
 }
-EXTRACK_EXPORT bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info) {
+IRSENY_EXPORT bool ivjFreeFreetrackConstructionInfo(IvjFreetrackConstructionInfo* info) {
 	return true;
 }
-EXTRACK_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info) {
+IRSENY_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* context, IvjFreetrackConstructionInfo* info) {
 	if (context->FreetrackFile == NULL || context->FreetrackSync == NULL) {
 		return NULL;
 	}
@@ -149,14 +149,14 @@ EXTRACK_EXPORT IvjFreetrackInterface* ivjConnectFreetrackInterface(IvjContext* c
 	// the stored axis and point values stay 0
 	return result;
 }
-EXTRACK_EXPORT bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack) {
+IRSENY_EXPORT bool ivjDisconnectFreetrackInterface(IvjContext* context, IvjFreetrackInterface* freetrack) {
 	if (freetrack->Map != NULL) {
 		UnmapViewOfFile(freetrack->Map);
 	}
 	free(freetrack);
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height) {
+IRSENY_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, int width, int height) {
 	if (width < 0 || height < 0) {
 		return false;
 	}
@@ -164,7 +164,7 @@ EXTRACK_EXPORT bool ivjSetFreetrackResolution(IvjFreetrackInterface* freetrack, 
 	freetrack->Packet.Resolution[1] = height;
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
+IRSENY_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int pointIndex, int x, int y) {
 	if (pointIndex < 0 || pointIndex >= IVJ_FREETRACK_POINT_NO) {
 		return false;
 	}
@@ -172,7 +172,7 @@ EXTRACK_EXPORT bool ivjSetFreetrackPoint(IvjFreetrackInterface* freetrack, int p
 	freetrack->Packet.Points[pointIndex][1] = (float)y;
 	return true;
 }
-EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
+IRSENY_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int axisIndex, float smooth, float raw) {
 	if (axisIndex < 0 || axisIndex >= IVJ_FREETRACK_AXIS_NO) {
 		return false;
 	}
@@ -180,7 +180,7 @@ EXTRACK_EXPORT bool ivjSetFreetrackAxis(IvjFreetrackInterface* freetrack, int ax
 	freetrack->Packet.RawAxes[axisIndex] = raw;
 	return true;
 }
-EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
+IRSENY_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) {
 	if (WaitForSingleObject(freetrack->Sync, 16) != WAIT_OBJECT_0) {
 		ivjLogError("Failed to lock shared freetrack mutex");
 		// timeout or error
@@ -198,19 +198,19 @@ EXTRACK_EXPORT bool ivjSendFreetrackInterface(IvjFreetrackInterface* freetrack) 
 }
 #endif // WITH_FREETRACK
 #if WITH_VJOY
-EXTRACK_EXPORT IvjJoystickConstructionInfo* ivjAllocJoystickConstructionInfo() {
+IRSENY_EXPORT IvjJoystickConstructionInfo* ivjAllocJoystickConstructionInfo() {
 	IvjJoystickConstructionInfo* result = (IvjJoystickConstructionInfo*)malloc(sizeof(IvjJoystickConstructionInfo));
 	result->JoystickIndex = 0;
 	return result;
 }
-EXTRACK_EXPORT bool ivjSetJoystickIndex(IvjJoystickConstructionInfo* info, int joyIndex) {
+IRSENY_EXPORT bool ivjSetJoystickIndex(IvjJoystickConstructionInfo* info, int joyIndex) {
 	if (joyIndex < 0) {
 		return false;
 	}
 	info->JoystickIndex = joyIndex;
 	return true;
 }
-EXTRACK_EXPORT bool ivjFreeJoystickConstructionInfo(IvjJoystickConstructionInfo* info) {
+IRSENY_EXPORT bool ivjFreeJoystickConstructionInfo(IvjJoystickConstructionInfo* info) {
 	free(info);
 	return true;
 }

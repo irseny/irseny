@@ -1,0 +1,6 @@
+This folder is supposed to contain the whole OpenCV build content including:
+doc
+include
+x64
+LICENSE
+OpenCVConfig.cmake
