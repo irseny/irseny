@@ -130,7 +130,7 @@ namespace Irseny.Main.Webface.LiveWire {
 				{
 					var dataEntry = JsonString.CreateDict();
 					{
-						if (includeImage) {
+						if (includeImage && imageString.Length > 2) {
 							dataEntry.AddTerminal("image", imageString);
 						}
 						dataEntry.AddTerminal("frameWidth", JsonString.Stringify(frame.Width));
@@ -156,9 +156,9 @@ namespace Irseny.Main.Webface.LiveWire {
 		private string CompressImage(VideoFrame frame) {
 			if (frame.PixelData == null || frame.Width <= 0 || frame.Height <= 0) {
 				// missing image data
-				return string.Empty;
+				return null;
 			}
-			string result = string.Empty;
+			string result = null;
 			PixelFormat bitmapFormat = VideoFrame.GetBitmapFormat(frame.PixelFormat);
 			int pixelSize = VideoFrame.GetPixelSize(frame.PixelFormat);
 			int imageSize = frame.Width*frame.Height*pixelSize;

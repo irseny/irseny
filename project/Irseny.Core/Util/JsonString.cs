@@ -20,6 +20,7 @@ using System.Text;
 using System.Collections.Generic;
 
 namespace Irseny.Core.Util {
+	
 	public partial class JsonString {
 		Dictionary<string, object> dict = null;
 		List<object> array = null;
@@ -165,6 +166,7 @@ namespace Irseny.Core.Util {
 		public void AddTerminal(string key, string value) {
 			if (key == null) throw new ArgumentNullException("key");
 			if (value == null) throw new ArgumentNullException("value");
+			if (value.Length == 0) throw new ArgumentException("String is empty", "value");
 			switch (Type) {
 			case JsonStringType.Array:
 				array.Add(value);
