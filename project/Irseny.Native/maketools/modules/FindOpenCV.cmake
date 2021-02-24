@@ -1,5 +1,22 @@
+# ----------------------------
+# This file is part of Irseny.
+#
+# Copyright (C) 2021  Thilo Gabel
+#
+# Irseny is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Irseny is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ----------------------------------------------------------------------
 
-# -----------------
 # This script works with the existing OpenCVConfig.cmake from your specific Windows OpenCV build
 # and tries to circumvent unconsidered shortcomings
 # These include:
@@ -9,6 +26,7 @@
 #
 # This script does not handle:
 # - finding debug libraries
+# - dependencies between runtime libraries
 
 # This script can be configured with these variables:
 # OpenCV_FIND_RUNTIME_LIBS - also search for runtime libraries AKA .dlls on Windows platforms
@@ -28,14 +46,21 @@
 # OpenCV_LINK_LIB_DIR - directory containsing OpenCV link libraries
 # OpenCV_RUNTIME_LIB_DIR - directory containing OpenCV runtime libraries
 # OpenCV_STATIC_LIB_DIR - directory containing static OpenCV libraries
-# OpenCV_INCLUDE_DIR - directories with OpenCV headers
+# OpenCV_INCLUDE_DIRS - directories with OpenCV headers
 
 # OpenCV_VERSION
 # OpenCV_VERSION_MAJOR
 # OpenCV_VERSION_MINOR
 # OpenCV_VERSION_PATCH
 # OpenCV_VERSION_TWEAK
-# --------------------
+
+# Advanced variables from OpenCVConfig.cmake
+# OpenCV_SHARED
+# OpenCV_CONFIG_PATH
+# OpenCV_LIB_COMPONENTS
+
+# (source: OpenCV 2.4.13.6 Windows release)
+# -----------------------------------------
 
 include(FindPackageHandleStandardArgs)
 
@@ -332,14 +357,32 @@ if (EXISTS "${_OpenCV_RUNTIME_DIR}/bin")
 	set(OpenCV_RUNTIME_LIB_DIR "${_OpenCV_RUNTIME_DIR}/bin")
 endif()
 
+
 # setup some more configuration variables
 set(_OpenCV_FIND_RUNTIME_LIBS ${OpenCV_FIND_RUNTIME_LIBS} AND ${MSVC} AND NOT ${OpenCV_STATIC})
 set(_OpenCV_FIND_STATIC_LIBS ${OpenCV_STATIC})
 set(_OpenCV_FIND_LINK_LIBS NOT ${OpenCV_STATIC})
 set(OpenCV_LINK_LIBS)
 set(OpenCV_RUNTIME_LIBS)
+set(_OpenCV_REQUIRED_RUNTIME_LIBS)
 set(OpenCV_STATIC_LIBS)
 set(_OpenCV_REQUIRED_LIB_VARS)
+
+# handle dependencies between runtime libraries
+# simply searching for all pendants of link libs does not always suffice
+# for example in version 2.4 opencv_highgui.dll also depends on opencv_imgproc.dll
+# not sure why these are not an issue during linking
+# note that this code is only a workaround that works with the current dependencies in Irseny
+# and only solves a fraction of the possible dependencies
+# disabled -> for now the user must know and specify all dependencies as components
+if (_OpenCV_FIND_RUNTIME_LIBS)
+	set(_OpenCV_REQUIRED_RUNTIME_LIBS "${OpenCV_LIBS}")
+	# foreach (_LIB ${OpenCV_LIBS})
+		# if (_LIB STREQUAL "opencv_highgui")
+			# list(APPEND _OpenCV_REQUIRED_RUNTIME_LIBS "opencv_imgproc")
+		# endif()
+	# endforeach()
+endif()
 
 # search for library files in the previously determined library folders
 # search for link libs
@@ -360,13 +403,13 @@ if (_OpenCV_FIND_LINK_LIBS)
 		endif()
 	endforeach()
 	if (_OpenCV_MISSING_LINK_LIBS AND NOT OpenCV_FIND_QUIETLY)
-		message(SEND_ERROR "OpenCV libraries not found: ${_OpenCV_MISSING_LINK_LIBS}")
+		message(SEND_ERROR "OpenCV libraries not found: ${_OpenCV_MISSING_LINK_LIBS} in ${OpenCV_LINK_LIB_DIR}")
 	endif()
 endif()
 # search for runtime libs
 if (_OpenCV_FIND_RUNTIME_LIBS)
 	set(_OpenCV_MISSING_RUNTIME_LIBS)
-	foreach (_LIB ${OpenCV_LIBS})
+	foreach (_LIB ${_OpenCV_REQUIRED_RUNTIME_LIBS})
 		list(APPEND _OpenCV_REQUIRED_LIB_VARS "OpenCV_${_LIB}_RUNTIME_LIB")
 		# since dlls are uninteresting to the compiler find_library does not consider them
 		# we only find runtime libraries with find_file
@@ -380,7 +423,7 @@ if (_OpenCV_FIND_RUNTIME_LIBS)
 		endif()
 	endforeach()
 	if (_OpenCV_MISSING_RUNTIME_LIBS AND NOT OpenCV_FIND_QUIETLY)
-		message(SEND_ERROR "OpenCV runtime libraries not found: ${_OpenCV_MISSING_RUNTIME_LIBS}")
+		message(SEND_ERROR "OpenCV runtime libraries not found: ${_OpenCV_MISSING_RUNTIME_LIBS} in ${OpenCV_RUNTIME_LIB_DIR}")
 	endif()
 endif()
 # search for static libs
@@ -398,7 +441,7 @@ if (_OpenCV_FIND_STATIC_LIBS)
 		endif()
 	endforeach()
 	if (_OpenCV_MISSING_STATIC_LIBS AND NOT OpenCV_FIND_QUIETLY)
-		message(SEND_ERROR "OpenCV static libraries not found: ${_OpenCV_MISSING_STATIC_LIBS}")
+		message(SEND_ERROR "OpenCV static libraries not found: ${_OpenCV_MISSING_STATIC_LIBS} in ${OpenCV_STATIC_LIB_DIR}")
 	endif()
 endif()
 

@@ -142,8 +142,5 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <Folder Include="Tracking\HeadTracking\" />
-    <Folder Include="Shared\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

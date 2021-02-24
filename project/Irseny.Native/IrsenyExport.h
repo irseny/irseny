@@ -23,7 +23,8 @@
 
 #if WINDOWS
 //#define IRSENY_EXPORT __attribute__(stdcall)
-#define IRSENY_EXPORT __declspec(dllexport)
+//#error "__declspec(dllexport)"
+#define IRSENY_EXPORT extern "C" __declspec(dllexport)
 #endif
 
 #endif // IRSENY_EXPORT
