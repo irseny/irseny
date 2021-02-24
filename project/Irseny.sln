@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Main", "Irseny.Main\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irseny.Core", "Irseny.Core\Irseny.Core.csproj", "{079C6237-47C4-40CA-B93F-9C47AB4F1767}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Irseny.Native", "Irseny.Native\Irseny.Native.vcxproj", "{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}"
-EndProject
 Project("{2857B73E-F847-4B02-9238-064979017E93}") = "Irseny.Native", "Irseny.Native\Irseny.Native.cproj", "{ECBC1092-536A-48E8-92FE-547AEA036156}"
 EndProject
 Global
@@ -35,10 +33,6 @@ Global
 		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsDebug|AnyCPU.Build.0 = WindowsDebug|Any CPU
 		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|Any CPU
 		{079C6237-47C4-40CA-B93F-9C47AB4F1767}.WindowsRelease|AnyCPU.Build.0 = WindowsRelease|Any CPU
-		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.LinuxDebug|AnyCPU.ActiveCfg = WindowsDebug|x64
-		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.LinuxRelease|AnyCPU.ActiveCfg = WindowsRelease|x64
-		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsDebug|AnyCPU.ActiveCfg = WindowsDebug|x64
-		{09F3BB45-168E-4CBB-9987-DB59F1CD8B51}.WindowsRelease|AnyCPU.ActiveCfg = WindowsRelease|x64
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.LinuxRelease|AnyCPU.ActiveCfg = LinuxRelease|Any CPU
 		{ECBC1092-536A-48E8-92FE-547AEA036156}.WindowsDebug|AnyCPU.ActiveCfg = LinuxDebug|Any CPU

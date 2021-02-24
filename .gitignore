@@ -4,9 +4,9 @@ obj/*
 lib/*.dll
 lib/*.so
 lib/*.xml
-lib/Emgu.CV/*
+
 lib/opencv/*
-lib/Irseny.Native/*
+lib/irseny_native/*
 lib/webfront.bootstrap/node_modules/*
 lib/bootstrap/*
 lib/angularjs/*
