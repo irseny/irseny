@@ -12,12 +12,11 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\lib\Irseny.Native</OutputPath>
+    <OutputPath>..\..\obj\LinuxDebug</OutputPath>
     <OutputName>irseny_native</OutputName>
     <CompileTarget>SharedLibrary</CompileTarget>
     <Includes>
       <Includes>
-        <Include>${CombineDir}/../include</Include>
         <Include>${ProjectDir}</Include>
       </Includes>
     </Includes>
@@ -36,7 +35,7 @@
     <SourceDirectory>.</SourceDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'LinuxRelease|AnyCPU' ">
-    <OutputPath>..\..\lib\Irseny.Native</OutputPath>
+    <OutputPath>..\..\obj\LinuxRelease</OutputPath>
     <OutputName>irseny_native</OutputName>
     <CompileTarget>SharedLibrary</CompileTarget>
     <Includes>

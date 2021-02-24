@@ -20,6 +20,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project("Irseny.Native" CXX)
+set(CXX_STANDARD 11)
 
 # project paths
 get_filename_component(IRSENY_NATIVE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
@@ -76,17 +77,8 @@ if (WITH_OPENCV OR WITH_LOCAL_OPENCV)
 		find_package(OpenCV REQUIRED COMPONENTS core highgui imgproc)
 	endif()
 	
-	#message(DEBUG " mangled paths: ${OpenCV_USE_MANGLED_PATHS}")
 	list(APPEND IRSENY_LIBS "${OpenCV_LIBS}")
 	list(APPEND IRSENY_INCLUDE_DIRS "${OpenCV_INCLUDE_DIRS}")
-	
-	#message(DEBUG " opencv version: ${OpenCV_VERSION}|${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}" )
-	#message(DEBUG " opencv suffix: ${OpenCV_MODULES_SUFFIX}")
-	#message(DEBUG " opencv libs are: ${OpenCV_LIBS}")
-	#message(DEBUG " opencv lib dir: ${OpenCV_LIB_DIR}")
-	#message(DEBUG " opencv components: ${OpenCV_LIB_COMPONENTS}")
-	#message(DEBUG " opencv include dir is: ${OpenCV_INCLUDE_DIRS}")
-	#message(DEBUG " mangled paths: ${OpenCV_USE_MANGLED_PATHS}")
 endif()
 # find vjoy
 if (WITH_VJOY)
@@ -120,7 +112,6 @@ if (WIN32)
 else()
 	set(IRSENY_NATIVE "irseny_native")
 endif()
-set(CXX_STANDARD 11)
 add_library(${IRSENY_NATIVE} SHARED ${IRSENY_NATIVE_SOURCE_FILES})
 target_include_directories(${IRSENY_NATIVE} PUBLIC "${IRSENY_NATIVE_DIR}")
 target_include_directories(${IRSENY_NATIVE} PUBLIC "${IRSENY_INCLUDE_DIRS}")
@@ -131,8 +122,7 @@ target_compile_definitions(${IRSENY_NATIVE} PUBLIC "${IRSENY_COMPILE_DEFINITIONS
 # installation
 install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_LIB_DIR}/irseny_native")
 install(TARGETS ${IRSENY_NATIVE} DESTINATION "${IRSENY_BIN_DIR}")
-message("runtime libs: ${OpenCV_RUNTIME_LIBS}")
-if ((WITH_OPENCV OR WITH_LOCAL_OPENCV) AND DEFINED OpenCV_RUNTIME_LIBS)
+if (WITH_LOCAL_OPENCV AND DEFINED OpenCV_RUNTIME_LIBS)
 	foreach (_LIB ${OpenCV_RUNTIME_LIBS})
 		install(FILES "${_LIB}" DESTINATION "${IRSENY_BIN_DIR}")
 	endforeach()
