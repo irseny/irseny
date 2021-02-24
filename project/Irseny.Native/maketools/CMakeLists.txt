@@ -96,6 +96,9 @@ endif()
 if (WITH_UINPUT)
 	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_UINPUT")
 endif()
+if (WITH_EVDEV)
+	list(APPEND IRSENY_COMPILE_DEFINITIONS "WITH_EVDEV")
+endif()
 
 # Irseny.Native
 # source files
@@ -128,22 +131,39 @@ if (WITH_LOCAL_OPENCV AND DEFINED OpenCV_RUNTIME_LIBS)
 	endforeach()
 endif()
 
-# optional FreetrackTest
-if (WITH_FREETRACK_TEST)
-	# source files
-	if (WIN32)
-		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest/FreetrackTest.win.cpp")
-	elseif(UNIX)
-		list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest/FreetrackTest.lin.cpp")
+# optional functionality tests
+if (BUILD_TESTING)
+	# freetrack packet receiver
+	if (WITH_FREETRACK)
+		# source files
+		if (WIN32)
+			list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Tests/Freetrack/FreetrackTest.win.cpp")
+		elseif(UNIX)
+			list(APPEND FREETRACK_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Tests/Freetrack/FreetrackTest.lin.cpp")
+		endif()
+		# target
+		set(FREETRACK_TEST "FreetrackTest")
+		add_executable(${FREETRACK_TEST} "${FREETRACK_TEST_SOURCE_FILES}")
+		#target_include_directories(${FREETRACK_TEST} PUBLIC "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest")
+		# compiler options
+		target_compile_options(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
+		target_link_libraries(${FREETRACK_TEST} PUBLIC "${IRSENY_LINKER_FLAGS}")
+		target_compile_definitions(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
+		# skip installation, only available from the build folder
+		# install(TARGETS ${FREETRACK_TEST} DESTINATION "${IRSENY_BIN_DIR}")
 	endif()
-	# target
-	set(FREETRACK_TEST "FreetrackTest")
-	add_executable(${FREETRACK_TEST} "${FREETRACK_TEST_SOURCE_FILES}")
-	#target_include_directories(${FREETRACK_TEST} PUBLIC "${IRSENY_NATIVE_SOURCE_DIR}/FreetrackTest")
-	# compiler options
-	target_compile_options(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
-	target_link_libraries(${FREETRACK_TEST} PUBLIC "${IRSENY_LINKER_FLAGS}")
-	target_compile_definitions(${FREETRACK_TEST} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
-	# installation
-	install(TARGETS ${FREETRACK_TEST} DESTINATION "${IRSENY_BIN_DIR}")
+
+	# webcam testing
+	if (WITH_OPENCV)
+		if (WIN32)
+			list(APPEND VIDEO_CAPTURE_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Tests/VideoCapture/VideoCaptureTest.win.cpp")
+		elseif (UNIX)
+			list(APPEND VIDEO_CAPTURE_TEST_SOURCE_FILES "${IRSENY_NATIVE_SOURCE_DIR}/Tests/VideoCapture/VideoCaptureTest.lin.cpp")
+		endif()
+		set(VIDEO_CAPTURE_TEST "VideoCaptureTest")
+		add_executable(${VIDEO_CAPTURE_TEST} "${VIDEO_CAPTURE_TEST_SOURCE_FILES}")
+		target_compile_options(${VIDEO_CAPTURE_TEST} PUBLIC "${IRSENY_COMPILE_OPTIONS}")
+		target_link_libraries(${VIDEO_CAPTURE_TEST} PUBLIC "${IRSENY_LINKER_FLAGS};${IRSENY_LIBS};${IRSENY_NATIVE}")
+		target_compile_definitions(${VIDEO_CAPTURE_TEST} PUBLIC "${IRSENY_COMPILE_DEFINITIONS}")
+	endif()
 endif()
